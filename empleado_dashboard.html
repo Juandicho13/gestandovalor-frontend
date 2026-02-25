@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Empleado - GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B', 
+                        gold: '#D4AF37', 
+                        lightGray: '#F9FAFB',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-lightGray">
+
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+        <a href="empleado_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            <a href="empleado_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi Panel</a>
+            <a href=" " class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
+            <div class="h-5 w-px bg-white/20 ml-2"></div>
+            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Cerrar Sesión
+            </a>
+        </div>
+
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                E
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Gestión de Limpieza</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Equipo de Aseo 👋</h1>
+                    <p class="text-gray-400 mt-2">Aquí tienes el resumen de tus tareas de limpieza para hoy.</p>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-white/20 text-center backdrop-blur-md">
+                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Fecha Actual</p>
+                    <p class="text-xl font-extrabold text-gold">17 Feb, 2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-6">
+                    <div class="w-14 h-14 bg-navy/5 rounded-2xl flex items-center justify-center text-navy">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Aseos Pendientes</p>
+                        <p class="text-3xl font-extrabold text-navy">5</p>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-6">
+                    <div class="w-14 h-14 bg-gold/10 rounded-2xl flex items-center justify-center text-gold">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Completados Hoy</p>
+                        <p class="text-3xl font-extrabold text-navy">2</p>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-6">
+                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Reportes de Daños</p>
+                        <p class="text-3xl font-extrabold text-navy">1</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-extrabold text-navy mb-6">Agenda de Limpieza</h2>
+            <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
+                
+                <div class="p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-navy">Aseo Apartamento 511</h3>
+                            <p class="text-gray-500 text-sm">Torre A - Chía</p>
+                            <span class="inline-block mt-2 text-xs font-bold bg-red-100 text-red-700 px-3 py-1 rounded-full">Limpieza de Salida (Urgente)</span>
+                        </div>
+                    </div>
+                    <button class="bg-navy hover:bg-gold text-white font-bold py-3 px-8 rounded-full transition-colors w-full md:w-auto">Comenzar</button>
+                </div>
+
+                <div class="p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-navy">Aseo Apartamento 716</h3>
+                            <p class="text-gray-500 text-sm">Edificio Central - Bogotá</p>
+                            <span class="inline-block mt-2 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Limpieza Programada</span>
+                        </div>
+                    </div>
+                    <button class="bg-navy hover:bg-gold text-white font-bold py-3 px-8 rounded-full transition-colors w-full md:w-auto">Comenzar</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[550px]'; 
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10'); 
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

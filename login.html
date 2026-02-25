@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B', 
+                        gold: '#D4AF37', 
+                        lightGray: '#F9FAFB'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-navy" x-data="{ openContact: false }">
+
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
+            <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
+            <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
+            
+            <div class="h-5 w-px bg-white/20 ml-2"></div>
+            
+            <a href="login.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1 ml-2">Iniciar Sesión</a>
+        </div>
+
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <a href="index.html#contacto" class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</a>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden bg-navy">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover opacity-10">
+        </div>
+        
+        <div class="relative z-10 w-full max-w-md px-6">
+            <div class="bg-white rounded-[40px] p-10 md:p-12 shadow-2xl border border-gray-100 transform transition-all hover:shadow-gold/10 hover:shadow-2xl">
+                
+                <div class="text-center mb-10">
+                    <div class="w-16 h-16 bg-navy rounded-2xl flex items-center justify-center shadow-inner mx-auto mb-6">
+                        <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <h1 class="text-3xl font-extrabold text-navy tracking-tight mb-2">Portal GV</h1>
+                    <p class="text-gray-500 text-sm">Ingresa a tu espacio de trabajo o inversión.</p>
+                </div>
+
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 pl-2">Usuario o Correo</label>
+                        <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors" required>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2 pl-2 pr-2">
+                            <label for="password" class="block text-xs font-bold uppercase tracking-widest text-gray-500">Contraseña</label>
+                            <a href="#" class="text-xs font-bold text-gold hover:text-navy transition-colors">¿Olvidaste tu contraseña?</a>
+                        </div>
+                        <input type="password" id="password" name="password" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors" required>
+                    </div>
+
+                    <div class="flex items-center pl-2">
+                        <input type="checkbox" id="remember" class="w-4 h-4 text-gold border-gray-300 rounded focus:ring-gold focus:ring-2 accent-gold cursor-pointer">
+                        <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer">Recordar mis datos</label>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold text-lg py-5 rounded-full shadow-lg transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300 active:scale-95">
+                            Acceder al sistema
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                    <p class="text-sm text-gray-500">¿Aún no eres propietario GestandoValor?</p>
+                    <a href="index.html#contacto" class="text-sm font-bold text-navy hover:text-gold transition-colors mt-1 inline-block">Agenda una asesoría gratuita</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. LÓGICA DE LA BARRA DE NAVEGACIÓN
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[760px]';
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10'); 
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                }
+            });
+
+            // 2. LÓGICA DE REDIRECCIÓN DE ROLES CON VALIDACIÓN DE CONTRASEÑA
+            const loginForm = document.getElementById('loginForm');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Evita que la página se recargue por defecto
+                
+                // Obtenemos el correo y la contraseña ingresada
+                const emailIngresado = document.getElementById('email').value.toLowerCase().trim();
+                const passwordIngresada = document.getElementById('password').value;
+                
+                // Validar la contraseña primero
+                if (passwordIngresada !== '12345678') {
+                    alert('Contraseña incorrecta. Por favor, intenta de nuevo.');
+                    return; // Detiene el código aquí si la contraseña está mal
+                }
+
+                // Si la contraseña es correcta, hacemos la redirección condicional
+                if (emailIngresado === 'admin@ejemplo.com') {
+                    window.location.href = 'admin_dashboard.html';
+                } 
+                else if (emailIngresado === 'amadellaves@ejemplo.com') {
+                    window.location.href = 'ama_llaves_dashboard.html';
+                } 
+                else if (emailIngresado === 'empleado@ejemplo.com') {
+                    window.location.href = 'empleado_dashboard.html';
+                } 
+                else {
+                    // Si es cualquier otro correo (con la contraseña correcta), lo tratamos como propietario
+                    window.location.href = 'propietario_dashboard.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

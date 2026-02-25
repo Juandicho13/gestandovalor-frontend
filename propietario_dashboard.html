@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Inversionista - GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B', 
+                        gold: '#D4AF37', 
+                        lightGray: '#F9FAFB',
+                        success: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-lightGray">
+
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+        <a href="propietario_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            <a href="propietario_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi Rentabilidad</a>
+            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Mis Propiedades</a>
+            
+            <div class="h-5 w-px bg-white/20 ml-2"></div>
+            
+            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Cerrar Sesión
+            </a>
+        </div>
+
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                P
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(#D4AF37 1px, transparent 1px); background-size: 30px 30px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Portal de Inversionista</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Propietario 📈</h1>
+                    <p class="text-gray-400 mt-2">Este es el rendimiento de tu Apartasuite en el mes actual.</p>
+                </div>
+                <div class="bg-white/10 p-5 rounded-[30px] border border-white/20 text-right backdrop-blur-md">
+                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Próximo Pago Estimado</p>
+                    <p class="text-3xl font-extrabold text-gold">$3,450,000 <span class="text-sm text-gray-300 font-medium">COP</span></p>
+                    <p class="text-xs text-success font-bold mt-1">▲ +8% vs mes anterior</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 relative z-20">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex items-center gap-6 hover:-translate-y-1 transition-transform">
+                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-success flex-shrink-0">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ganancias Acumuladas</p>
+                        <p class="text-3xl font-extrabold text-navy">$2.8M <span class="text-sm font-medium text-gray-500">COP</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex items-center gap-6 hover:-translate-y-1 transition-transform">
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 flex-shrink-0">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ocupación Mensual</p>
+                        <p class="text-3xl font-extrabold text-navy">85% <span class="text-sm font-medium text-gray-500">(24 días)</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-navy p-8 rounded-[40px] shadow-xl border border-gold/30 flex items-center gap-6 hover:-translate-y-1 transition-transform">
+                    <div class="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center text-navy flex-shrink-0 shadow-lg">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-300 text-xs font-bold uppercase tracking-wider mb-1">Calificación Promedio</p>
+                        <p class="text-3xl font-extrabold text-white">4.96 <span class="text-sm font-medium text-gold">/ 5.0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-extrabold text-navy">Historial de Reservas (Febrero)</h2>
+                    </div>
+                    
+                    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                        
+                        <div class="p-6 md:p-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 font-bold">
+                                    Airbnb
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-navy">12 Feb - 15 Feb (3 Noches)</h3>
+                                    <p class="text-gray-500 text-sm">Tarifa dinámica aplicada (Alta Demanda)</p>
+                                </div>
+                            </div>
+                            <div class="text-left md:text-right">
+                                <p class="text-xl font-extrabold text-success">+$450,000</p>
+                                <span class="text-xs font-bold text-gray-400 uppercase">Completada</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 md:p-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center font-bold text-xs">
+                                    Booking
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-navy">05 Feb - 10 Feb (5 Noches)</h3>
+                                    <p class="text-gray-500 text-sm">Huésped internacional</p>
+                                </div>
+                            </div>
+                            <div class="text-left md:text-right">
+                                <p class="text-xl font-extrabold text-success">+$720,000</p>
+                                <span class="text-xs font-bold text-gray-400 uppercase">Completada</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-navy/5 border-l-4 border-gold">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center font-bold text-navy text-xs">
+                                    Directa
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-navy">16 Feb - 20 Feb (4 Noches)</h3>
+                                    <p class="text-gray-500 text-sm">Estadía vacacional</p> 
+                                </div>
+                            </div>
+                            <div class="text-left md:text-right">
+                                <p class="text-xl font-extrabold text-navy">+$600,000 <span class="text-sm font-medium text-gray-500">(Est)</span></p>
+                                <span class="text-xs font-bold text-gold uppercase animate-pulse">En curso</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-navy mb-6">Tus Liquidaciones</h2>
+                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-8">
+                            <div class="flex justify-between items-center pb-4 border-b border-gray-100 mb-4">
+                                <div>
+                                    <p class="font-bold text-navy">Enero 2026</p>
+                                    <p class="text-xs text-gray-400">Pagado el 05/02/26</p>
+                                </div>
+                                <button class="text-gold hover:text-navy transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                </button>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-navy">Diciembre 2025</p>
+                                    <p class="text-xs text-gray-400">Pagado el 05/01/26</p>
+                                </div>
+                                <button class="text-gold hover:text-navy transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[700px]'; 
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10'); 
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

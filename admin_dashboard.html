@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B', 
+                        gold: '#D4AF37', 
+                        lightGray: '#F9FAFB',
+                        danger: '#EF4444',
+                        success: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-lightGray">
+
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+        <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            <a href="admin_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi Panel</a>
+            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Propiedades</a>
+            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Finanzas</a>
+            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Equipo</a>
+            
+            <div class="h-5 w-px bg-white/20 ml-2"></div>
+            
+            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Salir
+            </a>
+        </div>
+
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform border-2 border-gold">
+                A
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+                <div>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Centro de Comando</span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Visión General</h1>
+                    <p class="text-gray-400 mt-3 text-lg">Control total de propiedades, ingresos y operaciones.</p>
+                </div>
+                <div class="flex gap-4">
+                    <button class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm">
+                        Descargar Reporte
+                    </button>
+                    <button class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm">
+                        + Nueva Reserva
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 -mt-10 relative z-20">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white p-8 rounded-[30px] shadow-xl border border-gray-100 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-success">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <span class="text-xs font-bold text-success bg-green-100 px-2 py-1 rounded-lg">+12% vs mes ant.</span>
+                    </div>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ingresos Brutos (Feb)</p>
+                    <p class="text-3xl font-extrabold text-navy">$24.5M <span class="text-sm font-medium text-gray-400">COP</span></p>
+                </div>
+
+                <div class="bg-white p-8 rounded-[30px] shadow-xl border border-gray-100 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ocupación Global</p>
+                    <p class="text-3xl font-extrabold text-navy">82% <span class="text-sm font-medium text-gray-400">Promedio</span></p>
+                </div>
+
+                <div class="bg-white p-8 rounded-[30px] shadow-xl border border-gray-100 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-navy/5 rounded-2xl flex items-center justify-center text-navy">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Propiedades Activas</p>
+                    <p class="text-3xl font-extrabold text-navy">12 <span class="text-sm font-medium text-gray-400">Listadas</span></p>
+                </div>
+
+                <div class="bg-navy p-8 rounded-[30px] shadow-xl border border-gold/30 hover:-translate-y-1 transition-transform relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-gold/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div class="w-12 h-12 bg-gold rounded-2xl flex items-center justify-center text-navy shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-xs font-bold uppercase tracking-wider mb-1 relative z-10">Atención Requerida</p>
+                    <p class="text-3xl font-extrabold text-white relative z-10">3 <span class="text-sm font-medium text-gold">Tareas</span></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-extrabold text-navy">Logística de Hoy</h2>
+                        <a href="#" class="text-sm font-bold text-gold hover:text-navy transition-colors">Ver calendario</a>
+                    </div>
+                    
+                    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-success flex-shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-success">Check-In • 15:00</span>
+                                    <h3 class="text-lg font-bold text-navy leading-tight">Suite Ejecutiva Chía</h3>
+                                    <p class="text-gray-500 text-sm">Huésped: Mariana G. • 2 Noches</p>
+                                </div>
+                            </div>
+                            <span class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">Aseo Completado</span>
+                        </div>
+
+                        <div class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-danger flex-shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-danger">Check-Out • 11:00</span>
+                                    <h3 class="text-lg font-bold text-navy leading-tight">Penthouse Bogotá</h3>
+                                    <p class="text-gray-500 text-sm">Huésped: Carlos R.</p>
+                                </div>
+                            </div>
+                            <span class="px-4 py-2 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">Aseo Pendiente</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-extrabold text-navy mb-6">Estado del Equipo</h2>
+                    
+                    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-8">
+                        <div class="space-y-6">
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-bold text-sm shadow-sm flex-shrink-0">E</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-navy">Equipo de Aseo</h4>
+                                    <p class="text-xs text-gray-500 mb-1">En Torre A - Chía</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                        <span class="text-xs font-bold text-blue-500">Limpiando Apto 511</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 pt-6 border-t border-gray-100">
+                                <div class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">AL</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-navy">Ama de Llaves (Supervisión)</h4>
+                                    <p class="text-xs text-gray-500 mb-1">Bogotá D.C.</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-success"></span>
+                                        <span class="text-xs font-bold text-success">Disponible</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <button class="w-full mt-8 bg-gray-50 hover:bg-gray-100 text-navy text-sm font-bold py-3 rounded-full transition-colors border border-gray-200">
+                            Asignar Tarea Rápida
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[700px]'; 
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10'); 
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
