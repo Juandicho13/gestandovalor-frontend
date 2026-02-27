@@ -16,128 +16,513 @@
                         navy: '#0B132B', 
                         gold: '#D4AF37', 
                         lightGray: '#F9FAFB',
-                        danger: '#EF4444'
+                        danger: '#EF4444',
+                        success: '#10B981',
+                        warning: '#F59E0B'
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="font-sans text-gray-800 antialiased bg-lightGray">
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="appAseo()">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="empleado_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
             <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
         </a>
         
         <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="empleado_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi Panel</a>
-            <a href=" " class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
             <div class="h-5 w-px bg-white/20 ml-2"></div>
             <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Cerrar Sesión
+                Salir
             </a>
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
             <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                E
+                EA
             </div>
         </div>
     </nav>
 
-    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden" x-show="!aseoActivo">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
                     <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Gestión de Limpieza</span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Equipo de Aseo 👋</h1>
-                    <p class="text-gray-400 mt-2">Aquí tienes el resumen de tus tareas de limpieza para hoy.</p>
-                </div>
-                <div class="bg-white/10 p-4 rounded-2xl border border-white/20 text-center backdrop-blur-md">
-                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Fecha Actual</p>
-                    <p class="text-xl font-extrabold text-gold">17 Feb, 2026</p>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Ricardo 👋</h1>
+                    <p class="text-gray-400 mt-2">Tienes <strong class="text-white">3 apartamentos</strong> asignados en tu ruta de hoy.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-12">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            
+    <section class="py-12 relative z-20 min-h-screen" x-show="!aseoActivo">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-6">
+                <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 flex items-center gap-6 transform transition hover:-translate-y-1">
                     <div class="w-14 h-14 bg-navy/5 rounded-2xl flex items-center justify-center text-navy">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                     </div>
                     <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Aseos Pendientes</p>
-                        <p class="text-3xl font-extrabold text-navy">5</p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Pendientes</p>
+                        <p class="text-3xl font-extrabold text-navy">2</p>
                     </div>
                 </div>
-                <div class="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-6">
+                <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 flex items-center gap-6 transform transition hover:-translate-y-1">
                     <div class="w-14 h-14 bg-gold/10 rounded-2xl flex items-center justify-center text-gold">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     </div>
                     <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Completados Hoy</p>
-                        <p class="text-3xl font-extrabold text-navy">2</p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Completados</p>
+                        <p class="text-3xl font-extrabold text-navy">0</p>
                     </div>
                 </div>
-                <div class="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-6">
-                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 flex items-center gap-6 transform transition hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-danger">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     </div>
                     <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Reportes de Daños</p>
-                        <p class="text-3xl font-extrabold text-navy">1</p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Daños Reportados</p>
+                        <p class="text-3xl font-extrabold text-navy">0</p>
                     </div>
                 </div>
             </div>
 
-            <h2 class="text-2xl font-extrabold text-navy mb-6">Agenda de Limpieza</h2>
-            <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
-                
-                <div class="p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-navy">Aseo Apartamento 511</h3>
-                            <p class="text-gray-500 text-sm">Torre A - Chía</p>
-                            <span class="inline-block mt-2 text-xs font-bold bg-red-100 text-red-700 px-3 py-1 rounded-full">Limpieza de Salida (Urgente)</span>
-                        </div>
+            <div class="space-y-6">
+                <h2 class="text-2xl font-extrabold text-navy mb-6">Agenda asignada</h2>
+
+                <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="bg-red-50 px-6 py-3 flex items-center justify-between border-b border-red-100">
+                        <span class="text-danger font-extrabold text-xs uppercase tracking-widest flex items-center gap-2">
+                            🔥 Urgente
+                        </span>
+                        <span class="text-xs font-bold text-red-400">Check-in: 3:00 PM</span>
                     </div>
-                    <button class="bg-navy hover:bg-gold text-white font-bold py-3 px-8 rounded-full transition-colors w-full md:w-auto">Comenzar</button>
+                    <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-3 mb-2">
+                                <h3 class="text-xl font-bold text-navy flex items-center gap-3">
+                                    Apto 511
+                                    <span class="bg-gray-100 text-gray-600 text-xs font-mono px-2 py-1 rounded-md border border-gray-200">🔑 1492 #</span>
+                                </h3>
+                            </div>
+                            <p class="text-gray-500 text-sm">Torre A - Chía</p>
+                        </div>
+                        <button @click="iniciarAseo('Apto 511')" class="w-full md:w-auto bg-navy hover:bg-blue-900 text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2 flex-shrink-0">
+                            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Iniciar Aseo
+                        </button>
+                    </div>
                 </div>
 
-                <div class="p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-navy">Aseo Apartamento 716</h3>
-                            <p class="text-gray-500 text-sm">Edificio Central - Bogotá</p>
-                            <span class="inline-block mt-2 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Limpieza Programada</span>
-                        </div>
+                <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="bg-yellow-50 px-6 py-3 flex items-center justify-between border-b border-yellow-100">
+                        <span class="text-warning font-extrabold text-xs uppercase tracking-widest flex items-center gap-2">
+                            ⚡ Normal
+                        </span>
                     </div>
-                    <button class="bg-navy hover:bg-gold text-white font-bold py-3 px-8 rounded-full transition-colors w-full md:w-auto">Comenzar</button>
+                    <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-3 mb-2">
+                                <h3 class="text-xl font-bold text-navy flex items-center gap-3">
+                                    Penthouse Bogotá
+                                    <span class="bg-gray-100 text-gray-600 text-xs font-mono px-2 py-1 rounded-md border border-gray-200">🔑 8899 *</span>
+                                </h3>
+                            </div>
+                            <p class="text-gray-500 text-sm">Bogotá D.C.</p>
+                        </div>
+                        <button @click="iniciarAseo('Penthouse Bogotá')" class="w-full md:w-auto bg-navy hover:bg-blue-900 text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2 flex-shrink-0">
+                            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Iniciar Aseo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="bg-gray-100 px-6 py-3 flex items-center justify-between border-b border-gray-200">
+                        <span class="text-gray-600 font-extrabold text-xs uppercase tracking-widest flex items-center gap-2">
+                            ☕ Flexible
+                        </span>
+                    </div>
+                    <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-3 mb-2">
+                                <h3 class="text-xl font-bold text-navy flex items-center gap-3">
+                                    Torre A
+                                </h3>
+                            </div>
+                            <p class="text-gray-500 text-sm">Chía</p>
+                        </div>
+                        <button @click="iniciarAseo('Torre A')" class="w-full md:w-auto bg-navy hover:bg-blue-900 text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2 flex-shrink-0">
+                            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Iniciar Aseo
+                        </button>
+                    </div>
                 </div>
 
             </div>
         </div>
     </section>
 
+    <section x-show="aseoActivo" style="display: none;" class="min-h-screen bg-white relative z-50 pt-24 pb-32">
+        
+        <div class="fixed top-0 left-0 w-full bg-navy text-white shadow-2xl z-50">
+            <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] text-gold uppercase tracking-widest font-bold">Limpiando ahora</p>
+                    <h2 class="text-lg font-extrabold truncate" x-text="nombreAseoActual"></h2>
+                </div>
+                <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
+                    <svg class="w-5 h-5 text-gold animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-2xl font-mono font-bold tracking-wider" x-text="tiempoFormateado"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto px-6 mt-8">
+            
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-8 sticky top-[88px] z-40">
+                <button @click="pestañaActiva = 'checklist'" 
+                        class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
+                        :class="pestañaActiva === 'checklist' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
+                    1. Checklist Tareas
+                </button>
+                <button @click="pestañaActiva = 'consumibles'" 
+                        class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
+                        :class="pestañaActiva === 'consumibles' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
+                    2. Consumibles
+                </button>
+            </div>
+
+            <div x-show="pestañaActiva === 'checklist'" x-transition.opacity class="pb-10">
+                
+                <div class="mb-8">
+                    <h3 class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🛏️ Habitaciones
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Cambio de sábanas y fundas limpias</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Revisión interior de armarios/gavetas</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Barrer y trapear pisos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🚿 Baños (Desinfección)
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Lavar y desinfectar inodoro y ducha</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Limpiar espejos sin dejar marcas</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Colocar toallas limpias (Cuerpo y manos)</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Vaciar papelera de baño</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🍳 Cocina
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Lavar, secar y guardar toda la loza</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Desengrasar estufa y mesones</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Revisar nevera (Tirar sobras, limpiar interior)</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura principal</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🛋️ Zonas Comunes (Sala/Comedor)
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Acomodar cojines y decoración</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Limpiar polvo en TV, mesas y repisas</span>
+                        </label>
+                        <label class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox" class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Barrer y trapear a fondo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button @click="modalReporte = true" class="mt-8 w-full bg-red-50 text-danger border border-red-200 font-bold py-4 rounded-xl hover:bg-red-100 transition flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Reportar Daño o Problema
+                </button>
+            </div>
+
+            <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
+                
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Insumos y Consumibles</h3>
+                <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento.</p>
+                
+                <div class="space-y-4 mb-10">
+                    
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🍬</span>
+                            <span class="font-bold text-navy">Sobres de Azúcar</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(azucar > 0) azucar--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="azucar"></span>
+                            <button @click="azucar++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🍵</span>
+                            <span class="font-bold text-navy">Sobres de Té</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(te > 0) te--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="te"></span>
+                            <button @click="te++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">☕</span>
+                            <span class="font-bold text-navy">Café</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(cafe > 0) cafe--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="cafe"></span>
+                            <button @click="cafe++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧻</span>
+                            <span class="font-bold text-navy">Papel Higiénico</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(papel > 0) papel--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="papel"></span>
+                            <button @click="papel++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧼</span>
+                            <span class="font-bold text-navy">Barra de Jabón</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(jabon_barra > 0) jabon_barra--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="jabon_barra"></span>
+                            <button @click="jabon_barra++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧴</span>
+                            <span class="font-bold text-navy">Shampoo</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(shampoo > 0) shampoo--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="shampoo"></span>
+                            <button @click="shampoo++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Reporte de Toallas</h3>
+                <p class="text-xs text-gray-500 mb-4">Lencería dejada en la propiedad.</p>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🛁</span>
+                            <span class="font-bold text-navy">Toallas Grandes</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(toallas_grandes > 0) toallas_grandes--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="toallas_grandes"></span>
+                            <button @click="toallas_grandes++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧺</span>
+                            <span class="font-bold text-navy">Toallas Pequeñas</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(toallas_pequenas > 0) toallas_pequenas--" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="toallas_pequenas"></span>
+                            <button @click="toallas_pequenas++" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="fixed bottom-0 left-0 w-full p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50">
+            <button @click="finalizarAseo()" class="w-full max-w-3xl mx-auto block bg-success hover:bg-green-600 text-white font-extrabold text-lg py-5 rounded-2xl shadow-lg shadow-green-200 transition-transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Finalizar Limpieza (Enviar Reporte)
+            </button>
+        </div>
+    </section>
+
+    <div x-show="modalReporte" style="display: none;" class="fixed inset-0 z-[100] flex items-end justify-center sm:items-center px-4 pb-4 sm:pb-0">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReporte = false"></div>
+        <div class="bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl w-full max-w-md relative z-10 overflow-hidden transform transition-all p-6 sm:p-8">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <h3 class="text-xl font-extrabold text-danger flex items-center gap-2 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Reportar Novedad
+            </h3>
+            <form class="space-y-4" onsubmit="event.preventDefault(); alert('Reporte enviado.'); modalReporte = false;">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Detalles del Daño o Faltante</label>
+                    <textarea placeholder="Ej: Se rompió una copa de vino..." rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-danger text-sm text-navy resize-none"></textarea>
+                </div>
+                <button type="button" class="w-full bg-gray-50 border-2 border-dashed border-gray-300 text-gray-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 mb-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Tomar Foto del Problema
+                </button>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" @click="modalReporte = false" class="w-1/3 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
+                    <button type="submit" class="w-2/3 bg-danger text-white font-extrabold py-4 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200">Enviar Alerta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        function appAseo() {
+            return {
+                aseoActivo: false,
+                nombreAseoActual: '',
+                pestañaActiva: 'checklist',
+                modalReporte: false,
+                
+                // Variables del Reloj
+                segundos: 0,
+                intervalo: null,
+                tiempoFormateado: '00:00',
+
+                // Variables de Inventario (TODAS EN 0)
+                azucar: 0,
+                te: 0,
+                cafe: 0,
+                papel: 0,
+                jabon_barra: 0,
+                shampoo: 0,
+                toallas_grandes: 0,
+                toallas_pequenas: 0,
+
+                iniciarAseo(nombre) {
+                    this.aseoActivo = true;
+                    this.nombreAseoActual = nombre;
+                    this.pestañaActiva = 'checklist';
+                    
+                    // Reiniciar cronómetro
+                    this.segundos = 0;
+                    this.actualizarReloj();
+                    this.intervalo = setInterval(() => {
+                        this.segundos++;
+                        this.actualizarReloj();
+                    }, 1000);
+                    
+                    // Reiniciar consumibles a 0 cada vez que inicia un nuevo aseo
+                    this.azucar = 0;
+                    this.te = 0;
+                    this.cafe = 0;
+                    this.papel = 0;
+                    this.jabon_barra = 0;
+                    this.shampoo = 0;
+                    this.toallas_grandes = 0;
+                    this.toallas_pequenas = 0;
+
+                    // Mover scroll al top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                actualizarReloj() {
+                    const hrs = Math.floor(this.segundos / 3600);
+                    const mins = Math.floor((this.segundos % 3600) / 60);
+                    const secs = this.segundos % 60;
+                    
+                    let tiempo = '';
+                    if (hrs > 0) tiempo += `${hrs}:`;
+                    tiempo += `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    this.tiempoFormateado = tiempo;
+                },
+
+                finalizarAseo() {
+                    clearInterval(this.intervalo);
+                    alert(`¡Aseo finalizado en ${this.tiempoFormateado}!\nInventario reportado con éxito al Ama de Llaves.`);
+                    this.aseoActivo = false;
+                    this.nombreAseoActual = '';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        }
+
+        // Lógica de Navbar 
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
             const largoPildora = 'max-w-[550px]'; 
 
             window.addEventListener('scroll', () => {
+                // Solo animar si no estamos en modo aseo
+                if(document.querySelector('[x-data]').__x.$data.aseoActivo) return;
+
                 if (window.scrollY > 50) {
                     logo.classList.replace('h-16', 'h-10'); 
                     navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');

@@ -25,17 +25,17 @@
         }
     </script>
 </head>
-<body class="font-sans text-gray-800 antialiased bg-lightGray">
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="{ modalReportes: false, modalInspeccion: false, propAInspeccionar: '' }">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="ama_llaves_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
             <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
         </a>
         
         <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="ama_llaves_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi Panel</a>
-            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Inventario</a>
-            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Reportes</a>
+            <a href="ama_llaves_inventario.html" class="text-sm font-medium hover:text-gold transition-colors">Inventario por Apto</a>
+            <button @click="modalReportes = true" class="text-sm font-medium hover:text-gold transition-colors">Historial Novedades</button>
             
             <div class="h-5 w-px bg-white/20 ml-2"></div>
             
@@ -58,28 +58,28 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
                     <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Supervisión y Calidad</span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Ama de Llaves ✨</h1>
-                    <p class="text-gray-400 mt-2">Control de inspecciones, inventario y estado general de las suites.</p>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Andrea ✨</h1>
+                    <p class="text-gray-400 mt-2">Control de inspecciones, inventario por apartamento y estado de suites.</p>
                 </div>
-                <div class="bg-white/10 p-4 rounded-2xl border border-white/20 text-center backdrop-blur-md">
-                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Fecha Actual</p>
-                    <p class="text-xl font-extrabold text-gold">17 Feb, 2026</p>
-                </div>
+                <button onclick="window.location.href='ama_llaves_inventario.html'" class="bg-white/10 p-4 rounded-2xl border border-white/20 text-center backdrop-blur-md cursor-pointer hover:bg-white/20 transition-colors">
+                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Stock de Suites</p>
+                    <p class="text-sm font-extrabold text-gold flex items-center justify-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> Ver Inventarios</p>
+                </button>
             </div>
         </div>
     </section>
 
-    <section class="py-12 relative z-20">
+    <section class="py-12 relative z-20 min-h-screen">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 hover:-translate-y-1 transition-transform cursor-pointer">
                     <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 flex-shrink-0">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                     </div>
                     <div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Por Inspeccionar</p>
-                        <p class="text-2xl font-extrabold text-navy">3</p>
+                        <p class="text-2xl font-extrabold text-navy">2</p>
                     </div>
                 </div>
 
@@ -93,17 +93,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                    <div class="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center text-warning flex-shrink-0">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Solicitudes Stock</p>
-                        <p class="text-2xl font-extrabold text-navy">2</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 hover:-translate-y-1 transition-transform cursor-pointer" @click="modalReportes = true">
                     <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-danger flex-shrink-0">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
@@ -118,7 +108,8 @@
                 
                 <div>
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-extrabold text-navy">Inspecciones Pendientes</h2>
+                        <h2 class="text-2xl font-extrabold text-navy">Inspecciones de Aseo</h2>
+                        <span class="text-xs font-bold text-gray-500">Esperando revisión</span>
                     </div>
                     
                     <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
@@ -127,77 +118,61 @@
                             <div class="flex justify-between items-start">
                                 <div class="flex items-start gap-4">
                                     <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span class="font-bold text-xs">A511</span>
                                     </div>
                                     <div>
                                         <h3 class="text-lg font-bold text-navy">Apartamento 511</h3>
                                         <p class="text-gray-500 text-sm">Torre A - Chía</p>
-                                        <span class="inline-block mt-2 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Limpiado por: Empleado 1</span>
+                                        <span class="inline-block mt-2 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-3 py-1 rounded-md border border-blue-200 uppercase tracking-wider">Aseado por: Ricardo</span>
                                     </div>
                                 </div>
-                                <span class="text-xs font-bold text-gray-400 uppercase">Check-in: 15:00</span>
+                                <span class="text-xs font-bold text-red-400 bg-red-50 px-2 py-1 rounded border border-red-100 uppercase">Check-in: Hoy 15:00</span>
                             </div>
-                            <div class="flex gap-3 mt-2">
-                                <button class="flex-1 bg-green-50 hover:bg-green-100 text-success border border-green-200 font-bold py-2 rounded-xl transition-colors text-sm">Aprobar</button>
-                                <button class="flex-1 bg-red-50 hover:bg-red-100 text-danger border border-red-200 font-bold py-2 rounded-xl transition-colors text-sm">Rechazar (Rehacer)</button>
-                            </div>
+                            <button @click="modalInspeccion = true; propAInspeccionar = 'Apto 511'" class="w-full mt-2 bg-gray-50 hover:bg-gray-100 text-navy border border-gray-200 font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2">
+                                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                Revisar Reporte y Aprobar
+                            </button>
                         </div>
 
                         <div class="p-6 md:p-8 hover:bg-gray-50 transition-colors flex flex-col gap-4">
                             <div class="flex justify-between items-start">
                                 <div class="flex items-start gap-4">
                                     <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span class="font-bold text-xs">PH</span>
                                     </div>
                                     <div>
-                                        <h3 class="text-lg font-bold text-navy">Apartamento 716</h3>
-                                        <p class="text-gray-500 text-sm">Edificio Central - Bogotá</p>
-                                        <span class="inline-block mt-2 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Limpiado por: Empleado 2</span>
+                                        <h3 class="text-lg font-bold text-navy">Penthouse Luxury</h3>
+                                        <p class="text-gray-500 text-sm">Bogotá D.C.</p>
+                                        <span class="inline-block mt-2 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-3 py-1 rounded-md border border-blue-200 uppercase tracking-wider">Aseado por: Camila</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-3 mt-2">
-                                <button class="flex-1 bg-green-50 hover:bg-green-100 text-success border border-green-200 font-bold py-2 rounded-xl transition-colors text-sm">Aprobar</button>
-                                <button class="flex-1 bg-red-50 hover:bg-red-100 text-danger border border-red-200 font-bold py-2 rounded-xl transition-colors text-sm">Rechazar (Rehacer)</button>
-                            </div>
+                            <button @click="modalInspeccion = true; propAInspeccionar = 'Penthouse'" class="w-full mt-2 bg-gray-50 hover:bg-gray-100 text-navy border border-gray-200 font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2">
+                                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                Revisar Reporte y Aprobar
+                            </button>
                         </div>
 
                     </div>
                 </div>
 
                 <div>
-                    <h2 class="text-2xl font-extrabold text-navy mb-6">Novedades y Reportes</h2>
+                    <h2 class="text-2xl font-extrabold text-navy mb-6">Alertas Operativas</h2>
                     
                     <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
                         
-                        <div class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <div class="p-6 md:p-8 hover:bg-gray-50 transition-colors">
                             <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-danger flex-shrink-0">
+                                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-danger flex-shrink-0 border border-red-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </div>
                                 <div class="w-full">
                                     <div class="flex justify-between items-center mb-1">
-                                        <h4 class="text-md font-bold text-navy">Copa de vino rota</h4>
-                                        <span class="text-xs text-gray-400 font-bold">Hace 10 min</span>
+                                        <h4 class="text-sm font-bold text-navy">Copa de vino rota</h4>
+                                        <span class="text-[10px] bg-red-50 text-danger border border-red-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest">Nuevo</span>
                                     </div>
-                                    <p class="text-sm text-gray-500 mb-3">Penthouse Bogotá - Reportado por el equipo de limpieza tras el Check-out.</p>
-                                    <button class="text-xs font-bold text-gold hover:text-navy transition-colors border border-gold px-3 py-1.5 rounded-lg">Cargar costo a huésped</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-6 md:p-8 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center text-warning flex-shrink-0">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                </div>
-                                <div class="w-full">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <h4 class="text-md font-bold text-navy">Stock bajo: Amenities</h4>
-                                        <span class="text-xs text-gray-400 font-bold">Hace 1 hora</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500 mb-3">Quedan menos de 10 de Shampoo/Jabón.</p>
-                                    <button class="text-xs font-bold text-navy hover:text-gold transition-colors border border-gray-200 px-3 py-1.5 rounded-lg">Solicitar a Proveedor</button>
+                                    <p class="text-xs text-gray-500 mb-3 font-bold">Apto 511 • Reportado por Ricardo hace 10 min.</p>
+                                    <button class="text-[10px] uppercase tracking-wider font-extrabold text-white bg-danger hover:bg-red-600 transition-colors shadow-sm px-4 py-2 rounded-lg">Ver foto del daño</button>
                                 </div>
                             </div>
                         </div>
@@ -209,11 +184,90 @@
         </div>
     </section>
 
+    <div x-show="modalInspeccion" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalInspeccion = false"></div>
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-xl relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] overflow-y-auto">
+            
+            <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
+                <div>
+                    <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de Empleado</span>
+                    <h3 class="text-2xl font-extrabold text-navy" x-text="propAInspeccionar"></h3>
+                    <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy">Ricardo (Tiempo: 45m 12s)</strong></p>
+                </div>
+                <button @click="modalInspeccion = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+
+            <h4 class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-l-4 border-gold pl-2">Insumos usados / dejados listos</h4>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span class="text-lg">🧻</span> Papel Hig.</span>
+                    <span class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">2</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span class="text-lg">🧼</span> Kits Baño</span>
+                    <span class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">2</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span class="text-lg">☕</span> Café/Té</span>
+                    <span class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">4</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span class="text-lg">🛁</span> Toallas G.</span>
+                    <span class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">2</span>
+                </div>
+            </div>
+
+            <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-8">
+                <p class="text-xs text-blue-800 font-bold flex items-center gap-2">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Al aprobar esta inspección, estos insumos se descontarán del <strong>armario privado de este apartamento</strong>.
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="alert('Se ha notificado a Ricardo que debe regresar a corregir el aseo.'); document.querySelector('[x-data]').__x.$data.modalInspeccion = false;" class="w-1/3 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-xl hover:bg-red-50 transition-colors">
+                    Rechazar
+                </button>
+                <button onclick="alert('Aseo Aprobado. Insumos descontados del inventario del apartamento con éxito.'); document.querySelector('[x-data]').__x.$data.modalInspeccion = false;" class="w-2/3 bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
+                    Aprobar Inspección
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="modalReportes" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] overflow-y-auto">
+            
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-extrabold text-navy">Historial de Novedades</h3>
+                    <p class="text-xs text-gray-500 mt-1 font-bold">Daños reportados por el equipo de aseo.</p>
+                </div>
+                <button @click="modalReportes = false" class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-danger shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-navy">Copa de vino rota</h4>
+                        <p class="text-xs text-gray-500 mt-1">Apto 511 • Reportado por: Ricardo (Hoy 10:30 AM)</p>
+                        <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100">"Encontré los vidrios debajo de la mesa de la sala."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[650px]'; 
+            const largoPildora = 'max-w-[700px]'; 
 
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {

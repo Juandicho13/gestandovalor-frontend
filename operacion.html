@@ -191,22 +191,17 @@
                 <div>
                     <div class="bg-navy rounded-[40px] shadow-2xl border border-gold/20 p-8 text-white sticky top-32">
                         <h2 class="text-xl font-extrabold text-white mb-2">Accesos del Personal</h2>
-                        <p class="text-sm text-gray-400 mb-6">Credenciales sincronizadas con el portal de inicio.</p>
+                        <p class="text-sm text-gray-400 mb-6">Aquí verás los roles principales que pueden entrar al sistema.</p>
                         
-                        <div class="space-y-4" id="lista-empleados">
-                            
+                        <div class="space-y-4">
                             <div class="bg-white/5 border border-white/10 p-4 rounded-2xl group">
                                 <div class="flex justify-between items-start mb-2">
                                     <p class="font-bold text-sm">Ama de Llaves</p>
                                     <span class="text-[10px] bg-gold/20 text-gold px-2 py-1 rounded uppercase tracking-wider font-bold">Supervisión</span>
                                 </div>
                                 <p class="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                    amadellaves@ejemplo.com
-                                </p>
-                                <p class="text-xs text-gray-500 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                    12345678
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    Rol: AMA_LLAVES
                                 </p>
                             </div>
 
@@ -216,17 +211,11 @@
                                     <span class="text-[10px] bg-white/10 text-white px-2 py-1 rounded uppercase tracking-wider font-bold">Limpieza</span>
                                 </div>
                                 <p class="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                    empleado@ejemplo.com
-                                </p>
-                                <p class="text-xs text-gray-500 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                    12345678
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    Rol: ASEO
                                 </p>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
 
@@ -247,32 +236,32 @@
                 <button @click="modalNuevoEmpleado = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
 
-            <form class="space-y-5" onsubmit="event.preventDefault(); alert('¡Credenciales creadas! El usuario ya puede iniciar sesión con la clave 12345678.'); modalNuevoEmpleado = false;">
+            <form id="formNuevoEmpleado" class="space-y-5">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre del Empleado</label>
-                    <input type="text" placeholder="Ej. Equipo Limpieza 2" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
+                    <input type="text" id="nombreEmp" placeholder="Ej. Camila" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Rol</label>
-                    <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy cursor-pointer">
-                        <option>Equipo de Aseo</option>
-                        <option>Ama de Llaves (Supervisión)</option>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Rol en la empresa</label>
+                    <select id="rolEmp" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy cursor-pointer">
+                        <option value="ASEO">Equipo de Aseo</option>
+                        <option value="AMA_LLAVES">Ama de Llaves (Supervisión)</option>
                     </select>
                 </div>
                 
                 <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
                     <p class="text-xs text-blue-800 font-bold mb-3 flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Datos para el portal de inicio
+                        Datos para Iniciar Sesión
                     </p>
                     <div class="grid grid-cols-1 gap-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Correo de Acceso</label>
-                            <input type="email" placeholder="nuevo@ejemplo.com" required class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Usuario</label>
+                            <input type="text" id="userEmp" placeholder="Ej: camila_aseo" required class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Contraseña por defecto</label>
-                            <input type="text" value="12345678" readonly class="w-full bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 outline-none text-sm text-gray-500 cursor-not-allowed">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Contraseña</label>
+                            <input type="text" id="passEmp" placeholder="Escribe la contraseña..." required class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
                         </div>
                     </div>
                 </div>
@@ -286,6 +275,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Lógica visual del Navbar
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
             const largoPildora = 'max-w-[700px]'; 
@@ -301,35 +291,50 @@
                     navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
                 }
             });
-        });
-    </script>
 
-    <script>
-    // Función para guardar el empleado en la base de datos real
-    async function crearEmpleadoReal() {
-        const nombre = document.getElementById('nombreEmp').value;
-        const rol = document.getElementById('rolEmp').value; // 'ASEO' o 'AMA_LLAVES'
-        const username = document.getElementById('userEmp').value;
-        const password = '12345678'; // Clave por defecto
+            // LÓGICA DE CONEXIÓN A BASE DE DATOS (Crear Usuario Real)
+            const formEmpleado = document.getElementById('formNuevoEmpleado');
+            
+            if(formEmpleado) {
+                formEmpleado.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const nombre = document.getElementById('nombreEmp').value;
+                    const rol = document.getElementById('rolEmp').value; // Tomará "ASEO" o "AMA_LLAVES"
+                    const username = document.getElementById('userEmp').value.toLowerCase().trim();
+                    const password = document.getElementById('passEmp').value;
 
-        try {
-            const respuesta = await fetch('https://gestandovalor-backend.onrender.com/usuarios', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, username, password, rol })
-            });
+                    const boton = e.target.querySelector('button');
+                    const textoOriginal = boton.textContent;
+                    boton.textContent = 'Guardando en Servidor...';
+                    boton.disabled = true;
 
-            if (respuesta.ok) {
-                alert('¡Empleado creado exitosamente en la base de datos!');
-                // Aquí podrías recargar la tabla de empleados para que aparezca
-            } else {
-                alert('Hubo un error al crear el usuario. ¿Quizás el usuario ya existe?');
+                    try {
+                        const respuesta = await fetch('https://gestandovalor-backend.onrender.com/usuarios', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ nombre, username, password, rol })
+                        });
+
+                        if (respuesta.ok) {
+                            alert('¡Usuario creado exitosamente en la base de datos!');
+                            formEmpleado.reset();
+                            
+                            // Cerramos la ventana flotante usando AlpineJS
+                            document.querySelector('[x-data]').__x.$data.modalNuevoEmpleado = false;
+                        } else {
+                            alert('Hubo un error. ¿Quizás este usuario ya existe?');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('No se pudo conectar con el servidor.');
+                    } finally {
+                        boton.textContent = textoOriginal;
+                        boton.disabled = false;
+                    }
+                });
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('No se pudo conectar con el servidor.');
-        }
-    }
+        });
     </script>
 </body>
 </html>

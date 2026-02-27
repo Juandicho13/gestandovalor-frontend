@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas y Calendario - GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B', 
+                        gold: '#D4AF37', 
+                        lightGray: '#F9FAFB',
+                        airbnb: '#FF5A5F',
+                        booking: '#003580',
+                        directo: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ocultar barra de scroll para las miniaturas */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="{ mobileMenuOpen: false, propiedadSeleccionada: 'apto511', modalEditarReserva: false }">
+
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+        
+        <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            <a href="admin_dashboard.html" class="text-sm font-medium hover:text-gold transition-colors">Mi Panel</a>
+            <a href="solicitudes.html" class="text-sm font-medium hover:text-gold transition-colors">Solicitudes</a>
+            <a href="reservas.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Reservas</a>
+            <a href="operacion.html" class="text-sm font-medium hover:text-gold transition-colors">Operación</a>
+            <a href="propiedades.html" class="text-sm font-medium hover:text-gold transition-colors">Propiedades</a>
+            
+            <div class="h-5 w-px bg-white/20 ml-2"></div>
+            
+            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Salir
+            </a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-4 flex-shrink-0">
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">
+                E
+            </div>
+        </div>
+
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        </button>
+    </nav>
+
+    <div x-show="mobileMenuOpen" style="display: none;" class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+        <div class="flex flex-col items-center gap-8 w-full mt-10">
+            <a href="admin_dashboard.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Mi Panel</a>
+            <a href="solicitudes.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Solicitudes</a>
+            <a href="reservas.html" class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Reservas</a>
+            <a href="operacion.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Operación</a>
+            <a href="propiedades.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Propiedades</a>
+            <a href="login.html" class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">Salir</a>
+        </div>
+    </div>
+
+    <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="w-[95%] max-w-[1600px] mx-auto px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+                <div>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Channel Manager</span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Calendario de Reservas</h1>
+                </div>
+                <div class="flex gap-4">
+                    <button class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Sincronizar Canales
+                    </button>
+                    <button class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Nueva Reserva Directa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 -mt-10 relative z-20 min-h-screen">
+        <div class="w-[95%] max-w-[1600px] mx-auto px-6 lg:px-8">
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <div class="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar lg:w-24 shrink-0 pb-4 lg:pb-0 z-30">
+                    
+                    <button @click="propiedadSeleccionada = 'apto511'" 
+                            class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
+                            :class="propiedadSeleccionada === 'apto511' ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'">
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80" class="w-full h-full object-cover" alt="Apto 511" title="Apto 511 (Chía)">
+                        <div x-show="propiedadSeleccionada === 'apto511'" class="absolute inset-0 border-2 border-gold rounded-2xl pointer-events-none"></div>
+                    </button>
+
+                    <button @click="propiedadSeleccionada = 'penthouse'" 
+                            class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
+                            :class="propiedadSeleccionada === 'penthouse' ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'">
+                        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=200&q=80" class="w-full h-full object-cover" alt="Penthouse" title="Penthouse Bogotá">
+                    </button>
+
+                    <button @click="propiedadSeleccionada = 'torrea'" 
+                            class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
+                            :class="propiedadSeleccionada === 'torrea' ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'">
+                        <img src="https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?w=200&q=80" class="w-full h-full object-cover" alt="Torre A" title="Torre A (Chía)">
+                    </button>
+                    
+                    <button class="w-16 h-16 rounded-2xl border-2 border-dashed border-gray-300 text-gray-400 hover:text-gold hover:border-gold transition-colors flex items-center justify-center shrink-0 shadow-sm bg-white/50" title="Añadir propiedad">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 min-w-0 flex flex-col gap-8">
+                    
+                    <div class="bg-white rounded-[40px] shadow-2xl border border-gray-100 p-6 md:p-8 overflow-hidden relative">
+                        <div class="absolute top-8 right-8 text-right hidden md:block opacity-10">
+                            <h2 class="text-6xl font-black text-navy uppercase tracking-tighter" x-text="propiedadSeleccionada === 'apto511' ? 'Apto 511' : (propiedadSeleccionada === 'penthouse' ? 'Penthouse' : 'Torre A')"></h2>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 relative z-10">
+                            <div class="flex items-center gap-4">
+                                <h2 class="text-3xl font-extrabold text-navy">Marzo 2026</h2>
+                                <div class="flex gap-2">
+                                    <button class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-navy border border-gray-200 shadow-sm">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                                    </button>
+                                    <button class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-navy border border-gray-200 shadow-sm">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-5 text-xs font-bold text-gray-500 bg-gray-50/80 backdrop-blur-sm p-3 px-5 rounded-xl border border-gray-100 shadow-inner">
+                                <span class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-airbnb"></div> Airbnb</span>
+                                <span class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-booking"></div> Booking</span>
+                                <span class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-directo"></div> Directa</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full overflow-x-auto pb-2 relative z-10">
+                            <div class="min-w-[900px] border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
+                                
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Lunes</div>
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Martes</div>
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Miércoles</div>
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Jueves</div>
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Viernes</div>
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Sábado</div>
+                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Domingo</div>
+
+                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">23</span></div>
+                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">24</span></div>
+                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">25</span></div>
+                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">26</span></div>
+                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">27</span></div>
+                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">28</span></div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base mb-2 block">1</span>
+                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
+                                </div>
+
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors relative">
+                                    <span class="text-navy font-bold text-base block mb-1">2</span>
+                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
+                                </div>
+                                <div class="bg-airbnb/10 border-l-[6px] border-airbnb p-4 min-h-[140px] cursor-pointer hover:bg-airbnb/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
+                                    <span class="text-airbnb font-extrabold text-base block mb-2">3</span>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="w-6 h-6 rounded-full bg-airbnb text-white flex items-center justify-center text-[10px] font-bold">CR</div>
+                                        <div class="text-airbnb font-bold text-sm">Carlos R.</div>
+                                    </div>
+                                    <div class="text-airbnb/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-in 15:00</div>
+                                </div>
+                                <div class="bg-airbnb/10 border-l-[6px] border-airbnb p-4 min-h-[140px] cursor-pointer hover:bg-airbnb/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
+                                    <span class="text-airbnb font-extrabold text-base block mb-2">4</span>
+                                </div>
+                                <div class="bg-airbnb/10 border-l-[6px] border-airbnb p-4 min-h-[140px] cursor-pointer hover:bg-airbnb/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
+                                    <span class="text-airbnb font-extrabold text-base block mb-2">5</span>
+                                    <div class="text-airbnb/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-out 11:00</div>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">6</span>
+                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">7</span>
+                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">8</span>
+                                    <span class="text-gray-400 text-xs font-bold">$121K</span>
+                                </div>
+
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">9</span>
+                                    <span class="text-gray-400 text-xs font-bold">$121K</span>
+                                </div>
+                                <div class="bg-booking/10 border-l-[6px] border-booking p-4 min-h-[140px] cursor-pointer hover:bg-booking/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
+                                    <span class="text-booking font-extrabold text-base block mb-2">10</span>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="w-6 h-6 rounded-full bg-booking text-white flex items-center justify-center text-[10px] font-bold">LM</div>
+                                        <div class="text-booking font-bold text-sm">Laura M.</div>
+                                    </div>
+                                    <div class="text-booking/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-in 14:00</div>
+                                </div>
+                                <div class="bg-booking/10 border-l-[6px] border-booking p-4 min-h-[140px] cursor-pointer hover:bg-booking/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
+                                    <span class="text-booking font-extrabold text-base block mb-2">11</span>
+                                </div>
+                                <div class="bg-booking/10 border-l-[6px] border-booking p-4 min-h-[140px] cursor-pointer hover:bg-booking/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
+                                    <span class="text-booking font-extrabold text-base block mb-2">12</span>
+                                    <div class="text-booking/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-out 11:00</div>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">13</span>
+                                    <span class="text-gray-400 text-xs font-bold">$121K</span>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">14</span>
+                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
+                                    <span class="text-navy font-bold text-base block mb-1">15</span>
+                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
+                                </div>
+
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors border-2 border-gold relative shadow-md">
+                                    <span class="text-gold font-extrabold text-base block mb-1">16 (Hoy)</span>
+                                    <div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-gold animate-pulse"></div>
+                                </div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">17</span></div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">18</span></div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">19</span></div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">20</span></div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">21</span></div>
+                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">22</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50">
+                            <h2 class="text-xl font-extrabold text-navy">Reservas Confirmadas</h2>
+                            <p class="text-sm text-gray-500 mt-1">Huéspedes del mes para la propiedad seleccionada.</p>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-bold">
+                                        <th class="p-6 font-medium">Huésped</th>
+                                        <th class="p-6 font-medium">Fechas</th>
+                                        <th class="p-6 font-medium">Canal de Venta</th>
+                                        <th class="p-6 font-medium text-right">Monto (COP)</th>
+                                        <th class="p-6 font-medium text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    
+                                    <tr class="hover:bg-gray-50 transition-colors group">
+                                        <td class="p-6 border-b border-gray-100">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-full bg-airbnb text-white flex items-center justify-center font-bold shadow-sm">CR</div>
+                                                <div>
+                                                    <h3 class="text-sm font-bold text-navy">Carlos Ramírez</h3>
+                                                    <p class="text-xs text-gray-500">2 Huéspedes</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 03</span>
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 05</span>
+                                            </div>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-airbnb/10 text-airbnb text-xs font-bold border border-airbnb/20 shadow-sm">Airbnb</span>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100 text-right">
+                                            <span class="text-sm font-bold text-navy">$450.000</span>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100 text-center">
+                                            <button @click="modalEditarReserva = true" class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all hover:scale-105" title="Editar Reserva">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="hover:bg-gray-50 transition-colors group">
+                                        <td class="p-6 border-b border-gray-100">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-full bg-booking text-white flex items-center justify-center font-bold shadow-sm">LM</div>
+                                                <div>
+                                                    <h3 class="text-sm font-bold text-navy">Laura Martínez</h3>
+                                                    <p class="text-xs text-gray-500">1 Huésped</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 10</span>
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 12</span>
+                                            </div>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-booking/10 text-booking text-xs font-bold border border-booking/20 shadow-sm">Booking.com</span>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100 text-right">
+                                            <span class="text-sm font-bold text-navy">$380.000</span>
+                                        </td>
+                                        <td class="p-6 border-b border-gray-100 text-center">
+                                            <button @click="modalEditarReserva = true" class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all hover:scale-105" title="Editar Reserva">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div x-show="modalEditarReserva" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalEditarReserva = false"></div>
+        
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-extrabold text-navy">Modificar Reserva</h3>
+                <button @click="modalEditarReserva = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+
+            <form class="space-y-4" onsubmit="event.preventDefault(); alert('Reserva actualizada exitosamente.'); document.querySelector('[x-data]').__x.$data.modalEditarReserva = false;">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre del Huésped</label>
+                        <input type="text" value="Carlos Ramírez" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Check-In</label>
+                        <input type="date" value="2026-03-03" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Check-Out</label>
+                        <input type="date" value="2026-03-05" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Monto Total (COP)</label>
+                        <input type="text" value="$450.000" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Canal</label>
+                        <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy cursor-pointer">
+                            <option selected>Airbnb</option>
+                            <option>Booking.com</option>
+                            <option>Directa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" class="w-1/3 bg-red-50 text-danger font-bold py-4 rounded-xl hover:bg-red-100 transition-colors shadow-sm">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="w-2/3 bg-navy text-white font-bold py-4 rounded-xl hover:bg-blue-900 transition-colors shadow-lg">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[700px]'; 
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10'); 
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

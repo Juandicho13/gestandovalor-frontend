@@ -109,72 +109,50 @@
                 }
             });
 
-            // 2. Lógica de Conexión a Base de Datos (Validación de Usuario)
+            // 2. LÓGICA DE REDIRECCIÓN Y LLAVES MAESTRAS
             const loginForm = document.getElementById('loginForm');
             const btnSubmit = document.getElementById('btnSubmit');
             
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault(); 
                 
-                const usernameIngresado = document.getElementById('username').value.toLowerCase().trim();
+                const usernameIngresado = document.getElementById('username').value.trim();
                 const passwordIngresada = document.getElementById('password').value;
                 
-                // Cambiar el estado del botón a cargando
                 const textoOriginal = btnSubmit.textContent;
                 btnSubmit.textContent = 'Verificando...';
                 btnSubmit.disabled = true;
-                btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
 
-                try {
-                    // Llamada al Backend en Render
-                    const respuesta = await fetch('https://gestandovalor-backend.onrender.com/auth/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: usernameIngresado, password: passwordIngresada })
-                    });
+                // ==========================================
+                // 🚨 LLAVES MAESTRAS TEMPORALES (FRONTEND) 🚨
+                // ==========================================
+                
+                // 1. Acceso de Administrador (Edwin y Marce)
+                if (usernameIngresado === 'EdwinyMarce' && passwordIngresada === 'Gaby2012') {
+                    window.location.href = 'admin_dashboard.html';
+                    return; 
+                }
 
-                    // Si la contraseña o usuario no existen
-                    if (!respuesta.ok) {
-                        alert('Usuario o contraseña incorrectos.');
-                        restaurarBoton(textoOriginal);
+                // 2. Acceso del Equipo (Claves temporales)
+                if (passwordIngresada === '12345678') {
+                    if (usernameIngresado.toLowerCase() === 'amadellaves@ejemplo.com' || usernameIngresado.toLowerCase() === 'andrea_al') {
+                        window.location.href = 'ama_llaves_dashboard.html';
+                        return;
+                    } else if (usernameIngresado.toLowerCase() === 'empleado@ejemplo.com' || usernameIngresado.toLowerCase() === 'ricardo_aseo') {
+                        window.location.href = 'empleado_dashboard.html';
+                        return;
+                    } else {
+                        // Cualquier otro usuario con 12345678 va a propietario
+                        window.location.href = 'propietario_dashboard.html';
                         return;
                     }
-
-                    // Si fue exitoso, leemos el ROL
-                    const datosUsuario = await respuesta.json();
-                    
-                    // Redirección inteligente
-                    switch (datosUsuario.rol) {
-                        case 'ADMIN':
-                            window.location.href = 'admin_dashboard.html';
-                            break;
-                        case 'AMA_LLAVES':
-                            window.location.href = 'ama_llaves_dashboard.html';
-                            break;
-                        case 'ASEO':
-                            window.location.href = 'empleado_dashboard.html';
-                            break;
-                        case 'PROPIETARIO':
-                            window.location.href = 'propietario_dashboard.html';
-                            break;
-                        default:
-                            alert('Rol no reconocido por el sistema.');
-                            restaurarBoton(textoOriginal);
-                    }
-
-                } catch (error) {
-                    console.error('Error de conexión:', error);
-                    alert('No se pudo conectar con el servidor. Revisa tu internet o avisa al soporte.');
-                    restaurarBoton(textoOriginal);
                 }
-            });
 
-            // Función auxiliar para regresar el botón a la normalidad
-            function restaurarBoton(texto) {
-                btnSubmit.textContent = texto;
+                // Si llega hasta aquí, los datos son incorrectos
+                alert('Usuario o contraseña incorrectos. Verifica tus datos.');
+                btnSubmit.textContent = textoOriginal;
                 btnSubmit.disabled = false;
-                btnSubmit.classList.remove('opacity-75', 'cursor-not-allowed');
-            }
+            });
         });
     </script>
 </body>
