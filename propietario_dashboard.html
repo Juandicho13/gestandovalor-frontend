@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Inversionista - GestandoValor</title>
+    <title>Portal de Propietarios - GestandoValor</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -16,184 +16,219 @@
                         navy: '#0B132B', 
                         gold: '#D4AF37', 
                         lightGray: '#F9FAFB',
-                        success: '#10B981'
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        airbnb: '#FF5A5F',
+                        booking: '#003580'
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="font-sans text-gray-800 antialiased bg-lightGray">
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="{ mesActivo: 'Febrero 2026', modalLiquidaciones: false }">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="propietario_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
             <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
         </a>
         
         <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="propietario_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi Rentabilidad</a>
-            <a href="#" class="text-sm font-medium hover:text-gold transition-colors">Mis Propiedades</a>
+            <a href="propietario_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Resumen Financiero</a>
+            <button @click="modalLiquidaciones = true" class="text-sm font-medium hover:text-gold transition-colors">Liquidaciones</button>
             
             <div class="h-5 w-px bg-white/20 ml-2"></div>
             
             <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Cerrar Sesión
+                Salir
             </a>
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                P
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy border-2 border-gold font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                PR
             </div>
         </div>
     </nav>
 
     <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(#D4AF37 1px, transparent 1px); background-size: 30px 30px;"></div>
-        
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Portal de Inversionista</span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Propietario 📈</h1>
-                    <p class="text-gray-400 mt-2">Este es el rendimiento de tu Apartasuite en el mes actual.</p>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Portal de Inversionistas</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Inversionista 📈</h1>
+                    <p class="text-gray-400 mt-2">Este es el rendimiento de tus propiedades administradas por GestandoValor.</p>
                 </div>
-                <div class="bg-white/10 p-5 rounded-[30px] border border-white/20 text-right backdrop-blur-md">
-                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Próximo Pago Estimado</p>
-                    <p class="text-3xl font-extrabold text-gold">$3,450,000 <span class="text-sm text-gray-300 font-medium">COP</span></p>
-                    <p class="text-xs text-success font-bold mt-1">▲ +8% vs mes anterior</p>
+                
+                <div class="bg-white/10 p-2 rounded-2xl border border-white/20 backdrop-blur-md flex items-center gap-4">
+                    <button class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+                    <span class="text-lg font-extrabold text-white w-32 text-center" x-text="mesActivo"></span>
+                    <button class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-12 relative z-20">
+    <section class="py-12 relative z-20 min-h-screen">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex items-center gap-6 hover:-translate-y-1 transition-transform">
-                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-success flex-shrink-0">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-gray-50 opacity-50">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                     </div>
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ganancias Acumuladas</p>
-                        <p class="text-3xl font-extrabold text-navy">$2.8M <span class="text-sm font-medium text-gray-500">COP</span></p>
-                    </div>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 relative z-10">Tus Ingresos Netos (Febrero)</p>
+                    <h3 class="text-4xl font-black text-navy relative z-10">$3.250.000</h3>
+                    <p class="text-xs text-success font-bold mt-2 flex items-center gap-1 relative z-10">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        +12% vs mes anterior
+                    </p>
                 </div>
 
-                <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex items-center gap-6 hover:-translate-y-1 transition-transform">
-                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 flex-shrink-0">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1">
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Ocupación Promedio</p>
+                    <h3 class="text-4xl font-black text-navy">78%</h3>
+                    <div class="w-full bg-gray-100 rounded-full h-2 mt-4 overflow-hidden">
+                        <div class="bg-gold h-2 rounded-full" style="width: 78%"></div>
                     </div>
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ocupación Mensual</p>
-                        <p class="text-3xl font-extrabold text-navy">85% <span class="text-sm font-medium text-gray-500">(24 días)</span></p>
-                    </div>
-                </div>
-
-                <div class="bg-navy p-8 rounded-[40px] shadow-xl border border-gold/30 flex items-center gap-6 hover:-translate-y-1 transition-transform">
-                    <div class="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center text-navy flex-shrink-0 shadow-lg">
-                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-gray-300 text-xs font-bold uppercase tracking-wider mb-1">Calificación Promedio</p>
-                        <p class="text-3xl font-extrabold text-white">4.96 <span class="text-sm font-medium text-gold">/ 5.0</span></p>
-                    </div>
+                    <p class="text-xs text-gray-500 font-bold mt-2">22 noches reservadas</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <h2 class="text-2xl font-extrabold text-navy mb-6">Desempeño de tus Propiedades</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
                 
-                <div class="lg:col-span-2">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-extrabold text-navy">Historial de Reservas (Febrero)</h2>
+                <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-40 h-full min-h-[140px] rounded-2xl overflow-hidden flex-shrink-0">
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&q=80" alt="Apto 511" class="w-full h-full object-cover">
                     </div>
-                    
-                    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
-                        
-                        <div class="p-6 md:p-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 font-bold">
-                                    Airbnb
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-bold text-navy">12 Feb - 15 Feb (3 Noches)</h3>
-                                    <p class="text-gray-500 text-sm">Tarifa dinámica aplicada (Alta Demanda)</p>
-                                </div>
+                    <div class="flex-1 w-full">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-lg font-extrabold text-navy">Apto 511</h3>
+                                <p class="text-xs text-gray-500 font-bold uppercase">Chía, Cundinamarca</p>
                             </div>
-                            <div class="text-left md:text-right">
-                                <p class="text-xl font-extrabold text-success">+$450,000</p>
-                                <span class="text-xs font-bold text-gray-400 uppercase">Completada</span>
+                            <span class="bg-green-50 text-success text-[10px] font-extrabold px-2 py-1 rounded border border-green-200">Ocupado Hoy</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Ingreso Bruto</p>
+                                <p class="font-bold text-navy">$2.100.000</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Tu Utilidad (Neto)</p>
+                                <p class="font-bold text-success">$1.680.000</p>
                             </div>
                         </div>
 
-                        <div class="p-6 md:p-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center font-bold text-xs">
-                                    Booking
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-bold text-navy">05 Feb - 10 Feb (5 Noches)</h3>
-                                    <p class="text-gray-500 text-sm">Huésped internacional</p>
-                                </div>
-                            </div>
-                            <div class="text-left md:text-right">
-                                <p class="text-xl font-extrabold text-success">+$720,000</p>
-                                <span class="text-xs font-bold text-gray-400 uppercase">Completada</span>
-                            </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+                            <a href="#" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-airbnb hover:text-white transition-all px-3 py-1.5 rounded-lg border border-red-100 shadow-sm flex-1 justify-center">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z"/></svg>
+                                Airbnb
+                            </a>
+                            <a href="#" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-booking hover:text-white transition-all px-3 py-1.5 rounded-lg border border-blue-100 shadow-sm flex-1 justify-center">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z"/></svg>
+                                Booking
+                            </a>
                         </div>
-
-                        <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-navy/5 border-l-4 border-gold">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center font-bold text-navy text-xs">
-                                    Directa
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-bold text-navy">16 Feb - 20 Feb (4 Noches)</h3>
-                                    <p class="text-gray-500 text-sm">Estadía vacacional</p> 
-                                </div>
-                            </div>
-                            <div class="text-left md:text-right">
-                                <p class="text-xl font-extrabold text-navy">+$600,000 <span class="text-sm font-medium text-gray-500">(Est)</span></p>
-                                <span class="text-xs font-bold text-gold uppercase animate-pulse">En curso</span>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
-                <div class="space-y-8">
-                    
-                    <div>
-                        <h2 class="text-2xl font-extrabold text-navy mb-6">Tus Liquidaciones</h2>
-                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-8">
-                            <div class="flex justify-between items-center pb-4 border-b border-gray-100 mb-4">
-                                <div>
-                                    <p class="font-bold text-navy">Enero 2026</p>
-                                    <p class="text-xs text-gray-400">Pagado el 05/02/26</p>
-                                </div>
-                                <button class="text-gold hover:text-navy transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                </button>
+                <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-40 h-full min-h-[140px] rounded-2xl overflow-hidden flex-shrink-0 relative">
+                        <img src="https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?w=500&q=80" alt="Torre A" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 w-full">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-lg font-extrabold text-navy">Torre A</h3>
+                                <p class="text-xs text-gray-500 font-bold uppercase">Chía, Cundinamarca</p>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-bold text-navy">Diciembre 2025</p>
-                                    <p class="text-xs text-gray-400">Pagado el 05/01/26</p>
-                                </div>
-                                <button class="text-gold hover:text-navy transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                </button>
+                            <span class="bg-gray-100 text-gray-500 text-[10px] font-extrabold px-2 py-1 rounded border border-gray-200">Libre Hoy</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Ingreso Bruto</p>
+                                <p class="font-bold text-navy">$1.962.500</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Tu Utilidad (Neto)</p>
+                                <p class="font-bold text-success">$1.570.000</p>
                             </div>
                         </div>
-                    </div>
 
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+                            <a href="#" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-airbnb hover:text-white transition-all px-3 py-1.5 rounded-lg border border-red-100 shadow-sm flex-1 justify-center">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z"/></svg>
+                                Airbnb
+                            </a>
+                            <a href="#" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-booking hover:text-white transition-all px-3 py-1.5 rounded-lg border border-blue-100 shadow-sm flex-1 justify-center">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z"/></svg>
+                                Booking
+                            </a>
+                        </div>
                     </div>
+                </div>
 
             </div>
+
         </div>
     </section>
+
+    <div x-show="modalLiquidaciones" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalLiquidaciones = false"></div>
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+            
+            <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-2xl font-extrabold text-navy">Tus Liquidaciones</h3>
+                    <p class="text-xs text-gray-500 mt-1 font-bold">Últimos 3 meses disponibles para descarga.</p>
+                </div>
+                <button @click="modalLiquidaciones = false" class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gold transition-colors">
+                    <div>
+                        <p class="font-bold text-navy">Enero 2026</p>
+                        <p class="text-[10px] text-success font-extrabold uppercase tracking-widest mt-1">Soporte Listo</p>
+                    </div>
+                    <button onclick="alert('Descargando Liquidacion_Enero2026.pdf')" class="bg-white border border-gray-200 hover:border-gold hover:text-gold text-navy font-bold py-2 px-4 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Descargar PDF
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gold transition-colors">
+                    <div>
+                        <p class="font-bold text-navy">Diciembre 2025</p>
+                        <p class="text-[10px] text-success font-extrabold uppercase tracking-widest mt-1">Soporte Listo</p>
+                    </div>
+                    <button onclick="alert('Descargando Liquidacion_Diciembre2025.pdf')" class="bg-white border border-gray-200 hover:border-gold hover:text-gold text-navy font-bold py-2 px-4 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Descargar PDF
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gold transition-colors">
+                    <div>
+                        <p class="font-bold text-navy">Noviembre 2025</p>
+                        <p class="text-[10px] text-warning font-extrabold uppercase tracking-widest mt-1">Pronto a expirar</p>
+                    </div>
+                    <button onclick="alert('Descargando Liquidacion_Noviembre2025.pdf')" class="bg-white border border-gray-200 hover:border-gold hover:text-gold text-navy font-bold py-2 px-4 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Descargar PDF
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

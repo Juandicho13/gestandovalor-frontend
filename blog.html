@@ -131,11 +131,11 @@
         </div>
     </section>
 
-    <section id="contacto" class="pt-24 pb-24 bg-white text-center border-t border-gray-100 rounded-t-[60px] relative -mt-10 z-10 shadow-[0_-20px_40px_rgba(0,0,0,0.05)]">
+    <section id="contacto" class="pt-32 pb-24 bg-white text-center border-t border-gray-100 rounded-t-[80px]">
         <div class="max-w-4xl mx-auto px-6">
             
             <div x-show="!openContact" x-transition>
-                <h2 class="text-3xl md:text-5xl font-extrabold text-navy mb-10">¿Listo para liberar tu tiempo?</h2>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-navy mb-10">¿Listo para liberar tu tiempo y aumentar tus ingresos?</h2>
                 <button @click="openContact = true" class="bg-gold hover:bg-yellow-500 text-navy font-bold text-xl py-6 px-12 rounded-full shadow-2xl transition-all transform hover:-translate-y-2 active:scale-95">
                     Agenda una asesoría gratuita
                 </button>
@@ -150,18 +150,84 @@
                         </div>
                         <button @click="openContact = false" class="text-white hover:text-gold"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
                     </div>
-                    <form class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <input type="text" placeholder="Nombre Completo" class="w-full bg-white/10 border border-white/20 rounded-2xl py-4 px-6 outline-none focus:border-gold">
-                        <input type="tel" placeholder="WhatsApp" class="w-full bg-white/10 border border-white/20 rounded-2xl py-4 px-6 outline-none focus:border-gold">
-                        <select class="w-full bg-white/10 border border-white/20 rounded-2xl py-4 px-6 outline-none focus:border-gold appearance-none">
-                            <option class="bg-navy">Chía, Cundinamarca</option>
-                            <option class="bg-navy">Bogotá, D.C.</option>
-                            <option class="bg-navy">Otra ubicación</option>
-                        </select>
-                        <input type="email" placeholder="Correo" class="w-full bg-white/10 border border-white/20 rounded-2xl py-4 px-6 outline-none focus:border-gold">
-                        <textarea rows="3" placeholder="Detalles de la propiedad..." class="md:col-span-2 w-full bg-white/10 border border-white/20 rounded-2xl py-4 px-6 outline-none focus:border-gold"></textarea>
-                        <div class="md:col-span-2 text-center mt-4"><button type="submit" class="bg-gold text-navy font-extrabold text-lg py-5 px-16 rounded-full hover:scale-105 transition-transform shadow-xl">Enviar información</button></div>
-                    </form>
+                    <form id="formularioProspecto" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-sm">
+    
+    <div class="md:col-span-2 mb-2">
+        <h3 class="text-2xl font-bold text-white mb-1">Agenda tu Asesoría</h3>
+        <p class="text-white/60 text-sm">Déjanos tus datos y el momento ideal para reunirnos.</p>
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label class="text-white/80 text-sm font-medium ml-2">Nombre Completo</label>
+        <input id="nombre" type="text" placeholder="Ej. Carlos Mendoza" required class="w-full bg-[#0a192f]/50 border border-white/10 rounded-2xl py-4 px-6 text-white placeholder-white/30 outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all">
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label class="text-white/80 text-sm font-medium ml-2">WhatsApp</label>
+        <input id="telefono" type="tel" placeholder="Ej. 310 123 4567" required class="w-full bg-[#0a192f]/50 border border-white/10 rounded-2xl py-4 px-6 text-white placeholder-white/30 outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all">
+    </div>
+    
+    <div class="flex flex-col gap-2">
+        <label class="text-white/80 text-sm font-medium ml-2">Ubicación de la Propiedad</label>
+        <div class="relative">
+            <select id="ciudadPropiedad" required class="w-full bg-[#0a192f]/50 border border-white/10 rounded-2xl py-4 px-6 text-white outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all appearance-none cursor-pointer">
+                <option class="bg-[#0a192f] text-white" value="Chía">Chía, Cundinamarca</option>
+                <option class="bg-[#0a192f] text-white" value="Bogotá">Bogotá, D.C.</option>
+                <option class="bg-[#0a192f] text-white" value="Otra">Otra ubicación</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gold">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label class="text-white/80 text-sm font-medium ml-2">Correo Electrónico</label>
+        <input id="email" type="email" placeholder="tucorreo@ejemplo.com" required class="w-full bg-[#0a192f]/50 border border-white/10 rounded-2xl py-4 px-6 text-white placeholder-white/30 outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all">
+    </div>
+
+    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 mt-2">
+        
+        <div class="flex flex-col gap-2">
+            <label class="text-gold text-sm font-bold ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Día de la Reunión
+            </label>
+            <input id="fechaReunion" type="date" required style="color-scheme: dark;" class="w-full bg-[#0a192f] border border-white/20 rounded-xl py-4 px-6 text-white outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all cursor-pointer">
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label class="text-gold text-sm font-bold ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Hora de la Reunión
+            </label>
+            <div class="relative">
+                <select id="horaReunion" required class="w-full bg-[#0a192f] border border-white/20 rounded-xl py-4 px-6 text-white outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all appearance-none cursor-pointer">
+                    <option class="bg-[#0a192f] text-white/50" value="" disabled selected>Elige un horario...</option>
+                    <option class="bg-[#0a192f] text-white" value="07:00">07:00 AM - Mañana</option>
+                    <option class="bg-[#0a192f] text-white" value="09:00">09:00 AM - Mañana</option>
+                    <option class="bg-[#0a192f] text-white" value="12:00">12:00 PM - Mediodía</option>
+                    <option class="bg-[#0a192f] text-white" value="15:00">03:00 PM - Tarde</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gold">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="md:col-span-2 flex flex-col gap-2 mt-2">
+        <label class="text-white/80 text-sm font-medium ml-2">Detalles Adicionales</label>
+        <textarea id="mensaje" rows="3" placeholder="Cuéntanos un poco sobre tu apartamento..." class="w-full bg-[#0a192f]/50 border border-white/10 rounded-2xl py-4 px-6 text-white placeholder-white/30 outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all resize-none"></textarea>
+    </div>
+    
+    <div class="md:col-span-2 flex justify-center mt-6">
+        <button type="submit" class="group relative w-full md:w-auto flex justify-center items-center gap-3 bg-gold text-navy font-extrabold text-lg py-5 px-16 rounded-full hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)]">
+            Agendar Mi Asesoría
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+    </div>
+</form>
                 </div>
             </div>
         </div>
