@@ -790,12 +790,8 @@
             </label>
             <div class="relative">
                 <select id="horaReunion" required class="w-full bg-[#0a192f] border border-white/20 rounded-xl py-4 px-6 text-white outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-all appearance-none cursor-pointer">
-                    <option class="bg-[#0a192f] text-white/50" value="" disabled selected>Elige un horario...</option>
-                    <option class="bg-[#0a192f] text-white" value="07:00">07:00 AM - Mañana</option>
-                    <option class="bg-[#0a192f] text-white" value="09:00">09:00 AM - Mañana</option>
-                    <option class="bg-[#0a192f] text-white" value="12:00">12:00 PM - Mediodía</option>
-                    <option class="bg-[#0a192f] text-white" value="15:00">03:00 PM - Tarde</option>
-                </select>
+                    <option class="bg-[#0a192f] text-white/50" value="" disabled selected>Primero elige un día...</option>
+                    </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gold">
                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
@@ -944,6 +940,85 @@
             alert('No pudimos conectar con el servidor. Revisa tu conexión.');
         }
     });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const fechaInput = document.getElementById('fechaReunion');
+            const horaSelect = document.getElementById('horaReunion');
+            let horariosDisponibles = [];
+
+            // 1. BLOQUEAMOS EL CALENDARIO INMEDIATAMENTE (Sin esperar a Render)
+            const hoy = new Date();
+            const year = hoy.getFullYear();
+            const month = String(hoy.getMonth() + 1).padStart(2, '0');
+            const day = String(hoy.getDate()).padStart(2, '0');
+            const fechaHoy = `${year}-${month}-${day}`;
+            fechaInput.min = fechaHoy;
+
+            // 2. Descargamos la agenda de Edwin en segundo plano
+            try {
+                const respuesta = await fetch('https://gestandovalor-backend.onrender.com/disponibilidad');
+                if (respuesta.ok) {
+                    horariosDisponibles = await respuesta.json();
+                }
+            } catch (error) {
+                console.error('Error conectando a la base de datos:', error);
+            }
+
+            // 3. Cuando el cliente le da clic a un día en el calendario...
+            fechaInput.addEventListener('change', function() {
+                const fechaSeleccionada = this.value; // Ej: "2026-03-10"
+                if (!fechaSeleccionada) return;
+
+                // Calculamos qué día de la semana es (1=Lunes ... 7=Domingo)
+                const dateObj = new Date(fechaSeleccionada + 'T12:00:00'); // T12 para evitar bugs de zona horaria
+                let jsDay = dateObj.getDay(); 
+                let backendDay = jsDay === 0 ? 7 : jsDay; 
+
+                // Filtramos SOLO las horas que Edwin guardó para ese día específico
+                const horasDelDia = horariosDisponibles.filter(h => h.diaSemana === backendDay);
+
+                // Limpiamos el selector
+                horaSelect.innerHTML = '<option value="" disabled selected>Elige un horario...</option>';
+
+                // Si Edwin no trabaja ese día:
+                if (horasDelDia.length === 0) {
+                    horaSelect.innerHTML = '<option value="" disabled selected>Sin disponibilidad este día</option>';
+                    return;
+                }
+
+                // Verificamos si la fecha elegida es HOY para bloquear horas pasadas
+                const esHoy = fechaSeleccionada === fechaHoy;
+                const horaActual = new Date().getHours();
+                let horasAgregadas = 0;
+
+                // Construimos las opciones de hora
+                horasDelDia.sort((a, b) => a.hora.localeCompare(b.hora)).forEach(h => {
+                    const horaOpcionNum = parseInt(h.hora.split(':')[0], 10);
+                    
+                    // Solo agregamos la hora si NO es hoy, o si es hoy pero la hora aún no ha pasado
+                    if (!esHoy || (esHoy && horaOpcionNum > horaActual)) {
+                        const option = document.createElement('option');
+                        option.value = h.hora;
+                        option.className = "bg-[#0a192f] text-white";
+                        
+                        // Convertir a formato AM/PM para que se vea bonito
+                        const ampm = horaOpcionNum >= 12 ? 'PM' : 'AM';
+                        const hora12 = horaOpcionNum > 12 ? horaOpcionNum - 12 : (horaOpcionNum === 0 ? 12 : horaOpcionNum);
+                        option.textContent = `${String(hora12).padStart(2, '0')}:00 ${ampm}`;
+                        
+                        horaSelect.appendChild(option);
+                        horasAgregadas++;
+                    }
+                });
+
+                // Si era hoy y ya pasaron todas las horas de trabajo de Edwin:
+                if (horasAgregadas === 0) {
+                    horaSelect.innerHTML = '<option value="" disabled selected>No quedan horas por hoy</option>';
+                }
+            });
+        });
     </script>
 
 </body>
