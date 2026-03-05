@@ -358,12 +358,17 @@
         function panelOperaciones() {
             return {
                 mobileMenuOpen: false,
-                vistaActiva: 'usuarios', 
+                vistaActiva: 'operacion', // Lo dejamos en operacion para que lo veas apenas entres
                 cargando: true,
                 procesando: false,
 
+                // Listas de datos
                 usuarios: [],
                 propiedadesReales: [],
+                
+                // NUEVAS LISTAS PARA OPERACIÓN EN VIVO
+                equipoRadar: [], 
+                novedades: [],
 
                 modalFormulario: false,
                 modoEdicion: false,
@@ -377,25 +382,52 @@
                 async cargarDatosCompletos() {
                     this.cargando = true;
                     try {
+                        // 1. Descargamos Usuarios
                         const resUsr = await fetch('https://gestandovalor-backend.onrender.com/usuarios');
+                        let listaUsuarios = [];
                         if (resUsr.ok) {
-                            const dataUsr = await resUsr.json();
-                            if (Array.isArray(dataUsr)) {
-                                this.usuarios = dataUsr.sort((a, b) => (a.rol || '').localeCompare(b.rol || ''));
-                            } else {
-                                this.usuarios = [];
+                            listaUsuarios = await resUsr.json();
+                            if (Array.isArray(listaUsuarios)) {
+                                this.usuarios = listaUsuarios.sort((a, b) => (a.rol || '').localeCompare(b.rol || ''));
                             }
                         }
 
+                        // 2. Descargamos Propiedades
                         try {
                             const resProp = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
                             if (resProp.ok) {
                                 const dataProp = await resProp.json();
                                 this.propiedadesReales = Array.isArray(dataProp) ? dataProp : [];
                             }
-                        } catch(e) {
-                            this.propiedadesReales = [];
-                        }
+                        } catch(e) { this.propiedadesReales = []; }
+
+                        // 3. NUEVO: Descargamos Tareas de Aseo en vivo
+                        let tareasActivas = [];
+                        try {
+                            const resTareas = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo');
+                            if (resTareas.ok) {
+                                tareasActivas = await resTareas.json();
+                            }
+                        } catch(e) { console.log('Aún no hay tareas creadas'); }
+
+                        // PROCESAMOS EL RADAR DEL EQUIPO
+                        // Filtramos solo a los empleados operativos
+                        const personalOperativo = listaUsuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
+                        
+                        this.equipoRadar = personalOperativo.map(emp => {
+                            // Buscamos si este empleado tiene una tarea "En Progreso"
+                            const tareaActual = tareasActivas.find(t => t.empleado_id === emp.id && t.estado === 'En Progreso');
+                            return {
+                                ...emp,
+                                estado: tareaActual ? 'Ocupado' : 'Disponible',
+                                ubicacion: tareaActual && tareaActual.propiedad ? tareaActual.propiedad.titulo : 'En base',
+                                checkIn: tareaActual ? new Date(tareaActual.created_at).toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'}) : null
+                            };
+                        });
+
+                        // PROCESAMOS LAS NOVEDADES
+                        // Filtramos las tareas que tengan un texto en "novedad_reportada"
+                        this.novedades = tareasActivas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
 
                     } catch (error) {
                         console.error("Error cargando base de datos:", error);
