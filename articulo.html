@@ -56,7 +56,7 @@
             <div class="flex flex-wrap items-center gap-6 text-gray-500 font-medium text-base border-t border-gray-100 pt-8 max-w-6xl">
                 <span class="bg-navy text-gold text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" x-text="articulo?.categoria"></span>
                 <span>•</span>
-                <span class="flex items-center gap-1" x-text="formatearFecha(articulo?.created_at)"></span>
+                <span class="flex items-center gap-1" x-text="formatearFecha(articulo?.createdAt)"></span>
                 <span>•</span>
                 <span class="flex items-center gap-1">
                     <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -71,7 +71,7 @@
 
         <article class="max-w-7xl mx-auto px-6 lg:px-12 pb-24">
             <div class="prose prose-xl md:prose-2xl prose-headings:text-navy prose-headings:font-extrabold prose-p:text-gray-800 prose-a:text-gold max-w-5xl mx-auto leading-relaxed prose-img:rounded-[20px] prose-img:shadow-md" x-html="formatearTexto(articulo?.contenido)">
-                </div>
+            </div>
         </article>
 
         <section class="bg-lightGray py-24 border-t border-gray-200" x-show="articulosRelacionados.length > 0">
@@ -109,37 +109,65 @@
         <a href="blog.html" class="bg-navy text-white font-bold px-8 py-3 rounded-full hover:bg-gold hover:text-navy transition-colors">Volver al Blog principal</a>
     </div>
 
-    <footer class="bg-navy pt-20 pb-12 border-t border-white/10 relative overflow-hidden">
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+    <footer class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10">
+    
+    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
+    
+    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
         
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
-            
-            <a href="index.html" class="mb-6 flex flex-col items-center">
-                <img src="GV.png" alt="Logo GestandoValor" class="h-16 w-auto object-contain mb-3">
-                <span class="text-gold text-sm font-bold tracking-widest uppercase">Apartasuites</span>
-            </a>
-            
-            <p class="text-gray-300 text-lg mb-4">La administración estratégica que tu propiedad en la Sabana merece.</p>
-            <p class="text-gray-400 text-sm mb-12">Chía, Cundinamarca, Colombia</p>
-            
-            <div class="flex items-center gap-6 mb-16 text-gold/60">
-                <a href="#" class="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center hover:bg-gold hover:text-navy hover:scale-105 transition-all">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.791.246 2.212.416.56.218.959.478 1.38.9.422.422.682.821.9 1.381.17.421.363 1.046.417 2.212.057 1.266.069 1.646.069 4.85s-.012 3.584-.069 4.85c-.054 1.166-.246 1.791-.417 2.212-.218.56-.478.959-.9 1.38-.422.422-.821.682-1.381.9-.421.17-1.046.363-2.212.417-1.266.057-1.646.069-4.85.069s-3.584-.012-4.85-.069c-1.166-.054-1.791-.246-2.212-.416-.56-.218-.959-.478-1.38-.9-.422-.422-.682-.821-.9-1.381-.17-.421-.363-1.046-.417-2.212-.057-1.266-.069-1.646-.069-4.85s.012-3.584.069-4.85c.054-1.166.246-1.791.417-2.212.218-.56.478-.959.9-1.38.422-.422.821-.682 1.381-.9.421-.17 1.046-.363 2.212-.417 1.266-.057 1.646-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-1.28.057-2.155.259-2.922.559-.793.308-1.465.72-2.134 1.389-.668.669-1.08 1.341-1.389 2.134-.3.767-.502 1.642-.559 2.922-.058 1.28-.072 1.688-.072 4.947s.014 3.668.072 4.947c.057 1.28.259 2.155.559 2.922.308.793.72 1.465 1.389 2.134.669.668 1.341 1.08 2.134 1.389.767.3 1.642.502 2.922.559 1.28.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.28-.057 2.155-.259 2.922-.559.793-.308 1.465-.72 2.134-1.389.669-.669 1.08-1.341 1.389-2.134.3-.767.502-1.642.559-2.922.058-1.28.072-1.688.072-4.947s-.014-3.668-.072-4.947c-.057-1.28-.259-2.155-.559-2.922-.308-.793-.72-1.465-1.389-2.134-.669-.668-1.341-1.08-2.134-1.389-.767-.3-1.642-.502-2.922-.559-1.28-.058-1.688-.072-4.947-.072zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z"></path></svg>
-                </a>
-                <a href="#" class="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center hover:bg-gold hover:text-navy hover:scale-105 transition-all">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"></path></svg>
-                </a>
-                <a href="#" class="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center hover:bg-gold hover:text-navy hover:scale-105 transition-all">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
-                </a>
-                <a href="#" class="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center hover:bg-gold hover:text-navy hover:scale-105 transition-all">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.657 17.657h-11.314v-11.314h11.314v11.314zm-11.314-12.021c-1.28 0-2.32 1.04-2.32 2.32v11.314c0 1.28 1.04 2.32 2.32 2.32h11.314c1.28 0 2.32-1.04 2.32-2.32v-11.314c0-1.28-1.04-2.32-2.32-2.32h-11.314zm14.85-2.321h-18.386v18.386h18.386v-18.386zm-18.386-2.32c-1.28 0-2.32 1.04-2.32 2.32v18.386c0 1.28 1.04 2.32 2.32 2.32h18.386c1.28 0 2.32-1.04 2.32-2.32v-18.386c0-1.28-1.04-2.32-2.32-2.32h-18.386z"></path></svg>
-                </a>
+        <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Tu apartamento puede generar más.<br>
+            <span class="text-gold">Nosotros lo hacemos posible.</span>
+        </h2>
+
+        <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+
+        <div class="mb-10">
+            <div class="inline-flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
+                <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span class="font-light text-gray-400">Apartasuites</span></span>
             </div>
-            
-            <p class="text-gray-600 text-xs border-t border-white/5 pt-8 w-full">&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
+            <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
+                Administración estratégica para rentas cortas
+            </p>
         </div>
-    </footer>
+
+        <div class="flex justify-center gap-8 mb-16">
+            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/>
+                    <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/>
+                </svg>
+            </a>
+
+            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+
+            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+
+            <a href="mailto:info@gestandovalor.com" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+            </a>
+        </div>
+        
+
+        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+            <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
+                <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
+            </div>
+        </div>
+
+    </div>
+</footer>
 
     <script>
         function lectorArticulo() {
@@ -158,26 +186,17 @@
                     }
 
                     try {
-                        // 1. Traer el artículo actual (desde Render)
                         const resArticulo = await fetch(`https://gestandovalor-backend.onrender.com/blog/${id}`);
                         if (resArticulo.ok) {
                             this.articulo = await resArticulo.json();
-                            // Ponemos el título real en el navegador
                             document.title = `${this.articulo.titulo} - GestandoValor Apartasuites`;
                         }
 
-                        // 2. Traer todos para sacar los "Relacionados" (al azar)
                         const resTodos = await fetch(`https://gestandovalor-backend.onrender.com/blog`);
                         if (resTodos.ok) {
                             const todos = await resTodos.json();
-                            
-                            // Filtrar para no mostrar el mismo que estamos leyendo y que esté publicado
                             let filtrados = todos.filter(a => a.id != id && a.estado === 'Publicado');
-                            
-                            // Mezclar (Shuffle) al azar
                             filtrados = filtrados.sort(() => 0.5 - Math.random());
-                            
-                            // Tomar solo los primeros 3
                             this.articulosRelacionados = filtrados.slice(0, 3);
                         }
                     } catch (error) {
@@ -187,21 +206,27 @@
                     }
                 },
                 
+                // FORMATO DE FECHA CORREGIDO ("04 MAR 2026")
                 formatearFecha(fechaIso) {
-                    if(!fechaIso) return '';
-                    const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
-                    return new Date(fechaIso).toLocaleDateString('es-ES', opciones);
+                    if (!fechaIso) return 'Hoy';
+                    const opciones = { day: '2-digit', month: 'short', year: 'numeric' };
+                    const fecha = new Date(fechaIso);
+                    return fecha.toLocaleDateString('es-ES', opciones).replace('.', '').toUpperCase();
                 },
                 
+                // FORMATO DE TEXTO PROTEGIDO (No rompe el HTML de tu editor)
                 formatearTexto(texto) {
-                    if(!texto) return '';
-                    // Divide los saltos de línea (doble enter) y crea párrafos
+                    if (!texto) return '';
+                    // Si el texto ya trae HTML de tu editor, lo pasa directo
+                    if (texto.includes('<') && texto.includes('>')) {
+                        return texto;
+                    }
+                    // Si es texto plano viejo, le pone párrafos
                     return texto.split(/\n\s*\n/).map(parrafo => `<p>${parrafo.replace(/\n/g, '<br>')}</p>`).join('');
                 }
             }
         }
 
-        // ANIMACIÓN DE LA PÍLDORA DE NAVEGACIÓN
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');

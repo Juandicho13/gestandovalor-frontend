@@ -63,20 +63,20 @@
                 <form id="loginForm" class="space-y-6">
                     <div>
                         <label for="username" class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 pl-2">Usuario de Acceso</label>
-                        <input type="text" id="username" name="username" placeholder="Usuario" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors" required>
+                        <input type="text" id="username" name="username" placeholder="Ej: carlos_mendoza" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors" required>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-2 pl-2 pr-2">
                             <label for="password" class="block text-xs font-bold uppercase tracking-widest text-gray-500">Contraseña</label>
-                            <a href="#" class="text-xs font-bold text-gold hover:text-navy transition-colors">¿Olvidaste tu contraseña?</a>
+                            <a href="#" class="text-xs font-bold text-gold hover:text-navy transition-colors">¿Olvidaste tu clave?</a>
                         </div>
                         <input type="password" id="password" name="password" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors" required>
                     </div>
 
-                    <div class="flex items-center pl-2">
-                        <input type="checkbox" id="remember" class="w-4 h-4 text-gold border-gray-300 rounded focus:ring-gold focus:ring-2 accent-gold cursor-pointer">
-                        <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer">Recordar mis datos</label>
+                    <div id="mensajeError" style="display: none;" class="bg-red-50 text-red-500 text-sm font-bold p-3 rounded-xl border border-red-100 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Usuario o contraseña incorrectos.</span>
                     </div>
 
                     <div class="pt-4">
@@ -92,7 +92,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Lógica visual del Navbar
+            // Lógica visual del Navbar
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
             const largoPildora = 'max-w-[760px]';
@@ -109,49 +109,79 @@
                 }
             });
 
-            // 2. LÓGICA DE REDIRECCIÓN Y LLAVES MAESTRAS
+            // LÓGICA DE LOGIN CONECTADA A LA BASE DE DATOS
             const loginForm = document.getElementById('loginForm');
             const btnSubmit = document.getElementById('btnSubmit');
+            const mensajeError = document.getElementById('mensajeError');
             
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault(); 
                 
-                const usernameIngresado = document.getElementById('username').value.trim();
-                const passwordIngresada = document.getElementById('password').value;
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
                 
                 const textoOriginal = btnSubmit.textContent;
                 btnSubmit.textContent = 'Verificando...';
                 btnSubmit.disabled = true;
+                mensajeError.style.display = 'none';
 
                 // ==========================================
-                // 🚨 LLAVES MAESTRAS TEMPORALES (FRONTEND) 🚨
+                // LLAVE MAESTRA TEMPORAL (Solo por si Render se duerme)
                 // ==========================================
-                
-                // 1. Acceso de Administrador (Edwin y Marce)
-                if (usernameIngresado === 'EdwinyMarce' && passwordIngresada === 'Gaby2012') {
+                if (username === 'EdwinyMarce' && password === 'Gaby2012') {
+                    // Guardamos la sesión en el navegador
+                    localStorage.setItem('gv_usuario_actual', JSON.stringify({ nombre: 'Edwin y Marce', rol: 'ADMIN' }));
                     window.location.href = 'admin_dashboard.html';
                     return; 
                 }
 
-                // 2. Acceso del Equipo (Claves temporales)
-                if (passwordIngresada === '12345678') {
-                    if (usernameIngresado.toLowerCase() === 'amadellaves@ejemplo.com' || usernameIngresado.toLowerCase() === 'andrea_al') {
-                        window.location.href = 'ama_llaves_dashboard.html';
-                        return;
-                    } else if (usernameIngresado.toLowerCase() === 'empleado@ejemplo.com' || usernameIngresado.toLowerCase() === 'ricardo_aseo') {
-                        window.location.href = 'empleado_dashboard.html';
-                        return;
-                    } else {
-                        // Cualquier otro usuario con 12345678 va a propietario
-                        window.location.href = 'propietario_dashboard.html';
-                        return;
-                    }
-                }
+                try {
+                    // 1. Llamamos a tu base de datos en Render
+                    const respuesta = await fetch('https://gestandovalor-backend.onrender.com/usuarios/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
 
-                // Si llega hasta aquí, los datos son incorrectos
-                alert('Usuario o contraseña incorrectos. Verifica tus datos.');
-                btnSubmit.textContent = textoOriginal;
-                btnSubmit.disabled = false;
+                    if (respuesta.ok) {
+                        const data = await respuesta.json();
+                        const usuario = data.usuario;
+
+                        // 2. Guardamos quién entró en la memoria del navegador
+                        // Así las otras páginas sabrán si decir "Hola, Ricardo" u "Hola, Carlos"
+                        localStorage.setItem('gv_usuario_actual', JSON.stringify(usuario));
+
+                        // 3. El Portero de Discoteca: Redirige según el Rol
+                        switch(usuario.rol) {
+                            case 'ADMIN':
+                                window.location.href = 'admin_dashboard.html';
+                                break;
+                            case 'AMA_LLAVES':
+                                window.location.href = 'ama_llaves_dashboard.html';
+                                break;
+                            case 'ASEO':
+                                window.location.href = 'empleado_dashboard.html';
+                                break;
+                            case 'PROPIETARIO':
+                                window.location.href = 'propietario_dashboard.html';
+                                break;
+                            default:
+                                alert('Tu usuario no tiene un rol asignado. Contacta al administrador.');
+                                btnSubmit.textContent = textoOriginal;
+                                btnSubmit.disabled = false;
+                        }
+                    } else {
+                        // Credenciales incorrectas
+                        mensajeError.style.display = 'flex';
+                        btnSubmit.textContent = textoOriginal;
+                        btnSubmit.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error de conexión:', error);
+                    alert('El servidor está despertando (Render gratuito). Intenta de nuevo en 30 segundos.');
+                    btnSubmit.textContent = textoOriginal;
+                    btnSubmit.disabled = false;
+                }
             });
         });
     </script>
