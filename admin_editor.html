@@ -258,42 +258,51 @@
                     this.form.secciones = this.form.secciones.filter(s => s.id !== id);
                 },
 
-                procesarFoto(event, destino) {
-                    const archivo = event.target.files[0];
-                    if (!archivo) return;
-                    
-                    if(destino === 'portada') this.comprimiendoGlobal = true;
-                    
-                    const lector = new FileReader();
-                    lector.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const MAX_WIDTH = 1400; const MAX_HEIGHT = 1400;
-                            let width = img.width; let height = img.height;
-                            if (width > height) { if (width > MAX_WIDTH) { height = Math.round((height *= MAX_WIDTH / width)); width = MAX_WIDTH; } } 
-                            else { if (height > MAX_HEIGHT) { width = Math.round((width *= MAX_HEIGHT / height)); height = MAX_HEIGHT; } }
-                            
-                            const canvas = document.createElement('canvas');
-                            canvas.width = width; canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            const imagenOptimizada = canvas.toDataURL('image/jpeg', 0.75);
-                            
-                            if(destino === 'portada') {
-                                this.form.foto_url = imagenOptimizada;
-                                this.comprimiendoGlobal = false;
-                            } else {
-                                const secIndex = this.form.secciones.findIndex(s => s.id === destino);
-                                if(secIndex !== -1) {
-                                    this.form.secciones[secIndex].foto_url = imagenOptimizada;
-                                }
-                            }
-                        };
-                        img.src = e.target.result;
-                    };
-                    lector.readAsDataURL(archivo);
-                },
+               procesarFoto(event, destino) {
+    const archivo = event.target.files[0]; 
+    if (!archivo) return;
+    
+    if(destino === 'portada') this.comprimiendoGlobal = true;
+    
+    const lector = new FileReader();
+    lector.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            
+            // LA MAGIA: 1200px para portada, 800px para las fotos del texto
+            const MAX_WIDTH = destino === 'portada' ? 1200 : 800; 
+            const MAX_HEIGHT = destino === 'portada' ? 1200 : 800; 
+            
+            let w = img.width, h = img.height;
+            
+            if (w > h) { 
+                if (w > MAX_WIDTH) { h = Math.round(h * MAX_WIDTH / w); w = MAX_WIDTH; } 
+            } else { 
+                if (h > MAX_HEIGHT) { w = Math.round(w * MAX_HEIGHT / h); h = MAX_HEIGHT; } 
+            }
+            
+            canvas.width = w; 
+            canvas.height = h;
+            
+            // Dibujamos la imagen redimensionada
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            
+            // COMPRESIÓN AGRESIVA PERO NÍTIDA: 65% de calidad (0.65)
+            const imagenOptimizada = canvas.toDataURL('image/jpeg', 0.65);
+            
+            if(destino === 'portada') { 
+                this.form.foto_url = imagenOptimizada; 
+                this.comprimiendoGlobal = false; 
+            } else { 
+                const secIndex = this.form.secciones.findIndex(s => s.id === destino); 
+                if(secIndex !== -1) this.form.secciones[secIndex].foto_url = imagenOptimizada; 
+            }
+        };
+        img.src = e.target.result;
+    };
+    lector.readAsDataURL(archivo);
+},
 
                 async guardarArticulo() {
                     this.form.titulo = document.getElementById('titulo-articulo').innerText;
