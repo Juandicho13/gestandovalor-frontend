@@ -4,24 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operación y Usuarios - GestandoValor</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: '#0B132B', 
-                        gold: '#D4AF37', 
-                        lightGray: '#F9FAFB',
-                        danger: '#EF4444',
-                        success: '#10B981',
-                        warning: '#F59E0B'
-                    }
-                }
-            }
+            theme: { extend: { colors: { navy: '#0B132B', gold: '#D4AF37', lightGray: '#F9FAFB', danger: '#EF4444', success: '#10B981', warning: '#F59E0B' } } }
         }
     </script>
     <style>
@@ -33,40 +20,27 @@
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="panelOperaciones()" x-init="init()">
 
     <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
-        
         <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        
         <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="admin_dashboard.html" class="text-sm font-medium hover:text-gold transition-colors">Mi Panel</a>
             <a href="solicitudes.html" class="text-sm font-medium hover:text-gold transition-colors">Solicitudes</a>
             <a href="reservas.html" class="text-sm font-medium hover:text-gold transition-colors">Reservas</a>
             <a href="operacion.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Operación y Usuarios</a>
             <a href="propiedades.html" class="text-sm font-medium hover:text-gold transition-colors">Propiedades</a>
-            
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            
             <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Salir
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> Salir
             </a>
         </div>
-
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
             <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">E</div>
         </div>
-
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
-        </button>
     </nav>
 
     <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
-        
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
@@ -74,18 +48,9 @@
                     <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Centro de Mando</h1>
                     <p class="text-gray-400 mt-3 text-lg">Supervisa la operación diaria o gestiona los accesos de todos tus usuarios.</p>
                 </div>
-                
                 <div class="flex bg-white/10 p-1.5 rounded-full border border-white/20 mt-4 md:mt-0">
-                    <button @click="vistaActiva = 'operacion'" 
-                            class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300"
-                            :class="vistaActiva === 'operacion' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">
-                        Operación en Vivo
-                    </button>
-                    <button @click="vistaActiva = 'usuarios'" 
-                            class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300"
-                            :class="vistaActiva === 'usuarios' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">
-                        Gestión de Usuarios
-                    </button>
+                    <button @click="vistaActiva = 'operacion'" class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300" :class="vistaActiva === 'operacion' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">Operación en Vivo</button>
+                    <button @click="vistaActiva = 'usuarios'" class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300" :class="vistaActiva === 'usuarios' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">Gestión de Usuarios</button>
                 </div>
             </div>
         </div>
@@ -99,105 +64,64 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             
             <div x-show="vistaActiva === 'operacion'" x-transition.opacity>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="max-w-5xl mx-auto space-y-8">
                     
-                    <div class="lg:col-span-2 space-y-8">
-                        <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-2xl font-extrabold text-navy flex items-center gap-3">
-                                    <span class="w-3 h-3 rounded-full bg-success animate-pulse"></span>
-                                    Radar del Equipo
-                                </h2>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="p-5 rounded-2xl border border-blue-100 bg-blue-50/50 flex items-start gap-4">
-                                    <div class="w-12 h-12 bg-navy text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 shadow-inner">EA</div>
-                                    <div>
-                                        <h4 class="font-bold text-navy mb-1">Ricardo (Aseo)</h4>
-                                        <p class="text-xs text-blue-600 font-extrabold mb-2 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                            En Apto 511 (Chía)
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="p-5 rounded-2xl border border-green-100 bg-green-50/50 flex items-start gap-4">
-                                    <div class="w-12 h-12 bg-success text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 shadow-inner">AL</div>
-                                    <div>
-                                        <h4 class="font-bold text-navy mb-1">Andrea (Ama de Llaves)</h4>
-                                        <p class="text-xs text-success font-extrabold mb-2 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            Disponible
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-extrabold text-navy flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-success animate-pulse"></span> Radar del Equipo
+                            </h2>
                         </div>
-
-                        <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
-                            <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                                <h2 class="text-xl font-extrabold text-navy">Novedades y Reportes</h2>
-                            </div>
-                            
-                            <div class="divide-y divide-gray-100">
-                                <div class="p-6 hover:bg-gray-50 transition-colors flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-danger flex-shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                    </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <template x-for="miembro in equipoRadar" :key="miembro.id">
+                                <div class="p-6 rounded-3xl border flex items-start gap-4 transition-shadow hover:shadow-lg" :class="miembro.rol === 'AMA_LLAVES' ? 'border-green-100 bg-green-50/50' : 'border-blue-100 bg-blue-50/50'">
+                                    <div class="w-14 h-14 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-inner" :class="miembro.rol === 'AMA_LLAVES' ? 'bg-success' : 'bg-navy'" x-text="miembro.rol === 'AMA_LLAVES' ? 'AL' : 'EA'"></div>
                                     <div>
-                                        <h3 class="font-bold text-navy text-base">Copa de vino rota</h3>
-                                        <div class="flex items-center gap-2 mt-1">
-                                            <span class="text-xs font-bold text-navy bg-gray-100 px-2 py-0.5 rounded">Penthouse Bogotá</span>
-                                            <span class="text-xs text-gray-400">17 Feb, 2026 - 14:30 PM</span>
+                                        <h4 class="font-bold text-navy text-lg mb-1" x-text="miembro.nombre"></h4>
+                                        <p x-show="miembro.estado === 'Disponible'" class="text-sm font-extrabold mb-2 flex items-center gap-1" :class="miembro.rol === 'AMA_LLAVES' ? 'text-success' : 'text-gray-500'">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Disponible
+                                        </p>
+                                        <div x-show="miembro.estado === 'Ocupado'">
+                                            <p class="text-sm text-blue-600 font-extrabold mb-2 flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <span x-text="`En ${miembro.ubicacion}`"></span>
+                                            </p>
+                                            <div class="flex gap-3 text-[11px] text-gray-500 bg-white px-3 py-1.5 rounded-md border border-gray-100 inline-flex shadow-sm">
+                                                <span><strong class="text-navy">Inició:</strong> <span x-text="miembro.checkIn"></span></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </template>
+                            <p x-show="equipoRadar.length === 0" class="text-sm text-gray-500 col-span-2 text-center py-4">No hay personal operativo registrado.</p>
+                        </div>
+                    </div>
 
-                                <div class="p-6 hover:bg-gray-50 transition-colors flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-yellow-50 rounded-full flex items-center justify-center text-warning flex-shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h2 class="text-xl font-extrabold text-navy">Novedades y Reportes</h2>
+                        </div>
+                        <div class="divide-y divide-gray-100">
+                            <template x-for="nov in novedades" :key="nov.id">
+                                <div class="p-6 md:px-8 hover:bg-gray-50 transition-colors flex items-center gap-5">
+                                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-danger flex-shrink-0">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     </div>
                                     <div>
-                                        <h3 class="font-bold text-navy text-base">Stock bajo: Amenities (Shampoo)</h3>
-                                        <div class="flex items-center gap-2 mt-1">
-                                            <span class="text-xs font-bold text-navy bg-gray-100 px-2 py-0.5 rounded">Torre A Chía</span>
-                                            <span class="text-xs text-gray-400">17 Feb, 2026 - 09:15 AM</span>
+                                        <h3 class="font-bold text-navy text-lg" x-text="nov.novedad_reportada"></h3>
+                                        <div class="flex items-center gap-2 mt-1.5">
+                                            <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1 rounded-full" x-text="nov.propiedad ? nov.propiedad.titulo : 'Propiedad'"></span>
+                                            <span class="text-xs text-gray-400" x-text="new Date(nov.created_at).toLocaleDateString('es-CO')"></span>
                                         </div>
                                     </div>
                                 </div>
+                            </template>
+                            <div x-show="novedades.length === 0" class="p-10 text-center">
+                                <span class="text-4xl mb-3 block">✨</span>
+                                <p class="text-gray-500 font-medium">Todo en orden. No hay novedades reportadas.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="bg-navy rounded-[40px] shadow-2xl border border-gold/20 p-8 text-white sticky top-32">
-                            <h2 class="text-xl font-extrabold text-white mb-2">Accesos del Personal</h2>
-                            <p class="text-sm text-gray-400 mb-6">Aquí verás los roles principales que pueden entrar al sistema.</p>
-                            
-                            <div class="space-y-4">
-                                <div class="bg-white/5 border border-white/10 p-4 rounded-2xl group">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <p class="font-bold text-sm">Ama de Llaves</p>
-                                        <span class="text-[10px] bg-gold/20 text-gold px-2 py-1 rounded uppercase tracking-wider font-bold">Supervisión</span>
-                                    </div>
-                                    <p class="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                        Rol: AMA_LLAVES
-                                    </p>
-                                </div>
-
-                                <div class="bg-white/5 border border-white/10 p-4 rounded-2xl group">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <p class="font-bold text-sm">Equipo de Aseo</p>
-                                        <span class="text-[10px] bg-white/10 text-white px-2 py-1 rounded uppercase tracking-wider font-bold">Limpieza</span>
-                                    </div>
-                                    <p class="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                        Rol: ASEO
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -218,6 +142,7 @@
                                     <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Nombre</th>
                                     <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rol</th>
                                     <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Usuario (Login)</th>
+                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Propiedades</th>
                                     <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">Acciones</th>
                                 </tr>
                             </thead>
@@ -227,12 +152,7 @@
                                         <td class="p-5">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                                                     :class="{
-                                                         'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO',
-                                                         'bg-blue-100 text-blue-700': usr.rol === 'ASEO',
-                                                         'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES',
-                                                         'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol
-                                                     }"
+                                                     :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
                                                      x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
                                                 </div>
                                                 <p class="font-bold text-navy" x-text="usr.nombre"></p>
@@ -240,17 +160,18 @@
                                         </td>
                                         <td class="p-5">
                                             <span class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
-                                                  :class="{
-                                                      'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO',
-                                                      'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO',
-                                                      'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES',
-                                                      'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol
-                                                  }" 
+                                                  :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }" 
                                                   x-text="formatearRol(usr.rol)">
                                             </span>
                                         </td>
                                         <td class="p-5">
                                             <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200" x-text="usr.username"></span>
+                                        </td>
+                                        <td class="p-5">
+                                            <span x-show="usr.rol === 'PROPIETARIO'" class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30">
+                                                <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span> Asignadas
+                                            </span>
+                                            <span x-show="usr.rol !== 'PROPIETARIO'" class="text-xs text-gray-400 font-bold">-</span>
                                         </td>
                                         <td class="p-5 text-right">
                                             <button @click="abrirEdicion(usr)" class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
@@ -259,7 +180,7 @@
                                     </tr>
                                 </template>
                                 <tr x-show="usuarios.length === 0">
-                                    <td colspan="4" class="p-8 text-center text-gray-500 font-medium">No hay usuarios registrados en la base de datos.</td>
+                                    <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay usuarios registrados en la base de datos.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -305,11 +226,10 @@
                             <input type="text" x-model="formUsuario.username" placeholder="Usuario" required class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
                         </div>
                         <div>
-                            <input type="text" x-model="formUsuario.password" placeholder="Contraseña" required minlength="6" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
-                            
+                            <input type="text" x-model="formUsuario.password" :placeholder="modoEdicion ? 'Cambiar contraseña' : 'Contraseña'" :required="!modoEdicion" minlength="6" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
                             <p class="text-[10px] mt-1 ml-1" :class="modoEdicion ? 'text-blue-500 font-bold' : 'text-gray-500'">
                                 <span x-show="!modoEdicion">Mínimo 6 caracteres.</span>
-                                <span x-show="modoEdicion">Contraseña actual visible. Cámbiala si deseas.</span>
+                                <span x-show="modoEdicion">Contraseña actual visible.</span>
                             </p>
                         </div>
                     </div>
@@ -321,7 +241,7 @@
                         <span class="text-[10px] text-navy bg-gold px-2 py-0.5 rounded-full font-bold" x-text="propiedadesSeleccionadas.length + ' seleccionadas'"></span>
                     </label>
                     
-                    <p x-show="propiedadesReales.length === 0" class="text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100">
+                    <p x-show="propiedadesReales.length === 0" class="text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100 mb-2">
                         Aún no has creado propiedades en el sistema.
                     </p>
 
@@ -329,11 +249,9 @@
                         <template x-for="prop in propiedadesReales" :key="prop.id">
                             <label class="relative cursor-pointer group block">
                                 <input type="checkbox" :value="prop.id" x-model="propiedadesSeleccionadas" class="peer sr-only">
-                                
                                 <div class="rounded-xl overflow-hidden border-4 border-transparent peer-checked:border-gold transition-all relative h-28 shadow-sm group-hover:shadow-md bg-gray-100">
                                     <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : 'https://via.placeholder.com/400x300?text=Sin+Foto'" class="w-full h-full object-cover">
                                     <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/40 to-transparent"></div>
-                                    
                                     <div class="absolute bottom-2 left-2 right-2">
                                         <p class="text-white text-xs font-extrabold truncate drop-shadow-md" x-text="prop.titulo || prop.tipo_propiedad || 'Propiedad'"></p>
                                         <p class="text-gray-300 text-[10px] uppercase font-bold" x-text="prop.ciudad || 'Sin ciudad'"></p>
@@ -358,15 +276,13 @@
         function panelOperaciones() {
             return {
                 mobileMenuOpen: false,
-                vistaActiva: 'operacion', // Lo dejamos en operacion para que lo veas apenas entres
+                vistaActiva: 'operacion', 
                 cargando: true,
                 procesando: false,
 
-                // Listas de datos
                 usuarios: [],
                 propiedadesReales: [],
                 
-                // NUEVAS LISTAS PARA OPERACIÓN EN VIVO
                 equipoRadar: [], 
                 novedades: [],
 
@@ -382,7 +298,6 @@
                 async cargarDatosCompletos() {
                     this.cargando = true;
                     try {
-                        // 1. Descargamos Usuarios
                         const resUsr = await fetch('https://gestandovalor-backend.onrender.com/usuarios');
                         let listaUsuarios = [];
                         if (resUsr.ok) {
@@ -392,7 +307,6 @@
                             }
                         }
 
-                        // 2. Descargamos Propiedades
                         try {
                             const resProp = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
                             if (resProp.ok) {
@@ -401,7 +315,6 @@
                             }
                         } catch(e) { this.propiedadesReales = []; }
 
-                        // 3. NUEVO: Descargamos Tareas de Aseo en vivo
                         let tareasActivas = [];
                         try {
                             const resTareas = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo');
@@ -410,12 +323,8 @@
                             }
                         } catch(e) { console.log('Aún no hay tareas creadas'); }
 
-                        // PROCESAMOS EL RADAR DEL EQUIPO
-                        // Filtramos solo a los empleados operativos
                         const personalOperativo = listaUsuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
-                        
                         this.equipoRadar = personalOperativo.map(emp => {
-                            // Buscamos si este empleado tiene una tarea "En Progreso"
                             const tareaActual = tareasActivas.find(t => t.empleado_id === emp.id && t.estado === 'En Progreso');
                             return {
                                 ...emp,
@@ -425,8 +334,6 @@
                             };
                         });
 
-                        // PROCESAMOS LAS NOVEDADES
-                        // Filtramos las tareas que tengan un texto en "novedad_reportada"
                         this.novedades = tareasActivas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
 
                     } catch (error) {
@@ -458,11 +365,11 @@
                         id: usuario.id, 
                         nombre: usuario.nombre, 
                         username: usuario.username, 
-                        password: usuario.password || '', // AQUÍ ESTÁ EL CAMBIO: Ahora carga la contraseña que existe en la BD
+                        password: usuario.password || '', 
                         rol: usuario.rol 
                     };
                     
-                    if(usuario.propiedades) {
+                    if(usuario.propiedades && usuario.propiedades.length > 0) {
                         this.propiedadesSeleccionadas = usuario.propiedades.map(p => p.id);
                     } else {
                         this.propiedadesSeleccionadas = [];
@@ -480,7 +387,6 @@
                     
                     const metodo = this.modoEdicion ? 'PATCH' : 'POST';
 
-                    // En esta versión, como la contraseña siempre es visible, siempre la enviamos
                     const payload = { ...this.formUsuario };
                     delete payload.id;
 
@@ -529,7 +435,6 @@
             }
         }
 
-        // Animación Píldora Navbar
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
