@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor WYSIWYG - GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { navy: '#0B132B', gold: '#D4AF37', lightGray: '#F9FAFB' } } }
+        }
+    </script>
+    <style>
+        /* Magia para los placeholders de las zonas de escritura */
+        [contenteditable]:empty:before {
+            content: attr(data-placeholder);
+            color: #9ca3af;
+            pointer-events: none;
+            display: block;
+            font-style: italic;
+        }
+        /* Resalta sutilmente el área donde se está escribiendo */
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #f9fafb;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: -1.5rem;
+            box-shadow: inset 0 0 0 2px rgba(212,175,55,0.3);
+        }
+        [contenteditable] { transition: all 0.3s ease; }
+        
+        /* Ocultar scrollbar en la píldora para móviles */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-white pb-32" x-data="editorEnVivo()" x-init="init()">
+
+    <nav id="navbar" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 backdrop-blur-lg border border-white/10 w-[95%] max-w-[400px] h-14 rounded-full px-6 shadow-2xl bg-navy/90">
+        <a href="admin_dashboard.html" class="flex items-center z-[60]">
+            <img src="GV.png" alt="Logo" class="h-8 w-auto object-contain">
+        </a>
+        <div class="flex items-center justify-end flex-1 pl-4">
+            <a href="admin_blog.html" class="group text-sm font-bold text-white hover:text-gold transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Volver a Gestión
+            </a>
+        </div>
+    </nav>
+
+    <div class="pt-40">
+        
+        <header class="max-w-7xl mx-auto px-6 lg:px-12">
+            
+            <h1 id="titulo-articulo" contenteditable="true" data-placeholder="Escribe el Título de Impacto Aquí..." class="text-4xl md:text-7xl font-extrabold text-navy leading-tight mb-10 max-w-6xl outline-none" x-text="form.titulo"></h1>
+            
+            <div class="flex flex-wrap items-center gap-6 text-gray-500 font-medium text-base border-t border-gray-100 pt-8 max-w-6xl mb-12">
+                
+                <select x-model="form.categoria" class="bg-navy text-gold text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider outline-none cursor-pointer appearance-none shadow-md hover:bg-blue-950 transition-colors">
+                    <option value="Inversión Inmobiliaria">Inversión Inmobiliaria</option>
+                    <option value="Gestión de Rentas">Gestión de Rentas</option>
+                    <option value="Mercado y Tendencias">Mercado y Tendencias</option>
+                    <option value="Diseño y Hospitalidad">Diseño y Hospitalidad</option>
+                </select>
+                
+                <span>•</span>
+                <span class="flex items-center gap-1">Hoy</span>
+                <span>•</span>
+                <span class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <input type="number" x-model="form.tiempo_lectura" class="w-12 bg-transparent outline-none text-center font-bold text-navy" min="1"> min lectura
+                </span>
+            </div>
+        </header>
+
+        <section class="max-w-7xl mx-auto px-6 lg:px-12 mb-12 relative group">
+            <div class="relative w-full rounded-[30px] overflow-hidden shadow-xl bg-gray-100 flex items-center justify-center min-h-[400px] border-4 border-dashed border-gray-200 transition-colors" :class="!form.foto_url ? 'hover:border-gold' : 'border-transparent'">
+                
+                <label x-show="!form.foto_url && !comprimiendoGlobal" class="cursor-pointer text-center p-20 w-full h-full flex flex-col items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-xl font-bold text-gray-400">Haz clic para subir la Portada</span>
+                    <input type="file" accept="image/*" class="hidden" @change="procesarFoto($event, 'portada')">
+                </label>
+
+                <div x-show="comprimiendoGlobal" style="display: none;" class="flex flex-col items-center justify-center text-gold">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-gold mb-4"></div>
+                    <p class="font-bold">Optimizando imagen...</p>
+                </div>
+
+                <template x-if="form.foto_url && !comprimiendoGlobal">
+                    <img :src="form.foto_url" class="w-full h-auto max-h-[650px] object-cover">
+                </template>
+                
+                <label x-show="form.foto_url && !comprimiendoGlobal" style="display: none;" class="absolute bottom-6 left-6 bg-white text-navy w-12 h-12 rounded-full flex items-center justify-center cursor-pointer shadow-xl hover:scale-110 hover:text-gold transition-transform border border-gray-100 z-10" title="Cambiar Portada">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    <input type="file" accept="image/*" class="hidden" @change="procesarFoto($event, 'portada')">
+                </label>
+            </div>
+        </section>
+
+        <article class="max-w-7xl mx-auto px-6 lg:px-12 mb-16">
+            <div id="texto-principal" contenteditable="true" data-placeholder="Haz clic aquí y empieza a escribir la introducción de tu artículo..." class="prose prose-xl md:prose-2xl prose-headings:text-navy prose-headings:font-extrabold prose-p:text-gray-800 prose-a:text-gold max-w-5xl mx-auto leading-relaxed outline-none min-h-[150px]" x-html="form.contenido_principal"></div>
+        </article>
+
+        <article class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="max-w-5xl mx-auto">
+                <template x-for="(sec, index) in form.secciones" :key="sec.id">
+                    <div class="relative group mb-12" :id="'contenedor-sec-' + sec.id">
+                        
+                        <button @click="eliminarSeccion(sec.id)" class="absolute -left-16 top-0 opacity-0 group-hover:opacity-100 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md" title="Eliminar sección">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+
+                        <div class="relative w-full rounded-[20px] overflow-hidden mb-8 bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200 hover:border-gold transition-colors" :class="sec.foto_url ? 'border-transparent border-0' : 'min-h-[150px]'">
+                            <label x-show="!sec.foto_url" class="cursor-pointer text-center w-full h-full flex flex-col items-center justify-center p-6 text-gray-400 hover:text-gold transition-colors">
+                                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span class="text-sm font-bold uppercase tracking-widest">+ Añadir Imagen Intercalada (Opcional)</span>
+                                <input type="file" accept="image/*" class="hidden" @change="procesarFoto($event, sec.id)">
+                            </label>
+                            <template x-if="sec.foto_url">
+                                <img :src="sec.foto_url" class="w-full h-auto object-cover shadow-md">
+                            </template>
+                            <label x-show="sec.foto_url" style="display: none;" class="absolute bottom-4 left-4 bg-white text-navy w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 hover:text-gold transition-transform z-10" title="Cambiar Foto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                <input type="file" accept="image/*" class="hidden" @change="procesarFoto($event, sec.id)">
+                            </label>
+                            <button x-show="sec.foto_url" style="display: none;" @click="sec.foto_url = ''" class="absolute top-4 right-4 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors z-10" title="Quitar Foto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <div :id="'texto-sec-' + sec.id" contenteditable="true" data-placeholder="Continúa escribiendo aquí..." class="prose prose-xl md:prose-2xl prose-headings:text-navy prose-headings:font-extrabold prose-p:text-gray-800 prose-a:text-gold max-w-none leading-relaxed outline-none" x-html="sec.texto"></div>
+                    </div>
+                </template>
+
+                <div class="flex justify-center mt-12">
+                    <button @click="agregarSeccion()" class="group relative border-2 border-dashed border-gray-300 text-gray-400 hover:text-gold hover:border-gold hover:bg-gold/5 w-full py-6 rounded-[30px] flex items-center justify-center gap-3 transition-all shadow-sm">
+                        <svg class="w-6 h-6 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span class="font-bold uppercase tracking-widest text-sm">Añadir otra zona de Imagen + Texto</span>
+                    </button>
+                </div>
+
+            </div>
+        </article>
+    </div>
+
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[98%] max-w-6xl bg-navy rounded-full h-[72px] flex items-center justify-between px-3 shadow-[0_20px_50px_rgba(11,19,43,0.5)] z-[100] border border-white/10 overflow-x-auto scrollbar-hide">
+        
+        <div class="flex items-center gap-2 md:gap-4 flex-nowrap">
+            
+            <div class="bg-white/10 rounded-full px-3 py-1.5 flex items-center h-10 border border-white/5">
+                <select onchange="document.execCommand('formatBlock', false, this.value); this.selectedIndex=0;" class="bg-transparent text-white font-bold outline-none cursor-pointer text-sm w-32 appearance-none text-center">
+                    <option value="" disabled selected>Estilos ▼</option>
+                    <option value="P" class="text-black">Texto normal</option>
+                    <option value="H1" class="text-black text-xl font-bold">Título (H1)</option>
+                    <option value="H2" class="text-black text-lg font-bold">Subtítulo (H2)</option>
+                    <option value="H3" class="text-black font-bold">Encabezado (H3)</option>
+                </select>
+            </div>
+
+            <div class="bg-white/10 rounded-full px-2 py-1.5 flex items-center h-10 border border-white/5 text-white gap-2">
+                <button @click="aplicarTamano(-2)" class="w-6 h-full flex items-center justify-center hover:text-gold font-bold">-</button>
+                <span class="text-sm font-bold w-6 text-center select-none" x-text="tamanoFuente"></span>
+                <button @click="aplicarTamano(2)" class="w-6 h-full flex items-center justify-center hover:text-gold font-bold">+</button>
+            </div>
+
+            <div class="bg-white/10 rounded-full px-1 flex items-center h-10 border border-white/5">
+                <button onmousedown="event.preventDefault(); document.execCommand('bold', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold transition-colors font-serif font-bold text-lg" title="Negrita">B</button>
+                <button onmousedown="event.preventDefault(); document.execCommand('italic', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold transition-colors font-serif italic text-lg" title="Cursiva">I</button>
+                <button onmousedown="event.preventDefault(); document.execCommand('underline', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold transition-colors font-serif underline text-lg" title="Subrayado">U</button>
+            </div>
+
+            <div class="bg-white/10 rounded-full px-1 flex items-center h-10 border border-white/5">
+                <button onmousedown="event.preventDefault(); document.execCommand('justifyLeft', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold" title="Alinear a la izquierda">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z"/></svg>
+                </button>
+                <button onmousedown="event.preventDefault(); document.execCommand('justifyCenter', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold" title="Centrar">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm3 7h12v2H6v-2zm-3 7h18v2H3v-2z"/></svg>
+                </button>
+                <button onmousedown="event.preventDefault(); document.execCommand('justifyRight', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold" title="Alinear a la derecha">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm6 7h12v2H9v-2zm-6 7h18v2H3v-2z"/></svg>
+                </button>
+                <button onmousedown="event.preventDefault(); document.execCommand('justifyFull', false, null)" class="w-10 h-full flex items-center justify-center text-white hover:text-gold" title="Justificar">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></svg>
+                </button>
+            </div>
+
+            <button onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList', false, null)" class="w-10 h-10 bg-white/10 border border-white/5 rounded-full flex items-center justify-center text-white hover:text-gold transition-colors flex-shrink-0" title="Lista de puntos">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16M4 6h.01M4 12h.01M4 18h.01" stroke-width="3"/></svg>
+            </button>
+        </div>
+
+        <button @click="guardarArticulo()" class="ml-2 bg-gold hover:bg-yellow-500 text-navy font-extrabold h-12 px-6 rounded-full transition-transform hover:scale-105 flex items-center gap-2 flex-shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.4)]" :disabled="guardando || comprimiendoGlobal">
+            <span x-show="!guardando" x-text="idEditando ? 'Guardar' : 'Publicar'"></span>
+            <span x-show="guardando">...</span>
+            <svg x-show="!guardando" class="w-4 h-4 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+
+    </div>
+
+    <script>
+        function editorEnVivo() {
+            return {
+                URL_API: 'https://gestandovalor-backend.onrender.com/blog',
+                idEditando: null,
+                guardando: false,
+                comprimiendoGlobal: false,
+                tamanoFuente: 18, // Tamaño base
+                
+                form: {
+                    titulo: '',
+                    categoria: 'Inversión Inmobiliaria',
+                    tiempo_lectura: 5,
+                    foto_url: '',
+                    contenido_principal: '',
+                    secciones: [] // Inicia vacío, ya que el principal está arriba
+                },
+
+                async init() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.idEditando = urlParams.get('id');
+
+                    if (this.idEditando) {
+                        await this.cargarArticuloExistente();
+                    }
+                },
+
+                // LA MAGIA DEL TAMAÑO DE FUENTE
+                aplicarTamano(delta) {
+                    event.preventDefault(); // Evita perder el cursor del texto
+                    let nuevoTamano = this.tamanoFuente + delta;
+                    if(nuevoTamano < 10) nuevoTamano = 10;
+                    if(nuevoTamano > 48) nuevoTamano = 48;
+                    this.tamanoFuente = nuevoTamano;
+
+                    // Truco maestro para navegadores: Aplicar etiqueta <font size="7"> y luego cambiarla por CSS real
+                    document.execCommand('fontSize', false, '7');
+                    const fonts = document.getElementsByTagName('font');
+                    for (let i = 0; i < fonts.length; i++) {
+                        if (fonts[i].size == '7') {
+                            fonts[i].removeAttribute('size');
+                            fonts[i].style.fontSize = this.tamanoFuente + 'px';
+                        }
+                    }
+                },
+
+                agregarSeccion() {
+                    this.form.secciones.push({ id: Date.now(), foto_url: '', texto: '' });
+                    setTimeout(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 100);
+                },
+
+                eliminarSeccion(id) {
+                    this.form.secciones = this.form.secciones.filter(s => s.id !== id);
+                },
+
+                procesarFoto(event, destino) {
+                    const archivo = event.target.files[0];
+                    if (!archivo) return;
+                    
+                    if(destino === 'portada') this.comprimiendoGlobal = true;
+                    
+                    const lector = new FileReader();
+                    lector.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const MAX_WIDTH = 1400; const MAX_HEIGHT = 1400;
+                            let width = img.width; let height = img.height;
+                            if (width > height) { if (width > MAX_WIDTH) { height = Math.round((height *= MAX_WIDTH / width)); width = MAX_WIDTH; } } 
+                            else { if (height > MAX_HEIGHT) { width = Math.round((width *= MAX_HEIGHT / height)); height = MAX_HEIGHT; } }
+                            
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width; canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            const imagenOptimizada = canvas.toDataURL('image/jpeg', 0.75);
+                            
+                            if(destino === 'portada') {
+                                this.form.foto_url = imagenOptimizada;
+                                this.comprimiendoGlobal = false;
+                            } else {
+                                const secIndex = this.form.secciones.findIndex(s => s.id === destino);
+                                if(secIndex !== -1) {
+                                    this.form.secciones[secIndex].foto_url = imagenOptimizada;
+                                }
+                            }
+                        };
+                        img.src = e.target.result;
+                    };
+                    lector.readAsDataURL(archivo);
+                },
+
+                async guardarArticulo() {
+                    this.form.titulo = document.getElementById('titulo-articulo').innerText;
+
+                    if(!this.form.titulo.trim()) {
+                        alert('Por favor ponle un Título a tu artículo.'); 
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    
+                    this.guardando = true;
+
+                    // Recolectar texto principal
+                    const divPrincipal = document.getElementById('texto-principal');
+                    this.form.contenido_principal = divPrincipal ? divPrincipal.innerHTML : '';
+
+                    // Recolectar secciones extras
+                    const seccionesActualizadas = this.form.secciones.map(sec => {
+                        const elementoDiv = document.getElementById('texto-sec-' + sec.id);
+                        return { ...sec, texto: elementoDiv ? elementoDiv.innerHTML : '' };
+                    });
+
+                    // Empaquetar todo en la memoria oculta JSON
+                    const memoriaOculta = {
+                        principal: this.form.contenido_principal,
+                        secciones: seccionesActualizadas
+                    };
+                    let contenidoFinal = `\n`;
+
+                    // Armar HTML visual público
+                    if(this.form.contenido_principal && this.form.contenido_principal !== '<br>') {
+                        contenidoFinal += `<div class="mb-12">${this.form.contenido_principal}</div>\n`;
+                    }
+
+                    seccionesActualizadas.forEach(s => {
+                        if(s.foto_url) {
+                            contenidoFinal += `<img src="${s.foto_url}" class="w-full h-auto object-cover rounded-[20px] shadow-lg mb-8" />\n`;
+                        }
+                        if(s.texto && s.texto !== '<br>') {
+                            contenidoFinal += `<div class="mb-12">${s.texto}</div>\n`;
+                        }
+                    });
+
+                    const payload = {
+                        titulo: this.form.titulo,
+                        categoria: this.form.categoria,
+                        tiempo_lectura: Number(this.form.tiempo_lectura),
+                        foto_url: this.form.foto_url,
+                        contenido: contenidoFinal,
+                        estado: 'Publicado'
+                    };
+
+                    try {
+                        const url = this.idEditando ? `${this.URL_API}/${this.idEditando}` : this.URL_API;
+                        const metodo = this.idEditando ? 'PATCH' : 'POST';
+
+                        const response = await fetch(url, {
+                            method: metodo,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            window.location.href = 'admin_blog.html';
+                        } else {
+                            alert('Ocurrió un error. Verifica tu conexión.');
+                        }
+                    } catch (e) {
+                        alert('Error conectando al servidor.');
+                    }
+                    this.guardando = false;
+                },
+
+                async cargarArticuloExistente() {
+                    try {
+                        const response = await fetch(`${this.URL_API}/${this.idEditando}`);
+                        if (response.ok) {
+                            const datos = await response.json();
+                            this.form.titulo = datos.titulo;
+                            this.form.categoria = datos.categoria;
+                            this.form.tiempo_lectura = datos.tiempo_lectura;
+                            this.form.foto_url = datos.foto_url;
+                            
+                            const match = datos.contenido.match(new RegExp(''));
+                            
+                            if (match) {
+                                const dataParseada = JSON.parse(match[1]);
+                                // Compatibilidad con la versión anterior (que era un array directo) y la nueva (que es un objeto)
+                                if(Array.isArray(dataParseada)) {
+                                    this.form.secciones = dataParseada;
+                                } else {
+                                    this.form.contenido_principal = dataParseada.principal || '';
+                                    this.form.secciones = dataParseada.secciones || [];
+                                }
+                            } else {
+                                this.form.contenido_principal = datos.contenido;
+                            }
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

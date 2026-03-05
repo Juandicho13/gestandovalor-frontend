@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Blog - Admin GestandoValor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B', 
+                        gold: '#D4AF37', 
+                        lightGray: '#F9FAFB',
+                        danger: '#EF4444',
+                        success: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="gestionBlog()">
+
+    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+        
+        <a href="admin_dashboard.html" class="flex items-center flex-shrink-0 z-[60]">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 justify-center flex-1 whitespace-nowrap pl-4 text-gray-300">
+            <a href="admin_dashboard.html" class="group text-sm font-medium text-white flex items-center gap-2 hover:text-gold transition-colors">
+                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Mi Panel
+            </a>
+            
+            <div class="h-5 w-px bg-white/20 mx-2"></div>
+            
+            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Salir
+            </a>
+        </div>
+
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="hidden md:flex w-10 h-10 bg-white rounded-full items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold z-[60]">
+                E
+            </div>
+
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+                <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+                <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+                <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div x-show="mobileMenuOpen" 
+         style="display: none;"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+        <div class="flex flex-col items-center gap-8 w-full mt-10">
+            <a href="admin_dashboard.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white flex items-center gap-3 border-b-2 border-gold pb-2">
+                <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Mi Panel
+            </a>
+            <a href="login.html" @click="mobileMenuOpen = false" class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Salir del Sistema
+            </a>
+        </div>
+    </div>
+
+    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+                <div>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Marketing y Contenido</span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Gestión del Blog</h1>
+                    <p class="text-gray-400 mt-3 text-lg">Atrae más propietarios compartiendo tu experiencia.</p>
+                </div>
+                <a href="admin_editor.html" class="bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3.5 px-8 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:scale-105 transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Escribir Nuevo Artículo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 -mt-6 relative z-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            
+            <div x-show="cargandoInicial" class="text-center py-20">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
+                <p class="text-navy font-bold">Cargando artículos...</p>
+            </div>
+
+            <div x-show="!cargandoInicial && articulos.length === 0" style="display: none;" class="bg-white rounded-[40px] shadow-xl border border-gray-100 p-16 text-center">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                </div>
+                <h3 class="text-2xl font-extrabold text-navy mb-2">Tu blog está vacío</h3>
+                <p class="text-gray-500 mb-8 max-w-md mx-auto">Comienza a publicar artículos para demostrar tu experiencia.</p>
+                <a href="admin_editor.html" class="bg-navy text-white font-bold py-3 px-8 rounded-full hover:bg-gold hover:text-navy transition-colors">
+                    Crear mi primer artículo
+                </a>
+            </div>
+
+            <div x-show="!cargandoInicial && articulos.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="display: none;">
+                <template x-for="art in articulos" :key="art.id">
+                    <article class="bg-white rounded-[30px] overflow-hidden shadow-md border border-gray-100 flex flex-col group hover:shadow-xl transition-all">
+                        
+                        <a :href="`articulo.html?id=${art.id}`" target="_blank" class="relative block h-48 bg-gray-200 overflow-hidden cursor-pointer">
+                            <img :src="art.foto_url || 'https://via.placeholder.com/800x600?text=Sin+Imagen'" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute top-4 left-4 bg-navy/90 backdrop-blur-md text-gold text-[10px] font-bold px-3 py-1 rounded-full border border-white/10" x-text="art.categoria"></div>
+                            
+                            <div class="absolute inset-0 bg-navy/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="bg-white/90 text-navy font-bold px-4 py-2 rounded-full text-sm flex items-center gap-2 shadow-lg backdrop-blur-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    Ver en la web
+                                </span>
+                            </div>
+                        </a>
+
+                        <div class="p-6 flex-1 flex flex-col">
+                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 block" x-text="`Lectura: ${art.tiempo_lectura} min`"></span>
+                            <h3 class="text-xl font-extrabold text-navy mb-4 leading-tight cursor-pointer hover:text-gold transition-colors" x-text="art.titulo" @click="window.open(`articulo.html?id=${art.id}`, '_blank')"></h3>
+                            
+                            <div class="mt-auto flex justify-between gap-2 pt-6 border-t border-gray-50">
+                                <a :href="`articulo.html?id=${art.id}`" target="_blank" class="flex-1 flex items-center justify-center gap-1 bg-gray-50 text-gray-600 hover:bg-gray-100 font-bold py-2.5 rounded-xl transition-colors text-xs">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    Ver
+                                </a>
+                                <a :href="`admin_editor.html?id=${art.id}`" class="flex-1 flex items-center justify-center gap-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold py-2.5 rounded-xl transition-colors text-xs">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Editar
+                                </a>
+                                <button @click="eliminarArticulo(art.id)" class="flex-1 flex items-center justify-center gap-1 bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2.5 rounded-xl transition-colors text-xs">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    Borrar
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function gestionBlog() {
+            return {
+                articulos: [],
+                cargandoInicial: true,
+                mobileMenuOpen: false, 
+                URL_API: 'https://gestandovalor-backend.onrender.com/blog',
+
+                init() {
+                    this.cargarArticulos();
+                },
+
+                async cargarArticulos() {
+                    this.cargandoInicial = true;
+                    try {
+                        const response = await fetch(this.URL_API);
+                        if(response.ok) {
+                            this.articulos = await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Error cargando blog:', error);
+                    }
+                    this.cargandoInicial = false;
+                },
+
+                async eliminarArticulo(id) {
+                    if(!confirm('¿Estás seguro de borrar este artículo? Esta acción no se puede deshacer.')) return;
+                    
+                    try {
+                        const response = await fetch(`${this.URL_API}/${id}`, { method: 'DELETE' });
+                        if(response.ok) {
+                            this.cargarArticulos(); 
+                        }
+                    } catch(e) {
+                        alert('Error al eliminar.');
+                    }
+                }
+            }
+        }
+
+        // ANIMACIÓN DE LA PÍLDORA TRANSPARENTE
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[350px]'; 
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10'); 
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
