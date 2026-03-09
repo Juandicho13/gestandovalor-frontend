@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,24 +12,48 @@
             theme: { extend: { colors: { navy: '#0B132B', gold: '#D4AF37', lightGray: '#F9FAFB', success: '#10B981', warning: '#F59E0B', airbnb: '#FF5A5F', booking: '#003580' } } }
         }
     </script>
-    <style>.custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }</style>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 10px;
+        }
+    </style>
 </head>
+
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="portalPropietario()" x-init="init()">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="propietario_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+                class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="propietario_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Resumen Financiero</a>
-            <button @click="modalLiquidaciones = true" class="text-sm font-medium hover:text-gold transition-colors">Liquidaciones</button>
+        <div
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            <a href="propietario_dashboard.html"
+                class="text-sm font-medium text-white border-b-2 border-gold pb-1">Resumen Financiero</a>
+            <button @click="modalLiquidaciones = true"
+                class="text-sm font-medium hover:text-gold transition-colors">Liquidaciones</button>
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            <a href="#" @click="cerrarSesion()" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> Salir
-            </a>
+            <a href="#" @click="cerrarSesion()"
+                class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg Salir </a>
         </div>
         <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy border-2 border-gold font-extrabold shadow-lg" x-text="usuarioInfo ? usuarioInfo.nombre.substring(0,2).toUpperCase() : 'PR'"></div>
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy border-2 border-gold font-extrabold shadow-lg"
+                x-text="usuarioInfo ? usuarioInfo.nombre.substring(0,2).toUpperCase() : 'PR'"></div>
         </div>
     </nav>
 
@@ -41,19 +66,31 @@
 
     <div x-show="!cargando" style="display: none;">
         <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
-            <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div
+                class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none">
+            </div>
             <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Portal de Inversionistas</span>
-                        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, <span x-text="usuarioInfo ? usuarioInfo.nombre : 'Inversionista'"></span> 📈</h1>
-                        <p class="text-gray-400 mt-2">Este es el rendimiento de tus propiedades administradas por GestandoValor.</p>
+                        <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Portal de
+                            Inversionistas</span>
+                        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, <span
+                                x-text="usuarioInfo ? usuarioInfo.nombre : 'Inversionista'"></span> 📈</h1>
+                        <p class="text-gray-400 mt-2">Este es el rendimiento de tus propiedades administradas por
+                            GestandoValor.</p>
                     </div>
-                    
-                    <div class="bg-white/10 p-2 rounded-2xl border border-white/20 backdrop-blur-md flex items-center gap-4">
-                        <button class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+
+                    <div
+                        class="bg-white/10 p-2 rounded-2xl border border-white/20 backdrop-blur-md flex items-center gap-4">
+                        <button class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-5 h-5"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M15 19l-7-7 7-7" />
+                            </svg></button>
                         <span class="text-lg font-extrabold text-white w-32 text-center" x-text="mesActivo"></span>
-                        <button class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+                        <button class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-5 h-5"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 5l7 7-7 7" />
+                            </svg></button>
                     </div>
                 </div>
             </div>
@@ -61,67 +98,92 @@
 
         <section class="py-12 relative z-20 min-h-screen">
             <div class="max-w-7xl mx-auto px-6 lg:px-8">
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                    <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1 relative overflow-hidden">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 relative z-10" x-text="`Tus Ingresos Netos (${mesActivo.split(' ')[0]})`"></p>
-                        <h3 class="text-4xl font-black text-navy relative z-10" x-text="formatearDinero(totalIngresosSimulados)"></h3>
+                    <div
+                        class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1 relative overflow-hidden">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 relative z-10"
+                            x-text="`Tus Ingresos Netos (${mesActivo.split(' ')[0]})`"></p>
+                        <h3 class="text-4xl font-black text-navy relative z-10"
+                            x-text="formatearDinero(totalIngresosSimulados)"></h3>
                         <p class="text-xs text-success font-bold mt-2 flex items-center gap-1 relative z-10">
                             Calculado según tus activos
                         </p>
                     </div>
 
-                    <div class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Ocupación Promedio del Portafolio</p>
+                    <div
+                        class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Ocupación Promedio del
+                            Portafolio</p>
                         <h3 class="text-4xl font-black text-navy" x-text="ocupacionPromedio + '%'"></h3>
                         <div class="w-full bg-gray-100 rounded-full h-2 mt-4 overflow-hidden">
-                            <div class="bg-gold h-2 rounded-full transition-all duration-1000" :style="`width: ${ocupacionPromedio}%`"></div>
+                            <div class="bg-gold h-2 rounded-full transition-all duration-1000"
+                                :style="`width: ${ocupacionPromedio}%`"></div>
                         </div>
                         <p class="text-xs text-gray-500 font-bold mt-2">Dato referencial del mes</p>
                     </div>
                 </div>
 
                 <h2 class="text-2xl font-extrabold text-navy mb-6">Desempeño de tus Propiedades</h2>
-                
-                <div x-show="misPropiedades.length === 0" class="text-center py-20 bg-white rounded-[40px] shadow-xl border border-gray-100">
+
+                <div x-show="misPropiedades.length === 0"
+                    class="text-center py-20 bg-white rounded-[40px] shadow-xl border border-gray-100">
                     <h3 class="text-2xl font-bold text-navy">Aún no tienes propiedades asignadas</h3>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
                     <template x-for="(prop, index) in misPropiedades" :key="prop.id">
-                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row gap-6 items-center hover:shadow-lg transition-shadow">
+                        <div
+                            class="bg-white rounded-[40px] shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row gap-6 items-center hover:shadow-lg transition-shadow">
                             <div class="w-full md:w-40 h-full min-h-[140px] rounded-2xl overflow-hidden flex-shrink-0">
-                                <img :src="(prop.fotos && prop.fotos.length > 0) ? prop.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&q=80'" class="w-full h-full object-cover">
+                                <img :src="(prop.fotos && prop.fotos.length > 0) ? prop.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&q=80'"
+                                    class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1 w-full">
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
-                                        <h3 class="text-lg font-extrabold text-navy line-clamp-1" x-text="prop.titulo || prop.tipo_propiedad"></h3>
-                                        <p class="text-xs text-gray-500 font-bold uppercase" x-text="`${prop.ciudad}, ${prop.departamento}`"></p>
+                                        <h3 class="text-lg font-extrabold text-navy line-clamp-1"
+                                            x-text="prop.titulo || prop.tipo_propiedad"></h3>
+                                        <p class="text-xs text-gray-500 font-bold uppercase"
+                                            x-text="`${prop.ciudad}, ${prop.departamento}`"></p>
                                     </div>
                                     <span class="text-[10px] font-extrabold px-2 py-1 rounded border"
-                                          :class="prop.ocupacionSimulada > 75 ? 'bg-green-50 text-success border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'"
-                                          x-text="prop.ocupacionSimulada > 75 ? 'Ocupado Hoy' : 'Libre Hoy'"></span>
+                                        :class="prop.ocupacionSimulada > 75 ? 'bg-green-50 text-success border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'"
+                                        x-text="prop.ocupacionSimulada > 75 ? 'Ocupado Hoy' : 'Libre Hoy'"></span>
                                 </div>
-                                
-                                <div class="grid grid-cols-2 gap-4 mt-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+
+                                <div
+                                    class="grid grid-cols-2 gap-4 mt-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
                                     <div>
                                         <p class="text-[10px] text-gray-400 font-bold uppercase">Tarifa Noche Base</p>
-                                        <p class="font-bold text-navy" x-text="formatearDinero(prop.precio_noche || 0)"></p>
+                                        <p class="font-bold text-navy" x-text="formatearDinero(prop.precio_noche || 0)">
+                                        </p>
                                     </div>
                                     <div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Tu Utilidad Estimada</p>
-                                        <p class="font-bold text-success" x-text="formatearDinero((prop.precio_noche || 0) * 20 * 0.8)"></p>
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Tu Utilidad Estimada
+                                        </p>
+                                        <p class="font-bold text-success"
+                                            x-text="formatearDinero((prop.precio_noche || 0) * 20 * 0.8)"></p>
                                     </div>
                                 </div>
 
                                 <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                                    <a :href="prop.link_airbnb || '#'" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold transition-all px-3 py-1.5 rounded-lg border shadow-sm flex-1 justify-center" :class="prop.link_airbnb ? 'text-airbnb bg-red-50 hover:bg-airbnb hover:text-white border-red-100' : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z"/></svg>
+                                    <a :href="prop.link_airbnb || '#'" target="_blank"
+                                        class="flex items-center gap-1.5 text-[10px] font-extrabold transition-all px-3 py-1.5 rounded-lg border shadow-sm flex-1 justify-center"
+                                        :class="prop.link_airbnb ? 'text-airbnb bg-red-50 hover:bg-airbnb hover:text-white border-red-100' : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z" />
+                                        </svg>
                                         Airbnb
                                     </a>
-                                    <a :href="prop.link_booking || '#'" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold transition-all px-3 py-1.5 rounded-lg border shadow-sm flex-1 justify-center" :class="prop.link_booking ? 'text-booking bg-blue-50 hover:bg-booking hover:text-white border-blue-100' : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z"/></svg>
+                                    <a :href="prop.link_booking || '#'" target="_blank"
+                                        class="flex items-center gap-1.5 text-[10px] font-extrabold transition-all px-3 py-1.5 rounded-lg border shadow-sm flex-1 justify-center"
+                                        :class="prop.link_booking ? 'text-booking bg-blue-50 hover:bg-booking hover:text-white border-blue-100' : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z" />
+                                        </svg>
                                         Booking
                                     </a>
                                 </div>
@@ -133,20 +195,29 @@
         </section>
     </div>
 
-    <div x-show="modalLiquidaciones" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+    <div x-show="modalLiquidaciones" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalLiquidaciones = false"></div>
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8">
+        <div
+            class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8">
             <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
                 <div>
                     <h3 class="text-2xl font-extrabold text-navy">Tus Liquidaciones</h3>
                     <p class="text-xs text-gray-500 mt-1 font-bold">Documentos legales disponibles para descarga.</p>
                 </div>
-                <button @click="modalLiquidaciones = false" class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                <button @click="modalLiquidaciones = false"
+                    class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
             </div>
 
             <div x-show="misPropiedades.length > 1" class="mb-6 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Selecciona la Propiedad</label>
-                <select x-model="filtroPropiedadId" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold font-bold text-navy text-sm cursor-pointer shadow-sm">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Selecciona la
+                    Propiedad</label>
+                <select x-model="filtroPropiedadId"
+                    class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold font-bold text-navy text-sm cursor-pointer shadow-sm">
                     <template x-for="prop in misPropiedades" :key="prop.id">
                         <option :value="prop.id" x-text="prop.titulo || prop.tipo_propiedad"></option>
                     </template>
@@ -154,15 +225,23 @@
             </div>
 
             <div class="space-y-4 overflow-y-auto max-h-[50vh] pr-2 custom-scrollbar">
-                <p x-show="liquidacionesFiltradas.length === 0" class="text-center text-gray-400 py-6 font-medium">Aún no hay liquidaciones cargadas.</p>
+                <p x-show="liquidacionesFiltradas.length === 0" class="text-center text-gray-400 py-6 font-medium">Aún
+                    no hay liquidaciones cargadas.</p>
                 <template x-for="(liq, index) in liquidacionesFiltradas" :key="liq.id">
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gold transition-colors">
+                    <div
+                        class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gold transition-colors">
                         <div>
                             <p class="font-bold text-navy" x-text="liq.mes_anio"></p>
-                            <p class="text-[10px] font-extrabold uppercase tracking-widest mt-1" :class="index === 2 ? 'text-warning' : 'text-success'" x-text="index === 2 ? 'Pronto a expirar' : 'Soporte Listo'"></p>
+                            <p class="text-[10px] font-extrabold uppercase tracking-widest mt-1"
+                                :class="index === 2 ? 'text-warning' : 'text-success'"
+                                x-text="index === 2 ? 'Pronto a expirar' : 'Soporte Listo'"></p>
                         </div>
-                        <button @click="descargarPDF(liq.archivo_pdf, liq.nombre_archivo)" class="bg-white border border-gray-200 hover:border-gold hover:text-gold text-navy font-bold py-2 px-4 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-xs flex-shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Descargar
+                        <button @click="descargarPDF(liq.archivo_pdf, liq.nombre_archivo)"
+                            class="bg-white border border-gray-200 hover:border-gold hover:text-gold text-navy font-bold py-2 px-4 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-xs flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg> Descargar
                         </button>
                     </div>
                 </template>
@@ -181,7 +260,7 @@
                     this.obtenerMesActual();
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (!usuarioGuardado) { window.location.href = 'login.html'; return; }
-                    
+
                     this.usuarioInfo = JSON.parse(usuarioGuardado);
                     if (this.usuarioInfo.rol !== 'PROPIETARIO' && this.usuarioInfo.rol !== 'ADMIN') { window.location.href = 'login.html'; return; }
 
@@ -201,7 +280,7 @@
                         if (resProp.ok) {
                             const todasLasPropiedades = await resProp.json();
                             this.misPropiedades = todasLasPropiedades.filter(p => p.propietario_id === this.usuarioInfo.id);
-                            
+
                             if (this.misPropiedades.length > 0) { this.filtroPropiedadId = this.misPropiedades[0].id; }
 
                             if (this.misPropiedades.length > 0) {
@@ -215,8 +294,11 @@
                             }
 
                             this.totalIngresosSimulados = this.misPropiedades.reduce((total, prop) => {
-                                return total + ((prop.precio_noche || 0) * 20 * 0.8); 
+                                return total + ((prop.precio_noche || 0) * 20 * 0.8);
                             }, 0);
+
+                            // 🚨 SOLUCIÓN: Usar un arreglo temporal para forzar la reactividad en Alpine.js
+                            let liquidacionesCargadas = [];
 
                             for (const prop of this.misPropiedades) {
                                 try {
@@ -227,14 +309,21 @@
                                             l.propiedad = { titulo: prop.titulo || prop.tipo_propiedad };
                                             l.propiedad_id = prop.id;
                                         });
-                                        this.misLiquidaciones.push(...liquidacionesDeEstaPropiedad);
+                                        liquidacionesCargadas = [...liquidacionesCargadas, ...liquidacionesDeEstaPropiedad];
                                     }
-                                } catch (e) {}
+                                } catch (e) {
+                                    console.log('Error trayendo liquidación de', prop.id);
+                                }
                             }
-                            this.misLiquidaciones.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                            // Pasamos todo de un golpe para forzar a Alpine a dibujar la lista
+                            this.misLiquidaciones = liquidacionesCargadas.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                         }
-                    } catch (error) {} 
-                    finally { this.cargando = false; }
+                    } catch (error) {
+                        console.log("Error general cargando datos:", error);
+                    } finally {
+                        this.cargando = false;
+                    }
                 },
 
                 get liquidacionesFiltradas() {
@@ -252,4 +341,5 @@
         }
     </script>
 </body>
+
 </html>
