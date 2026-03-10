@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Propiedades e Inventario - GestandoValor</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -13,8 +14,8 @@
             theme: {
                 extend: {
                     colors: {
-                        navy: '#0B132B', 
-                        gold: '#D4AF37', 
+                        navy: '#0B132B',
+                        gold: '#D4AF37',
                         lightGray: '#F9FAFB',
                         danger: '#EF4444',
                         success: '#10B981',
@@ -27,57 +28,96 @@
         }
     </script>
     <style>
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="appGestandoValor()" x-init="init()">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+                class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+        <div
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="admin_dashboard.html" class="text-sm font-medium hover:text-gold transition-colors">Mi Panel</a>
             <a href="solicitudes.html" class="text-sm font-medium hover:text-gold transition-colors">Solicitudes</a>
             <a href="reservas.html" class="text-sm font-medium hover:text-gold transition-colors">Reservas</a>
             <a href="operacion.html" class="text-sm font-medium hover:text-gold transition-colors">Operación</a>
-            <a href="propiedades.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Propiedades</a>
+            <a href="propiedades.html"
+                class="text-sm font-medium text-white border-b-2 border-gold pb-1">Propiedades</a>
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> Salir
+            <a href="login.html"
+                class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg> Salir
             </a>
         </div>
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">E</div>
+            <div
+                class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">
+                E</div>
         </div>
     </nav>
 
     <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div
+            class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none">
+        </div>
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Gestión de Activos</span>
-                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight" x-text="vista === 'grid' ? 'Portafolio Inmobiliario' : propiedadActiva?.titulo"></h1>
-                    <p class="text-gray-400 mt-3 text-lg" x-text="vista === 'grid' ? 'Administra las propiedades, publica nuevas y edita el inventario.' : 'Detalle, Inventario y Finanzas de la Propiedad'"></p>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Gestión de
+                        Activos</span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight"
+                        x-text="vista === 'grid' ? 'Portafolio Inmobiliario' : propiedadActiva?.titulo"></h1>
+                    <p class="text-gray-400 mt-3 text-lg"
+                        x-text="vista === 'grid' ? 'Administra las propiedades, publica nuevas y edita el inventario.' : 'Detalle, Inventario y Finanzas de la Propiedad'">
+                    </p>
                 </div>
-                
+
                 <div class="flex gap-4">
-                    <button x-show="vista === 'detalle'" @click="vista = 'grid'" style="display: none;" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> Volver al Portafolio
+                    <button x-show="vista === 'detalle'" @click="vista = 'grid'" style="display: none;"
+                        class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg> Volver al Portafolio
                     </button>
-                    <button x-show="vista === 'detalle'" @click="abrirModalEditar()" style="display: none;" class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg> Editar Propiedad
+                    <button x-show="vista === 'detalle'" @click="abrirModalEditar()" style="display: none;"
+                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg> Editar Propiedad
                     </button>
-                    <button x-show="vista === 'grid'" @click="abrirModalNueva()" class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Crear Anuncio
+                    <button x-show="vista === 'grid'" @click="abrirModalNueva()"
+                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg> Crear Anuncio
                     </button>
                 </div>
             </div>
@@ -86,38 +126,64 @@
 
     <section class="py-12 -mt-10 relative z-20 min-h-screen">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            
-            <div x-show="vista === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+
+            <div x-show="vista === 'grid'" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
                 <div x-show="cargandoPropiedades" class="flex justify-center items-center py-20">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy"></div>
                 </div>
 
-                <div x-show="!cargandoPropiedades && propiedades.length === 0" style="display: none;" class="text-center py-20 bg-white rounded-[40px] shadow-xl border border-gray-100">
-                    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <div x-show="!cargandoPropiedades && propiedades.length === 0" style="display: none;"
+                    class="text-center py-20 bg-white rounded-[40px] shadow-xl border border-gray-100">
+                    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
                     <h3 class="text-2xl font-bold text-navy">Aún no hay alojamientos</h3>
                     <p class="text-gray-500 mt-2">Haz clic en "Crear Anuncio" para publicar tu primera propiedad.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" x-show="!cargandoPropiedades && propiedades.length > 0">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    x-show="!cargandoPropiedades && propiedades.length > 0">
                     <template x-for="prop in propiedades" :key="prop.id">
-                        <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 flex flex-col">
+                        <div
+                            class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300 flex flex-col">
                             <div class="h-56 relative overflow-hidden bg-gray-200">
-                                <img :src="(prop.fotos && prop.fotos.length > 0) ? prop.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-extrabold text-navy shadow-lg" x-text="prop.tipo_propiedad"></div>
+                                <img :src="(prop.fotos && prop.fotos.length > 0) ? prop.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'"
+                                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-extrabold text-navy shadow-lg"
+                                    x-text="prop.tipo_propiedad"></div>
                             </div>
                             <div class="p-8 flex-1 flex flex-col justify-between">
                                 <div>
-                                    <h3 class="text-xl font-extrabold text-navy line-clamp-1" x-text="prop.titulo || 'Propiedad sin título'"></h3>
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1" x-text="`${prop.ciudad}, ${prop.departamento}`"></p>
-                                    
-                                    <div class="flex gap-4 mt-4 mb-6 text-sm text-gray-600 font-medium border-b border-gray-100 pb-4">
-                                        <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <span x-text="prop.capacidad_huespedes + ' Pax'"></span></span>
-                                        <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> <span x-text="prop.habitaciones + ' Hab'"></span></span>
+                                    <h3 class="text-xl font-extrabold text-navy line-clamp-1"
+                                        x-text="prop.titulo || 'Propiedad sin título'"></h3>
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1"
+                                        x-text="`${prop.ciudad}, ${prop.departamento}`"></p>
+
+                                    <div
+                                        class="flex gap-4 mt-4 mb-6 text-sm text-gray-600 font-medium border-b border-gray-100 pb-4">
+                                        <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-gold"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg> <span x-text="prop.capacidad_huespedes + ' Pax'"></span></span>
+                                        <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-gold"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                            </svg> <span x-text="prop.habitaciones + ' Hab'"></span></span>
                                     </div>
                                 </div>
-                                <button @click="abrirDetalle(prop)" class="w-full bg-gray-50 hover:bg-navy hover:text-white text-navy font-bold py-3 rounded-xl border border-gray-200 hover:border-navy transition-colors flex justify-center items-center gap-2 group/btn">
+                                <button @click="abrirDetalle(prop)"
+                                    class="w-full bg-gray-50 hover:bg-navy hover:text-white text-navy font-bold py-3 rounded-xl border border-gray-200 hover:border-navy transition-colors flex justify-center items-center gap-2 group/btn">
                                     Gestionar Activo
-                                    <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -125,156 +191,305 @@
                 </div>
             </div>
 
-            <div x-show="vista === 'detalle' && propiedadActiva !== null" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-show="vista === 'detalle' && propiedadActiva !== null" style="display: none;"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
+
                     <div class="space-y-6">
                         <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
                             <div class="h-48 relative">
-                                <img :src="(propiedadActiva?.fotos && propiedadActiva.fotos.length > 0) ? propiedadActiva.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'" alt="Cover" class="w-full h-full object-cover">
+                                <img :src="(propiedadActiva?.fotos && propiedadActiva.fotos.length > 0) ? propiedadActiva.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'"
+                                    alt="Cover" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent"></div>
-                                <h2 class="absolute bottom-4 left-6 text-2xl font-extrabold text-white" x-text="propiedadActiva?.titulo"></h2>
+                                <h2 class="absolute bottom-4 left-6 text-2xl font-extrabold text-white"
+                                    x-text="propiedadActiva?.titulo"></h2>
                             </div>
                             <div class="p-6">
                                 <p class="text-sm text-gray-500 mb-6 flex items-start gap-2">
-                                    <svg class="w-5 h-5 text-gold shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    <span x-text="`${propiedadActiva?.direccion}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
+                                    <svg class="w-5 h-5 text-gold shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span
+                                        x-text="`${propiedadActiva?.direccion}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
                                 </p>
                                 <div class="space-y-4">
                                     <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Red Wi-Fi</p>
-                                        <p class="font-bold text-navy" x-text="propiedadActiva?.wifi_red || 'No configurada'"></p>
-                                        <p class="text-xs text-gray-500 font-mono mt-0.5" x-text="propiedadActiva?.wifi_pass ? `Clave: ${propiedadActiva?.wifi_pass}` : 'Sin clave'"></p>
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                            Red Wi-Fi</p>
+                                        <p class="font-bold text-navy"
+                                            x-text="propiedadActiva?.wifi_red || 'No configurada'"></p>
+                                        <p class="text-xs text-gray-500 font-mono mt-0.5"
+                                            x-text="propiedadActiva?.wifi_pass ? `Clave: ${propiedadActiva?.wifi_pass}` : 'Sin clave'">
+                                        </p>
                                     </div>
                                     <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-                                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Cerradura Inteligente</p>
-                                        <p class="font-extrabold text-navy tracking-widest text-lg" x-text="propiedadActiva?.cerradura_codigo || 'N/A'"></p>
+                                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">
+                                            Cerradura Inteligente</p>
+                                        <p class="font-extrabold text-navy tracking-widest text-lg"
+                                            x-text="propiedadActiva?.cerradura_codigo || 'N/A'"></p>
                                     </div>
                                 </div>
 
                                 <div class="mt-6 pt-6 border-t border-gray-100 flex gap-2">
-                                    
                                     <template x-if="propiedadActiva?.link_airbnb">
-                                        <a :href="propiedadActiva.link_airbnb" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-airbnb hover:text-white transition-all px-3 py-2 rounded-lg border border-red-100 shadow-sm flex-1 justify-center">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z"/></svg>
+                                        <a :href="propiedadActiva.link_airbnb" target="_blank"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-airbnb hover:text-white transition-all px-3 py-2 rounded-lg border border-red-100 shadow-sm flex-1 justify-center">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                                <path
+                                                    d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z" />
+                                            </svg>
                                             Ver Airbnb
                                         </a>
                                     </template>
                                     <template x-if="!propiedadActiva?.link_airbnb">
-                                        <button @click="agregarLinkRapido('airbnb')" class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        <button @click="agregarLinkRapido('airbnb')"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v16m8-8H4" />
+                                            </svg>
                                             Añadir Airbnb
                                         </button>
                                     </template>
 
                                     <template x-if="propiedadActiva?.link_booking">
-                                        <a :href="propiedadActiva.link_booking" target="_blank" class="flex items-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-booking hover:text-white transition-all px-3 py-2 rounded-lg border border-blue-100 shadow-sm flex-1 justify-center">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z"/></svg>
+                                        <a :href="propiedadActiva.link_booking" target="_blank"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-booking hover:text-white transition-all px-3 py-2 rounded-lg border border-blue-100 shadow-sm flex-1 justify-center">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                                <path
+                                                    d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z" />
+                                            </svg>
                                             Ver Booking
                                         </a>
                                     </template>
                                     <template x-if="!propiedadActiva?.link_booking">
-                                        <button @click="agregarLinkRapido('booking')" class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        <button @click="agregarLinkRapido('booking')"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v16m8-8H4" />
+                                            </svg>
                                             Añadir Booking
                                         </button>
                                     </template>
-
                                 </div>
                             </div>
                         </div>
 
                         <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 p-6">
                             <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-warning">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <div
+                                    class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-warning">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
                                 </div>
                                 <div>
-                                    <h3 class="font-extrabold text-navy text-sm uppercase tracking-wider">Subir Liquidación</h3>
-                                    <p class="text-xs text-gray-500">Reporte para el propietario (PDF).</p>
+                                    <h3 class="font-extrabold text-navy text-sm uppercase tracking-wider">Liquidación
+                                        Mensual</h3>
+                                    <p class="text-xs text-gray-500">Reporte para el propietario.</p>
                                 </div>
                             </div>
 
                             <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center mb-4">
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Periodo Actual</span>
+                                <span
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Periodo
+                                    Actual</span>
                                 <span class="text-lg font-extrabold text-navy" x-text="obtenerMesActual()"></span>
                             </div>
 
-                            <div class="mt-2">
-                                <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-white hover:bg-gray-50 transition-colors" :class="archivoPDF ? 'border-success bg-green-50' : ''">
-                                    <div class="flex flex-col items-center justify-center pt-3 pb-3 text-center px-4">
-                                        <svg x-show="!archivoPDF" class="w-6 h-6 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                        <svg x-show="archivoPDF" style="display: none;" class="w-6 h-6 text-success mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                        <p class="text-xs font-bold truncate w-full" :class="archivoPDF ? 'text-success' : 'text-gray-500'" x-text="archivoPDF ? nombrePDF : 'Clic para elegir PDF'"></p>
-                                    </div>
-                                    <input type="file" accept="application/pdf" class="hidden" @change="procesarPDF($event)" />
-                                </label>
+                            <div x-show="!liquidacionActual">
+                                <div class="mt-2">
+                                    <label
+                                        class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+                                        :class="archivoPDF ? 'border-success bg-green-50' : ''">
+                                        <div
+                                            class="flex flex-col items-center justify-center pt-3 pb-3 text-center px-4">
+                                            <svg x-show="!archivoPDF" class="w-6 h-6 text-gray-400 mb-1" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                            </svg>
+                                            <svg x-show="archivoPDF" style="display: none;"
+                                                class="w-6 h-6 text-success mb-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <p class="text-xs font-bold truncate w-full"
+                                                :class="archivoPDF ? 'text-success' : 'text-gray-500'"
+                                                x-text="archivoPDF ? nombrePDF : 'Clic para elegir PDF'"></p>
+                                        </div>
+                                        <input type="file" accept="application/pdf" class="hidden"
+                                            @change="procesarPDF($event)" />
+                                    </label>
+                                </div>
+
+                                <button x-show="archivoPDF" style="display: none;" @click="subirLiquidacion()"
+                                    class="w-full mt-4 bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3 rounded-xl transition-transform active:scale-95 shadow-md flex justify-center items-center gap-2"
+                                    :disabled="subiendoPDF">
+                                    <span x-show="!subiendoPDF">Enviar Reporte</span>
+                                    <span x-show="subiendoPDF">Guardando...</span>
+                                    <svg x-show="!subiendoPDF" class="w-4 h-4" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                    </svg>
+                                </button>
                             </div>
 
-                            <button x-show="archivoPDF" style="display: none;" @click="subirLiquidacion()" class="w-full mt-4 bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3 rounded-xl transition-transform active:scale-95 shadow-md flex justify-center items-center gap-2" :disabled="subiendoPDF">
-                                <span x-show="!subiendoPDF">Enviar Reporte</span>
-                                <span x-show="subiendoPDF">Guardando...</span>
-                                <svg x-show="!subiendoPDF" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                            </button>
+                            <div x-show="liquidacionActual" style="display: none;"
+                                class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                                <div
+                                    class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-success mx-auto mb-2 shadow-sm">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm font-bold text-navy">¡Reporte Enviado!</p>
+                                <p class="text-[10px] text-gray-500 truncate mb-4 mt-1"
+                                    x-text="liquidacionActual?.nombre_archivo"></p>
+
+                                <div class="flex gap-2">
+                                    <button
+                                        @click="descargarPDF(liquidacionActual.archivo_pdf, liquidacionActual.nombre_archivo)"
+                                        class="flex-1 bg-white border border-gray-200 hover:border-navy text-navy text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
+                                        Ver PDF
+                                    </button>
+                                    <button @click="eliminarLiquidacion(liquidacionActual.id)"
+                                        class="flex-1 bg-red-50 border border-red-100 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm">
+                                        Quitar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 p-6">
+                            <h3
+                                class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Historial de Reportes
+                            </h3>
+
+                            <div class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                                <template x-for="liq in liquidacionesPropiedad" :key="liq.id">
+                                    <div
+                                        class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div class="overflow-hidden mr-2">
+                                            <p class="font-bold text-navy text-xs" x-text="liq.mes_anio"></p>
+                                            <p class="text-[10px] text-gray-500 truncate" x-text="liq.nombre_archivo">
+                                            </p>
+                                        </div>
+                                        <button @click="descargarPDF(liq.archivo_pdf, liq.nombre_archivo)"
+                                            class="bg-white border border-gray-200 p-2 rounded-lg text-gold hover:bg-gold hover:text-white transition-colors shadow-sm shrink-0">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
+
+                                <p x-show="liquidacionesPropiedad.length === 0"
+                                    class="text-center text-gray-400 py-4 text-xs font-medium">Aún no hay reportes para
+                                    esta propiedad.</p>
+                            </div>
                         </div>
 
                     </div>
 
                     <div class="lg:col-span-2">
                         <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden h-full">
-                            <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                            <div
+                                class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                                 <div>
                                     <h2 class="text-2xl font-extrabold text-navy">Inventario en Vivo</h2>
                                     <p class="text-sm text-gray-500 mt-1">Conectado a tu base de datos real.</p>
                                 </div>
-                                <span class="px-3 py-1 bg-green-100 text-success text-xs font-bold rounded-full border border-green-200 shadow-sm flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 
-                                    <span x-text="propiedadActiva?.inventario ? 'Sincronizado' : 'Sin Inventario'"></span>
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-success text-xs font-bold rounded-full border border-green-200 shadow-sm flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span
+                                        x-text="propiedadActiva?.inventario ? 'Sincronizado' : 'Sin Inventario'"></span>
                                 </span>
                             </div>
 
                             <div x-show="!propiedadActiva?.inventario" class="p-12 text-center">
-                                <p class="text-gray-500 mb-4">Esta propiedad aún no tiene un registro de inventario inicial.</p>
-                                <button class="bg-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors">
+                                <p class="text-gray-500 mb-4">Esta propiedad aún no tiene un registro de inventario
+                                    inicial.</p>
+                                <button
+                                    class="bg-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors">
                                     Crear Inventario Inicial
                                 </button>
                             </div>
 
-                            <div x-show="propiedadActiva?.inventario" class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div x-show="propiedadActiva?.inventario"
+                                class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <h3 class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">Consumibles</h3>
+                                    <h3
+                                        class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
+                                        Consumibles</h3>
                                     <div class="space-y-5 mt-4">
                                         <div>
                                             <div class="flex justify-between text-xs font-bold text-gray-600 mb-2">
                                                 <span>Papel Higiénico</span>
-                                                <span :class="propiedadActiva?.inventario?.papel_higienico < 2 ? 'text-danger' : 'text-success'" x-text="`${propiedadActiva?.inventario?.papel_higienico || 0} rollos`"></span>
+                                                <span
+                                                    :class="propiedadActiva?.inventario?.papel_higienico < 2 ? 'text-danger' : 'text-success'"
+                                                    x-text="`${propiedadActiva?.inventario?.papel_higienico || 0} rollos`"></span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                <div :class="propiedadActiva?.inventario?.papel_higienico < 2 ? 'bg-danger' : 'bg-success'" class="h-2.5 rounded-full" :style="`width: ${Math.min((propiedadActiva?.inventario?.papel_higienico || 0) * 20, 100)}%`"></div>
+                                                <div :class="propiedadActiva?.inventario?.papel_higienico < 2 ? 'bg-danger' : 'bg-success'"
+                                                    class="h-2.5 rounded-full"
+                                                    :style="`width: ${Math.min((propiedadActiva?.inventario?.papel_higienico || 0) * 20, 100)}%`">
+                                                </div>
                                             </div>
                                         </div>
                                         <div>
                                             <div class="flex justify-between text-xs font-bold text-gray-600 mb-2">
                                                 <span>Sobres de Café</span>
-                                                <span :class="propiedadActiva?.inventario?.cafe < 3 ? 'text-danger' : 'text-success'" x-text="`${propiedadActiva?.inventario?.cafe || 0} sobres`"></span>
+                                                <span
+                                                    :class="propiedadActiva?.inventario?.cafe < 3 ? 'text-danger' : 'text-success'"
+                                                    x-text="`${propiedadActiva?.inventario?.cafe || 0} sobres`"></span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                <div :class="propiedadActiva?.inventario?.cafe < 3 ? 'bg-warning' : 'bg-success'" class="h-2.5 rounded-full" :style="`width: ${Math.min((propiedadActiva?.inventario?.cafe || 0) * 10, 100)}%`"></div>
+                                                <div :class="propiedadActiva?.inventario?.cafe < 3 ? 'bg-warning' : 'bg-success'"
+                                                    class="h-2.5 rounded-full"
+                                                    :style="`width: ${Math.min((propiedadActiva?.inventario?.cafe || 0) * 10, 100)}%`">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <h3 class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">Dotación Fija</h3>
+                                    <h3
+                                        class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
+                                        Dotación Fija</h3>
                                     <ul class="space-y-3 mt-4">
-                                        <li class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        <li
+                                            class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
                                             <span class="text-sm font-bold text-navy">Toallas Grandes</span>
-                                            <span class="font-extrabold text-navy" x-text="propiedadActiva?.inventario?.toallas_grandes || 0"></span>
+                                            <span class="font-extrabold text-navy"
+                                                x-text="propiedadActiva?.inventario?.toallas_grandes || 0"></span>
                                         </li>
-                                        <li class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        <li
+                                            class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
                                             <span class="text-sm font-bold text-navy">Platos</span>
-                                            <span class="font-extrabold text-navy" x-text="propiedadActiva?.inventario?.platos || 0"></span>
+                                            <span class="font-extrabold text-navy"
+                                                x-text="propiedadActiva?.inventario?.platos || 0"></span>
                                         </li>
                                     </ul>
                                 </div>
@@ -290,15 +505,21 @@
     <div x-show="modalNueva" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-navy/90 backdrop-blur-md" @click="modalNueva = false"></div>
         <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-4xl h-[85vh] relative z-10 flex flex-col overflow-hidden transform transition-all"
-             x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-8 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100">
-            
+            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100">
+
             <div class="flex justify-between items-center p-6 border-b border-gray-100">
                 <div class="flex items-center gap-4">
-                    <span class="bg-gray-100 text-navy font-bold px-3 py-1 rounded-lg text-sm" x-text="'Paso ' + paso + ' de 3'"></span>
+                    <span class="bg-gray-100 text-navy font-bold px-3 py-1 rounded-lg text-sm"
+                        x-text="'Paso ' + paso + ' de 3'"></span>
                     <h3 class="text-xl font-extrabold text-navy" x-text="titulos[paso-1]"></h3>
                 </div>
-                <button @click="modalNueva = false" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-navy transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <button @click="modalNueva = false"
+                    class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-navy transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
 
@@ -309,14 +530,20 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de Propiedad</label>
-                                <select x-model="form.tipo_propiedad" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
-                                    <option>Apartamento</option><option>Casa</option><option>Loft</option><option>Apartaestudio</option>
+                                <select x-model="form.tipo_propiedad"
+                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                    <option>Apartamento</option>
+                                    <option>Casa</option>
+                                    <option>Loft</option>
+                                    <option>Apartaestudio</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de Alojamiento</label>
-                                <select x-model="form.tipo_alojamiento" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
-                                    <option>Un alojamiento entero</option><option>Una habitación privada</option>
+                                <select x-model="form.tipo_alojamiento"
+                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                    <option>Un alojamiento entero</option>
+                                    <option>Una habitación privada</option>
                                 </select>
                             </div>
                         </div>
@@ -326,15 +553,18 @@
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div class="col-span-2">
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Dirección exacta</label>
-                                <input x-model="form.direccion" type="text" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                <input x-model="form.direccion" type="text"
+                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Ciudad</label>
-                                <input x-model="form.ciudad" type="text" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                <input x-model="form.ciudad" type="text"
+                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Departamento</label>
-                                <input x-model="form.departamento" type="text" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                <input x-model="form.departamento" type="text"
+                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
                             </div>
                         </div>
                     </div>
@@ -345,9 +575,11 @@
                                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                                     <span class="text-lg font-medium text-gray-700" x-text="item.label"></span>
                                     <div class="flex items-center gap-4">
-                                        <button type="button" @click="if(form[item.id] > 1) form[item.id]--" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">-</button>
+                                        <button type="button" @click="if(form[item.id] > 1) form[item.id]--"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">-</button>
                                         <span class="w-4 text-center font-medium" x-text="form[item.id]"></span>
-                                        <button type="button" @click="form[item.id]++" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
+                                        <button type="button" @click="form[item.id]++"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
                                     </div>
                                 </div>
                             </template>
@@ -358,17 +590,21 @@
                 <div x-show="paso === 2" x-transition.opacity class="max-w-2xl mx-auto space-y-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-navy mb-2">Ponle un título cautivador</h2>
-                        <input x-model="form.titulo" type="text" class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-4 text-lg outline-none focus:border-black font-bold">
+                        <input x-model="form.titulo" type="text"
+                            class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-4 text-lg outline-none focus:border-black font-bold">
                     </div>
                     <div>
                         <h2 class="text-xl font-extrabold text-navy mb-2">Crea tu descripción</h2>
-                        <textarea x-model="form.descripcion" rows="4" class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-4 outline-none focus:border-black resize-none text-gray-700"></textarea>
+                        <textarea x-model="form.descripcion" rows="4"
+                            class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-4 outline-none focus:border-black resize-none text-gray-700"></textarea>
                     </div>
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-4">Comodidades principales</h2>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                             <template x-for="comodidad in listaComodidades" :key="comodidad">
-                                <button type="button" @click="toggleComodidad(comodidad)" class="p-4 border rounded-2xl text-left transition-all duration-200 flex flex-col gap-2" :class="form.comodidades.includes(comodidad) ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 hover:border-black'">
+                                <button type="button" @click="toggleComodidad(comodidad)"
+                                    class="p-4 border rounded-2xl text-left transition-all duration-200 flex flex-col gap-2"
+                                    :class="form.comodidades.includes(comodidad) ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 hover:border-black'">
                                     <span class="text-sm font-bold text-gray-800" x-text="comodidad"></span>
                                 </button>
                             </template>
@@ -377,20 +613,33 @@
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-2">Sube las fotos de tu espacio</h2>
                         <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white hover:bg-gray-50 hover:border-black transition-colors">
+                            <label
+                                class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white hover:bg-gray-50 hover:border-black transition-colors">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg class="w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                    <p class="mb-2 text-sm text-gray-600 font-bold">Haz clic aquí para subir tus fotos</p>
+                                    <svg class="w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-600 font-bold">Haz clic aquí para subir tus fotos
+                                    </p>
                                 </div>
-                                <input type="file" multiple accept="image/*" class="hidden" @change="procesarFotos($event)" />
+                                <input type="file" multiple accept="image/*" class="hidden"
+                                    @change="procesarFotos($event)" />
                             </label>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6" x-show="form.fotos && form.fotos.length > 0">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"
+                            x-show="form.fotos && form.fotos.length > 0">
                             <template x-for="(fotoUrl, index) in form.fotos" :key="index">
-                                <div class="relative group rounded-xl overflow-hidden aspect-video shadow-sm border border-gray-100">
+                                <div
+                                    class="relative group rounded-xl overflow-hidden aspect-video shadow-sm border border-gray-100">
                                     <img :src="fotoUrl" class="w-full h-full object-cover">
-                                    <button type="button" @click="eliminarFoto(index)" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    <button type="button" @click="eliminarFoto(index)"
+                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
                                     </button>
                                 </div>
                             </template>
@@ -403,7 +652,8 @@
                         <h2 class="text-2xl font-extrabold text-navy mb-2">Establece tu precio base</h2>
                         <div class="flex items-center justify-center gap-2 mt-4">
                             <span class="text-3xl font-extrabold text-gray-400">$</span>
-                            <input x-model="form.precio_noche" type="number" class="w-48 bg-transparent text-5xl font-extrabold text-navy text-center outline-none border-b-2 border-gray-300 focus:border-black pb-2">
+                            <input x-model="form.precio_noche" type="number"
+                                class="w-48 bg-transparent text-5xl font-extrabold text-navy text-center outline-none border-b-2 border-gray-300 focus:border-black pb-2">
                             <span class="text-xl font-bold text-gray-500">COP</span>
                         </div>
                     </div>
@@ -412,17 +662,23 @@
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Red Wi-Fi</label>
-                                    <input x-model="form.wifi_red" type="text" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Red
+                                        Wi-Fi</label>
+                                    <input x-model="form.wifi_red" type="text"
+                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Clave Wi-Fi</label>
-                                    <input x-model="form.wifi_pass" type="text" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Clave
+                                        Wi-Fi</label>
+                                    <input x-model="form.wifi_pass" type="text"
+                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Código Cerradura</label>
-                                <input x-model="form.cerradura_codigo" type="text" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-mono text-lg">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Código
+                                    Cerradura</label>
+                                <input x-model="form.cerradura_codigo" type="text"
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-mono text-lg">
                             </div>
                         </div>
                     </div>
@@ -432,11 +688,15 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-airbnb uppercase mb-2">Link de Airbnb</label>
-                                <input x-model="form.link_airbnb" type="url" placeholder="https://www.airbnb.com/h/..." class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 outline-none focus:border-airbnb text-sm font-medium">
+                                <input x-model="form.link_airbnb" type="url" placeholder="https://www.airbnb.com/h/..."
+                                    class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 outline-none focus:border-airbnb text-sm font-medium">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-booking uppercase mb-2">Link de Booking</label>
-                                <input x-model="form.link_booking" type="url" placeholder="https://www.booking.com/hotel/..." class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-booking text-sm font-medium">
+                                <label class="block text-xs font-bold text-booking uppercase mb-2">Link de
+                                    Booking</label>
+                                <input x-model="form.link_booking" type="url"
+                                    placeholder="https://www.booking.com/hotel/..."
+                                    class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-booking text-sm font-medium">
                             </div>
                         </div>
                     </div>
@@ -444,11 +704,19 @@
             </div>
 
             <div class="p-6 bg-white border-t border-gray-200 flex justify-between items-center relative">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gray-100"><div class="h-full bg-black transition-all duration-500" :style="'width: ' + ((paso / 3) * 100) + '%'"></div></div>
-                <button type="button" @click="paso > 1 ? paso-- : null" class="font-bold text-gray-900 underline hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors" :class="paso === 1 ? 'invisible' : ''">Atrás</button>
-                <button type="button" x-show="paso < 3" @click="paso++" class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-black transition-transform hover:scale-105">Siguiente</button>
-                
-                <button type="button" x-show="paso === 3" @click="enviarDatos()" class="bg-gold text-navy font-extrabold py-3 px-8 rounded-xl flex items-center gap-2 hover:bg-yellow-500 transition-transform hover:scale-105 shadow-lg" :disabled="cargando">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gray-100">
+                    <div class="h-full bg-black transition-all duration-500"
+                        :style="'width: ' + ((paso / 3) * 100) + '%'"></div>
+                </div>
+                <button type="button" @click="paso > 1 ? paso-- : null"
+                    class="font-bold text-gray-900 underline hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+                    :class="paso === 1 ? 'invisible' : ''">Atrás</button>
+                <button type="button" x-show="paso < 3" @click="paso++"
+                    class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-black transition-transform hover:scale-105">Siguiente</button>
+
+                <button type="button" x-show="paso === 3" @click="enviarDatos()"
+                    class="bg-gold text-navy font-extrabold py-3 px-8 rounded-xl flex items-center gap-2 hover:bg-yellow-500 transition-transform hover:scale-105 shadow-lg"
+                    :disabled="cargando">
                     <span x-show="!cargando && !modoEdicion">Publicar Anuncio</span>
                     <span x-show="!cargando && modoEdicion">Guardar Cambios</span>
                     <span x-show="cargando">Procesando...</span>
@@ -460,13 +728,13 @@
     <script>
         function appGestandoValor() {
             return {
-                vista: 'grid', 
-                propiedadActiva: null, 
+                vista: 'grid',
+                propiedadActiva: null,
                 propiedades: [],
                 cargandoPropiedades: true,
                 modalNueva: false,
                 modoEdicion: false,
-                
+
                 paso: 1,
                 cargando: false,
                 titulos: ['Describe tu espacio', 'Haz que destaque', 'Terminar y publicar'],
@@ -481,22 +749,31 @@
                 nombrePDF: '',
                 subiendoPDF: false,
 
+                liquidacionesPropiedad: [],
+
                 init() {
                     this.form = this.getFormVacio();
                     this.cargarPropiedades();
                     this.activarNavbarDinamica();
                 },
 
+                // ✨ COMPUTADO: Detecta si ya existe un archivo para el mes actual
+                get liquidacionActual() {
+                    if (!this.propiedadActiva || !this.liquidacionesPropiedad) return null;
+                    const mes = this.obtenerMesActual();
+                    return this.liquidacionesPropiedad.find(l => l.mes_anio === mes);
+                },
+
                 activarNavbarDinamica() {
                     const navbar = document.getElementById('navbar');
                     const logo = document.getElementById('nav-logo-combined');
-                    const largoPildora = 'max-w-[700px]'; 
+                    const largoPildora = 'max-w-[700px]';
 
                     window.addEventListener('scroll', () => {
                         if (window.scrollY > 50) {
-                            logo.classList.replace('h-16', 'h-10'); 
+                            logo.classList.replace('h-16', 'h-10');
                             navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
-                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
                         } else {
                             logo.classList.replace('h-10', 'h-16');
                             navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
@@ -542,11 +819,21 @@
                     this.modalNueva = true;
                 },
 
-                abrirDetalle(propiedad) {
+                async abrirDetalle(propiedad) {
                     this.propiedadActiva = propiedad;
                     this.vista = 'detalle';
                     this.archivoPDF = null;
                     this.nombrePDF = '';
+                    this.liquidacionesPropiedad = [];
+
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/liquidaciones/propiedad/${propiedad.id}`);
+                        if (res.ok) {
+                            this.liquidacionesPropiedad = await res.json();
+                        }
+                    } catch (e) {
+                        console.log("Error al traer reportes");
+                    }
                 },
 
                 toggleComodidad(item) {
@@ -593,12 +880,12 @@
                         if (response.ok) {
                             alert(this.modoEdicion ? '✅ Propiedad actualizada con éxito.' : '🎉 ¡Anuncio publicado con éxito!');
                             this.modalNueva = false;
-                            await this.cargarPropiedades(); 
+                            await this.cargarPropiedades();
                             if (this.modoEdicion) {
                                 this.propiedadActiva = this.propiedades.find(p => p.id === this.propiedadActiva.id);
                             }
                         } else {
-                            if(response.status === 413) { alert('Error: Las imágenes pesan demasiado por ahora.'); } 
+                            if (response.status === 413) { alert('Error: Las imágenes pesan demasiado por ahora.'); }
                             else { alert('Hubo un error al guardar.'); }
                         }
                     } catch (error) {
@@ -607,14 +894,11 @@
                     this.cargando = false;
                 },
 
-                // ==========================================
-                // MAGIA: AÑADIR LINK RÁPIDO SIN ENTRAR AL FORM
-                // ==========================================
                 async agregarLinkRapido(plataforma) {
                     const nombrePlataforma = plataforma === 'airbnb' ? 'Airbnb' : 'Booking';
                     const link = prompt(`Pega aquí el enlace de tu publicación en ${nombrePlataforma}:`);
-                    
-                    if (!link) return; // Si cancela, no hace nada
+
+                    if (!link) return;
                     if (!link.startsWith('http')) {
                         alert('El enlace debe comenzar con "http://" o "https://"');
                         return;
@@ -634,7 +918,7 @@
                         if (response.ok) {
                             if (plataforma === 'airbnb') this.propiedadActiva.link_airbnb = link;
                             if (plataforma === 'booking') this.propiedadActiva.link_booking = link;
-                            
+
                             const index = this.propiedades.findIndex(p => p.id === this.propiedadActiva.id);
                             if (index !== -1) {
                                 if (plataforma === 'airbnb') this.propiedades[index].link_airbnb = link;
@@ -647,7 +931,7 @@
                         alert('Error de conexión.');
                     }
                 },
-                
+
                 obtenerMesActual() {
                     const opciones = { month: 'long', year: 'numeric' };
                     let fecha = new Date().toLocaleDateString('es-CO', opciones);
@@ -661,17 +945,17 @@
                         return;
                     }
                     this.nombrePDF = archivo.name;
-                    
+
                     const lector = new FileReader();
                     lector.onload = (e) => {
-                        this.archivoPDF = e.target.result; 
+                        this.archivoPDF = e.target.result;
                     };
                     lector.readAsDataURL(archivo);
                 },
 
                 async subirLiquidacion() {
                     if (!this.archivoPDF || !this.propiedadActiva) return;
-                    
+
                     this.subiendoPDF = true;
                     try {
                         const payload = {
@@ -688,7 +972,13 @@
                         });
 
                         if (response.ok) {
+                            const data = await response.json();
                             alert(`✅ ¡Liquidación de ${this.obtenerMesActual()} enviada al propietario exitosamente!`);
+
+                            if (data.liquidacion) {
+                                this.liquidacionesPropiedad.unshift(data.liquidacion);
+                            }
+
                             this.archivoPDF = null;
                             this.nombrePDF = '';
                         } else {
@@ -700,9 +990,38 @@
                     } finally {
                         this.subiendoPDF = false;
                     }
+                },
+
+                descargarPDF(base64String, nombreArchivo) {
+                    const link = document.createElement('a');
+                    link.href = base64String;
+                    link.download = nombreArchivo || 'Reporte_GestandoValor.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+
+                // ✨ NUEVA FUNCIÓN: ELIMINAR LIQUIDACIÓN
+                async eliminarLiquidacion(id) {
+                    if (!confirm('¿Estás seguro de quitar este reporte? El inversionista ya no lo verá.')) return;
+                    try {
+                        const response = await fetch(`https://gestandovalor-backend.onrender.com/liquidaciones/${id}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            // Lo borramos de la lista local instantáneamente
+                            this.liquidacionesPropiedad = this.liquidacionesPropiedad.filter(l => l.id !== id);
+                            alert('Archivo eliminado. Ya puedes subir uno nuevo para este mes.');
+                        } else {
+                            alert('No se pudo borrar del servidor. Revisa si el backend ya fue actualizado.');
+                        }
+                    } catch (e) {
+                        alert('Error de conexión.');
+                    }
                 }
             }
         }
     </script>
 </body>
+
 </html>
