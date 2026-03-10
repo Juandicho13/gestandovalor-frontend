@@ -345,26 +345,36 @@
                             </div>
 
                             <div x-show="liquidacionActual" style="display: none;"
-                                class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                                class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
                                 <div
-                                    class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-success mx-auto mb-2 shadow-sm">
+                                    class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-success mx-auto mb-3 shadow-sm border border-green-100">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <p class="text-sm font-bold text-navy">¡Reporte Enviado!</p>
-                                <p class="text-[10px] text-gray-500 truncate mb-4 mt-1"
+                                <h4 class="font-extrabold text-navy mb-1">¡Archivo Listo!</h4>
+                                <p class="text-xs text-gray-500 truncate mb-4 px-2"
                                     x-text="liquidacionActual?.nombre_archivo"></p>
 
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 justify-center">
                                     <button
                                         @click="descargarPDF(liquidacionActual.archivo_pdf, liquidacionActual.nombre_archivo)"
-                                        class="flex-1 bg-white border border-gray-200 hover:border-navy text-navy text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
+                                        class="flex-1 bg-white border border-gray-200 hover:border-navy hover:text-navy text-gray-700 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
                                         Ver PDF
                                     </button>
                                     <button @click="eliminarLiquidacion(liquidacionActual.id)"
-                                        class="flex-1 bg-red-50 border border-red-100 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm">
+                                        class="flex-1 bg-red-50 border border-red-100 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
                                         Quitar
                                     </button>
                                 </div>
@@ -751,17 +761,23 @@
 
                 liquidacionesPropiedad: [],
 
+                // ✨ NUEVA VARIABLE: Para asegurar que el cambio de interfaz sea inmediato
+                liquidacionActual: null,
+
                 init() {
                     this.form = this.getFormVacio();
                     this.cargarPropiedades();
                     this.activarNavbarDinamica();
                 },
 
-                // ✨ COMPUTADO: Detecta si ya existe un archivo para el mes actual
-                get liquidacionActual() {
-                    if (!this.propiedadActiva || !this.liquidacionesPropiedad) return null;
+                // ✨ NUEVA LÓGICA: Esta función decide si muestra el cuadro de subir o la tarjeta verde
+                evaluarLiquidacionActual() {
+                    if (!this.liquidacionesPropiedad || this.liquidacionesPropiedad.length === 0) {
+                        this.liquidacionActual = null;
+                        return;
+                    }
                     const mes = this.obtenerMesActual();
-                    return this.liquidacionesPropiedad.find(l => l.mes_anio === mes);
+                    this.liquidacionActual = this.liquidacionesPropiedad.find(l => l.mes_anio === mes) || null;
                 },
 
                 activarNavbarDinamica() {
@@ -825,11 +841,13 @@
                     this.archivoPDF = null;
                     this.nombrePDF = '';
                     this.liquidacionesPropiedad = [];
+                    this.evaluarLiquidacionActual();
 
                     try {
                         const res = await fetch(`https://gestandovalor-backend.onrender.com/liquidaciones/propiedad/${propiedad.id}`);
                         if (res.ok) {
                             this.liquidacionesPropiedad = await res.json();
+                            this.evaluarLiquidacionActual(); // Revisamos apenas llegan los datos
                         }
                     } catch (e) {
                         console.log("Error al traer reportes");
@@ -973,10 +991,10 @@
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ ¡Liquidación de ${this.obtenerMesActual()} enviada al propietario exitosamente!`);
 
                             if (data.liquidacion) {
                                 this.liquidacionesPropiedad.unshift(data.liquidacion);
+                                this.evaluarLiquidacionActual(); // Actualiza la pantalla instantáneamente
                             }
 
                             this.archivoPDF = null;
@@ -1001,7 +1019,6 @@
                     document.body.removeChild(link);
                 },
 
-                // ✨ NUEVA FUNCIÓN: ELIMINAR LIQUIDACIÓN
                 async eliminarLiquidacion(id) {
                     if (!confirm('¿Estás seguro de quitar este reporte? El inversionista ya no lo verá.')) return;
                     try {
@@ -1009,11 +1026,10 @@
                             method: 'DELETE'
                         });
                         if (response.ok) {
-                            // Lo borramos de la lista local instantáneamente
                             this.liquidacionesPropiedad = this.liquidacionesPropiedad.filter(l => l.id !== id);
-                            alert('Archivo eliminado. Ya puedes subir uno nuevo para este mes.');
+                            this.evaluarLiquidacionActual(); // Vuelve a mostrar el cuadro de subida instantáneamente
                         } else {
-                            alert('No se pudo borrar del servidor. Revisa si el backend ya fue actualizado.');
+                            alert('No se pudo borrar del servidor.');
                         }
                     } catch (e) {
                         alert('Error de conexión.');
