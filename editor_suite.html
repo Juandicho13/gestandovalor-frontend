@@ -4,10 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor WYSIWYG - GestandoValor</title>
+    <title>Editor WYSIWYG Premium - GestandoValor</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
         tailwind.config = {
@@ -16,7 +19,8 @@
                     colors: {
                         navy: '#0B132B',
                         gold: '#D4AF37',
-                        lightGray: '#F9FAFB'
+                        lightGray: '#F9FAFB',
+                        airbnb: '#FF5A5F'
                     }
                 }
             }
@@ -33,6 +37,7 @@
             border: 2px dashed transparent;
             transition: all 0.3s ease;
             border-radius: 8px;
+            background: transparent;
         }
 
         .editable-field:hover {
@@ -45,19 +50,46 @@
             background: white;
             outline: none;
         }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 10px;
+        }
+
+        .slide-panel-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 140;
+        }
+
+        .cursor-grab {
+            cursor: grab;
+        }
+
+        .cursor-grab:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-white" x-data="editorSuite()" x-init="init()">
+<body class="font-sans text-gray-800 antialiased bg-white" x-data="editorSuitePremium()" x-init="init()">
 
     <div
-        class="fixed top-0 left-0 w-full bg-gold text-navy font-extrabold px-6 py-3 z-[100] flex justify-between items-center shadow-lg">
+        class="fixed top-0 left-0 w-full bg-gold text-navy font-extrabold px-6 py-3 z-[100] flex justify-between items-center shadow-lg h-16">
         <div class="flex items-center gap-3">
             <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
-            <span>MODO EDICIÓN EN VIVO</span>
+            <span x-text="esBorrador ? 'MODO CREACIÓN EN VIVO' : 'MODO EDICIÓN EN VIVO'"></span>
         </div>
         <div class="flex gap-4">
             <button @click="volver()"
@@ -66,12 +98,13 @@
             <button @click="guardarCambios()"
                 class="px-6 py-2 bg-navy text-white rounded-lg hover:bg-gray-800 transition-colors shadow-md flex items-center gap-2"
                 :disabled="guardando">
-                <span x-text="guardando ? 'Guardando...' : 'Guardar Cambios'"></span>
+                <span
+                    x-text="guardando ? 'Guardando...' : (esBorrador ? 'Publicar Anuncio Oficial' : 'Guardar Cambios')"></span>
             </button>
         </div>
     </div>
 
-    <div x-show="cargando" class="fixed inset-0 bg-white z-[90] flex flex-col items-center justify-center">
+    <div x-show="cargando" class="fixed inset-0 bg-white z-[130] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-gold mb-4"></div>
         <p class="font-bold text-navy animate-pulse">Cargando editor WYSIWYG...</p>
     </div>
@@ -81,7 +114,7 @@
                 class="h-10 w-auto object-contain"></a>
         <div class="hidden md:flex items-center gap-6 justify-center flex-1 text-white opacity-50 pointer-events-none">
             <span class="text-sm font-medium">Inicio</span> <span class="text-sm font-medium">Blog</span> <span
-                class="text-sm font-medium">Alojamientos</span>
+                class="text-sm font-medium text-gold">Alojamientos</span>
         </div>
     </nav>
 
@@ -91,67 +124,70 @@
         <section class="mb-8">
             <input type="text" x-model="propiedad.titulo" placeholder="Escribe un título increíble aquí..."
                 class="w-full editable-field text-3xl md:text-4xl font-extrabold text-navy leading-tight mb-2 p-2">
-
             <div class="flex items-center gap-2 mt-2 px-2">
                 <input type="text" x-model="propiedad.ciudad" placeholder="Ciudad"
-                    class="editable-field text-sm text-gray-600 font-bold p-1 w-32 underline">
+                    class="editable-field text-sm text-gray-600 font-bold p-1 underline w-32">
                 <span class="text-gray-400">,</span>
                 <input type="text" x-model="propiedad.departamento" placeholder="Departamento"
-                    class="editable-field text-sm text-gray-600 font-bold p-1 w-40 underline">
+                    class="editable-field text-sm text-gray-600 font-bold p-1 underline w-40">
                 <span class="text-gray-600 font-medium text-sm">, Colombia</span>
             </div>
         </section>
 
         <div class="flex flex-col lg:flex-row gap-12 relative">
-
             <div class="w-full lg:w-[65%] xl:w-[70%]">
 
                 <section
-                    class="relative rounded-[32px] overflow-hidden mb-12 shadow-lg border-4 border-dashed border-gray-200 p-2 hover:border-gold transition-colors bg-gray-50">
+                    class="relative rounded-[32px] overflow-hidden mb-12 shadow-lg border-4 border-dashed border-gray-200 p-2 hover:border-gold transition-colors bg-gray-50 min-h-[350px]">
                     <div
                         class="absolute top-4 left-4 bg-navy text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md z-10 opacity-80 pointer-events-none">
                         Zona de Galería (Edita tus fotos)
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 auto-rows-[200px] gap-3">
-
-                        <template x-for="(fotoUrl, index) in propiedad.fotos" :key="index">
+                    <div class="grid grid-cols-1 md:grid-cols-4 auto-rows-[200px] gap-3 relative">
+                        <template x-for="(fotoUrl, index) in propiedad.fotos.slice(0, 5)" :key="index">
                             <div class="relative group cursor-pointer overflow-hidden rounded-2xl shadow-sm"
                                 :class="index === 0 ? 'md:col-span-2 md:row-span-2' : ''">
                                 <img :src="fotoUrl" class="w-full h-full object-cover">
-                                <div
-                                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                    <button @click="eliminarFoto(index)"
-                                        class="bg-red-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg transform hover:scale-105 transition-transform flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg> Quitar
-                                    </button>
-                                </div>
+                                <template x-if="index === 0">
+                                    <div
+                                        class="absolute top-16 left-5 bg-gold/90 text-navy font-extrabold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wider z-10 shadow-lg">
+                                        Portada</div>
+                                </template>
                             </div>
                         </template>
 
-                        <label
-                            class="relative group cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center bg-white hover:bg-gold/10 hover:border-gold transition-colors"
-                            :class="propiedad.fotos.length === 0 ? 'md:col-span-4 md:row-span-2 h-[400px]' : ''">
-                            <div
-                                class="w-12 h-12 bg-gray-100 group-hover:bg-gold rounded-full flex items-center justify-center text-gray-400 group-hover:text-navy transition-colors mb-2">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                            </div>
-                            <span class="font-bold text-gray-500 group-hover:text-navy">Subir Foto</span>
-                            <input type="file" multiple accept="image/*" class="hidden" @change="procesarFotos($event)">
-                        </label>
+                        <div @click="abrirModalFotosInicial()"
+                            class="absolute inset-0 cursor-pointer z-20 hover:bg-black/5 transition-colors rounded-xl">
+                        </div>
 
+                        <template x-if="propiedad.fotos.length === 0">
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
+                                <svg class="w-12 h-12 mb-2 text-gray-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                <p class="font-bold">No hay fotos</p>
+                                <p class="text-sm">Usa el botón inferior para agregarlas</p>
+                            </div>
+                        </template>
                     </div>
+
+                    <button @click="abrirModalFotosInicial()"
+                        class="absolute bottom-6 right-6 bg-white border border-gray-900 text-gray-900 font-bold text-[12px] py-2 px-4 rounded-lg shadow-lg hover:bg-gray-100 transition-transform hover:scale-[1.02] flex items-center gap-2 z-30">
+                        <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
+                            <path
+                                d="M3 2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-2zM3 7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-2zM3 12a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2z" />
+                        </svg>
+                        Mostrar todas las fotos (<span x-text="propiedad.fotos.length"></span>)
+                    </button>
                 </section>
 
                 <div class="flex justify-between items-start pb-8 border-b border-gray-100">
                     <div class="w-full">
-                        <div class="flex gap-2 items-center text-2xl font-extrabold text-navy mb-2">
+                        <div class="flex gap-2 items-center text-xl font-extrabold text-navy mb-1">
                             <select x-model="propiedad.tipo_propiedad"
                                 class="editable-field p-1 outline-none font-extrabold bg-transparent appearance-none">
                                 <option>Apartamento</option>
@@ -161,105 +197,618 @@
                                 <option>Suite</option>
                             </select>
                             <span>entero en</span>
-                            <span x-text="propiedad.ciudad"></span>
+                            <span x-text="propiedad.ciudad || 'Ciudad'"></span>
                         </div>
-                        <ol class="flex flex-wrap gap-x-2 text-gray-600 font-medium items-center">
+                        <ol class="flex flex-wrap gap-x-1 text-gray-600 font-medium items-center text-sm mt-1">
                             <li><input type="number" x-model="propiedad.capacidad_huespedes"
-                                    class="editable-field w-10 text-center p-1 bg-transparent"> huéspedes</li>
-                            <span>·</span>
+                                    class="editable-field w-10 text-center py-0.5 bg-transparent border border-gray-200">
+                                huéspedes</li><span>·</span>
                             <li><input type="number" x-model="propiedad.habitaciones"
-                                    class="editable-field w-10 text-center p-1 bg-transparent"> hab.</li><span>·</span>
+                                    class="editable-field w-10 text-center py-0.5 bg-transparent border border-gray-200">
+                                habitaciones</li><span>·</span>
                             <li><input type="number" x-model="propiedad.camas"
-                                    class="editable-field w-10 text-center p-1 bg-transparent"> camas</li><span>·</span>
+                                    class="editable-field w-10 text-center py-0.5 bg-transparent border border-gray-200">
+                                camas</li><span>·</span>
                             <li><input type="number" x-model="propiedad.banos"
-                                    class="editable-field w-10 text-center p-1 bg-transparent"> baños</li>
+                                    class="editable-field w-10 text-center py-0.5 bg-transparent border border-gray-200">
+                                baños</li>
                         </ol>
                     </div>
                 </div>
 
-                <div class="py-8 border-b border-gray-100">
+                <div class="py-8 border-b border-gray-100 relative">
                     <h2 class="text-2xl font-extrabold text-navy mb-4 px-2">Acerca de este espacio</h2>
-                    <textarea x-model="propiedad.descripcion" rows="6"
-                        placeholder="Escribe aquí los detalles que hacen único a tu alojamiento..."
-                        class="w-full editable-field text-gray-600 leading-relaxed text-lg p-4 resize-y"></textarea>
+                    <div class="relative mb-4">
+                        <textarea x-model="propiedad.descripcion" rows="4"
+                            placeholder="Disfruta de la sencillez de este alojamiento tranquilo y céntrico..."
+                            class="w-full editable-field text-gray-600 leading-relaxed text-base p-2 resize-y"></textarea>
+                    </div>
+                    <button @click="openDescriptionModal = true"
+                        class="font-bold text-navy underline hover:text-gold transition-colors flex items-center gap-1.5 px-2">
+                        Mostrar más <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="py-8 border-b border-gray-100 opacity-60">
+                <div class="py-8 border-b border-gray-100">
+                    <h2 class="text-2xl font-extrabold text-navy mb-6">¿Qué hay en el alojamiento?</h2>
+                    <p class="text-sm text-gray-500 mb-6">Haz clic en los botones para seleccionar o quitar los
+                        servicios principales.</p>
+
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-8 text-gray-600 font-medium text-lg">
+                        <template x-for="comodidad in listaComodidadesVisuales" :key="comodidad.id">
+                            <button type="button" @click.prevent="toggleComodidad(comodidad.id)"
+                                class="flex items-center gap-4 p-3 rounded-2xl border-2 transition-all w-full text-left"
+                                :class="propiedad.comodidades.includes(comodidad.id) ? 'border-navy bg-navy/5 text-navy font-bold' : 'border-gray-200 hover:border-navy hover:bg-gray-50'">
+                                <div x-html="comodidad.svg" class="w-6 h-6 shrink-0"
+                                    :class="propiedad.comodidades.includes(comodidad.id) ? 'text-navy' : 'text-gray-400'">
+                                </div>
+                                <span class="text-sm lg:text-base" x-text="comodidad.nombre"></span>
+                            </button>
+                        </template>
+                    </div>
+
+                    <button @click="openComodidadesModal = true"
+                        class="mt-8 border border-navy text-navy font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+                        Mostrar los <span x-text="totalServicios()"></span> servicios
+                    </button>
+                </div>
+
+                <div class="py-12 border-b border-gray-100 relative">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-navy mb-2">A dónde irás</h2>
+                            <p class="text-gray-600 font-medium">Haz clic o mueve el marcador rojo para establecer la
+                                ubicación exacta. La ciudad se llena sola.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div><label
+                                class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Dirección
+                                exacta</label><input x-model="propiedad.direccion" type="text"
+                                class="w-full editable-field p-3 border border-gray-200 rounded-xl text-sm"
+                                placeholder="Ej: Calle 1 #2-3"></div>
+                        <div><label
+                                class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Ciudad</label><input
+                                x-model="propiedad.ciudad" type="text"
+                                class="w-full editable-field p-3 border border-gray-200 rounded-xl text-sm"
+                                placeholder="Ej: Chía"></div>
+                        <div><label
+                                class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Departamento</label><input
+                                x-model="propiedad.departamento" type="text"
+                                class="w-full editable-field p-3 border border-gray-200 rounded-xl text-sm"
+                                placeholder="Ej: Cundinamarca"></div>
+                    </div>
+                    <div id="mapa-interactivo"
+                        class="w-full h-[400px] rounded-[32px] overflow-hidden shadow-sm border border-gray-200 z-10 relative">
+                        <div x-show="cargandoMapa"
+                            class="absolute inset-0 bg-gray-100 flex items-center justify-center z-20"><span
+                                class="font-bold text-navy animate-pulse">Cargando mapa interactivo...</span></div>
+                    </div>
+                </div>
+
+                <div class="py-12 bg-gold/5 border border-gold/20 rounded-[32px] p-8 mt-12">
                     <h2 class="text-xl font-extrabold text-navy mb-2 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Las comodidades se editan en el paso 2 del Modal anterior.
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg> Datos Privados (Administración)
                     </h2>
-                    <p class="text-sm italic">Aquí verás reflejadas las que seleccionaste.</p>
+                    <p class="text-sm text-gray-600 mb-6">Esto NO lo verán los clientes, solo tu equipo operativo.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div><label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Red
+                                Wi-Fi</label><input x-model="propiedad.wifi_red" type="text"
+                                class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-medium">
+                        </div>
+                        <div><label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Clave
+                                Wi-Fi</label><input x-model="propiedad.wifi_pass" type="text"
+                                class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-medium">
+                        </div>
+                    </div>
+                    <div class="mb-6"><label
+                            class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Código
+                            Cerradura</label><input x-model="propiedad.cerradura_codigo" type="text"
+                            class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-mono text-lg">
+                    </div>
+                    <div class="space-y-4 pt-6 border-t border-gold/20">
+                        <div><label class="block text-xs font-bold text-airbnb uppercase tracking-wider mb-2">Link de
+                                Airbnb</label><input x-model="propiedad.link_airbnb" type="url"
+                                class="w-full bg-white border border-red-200 rounded-2xl px-4 py-3 outline-none focus:border-airbnb shadow-sm text-sm font-medium"
+                                placeholder="https://www.airbnb.com/h/..."></div>
+                        <div><label class="block text-xs font-bold text-booking uppercase tracking-wider mb-2">Link de
+                                Booking</label><input x-model="propiedad.link_booking" type="url"
+                                class="w-full bg-white border border-blue-200 rounded-2xl px-4 py-3 outline-none focus:border-booking shadow-sm text-sm font-medium"
+                                placeholder="https://www.booking.com/..."></div>
+                    </div>
                 </div>
 
             </div>
 
             <div class="w-full lg:w-[35%] xl:w-[30%] relative">
                 <div
-                    class="sticky top-20 bg-navy border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-6 lg:p-8">
-
-                    <div class="mb-8">
-                        <label class="block text-xs font-bold uppercase tracking-widest text-gold mb-2">Precio Base por
-                            Noche</label>
-                        <div
-                            class="flex items-center gap-2 border-b-2 border-white/20 pb-2 focus-within:border-gold transition-colors">
-                            <span class="text-3xl font-extrabold text-white">$</span>
+                    class="sticky top-28 bg-navy border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-6 lg:p-8">
+                    <div
+                        class="mb-8 p-3 bg-white/5 rounded-2xl border border-white/10 focus-within:border-gold transition-colors">
+                        <label
+                            class="block text-[10px] font-bold uppercase tracking-widest text-gold mb-1 text-center">Editar
+                            Tarifa Base</label>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <span class="text-2xl lg:text-3xl font-extrabold text-white">$</span>
                             <input type="number" x-model="propiedad.precio_noche"
-                                class="w-full bg-transparent text-3xl font-extrabold text-white outline-none">
-                            <span class="text-lg text-gray-400 font-bold">COP</span>
+                                class="w-32 bg-transparent text-2xl lg:text-3xl font-extrabold text-white outline-none text-center">
+                            <span class="text-sm lg:text-lg text-white">COP</span>
+                        </div>
+                        <span class="text-gray-400 font-medium block text-center text-sm">/ noche</span>
+                    </div>
+
+                    <div
+                        class="border-2 border-white/20 rounded-2xl mb-6 overflow-hidden pointer-events-none opacity-80">
+                        <div class="flex border-b-2 border-white/20 relative">
+                            <div class="w-1/2 p-4 border-r-2 border-white/20 relative"><label
+                                    class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Llegada</label>
+                                <div class="mt-1 text-sm font-bold text-white">Agregar</div>
+                            </div>
+                            <div class="w-1/2 p-4 relative"><label
+                                    class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Salida</label>
+                                <div class="mt-1 text-sm font-bold text-white">Agregar</div>
+                            </div>
+                        </div>
+                        <div class="p-4"><label
+                                class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Huéspedes</label>
+                            <div class="mt-1 text-sm font-bold text-white"
+                                x-text="`${propiedad.capacidad_huespedes || 1} huésped(es)`"></div>
                         </div>
                     </div>
 
-                    <div class="opacity-50 pointer-events-none filter grayscale">
-                        <div class="border-2 border-white/20 rounded-2xl mb-6 overflow-hidden">
-                            <div class="flex border-b-2 border-white/20 relative">
-                                <div class="w-1/2 p-4 border-r-2 border-white/20"><label
-                                        class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Llegada</label>
-                                    <div class="mt-1 text-sm font-bold text-white">Agregar</div>
-                                </div>
-                                <div class="w-1/2 p-4"><label
-                                        class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Salida</label>
-                                    <div class="mt-1 text-sm font-bold text-white">Agregar</div>
-                                </div>
-                            </div>
-                            <div class="p-4"><label
-                                    class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Huéspedes</label>
-                                <div class="mt-1 text-sm font-bold text-white">1 huésped</div>
-                            </div>
+                    <button
+                        class="w-full bg-gold text-navy font-extrabold py-4 rounded-full shadow-lg text-lg mb-4 pointer-events-none opacity-80">Reservar</button>
+
+                    <div class="space-y-4 text-gray-300 text-sm font-medium border-b border-white/10 pb-6 mb-6">
+                        <div class="flex justify-between"><span
+                                x-text="`${formatearDinero(propiedad.precio_noche || 0)} x 5 noches`"></span><span
+                                class="text-white" x-text="formatearDinero((propiedad.precio_noche || 0) * 5)"></span>
                         </div>
-                        <button
-                            class="w-full bg-gold text-navy font-extrabold py-4 rounded-full text-lg mb-4">Reservar</button>
+                        <div class="flex justify-between"><span>Tarifa de limpieza</span><span
+                                class="text-white">$55.000</span></div>
                     </div>
 
+                    <div class="flex justify-between items-center font-extrabold text-white text-xl">
+                        <span>Total <span class="text-sm font-medium text-gray-300">(COP)</span></span>
+                        <span class="text-gold"
+                            x-text="formatearDinero(((propiedad.precio_noche || 0) * 5) + 55000)"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div x-show="openComodidadesModal" class="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6"
+        style="display: none;">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="openComodidadesModal = false"
+            x-transition.opacity></div>
+        <div class="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[90vh] transform transition-all"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave-end="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95">
+            <div
+                class="px-6 py-5 border-b border-gray-200 flex items-center sticky top-0 bg-white rounded-t-3xl z-10 shrink-0">
+                <button @click="openComodidadesModal = false"
+                    class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors text-gray-700"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <div class="flex-1 overflow-y-auto px-6 md:px-12 py-8 custom-scrollbar">
+                <h2 class="text-3xl font-extrabold text-navy mb-8">¿Qué hay en el alojamiento?</h2>
+                <div class="space-y-10">
+                    <template x-for="(comodidades, categoria) in listaComodidadesCategorizadas" :key="categoria">
+                        <div>
+                            <h3 class="text-xl font-extrabold text-navy mb-4 border-b border-gray-100 pb-2"
+                                x-text="categoria"></h3>
+                            <div class="space-y-1">
+                                <template x-for="comodidad in comodidades" :key="comodidad.id">
+                                    <div class="flex justify-between items-center py-5 border-b border-gray-50 cursor-pointer group hover:bg-gray-50 px-4 -mx-4 rounded-xl transition-colors"
+                                        @click="toggleComodidad(comodidad.id)">
+                                        <div class="flex gap-4 items-center">
+                                            <div x-html="comodidad.svg" class="w-6 h-6 shrink-0 text-navy"></div>
+                                            <div>
+                                                <div class="font-medium text-gray-900 text-lg"
+                                                    x-text="comodidad.nombre"></div>
+                                                <template x-if="comodidad.descripcion">
+                                                    <div class="text-sm text-gray-500 mt-0.5"
+                                                        x-text="comodidad.descripcion"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="w-6 h-6 rounded border flex items-center justify-center transition-colors"
+                                            :class="propiedad.comodidades.includes(comodidad.id) ? 'bg-navy border-navy text-white' : 'border-gray-300 bg-white text-transparent'">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="openDescriptionModal" class="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6"
+        style="display: none;">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="openDescriptionModal = false"
+            x-transition.opacity></div>
+        <div class="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[90vh] transform transition-all"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+            <div
+                class="px-6 py-5 border-b border-gray-200 flex items-center sticky top-0 bg-white rounded-t-3xl z-10 shrink-0">
+                <button @click="openDescriptionModal = false"
+                    class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors text-gray-700"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <div class="flex-1 overflow-y-auto px-6 md:px-12 py-8 custom-scrollbar">
+                <h2 class="text-3xl font-extrabold text-navy mb-8">Acerca de este espacio</h2>
+                <div class="prose prose-navy max-w-none text-gray-700 space-y-8 text-base leading-relaxed">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-navy mb-4">El Espacio</h3>
+                        <div
+                            x-html="propiedad.descripcion ? propiedad.descripcion.split('\n\n')[0].replace(/\n/g, '<br>') : 'Aún no hay descripción'">
+                        </div>
+                    </div>
+                    <template x-if="propiedad.descripcion && propiedad.descripcion.split('\n\n').length > 1">
+                        <div>
+                            <h3 class="text-xl font-extrabold text-navy mb-4">Acceso de los huéspedes</h3>
+                            <div x-html="propiedad.descripcion.split('\n\n')[1].replace(/\n/g, '<br>')"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div x-show="modalFotos" style="display: none;" class="fixed inset-0 z-[120] bg-white flex flex-col"
+        x-transition.opacity>
+
+        <div
+            class="px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row md:justify-between items-start md:items-center bg-white sticky top-0 z-20 shadow-sm gap-4 h-auto md:h-20">
+
+            <div class="flex items-center gap-4 w-full md:w-auto relative">
+                <button @click="irAtrasEnFotos()"
+                    class="p-2 hover:bg-gray-100 rounded-full transition-colors text-navy md:absolute md:-left-2 md:top-1/2 md:-translate-y-1/2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <div class="md:pl-10">
+                    <h2 class="text-xl font-extrabold text-navy" x-text="tituloModalFotos()"></h2>
+                    <p class="text-xs text-gray-500 font-medium" x-show="vistaModalFotos === 'inicio'">Administra las
+                        fotos y agrega detalles a cada habitación.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3" x-show="vistaModalFotos !== 'seleccionar_fotos'">
+                <button x-show="vistaModalFotos === 'inicio'" @click="vistaModalFotos = 'todas'"
+                    class="border border-gray-300 hover:border-gray-900 text-gray-900 font-bold py-2 px-4 rounded-full transition-colors flex items-center gap-2 text-xs shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    Todas las fotos
+                </button>
+                <label
+                    class="bg-navy hover:bg-gray-800 text-white font-bold w-10 h-10 rounded-full cursor-pointer transition-colors shadow-md flex items-center justify-center shrink-0"
+                    title="Subir fotos nuevas">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <input type="file" multiple accept="image/*" class="hidden" @change="procesarFotos($event)">
+                </label>
+            </div>
+
+            <div class="flex items-center gap-3" x-show="vistaModalFotos === 'seleccionar_fotos'">
+                <button @click="vistaModalFotos = 'detalle_categoria'"
+                    class="bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded-lg transition-colors text-sm shadow-md">Listo</button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar bg-white">
+
+            <div x-show="vistaModalFotos === 'inicio'" class="max-w-6xl mx-auto p-6 md:p-12">
+                <div x-show="propiedad?.fotos.length === 0"
+                    class="text-center py-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[32px]">
+                    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold text-navy">Aún no hay fotos</h3>
+                    <p class="text-gray-500 mt-2">Haz clic en el botón "+" de arriba para subir fotos a tu galería.</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 gap-y-10" x-show="propiedad?.fotos.length > 0">
+                    <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
+                        <div class="cursor-pointer group" @click="abrirDetalleCategoria(grupo.nombre)">
+                            <div
+                                class="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-gray-100 mb-3 flex items-center justify-center">
+                                <template x-if="grupo.fotos.length > 0">
+                                    <img :src="grupo.fotos[0].url"
+                                        class="w-full h-full object-cover transform transition-transform group-hover:scale-105 duration-500">
+                                </template>
+                                <template x-if="grupo.fotos.length === 0">
+                                    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </template>
+                                <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors">
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-navy text-[16px] mb-0.5" x-text="grupo.nombre"></h4>
+                            <p class="text-[14px] text-gray-500"
+                                x-text="grupo.fotos.length + (grupo.fotos.length === 1 ? ' foto' : ' fotos')"></p>
+                        </div>
+                    </template>
+
+                    <div class="cursor-pointer group" @click="crearNuevaHabitacion()">
+                        <div
+                            class="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm border-2 border-dashed border-gray-300 bg-white mb-3 flex flex-col items-center justify-center text-gray-400 group-hover:text-navy group-hover:border-navy transition-colors">
+                            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span class="font-bold text-sm">Añadir habitación</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="vistaModalFotos === 'todas'" class="max-w-6xl mx-auto p-6 md:p-12" style="display: none;">
+                <p class="text-sm text-gray-500 mb-8 font-medium">Arrastra las fotos para cambiar su orden en la galería
+                    principal.</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <template x-for="(fotoUrl, index) in propiedad?.fotos" :key="index">
+                        <div draggable="true" @dragstart="draggedIndex = index" @dragover.prevent=""
+                            @drop="moverFoto(draggedIndex, index)"
+                            class="relative aspect-[4/3] rounded-2xl overflow-hidden group shadow-sm border cursor-grab hover:shadow-xl transition-all"
+                            :class="index === 0 ? 'ring-2 ring-gold border-transparent bg-gray-200' : 'border-gray-200 bg-gray-200'">
+
+                            <img :src="fotoUrl" class="w-full h-full object-cover">
+
+                            <div class="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
+                                <span
+                                    class="bg-white text-navy font-extrabold text-xs w-7 h-7 flex items-center justify-center rounded-full shadow-lg border border-gray-100"
+                                    x-text="index + 1"></span>
+                                <template x-if="index === 0">
+                                    <span
+                                        class="bg-white text-navy font-extrabold text-[10px] px-3 py-1.5 flex items-center justify-center rounded-lg shadow-lg uppercase tracking-widest">Foto
+                                        de portada</span>
+                                </template>
+                            </div>
+
+                            <div
+                                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px] z-10">
+                                <button @click.stop="eliminarFoto(index)"
+                                    class="bg-red-500 hover:bg-red-600 text-white font-bold w-12 h-12 rounded-full shadow-xl transform transition-transform hover:scale-110 flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div x-show="vistaModalFotos === 'detalle_categoria'" class="max-w-5xl mx-auto p-6 md:p-12"
+                style="display: none;">
+
+                <div class="flex justify-between items-center mb-8 pb-6 border-b border-gray-100">
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-navy">Fotos del espacio</h3>
+                        <p class="text-gray-500 text-sm mt-1">Estas fotos se agruparán bajo esta categoría.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button @click="eliminarCategoria()"
+                            class="bg-red-50 hover:bg-red-100 text-red-500 font-bold py-2 px-4 rounded-xl text-sm transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg> Eliminar espacio
+                        </button>
+                        <button @click="vistaModalFotos = 'seleccionar_fotos'"
+                            class="bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded-xl text-sm transition-colors shadow-md">
+                            Asignar fotos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                    <template x-for="foto in getFotosPorCategoria(categoriaSeleccionada)" :key="foto.index">
+                        <div
+                            class="relative aspect-[4/3] rounded-xl overflow-hidden group shadow-sm border border-gray-200">
+                            <img :src="foto.url" class="w-full h-full object-cover">
+                            <button @click.stop="quitarDeCategoria(foto.index)"
+                                class="absolute top-2 right-2 bg-white hover:bg-red-50 text-red-500 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Quitar de este espacio">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </template>
+
+                    <div x-show="getFotosPorCategoria(categoriaSeleccionada).length === 0"
+                        class="col-span-full py-12 text-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
+                        <p class="text-gray-500 font-medium">Aún no has asignado fotos a esta habitación.</p>
+                        <button @click="vistaModalFotos = 'seleccionar_fotos'"
+                            class="mt-3 text-navy font-bold underline hover:text-gold">Seleccionar fotos ahora</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div x-show="vistaModalFotos === 'seleccionar_fotos'" class="max-w-6xl mx-auto p-6 md:p-12"
+                style="display: none;">
+                <p class="text-sm text-gray-500 mb-8 font-medium">Haz clic en las fotos que pertenecen a este espacio
+                    para asignarlas.</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <template x-for="(fotoUrl, index) in propiedad?.fotos" :key="index">
+
+                        <div @click="toggleFotoEnCategoria(index)"
+                            class="relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm cursor-pointer transition-all border-4"
+                            :class="propiedad.foto_categorias[index] === categoriaSeleccionada ? 'border-navy scale-95' : 'border-transparent hover:opacity-80'">
+
+                            <img :src="fotoUrl" class="w-full h-full object-cover"
+                                :class="propiedad.foto_categorias[index] !== categoriaSeleccionada && propiedad.foto_categorias[index] !== 'Sin asignar' ? 'opacity-40 grayscale-[50%]' : ''">
+
+                            <div class="absolute top-3 left-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors shadow-sm z-10"
+                                :class="propiedad.foto_categorias[index] === categoriaSeleccionada ? 'bg-navy border-navy text-white' : 'bg-white border-white text-transparent'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+
+                            <div x-show="propiedad.foto_categorias[index] !== 'Sin asignar' && propiedad.foto_categorias[index] !== categoriaSeleccionada"
+                                class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded-md backdrop-blur-md">
+                                En: <span x-text="propiedad.foto_categorias[index]"></span>
+                            </div>
+                        </div>
+
+                    </template>
                 </div>
             </div>
 
         </div>
-    </main>
+    </div>
 
     <script>
-        function editorSuite() {
+        function editorSuitePremium() {
             return {
                 cargando: true,
                 guardando: false,
+                cargandoMapa: true,
                 propiedadId: null,
+                esBorrador: false,
                 propiedad: null,
 
+                modalFotos: false,
+                vistaModalFotos: 'inicio', // 'inicio', 'todas', 'detalle_categoria', 'seleccionar_fotos'
+                categoriaSeleccionada: '',
+
+                openComodidadesModal: false,
+                openDescriptionModal: false,
+
+                mapa: null,
+                marcador: null,
+                draggedIndex: null,
+
+                // Categorías base. Si el usuario añade más, se guardan en la DB.
+                categoriasCreadas: ['Sala', 'Cocina completa', 'Comedor', 'Habitación', 'Baño completo', 'Área de trabajo'],
+
+                // ... (listaComodidadesCategorizadas y listaComodidadesVisuales se mantienen igual) ...
+                listaComodidadesCategorizadas: {
+                    "Favoritos de los huéspedes": [
+                        { id: 'Wifi', nombre: 'Wifi', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>' },
+                        { id: 'Cocina', nombre: 'Cocina', descripcion: 'El espacio cuenta con lo necesario para cocinar', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>' },
+                        { id: 'Zona de trabajo', nombre: 'Zona de trabajo', descripcion: 'Una mesa o escritorio especial', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>' },
+                    ],
+                    "Baño": [
+                        { id: 'Secador', nombre: 'Secador de pelo', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2a2 2 0 100 4h2v14a2 2 0 104 0V6a2 2 0 100-4h-2zM4 14a2 2 0 100 4h2v14a2 2 0 104 0V14a2 2 0 100-4H6a2 2 0 100-4H4zm0-2h2a2 2 0 100 4H4a2 2 0 100-4zm12 0h2a2 2 0 100 4h-2a2 2 0 100-4z" />' },
+                        { id: 'Agua caliente', nombre: 'Agua caliente', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9.003 9.003 0 008.313-5.547l-2.828-2.828a5 5 0 01-7.07 0l-2.828 2.828A9.003 9.003 0 0012 21z" />' },
+                    ],
+                    "Dormitorio y lavadero": [
+                        { id: 'Lavadora', nombre: 'Lavadora', descripcion: 'Dentro del alojamiento, gratuita', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>' },
+                        { id: 'Ganchos', nombre: 'Ganchos para ropa', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />' },
+                        { id: 'Sábanas', nombre: 'Sábanas', descripcion: 'Sábanas de algodón', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />' }
+                    ],
+                    "Entretenimiento": [
+                        { id: 'TV', nombre: 'TV', descripcion: 'Smart TV con Netflix', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' }
+                    ],
+                    "Calefacción y refrigeración": [
+                        { id: 'Aire acondicionado', nombre: 'Aire Acondicionado', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>' },
+                    ],
+                    "Estacionamiento e instalaciones": [
+                        { id: 'Parqueadero', nombre: 'Estacionamiento gratuito', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>' },
+                        { id: 'Jacuzzi', nombre: 'Jacuzzi', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>' }
+                    ]
+                },
+
+                listaComodidadesVisuales: [
+                    { id: 'Wifi', nombre: 'Wifi Rápido', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>' },
+                    { id: 'Parqueadero', nombre: 'Parqueadero', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>' },
+                    { id: 'Cocina', nombre: 'Cocina equipada', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>' },
+                    { id: 'Lavadora', nombre: 'Lavadora', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>' },
+                    { id: 'TV', nombre: 'Smart TV', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' },
+                    { id: 'Aire acondicionado', nombre: 'Aire Acond.', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>' }
+                ],
+
                 async init() {
-                    // Obtener ID de la URL
                     const params = new URLSearchParams(window.location.search);
                     this.propiedadId = params.get('id');
+                    this.esBorrador = params.get('borrador') === 'true';
 
-                    if (!this.propiedadId) {
-                        alert("No se proporcionó un ID de propiedad válido.");
+                    if (this.esBorrador) {
+                        const borradorGuardado = localStorage.getItem('gv_borrador_propiedad');
+                        if (borradorGuardado) {
+                            this.propiedad = JSON.parse(borradorGuardado);
+                            this.asegurarEstructuraDatos();
+                            this.cargando = false;
+                            setTimeout(() => this.iniciarMapa(), 300);
+                        } else {
+                            alert("No se encontró el borrador.");
+                            this.volver();
+                        }
+                    } else if (this.propiedadId) {
+                        await this.cargarPropiedad();
+                    } else {
                         this.volver();
-                        return;
+                    }
+                },
+
+                asegurarEstructuraDatos() {
+                    if (!Array.isArray(this.propiedad.comodidades)) this.propiedad.comodidades = [];
+                    if (!Array.isArray(this.propiedad.fotos)) this.propiedad.fotos = [];
+                    if (!Array.isArray(this.propiedad.foto_categorias) || this.propiedad.foto_categorias.length !== this.propiedad.fotos.length) {
+                        this.propiedad.foto_categorias = new Array(this.propiedad.fotos.length).fill('Sin asignar');
                     }
 
-                    await this.cargarPropiedad();
+                    // Asegurar que las categorías creadas en sesiones anteriores se mantengan en la lista
+                    this.propiedad.foto_categorias.forEach(cat => {
+                        if (cat !== 'Sin asignar' && !this.categoriasCreadas.includes(cat)) {
+                            this.categoriasCreadas.push(cat);
+                        }
+                    });
+                },
+
+                formatearDinero(valor) {
+                    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor);
+                },
+
+                totalServicios() {
+                    let total = 0;
+                    for (const cat in this.listaComodidadesCategorizadas) {
+                        total += this.listaComodidadesCategorizadas[cat].length;
+                    }
+                    return total;
                 },
 
                 async cargarPropiedad() {
@@ -267,17 +816,67 @@
                         const response = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadId}`);
                         if (response.ok) {
                             this.propiedad = await response.json();
-                            // Asegurar que fotos sea un arreglo
-                            if (!this.propiedad.fotos) this.propiedad.fotos = [];
+                            this.asegurarEstructuraDatos();
+                            setTimeout(() => this.iniciarMapa(), 300);
                         } else {
                             alert("Error al cargar la propiedad.");
                             this.volver();
                         }
                     } catch (error) {
-                        alert("Error de conexión con el servidor.");
+                        alert("Error de conexión.");
                         this.volver();
                     } finally {
                         this.cargando = false;
+                    }
+                },
+
+                iniciarMapa() {
+                    let lat = 4.8587, lng = -74.0581;
+                    if (this.propiedad.lat && this.propiedad.lng) {
+                        lat = this.propiedad.lat; lng = this.propiedad.lng;
+                    }
+
+                    this.mapa = L.map('mapa-interactivo').setView([lat, lng], 16);
+
+                    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                        maxZoom: 20,
+                        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                    }).addTo(this.mapa);
+
+                    this.marcador = L.marker([lat, lng], { draggable: true }).addTo(this.mapa);
+                    this.cargandoMapa = false;
+
+                    setTimeout(() => { this.mapa.invalidateSize(); }, 500);
+
+                    const buscarUbicacion = async (lati, longi) => {
+                        try {
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lati}&lon=${longi}`);
+                            const data = await res.json();
+                            if (data && data.address) {
+                                this.propiedad.direccion = data.address.road || data.address.neighbourhood || '';
+                                this.propiedad.ciudad = data.address.city || data.address.town || 'Chía';
+                                this.propiedad.departamento = data.address.state || 'Cundinamarca';
+                                this.propiedad.lat = lati; this.propiedad.lng = longi;
+                            }
+                        } catch (e) { console.log("Error mapa"); }
+                    };
+
+                    if (!this.propiedad.lat) buscarUbicacion(lat, lng);
+
+                    this.marcador.on('dragend', e => buscarUbicacion(e.target.getLatLng().lat, e.target.getLatLng().lng));
+                    this.mapa.on('click', e => {
+                        this.marcador.setLatLng(e.latlng);
+                        buscarUbicacion(e.latlng.lat, e.latlng.lng);
+                    });
+                },
+
+                toggleComodidad(idComodidad) {
+                    if (!Array.isArray(this.propiedad.comodidades)) this.propiedad.comodidades = [];
+                    let index = this.propiedad.comodidades.indexOf(idComodidad);
+                    if (index > -1) {
+                        this.propiedad.comodidades.splice(index, 1);
+                    } else {
+                        this.propiedad.comodidades.push(idComodidad);
                     }
                 },
 
@@ -288,6 +887,7 @@
                         const lector = new FileReader();
                         lector.onload = (e) => {
                             this.propiedad.fotos.push(e.target.result);
+                            this.propiedad.foto_categorias.push('Sin asignar');
                         };
                         lector.readAsDataURL(archivos[i]);
                     }
@@ -296,53 +896,164 @@
                 eliminarFoto(index) {
                     if (confirm("¿Quitar esta foto?")) {
                         this.propiedad.fotos.splice(index, 1);
+                        this.propiedad.foto_categorias.splice(index, 1);
+                    }
+                },
+
+                moverFoto(fromIndex, toIndex) {
+                    if (fromIndex === null || fromIndex === toIndex) return;
+
+                    const itemToMove = this.propiedad.fotos.splice(fromIndex, 1)[0];
+                    this.propiedad.fotos.splice(toIndex, 0, itemToMove);
+
+                    const catToMove = this.propiedad.foto_categorias.splice(fromIndex, 1)[0];
+                    this.propiedad.foto_categorias.splice(toIndex, 0, catToMove);
+
+                    this.draggedIndex = null;
+                },
+
+                // ✨ LÓGICA DE CATEGORÍAS TIPO AIRBNB ✨
+                abrirModalFotosInicial() {
+                    this.vistaModalFotos = 'inicio';
+                    this.modalFotos = true;
+                },
+
+                tituloModalFotos() {
+                    if (this.vistaModalFotos === 'inicio') return 'Recorrido Fotográfico';
+                    if (this.vistaModalFotos === 'todas') return 'Todas las fotos';
+                    if (this.vistaModalFotos === 'detalle_categoria' || this.vistaModalFotos === 'seleccionar_fotos') {
+                        return this.vistaModalFotos === 'seleccionar_fotos' ? `Elegir fotos para ${this.categoriaSeleccionada}` : this.categoriaSeleccionada;
+                    }
+                    return '';
+                },
+
+                irAtrasEnFotos() {
+                    if (this.vistaModalFotos === 'seleccionar_fotos') {
+                        this.vistaModalFotos = 'detalle_categoria';
+                    } else if (this.vistaModalFotos === 'detalle_categoria' || this.vistaModalFotos === 'todas') {
+                        this.vistaModalFotos = 'inicio';
+                    } else {
+                        this.modalFotos = false;
+                    }
+                },
+
+                getFotosAgrupadas() {
+                    const grupos = {};
+                    this.categoriasCreadas.forEach(cat => grupos[cat] = []);
+
+                    this.propiedad.fotos.forEach((fotoUrl, index) => {
+                        let cat = this.propiedad.foto_categorias[index];
+                        if (!cat || !this.categoriasCreadas.includes(cat)) cat = 'Sin asignar';
+                        if (!grupos[cat]) grupos[cat] = [];
+                        grupos[cat].push({ url: fotoUrl, index: index });
+                    });
+
+                    // Devolver solo las que tienen fotos, o todas si estamos administrando
+                    return Object.keys(grupos).map(key => ({
+                        nombre: key,
+                        fotos: grupos[key]
+                    }));
+                },
+
+                getFotosPorCategoria(categoria) {
+                    let resultado = [];
+                    this.propiedad.fotos.forEach((fotoUrl, index) => {
+                        if (this.propiedad.foto_categorias[index] === categoria) {
+                            resultado.push({ url: fotoUrl, index: index });
+                        }
+                    });
+                    return resultado;
+                },
+
+                crearNuevaHabitacion() {
+                    let nombre = prompt("¿Qué espacio quieres añadir? (Ej: Balcón, Piscina, Sala de juegos)");
+                    if (nombre && nombre.trim() !== '') {
+                        nombre = nombre.trim();
+                        if (!this.categoriasCreadas.includes(nombre)) {
+                            this.categoriasCreadas.push(nombre);
+                        }
+                        this.categoriaSeleccionada = nombre;
+                        this.vistaModalFotos = 'detalle_categoria';
+                    }
+                },
+
+                eliminarCategoria() {
+                    if (confirm(`¿Estás seguro de eliminar el espacio "${this.categoriaSeleccionada}"? Las fotos no se borrarán, solo quedarán "Sin asignar".`)) {
+                        // Pasamos las fotos a 'Sin asignar'
+                        this.propiedad.foto_categorias = this.propiedad.foto_categorias.map(c => c === this.categoriaSeleccionada ? 'Sin asignar' : c);
+                        // Quitamos la categoría de la lista
+                        this.categoriasCreadas = this.categoriasCreadas.filter(c => c !== this.categoriaSeleccionada);
+                        this.vistaModalFotos = 'inicio';
+                    }
+                },
+
+                abrirDetalleCategoria(nombreCat) {
+                    this.categoriaSeleccionada = nombreCat;
+                    this.vistaModalFotos = 'detalle_categoria';
+                },
+
+                quitarDeCategoria(index) {
+                    this.propiedad.foto_categorias[index] = 'Sin asignar';
+                },
+
+                toggleFotoEnCategoria(index) {
+                    if (this.propiedad.foto_categorias[index] === this.categoriaSeleccionada) {
+                        this.propiedad.foto_categorias[index] = 'Sin asignar';
+                    } else {
+                        this.propiedad.foto_categorias[index] = this.categoriaSeleccionada;
                     }
                 },
 
                 async guardarCambios() {
                     this.guardando = true;
-
-                    // Formatear numéricos
                     const payload = {
                         titulo: this.propiedad.titulo,
                         ciudad: this.propiedad.ciudad,
                         departamento: this.propiedad.departamento,
                         tipo_propiedad: this.propiedad.tipo_propiedad,
+                        tipo_alojamiento: this.propiedad.tipo_alojamiento,
+                        direccion: this.propiedad.direccion,
                         capacidad_huespedes: Number(this.propiedad.capacidad_huespedes),
                         habitaciones: Number(this.propiedad.habitaciones),
                         camas: Number(this.propiedad.camas),
                         banos: Number(this.propiedad.banos),
                         descripcion: this.propiedad.descripcion,
                         precio_noche: Number(this.propiedad.precio_noche),
-                        fotos: this.propiedad.fotos
+                        comodidades: this.propiedad.comodidades || [],
+                        wifi_red: this.propiedad.wifi_red,
+                        wifi_pass: this.propiedad.wifi_pass,
+                        cerradura_codigo: this.propiedad.cerradura_codigo,
+                        link_airbnb: this.propiedad.link_airbnb,
+                        link_booking: this.propiedad.link_booking,
+                        fotos: this.propiedad.fotos,
+                        foto_categorias: this.propiedad.foto_categorias,
+                        lat: this.propiedad.lat,
+                        lng: this.propiedad.lng
                     };
 
+                    let url = 'https://gestandovalor-backend.onrender.com/propiedades';
+                    let method = 'POST';
+
+                    if (!this.esBorrador && this.propiedadId) {
+                        url = `${url}/${this.propiedadId}`; method = 'PATCH';
+                    }
+
                     try {
-                        const response = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadId}`, {
-                            method: 'PATCH',
+                        const response = await fetch(url, {
+                            method: method,
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(payload)
                         });
 
                         if (response.ok) {
-                            alert('🎉 ¡Diseño de propiedad guardado con éxito!');
-                        } else {
-                            if (response.status === 413) {
-                                alert("Las imágenes pesan demasiado. Intenta subir menos fotos o reducirlas de tamaño.");
-                            } else {
-                                alert('Error al guardar los cambios.');
-                            }
-                        }
-                    } catch (error) {
-                        alert('Error de conexión.');
-                    } finally {
-                        this.guardando = false;
-                    }
+                            alert(this.esBorrador ? '🎉 ¡Anuncio publicado oficialmente!' : '✅ ¡Diseño actualizado correctamente!');
+                            if (this.esBorrador) localStorage.removeItem('gv_borrador_propiedad');
+                            this.volver();
+                        } else { alert('Error al guardar en el servidor.'); }
+                    } catch (error) { alert('Error de conexión.'); } finally { this.guardando = false; }
                 },
 
-                volver() {
-                    window.location.href = 'propiedades.html';
-                }
+                volver() { window.location.href = 'propiedades.html'; }
             }
         }
     </script>
