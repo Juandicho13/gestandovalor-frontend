@@ -236,65 +236,47 @@
                                 </div>
 
                                 <div class="mt-6 pt-6 border-t border-gray-100 flex gap-2">
-
-                                    <div class="flex-1 flex" x-show="propiedadActiva?.link_airbnb"
-                                        style="display: none;">
-                                        <button @click="agregarLinkRapido('airbnb')"
-                                            class="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-red-100 transition-all px-3 py-2 rounded-l-lg border-y border-l border-red-200 shadow-sm"
-                                            title="Editar enlace">
+                                    <template x-if="propiedadActiva?.link_airbnb">
+                                        <a :href="propiedadActiva.link_airbnb" target="_blank"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-airbnb hover:text-white transition-all px-3 py-2 rounded-lg border border-red-100 shadow-sm flex-1 justify-center">
                                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                 <path
                                                     d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z" />
                                             </svg>
-                                            Airbnb
-                                        </button>
-                                        <a :href="propiedadActiva?.link_airbnb" target="_blank"
-                                            class="flex items-center justify-center px-3 py-2 bg-red-50 hover:bg-airbnb hover:text-white text-airbnb transition-all rounded-r-lg border border-red-200 shadow-sm border-l-0"
-                                            title="Abrir enlace externo">
+                                            Ver Airbnb
+                                        </a>
+                                    </template>
+                                    <template x-if="!propiedadActiva?.link_airbnb">
+                                        <button @click="agregarLinkRapido('airbnb')"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    d="M12 4v16m8-8H4" />
                                             </svg>
-                                        </a>
-                                    </div>
-                                    <button x-show="!propiedadActiva?.link_airbnb" @click="agregarLinkRapido('airbnb')"
-                                        class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        Añadir Airbnb
-                                    </button>
+                                            Añadir Airbnb
+                                        </button>
+                                    </template>
 
-                                    <div class="flex-1 flex" x-show="propiedadActiva?.link_booking"
-                                        style="display: none;">
-                                        <button @click="agregarLinkRapido('booking')"
-                                            class="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-blue-100 transition-all px-3 py-2 rounded-l-lg border-y border-l border-blue-200 shadow-sm"
-                                            title="Editar enlace">
+                                    <template x-if="propiedadActiva?.link_booking">
+                                        <a :href="propiedadActiva.link_booking" target="_blank"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-booking hover:text-white transition-all px-3 py-2 rounded-lg border border-blue-100 shadow-sm flex-1 justify-center">
                                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                 <path
                                                     d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z" />
                                             </svg>
-                                            Booking
-                                        </button>
-                                        <a :href="propiedadActiva?.link_booking" target="_blank"
-                                            class="flex items-center justify-center px-3 py-2 bg-blue-50 hover:bg-booking hover:text-white text-booking transition-all rounded-r-lg border border-blue-200 shadow-sm border-l-0"
-                                            title="Abrir enlace externo">
+                                            Ver Booking
+                                        </a>
+                                    </template>
+                                    <template x-if="!propiedadActiva?.link_booking">
+                                        <button @click="agregarLinkRapido('booking')"
+                                            class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    d="M12 4v16m8-8H4" />
                                             </svg>
-                                        </a>
-                                    </div>
-                                    <button x-show="!propiedadActiva?.link_booking"
-                                        @click="agregarLinkRapido('booking')"
-                                        class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        Añadir Booking
-                                    </button>
+                                            Añadir Booking
+                                        </button>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -348,7 +330,6 @@
                                             @change="procesarPDF($event)" />
                                     </label>
                                 </div>
-
                                 <button x-show="archivoPDF" style="display: none;" @click="subirLiquidacion()"
                                     class="w-full mt-4 bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3 rounded-xl transition-transform active:scale-95 shadow-md flex justify-center items-center gap-2"
                                     :disabled="subiendoPDF">
@@ -384,16 +365,14 @@
                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        Ver PDF
+                                        </svg> Ver PDF
                                     </button>
                                     <button @click="eliminarLiquidacion(liquidacionActual.id)"
                                         class="flex-1 bg-red-50 border border-red-100 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Quitar
+                                        </svg> Quitar
                                     </button>
                                 </div>
                             </div>
@@ -459,9 +438,8 @@
                                 <p class="text-gray-500 mb-4">Esta propiedad aún no tiene un registro de inventario
                                     inicial.</p>
                                 <button
-                                    class="bg-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors">
-                                    Crear Inventario Inicial
-                                </button>
+                                    class="bg-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors">Crear
+                                    Inventario Inicial</button>
                             </div>
 
                             <div x-show="propiedadActiva?.inventario"
@@ -501,7 +479,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div>
                                     <h3
                                         class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
@@ -745,9 +722,9 @@
                 <button type="button" x-show="paso === 3" @click="enviarDatos()"
                     class="bg-gold text-navy font-extrabold py-3 px-8 rounded-xl flex items-center gap-2 hover:bg-yellow-500 transition-transform hover:scale-105 shadow-lg"
                     :disabled="cargando">
-                    <span x-show="!cargando && !modoEdicion">Publicar Anuncio</span>
-                    <span x-show="!cargando && modoEdicion">Guardar Cambios</span>
-                    <span x-show="cargando">Procesando...</span>
+                    <span x-show="!cargando && !modoEdicion">Ir al Editor de Diseño Visual</span>
+                    <span x-show="!cargando && modoEdicion">Ir al Editor Visual</span>
+                    <span x-show="cargando">Preparando...</span>
                 </button>
             </div>
         </div>
@@ -889,45 +866,31 @@
 
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
+                // ✨ AQUÍ APLICAMOS LA MODIFICACIÓN (Guarda el borrador y redirige) ✨
                 async enviarDatos() {
+                    if (!this.form.titulo || !this.form.ciudad) {
+                        alert("Por favor ponle un título y una ciudad antes de continuar.");
+                        return;
+                    }
+
                     this.cargando = true;
                     const dataFinal = { ...this.form, precio_noche: Number(this.form.precio_noche) };
 
-                    try {
-                        let url = 'https://gestandovalor-backend.onrender.com/propiedades';
-                        let method = 'POST';
-
-                        if (this.modoEdicion) {
-                            url = `https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`;
-                            method = 'PATCH';
-                            delete dataFinal.id;
-                            delete dataFinal.created_at;
-                        }
-
-                        const response = await fetch(url, {
-                            method: method,
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(dataFinal)
-                        });
-
-                        if (response.ok) {
-                            alert(this.modoEdicion ? '✅ Propiedad actualizada con éxito.' : '🎉 ¡Anuncio publicado con éxito!');
-                            this.modalNueva = false;
-                            await this.cargarPropiedades();
-                            if (this.modoEdicion) {
-                                this.propiedadActiva = this.propiedades.find(p => p.id === this.propiedadActiva.id);
-                            }
-                        } else {
-                            if (response.status === 413) { alert('Error: Las imágenes pesan demasiado por ahora.'); }
-                            else { alert('Hubo un error al guardar.'); }
-                        }
-                    } catch (error) {
-                        alert('No se pudo conectar con el servidor.');
+                    // Si es edición, redirigir con el ID (no guardamos aquí, guardamos en el WYSIWYG)
+                    if (this.modoEdicion) {
+                        alert('👉 Vamos al Editor Visual para modificar los detalles y fotos de la propiedad.');
+                        window.location.href = `editor_suite.html?id=${this.propiedadActiva.id}`;
+                    } else {
+                        // Si es nuevo, lo guardamos en memoria temporal (Borrador) sin tocar la base de datos
+                        localStorage.setItem('gv_borrador_propiedad', JSON.stringify(dataFinal));
+                        alert('👉 ¡Casi listo! Vamos al Editor Visual para que acomodes tus fotos, veas cómo lucirá tu página y publiques el anuncio final.');
+                        window.location.href = 'editor_suite.html?borrador=true';
                     }
+
                     this.cargando = false;
+                    this.modalNueva = false;
                 },
 
-                // ✨ LÓGICA MEJORADA DE ENLACES: Soporta Modificación y Borrado
                 async agregarLinkRapido(plataforma) {
                     const nombrePlataforma = plataforma === 'airbnb' ? 'Airbnb' : 'Booking';
                     const linkActual = plataforma === 'airbnb' ? this.propiedadActiva.link_airbnb : this.propiedadActiva.link_booking;
@@ -938,7 +901,7 @@
 
                     const link = prompt(mensaje, linkActual || '');
 
-                    if (link === null) return; // Si le da cancelar
+                    if (link === null) return;
                     const linkFinal = link.trim();
 
                     if (linkFinal !== '' && !linkFinal.startsWith('http')) {
@@ -957,7 +920,6 @@
                         });
 
                         if (response.ok) {
-                            // Actualizamos la vista local
                             if (plataforma === 'airbnb') this.propiedadActiva.link_airbnb = payload[`link_${plataforma}`];
                             if (plataforma === 'booking') this.propiedadActiva.link_booking = payload[`link_${plataforma}`];
 
