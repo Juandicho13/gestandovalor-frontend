@@ -887,62 +887,50 @@
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
                 async enviarDatos() {
-                    // 1. Evitamos que el QuotaExceededError congele la pantalla
-                    try {
-                        localStorage.setItem('gv_borrador_propiedad', JSON.stringify(this.propiedad));
-                    } catch (e) {
-                        console.warn("Borrador demasiado pesado para memoria local, continuando con el guardado en servidor...");
-                    }
+                    // Tomamos los datos directamente del Asistente
+                    // Si usas this.titulo, los tomará. Si usas this.propiedad.titulo, también funcionará.
+                    const data = this.propiedad || this;
 
-                    // 2. Preparamos los datos asegurando que los números sean números y enviando las categorías vacías por defecto
-                    const payload = {
-                        titulo: this.propiedad.titulo,
-                        ciudad: this.propiedad.ciudad,
-                        departamento: this.propiedad.departamento,
-                        tipo_propiedad: this.propiedad.tipo_propiedad,
-                        tipo_alojamiento: this.propiedad.tipo_alojamiento,
-                        direccion: this.propiedad.direccion,
-                        capacidad_huespedes: Number(this.propiedad.capacidad_huespedes || 1),
-                        habitaciones: Number(this.propiedad.habitaciones || 1),
-                        camas: Number(this.propiedad.camas || 1),
-                        banos: Number(this.propiedad.banos || 1),
-                        descripcion: this.propiedad.descripcion,
-                        precio_noche: Number(this.propiedad.precio_noche || 0),
-                        comodidades: this.propiedad.comodidades || [],
-                        wifi_red: this.propiedad.wifi_red,
-                        wifi_pass: this.propiedad.wifi_pass,
-                        cerradura_codigo: this.propiedad.cerradura_codigo,
-                        link_airbnb: this.propiedad.link_airbnb,
-                        link_booking: this.propiedad.link_booking,
-                        fotos: this.propiedad.fotos || [],
-
-                        // ✨ NUEVOS CAMPOS DEL BACKEND ✨
-                        foto_categorias: (this.propiedad.fotos || []).map(() => 'Sin asignar'),
-                        lat: this.propiedad.lat || null,
-                        lng: this.propiedad.lng || null
+                    const borrador = {
+                        titulo: data.titulo || '',
+                        ciudad: data.ciudad || '',
+                        departamento: data.departamento || '',
+                        tipo_propiedad: data.tipo_propiedad || '',
+                        tipo_alojamiento: data.tipo_alojamiento || '',
+                        direccion: data.direccion || '',
+                        capacidad_huespedes: Number(data.capacidad_huespedes || 1),
+                        habitaciones: Number(data.habitaciones || 1),
+                        camas: Number(data.camas || 1),
+                        banos: Number(data.banos || 1),
+                        descripcion: data.descripcion || '',
+                        precio_noche: Number(data.precio_noche || 0),
+                        comodidades: data.comodidades || [],
+                        wifi_red: data.wifi_red || '',
+                        wifi_pass: data.wifi_pass || '',
+                        cerradura_codigo: data.cerradura_codigo || '',
+                        link_airbnb: data.link_airbnb || '',
+                        link_booking: data.link_booking || '',
+                        fotos: data.fotos || [],
+                        // Preparamos las fotos con categorías en blanco para que el Editor Visual las lea
+                        foto_categorias: (data.fotos || []).map(() => 'Sin asignar'),
+                        lat: data.lat || null,
+                        lng: data.lng || null
                     };
 
                     try {
-                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(payload)
-                        });
+                        // 1. Guardamos el paquete en el disco duro del navegador
+                        localStorage.setItem('gv_borrador_propiedad', JSON.stringify(borrador));
 
-                        if (response.ok) {
-                            localStorage.removeItem('gv_borrador_propiedad');
-                            alert("¡Anuncio creado con éxito!");
-                            window.location.href = 'index.html'; // O a donde quieras redirigir
-                        } else {
-                            const err = await response.json();
-                            console.error("Error del servidor:", err);
-                            alert("Hubo un error al guardar en el servidor. Revisa la consola.");
-                        }
-                    } catch (error) {
-                        console.error("Error de conexión:", error);
-                        alert("Error de conexión con el servidor.");
+                        // 2. ¡Lanzamos al usuario al nuevo Editor Premium!
+                        window.location.href = 'editor_suite.html?borrador=true';
+
+                    } catch (e) {
+                        // Si subieron fotos gigantescas que bloquean la memoria temporal:
+                        console.error("Error guardando en memoria:", e);
+                        alert("Las fotos son muy pesadas para este paso rápido. Sube solo 1 o 2 aquí, y luego agregas el resto directamente dentro del Editor Visual.");
+
+                        // Desbloqueamos el botón por si quieren intentar de nuevo
+                        this.paso = 3;
                     }
                 },
 
