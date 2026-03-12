@@ -886,44 +886,63 @@
 
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
-                // ✨ LA LÓGICA DE BORRADOR LOCAL (SIN PUBLICAR AÚN) ✨
                 async enviarDatos() {
-                    if (!this.form.titulo || !this.form.ciudad) {
-                        alert("Por favor llena al menos el título y la ciudad en los pasos anteriores.");
-                        return;
+                    // 1. Evitamos que el QuotaExceededError congele la pantalla
+                    try {
+                        localStorage.setItem('gv_borrador_propiedad', JSON.stringify(this.propiedad));
+                    } catch (e) {
+                        console.warn("Borrador demasiado pesado para memoria local, continuando con el guardado en servidor...");
                     }
 
-                    this.cargando = true;
-                    const dataFinal = { ...this.form, precio_noche: Number(this.form.precio_noche) };
+                    // 2. Preparamos los datos asegurando que los números sean números y enviando las categorías vacías por defecto
+                    const payload = {
+                        titulo: this.propiedad.titulo,
+                        ciudad: this.propiedad.ciudad,
+                        departamento: this.propiedad.departamento,
+                        tipo_propiedad: this.propiedad.tipo_propiedad,
+                        tipo_alojamiento: this.propiedad.tipo_alojamiento,
+                        direccion: this.propiedad.direccion,
+                        capacidad_huespedes: Number(this.propiedad.capacidad_huespedes || 1),
+                        habitaciones: Number(this.propiedad.habitaciones || 1),
+                        camas: Number(this.propiedad.camas || 1),
+                        banos: Number(this.propiedad.banos || 1),
+                        descripcion: this.propiedad.descripcion,
+                        precio_noche: Number(this.propiedad.precio_noche || 0),
+                        comodidades: this.propiedad.comodidades || [],
+                        wifi_red: this.propiedad.wifi_red,
+                        wifi_pass: this.propiedad.wifi_pass,
+                        cerradura_codigo: this.propiedad.cerradura_codigo,
+                        link_airbnb: this.propiedad.link_airbnb,
+                        link_booking: this.propiedad.link_booking,
+                        fotos: this.propiedad.fotos || [],
 
-                    // Lo guardamos en la memoria del navegador (Cero basura en tu base de datos)
-                    localStorage.setItem('gv_borrador_propiedad', JSON.stringify(dataFinal));
-
-                    alert('👉 ¡Casi listo! Vamos al Editor Visual para que acomodes tus fotos, veas cómo lucirá tu página y publiques el anuncio final.');
-
-                    window.location.href = 'editor_suite.html?borrador=true';
-                    this.cargando = false;
-                },
-
-                // ✨ NUEVA FUNCIÓN: ELIMINAR PROPIEDAD Y TODO SU RASTRO ✨
-                async eliminarPropiedad() {
-                    if (!confirm('🚨 ATENCIÓN: ¿Estás absolutamente seguro de borrar esta propiedad? Se eliminarán también todas sus fotos, inventario y reportes de liquidación vinculados. Esta acción NO se puede deshacer.')) return;
+                        // ✨ NUEVOS CAMPOS DEL BACKEND ✨
+                        foto_categorias: (this.propiedad.fotos || []).map(() => 'Sin asignar'),
+                        lat: this.propiedad.lat || null,
+                        lng: this.propiedad.lng || null
+                    };
 
                     try {
-                        const response = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`, {
-                            method: 'DELETE'
+                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
                         });
 
                         if (response.ok) {
-                            alert('🗑️ Propiedad y todos sus datos han sido eliminados correctamente.');
-                            this.propiedades = this.propiedades.filter(p => p.id !== this.propiedadActiva.id);
-                            this.vista = 'grid';
-                            this.propiedadActiva = null;
+                            localStorage.removeItem('gv_borrador_propiedad');
+                            alert("¡Anuncio creado con éxito!");
+                            window.location.href = 'index.html'; // O a donde quieras redirigir
                         } else {
-                            alert('No se pudo borrar la propiedad del servidor.');
+                            const err = await response.json();
+                            console.error("Error del servidor:", err);
+                            alert("Hubo un error al guardar en el servidor. Revisa la consola.");
                         }
                     } catch (error) {
-                        alert('Error de conexión.');
+                        console.error("Error de conexión:", error);
+                        alert("Error de conexión con el servidor.");
                     }
                 },
 
