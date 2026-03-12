@@ -281,7 +281,8 @@
                                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                 <path
                                                     d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z" />
-                                            </svg> Booking
+                                            </svg>
+                                            Booking
                                         </button>
                                         <a :href="propiedadActiva?.link_booking" target="_blank"
                                             class="flex items-center justify-center px-3 py-2 bg-blue-50 hover:bg-booking hover:text-white text-booking transition-all rounded-r-lg border border-blue-200 shadow-sm border-l-0"
@@ -378,7 +379,6 @@
                                 <h4 class="font-extrabold text-navy mb-1">¡Archivo Listo!</h4>
                                 <p class="text-xs text-gray-500 truncate mb-4 px-2"
                                     x-text="liquidacionActual?.nombre_archivo"></p>
-
                                 <div class="flex gap-2 justify-center">
                                     <button
                                         @click="descargarPDF(liquidacionActual.archivo_pdf, liquidacionActual.nombre_archivo)"
@@ -407,10 +407,8 @@
                                 <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Historial de Reportes
+                                </svg> Historial de Reportes
                             </h3>
-
                             <div class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
                                 <template x-for="liq in liquidacionesPropiedad" :key="liq.id">
                                     <div
@@ -429,7 +427,6 @@
                                         </button>
                                     </div>
                                 </template>
-
                                 <p x-show="liquidacionesPropiedad.length === 0"
                                     class="text-center text-gray-400 py-4 text-xs font-medium">Aún no hay reportes para
                                     esta propiedad.</p>
@@ -886,51 +883,56 @@
 
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
+                // ✨ FUNCIÓN SOLUCIONADA: Toma todo de this.form y salva la memoria ✨
                 async enviarDatos() {
-                    // Tomamos los datos directamente del Asistente
-                    // Si usas this.titulo, los tomará. Si usas this.propiedad.titulo, también funcionará.
-                    const data = this.propiedad || this;
+                    this.cargando = true; // Botón dice "Preparando..."
 
+                    // 1. Extraemos los datos estrictamente del objeto "form"
                     const borrador = {
-                        titulo: data.titulo || '',
-                        ciudad: data.ciudad || '',
-                        departamento: data.departamento || '',
-                        tipo_propiedad: data.tipo_propiedad || '',
-                        tipo_alojamiento: data.tipo_alojamiento || '',
-                        direccion: data.direccion || '',
-                        capacidad_huespedes: Number(data.capacidad_huespedes || 1),
-                        habitaciones: Number(data.habitaciones || 1),
-                        camas: Number(data.camas || 1),
-                        banos: Number(data.banos || 1),
-                        descripcion: data.descripcion || '',
-                        precio_noche: Number(data.precio_noche || 0),
-                        comodidades: data.comodidades || [],
-                        wifi_red: data.wifi_red || '',
-                        wifi_pass: data.wifi_pass || '',
-                        cerradura_codigo: data.cerradura_codigo || '',
-                        link_airbnb: data.link_airbnb || '',
-                        link_booking: data.link_booking || '',
-                        fotos: data.fotos || [],
-                        // Preparamos las fotos con categorías en blanco para que el Editor Visual las lea
-                        foto_categorias: (data.fotos || []).map(() => 'Sin asignar'),
-                        lat: data.lat || null,
-                        lng: data.lng || null
+                        titulo: this.form.titulo || '',
+                        ciudad: this.form.ciudad || '',
+                        departamento: this.form.departamento || '',
+                        tipo_propiedad: this.form.tipo_propiedad || 'Apartamento',
+                        tipo_alojamiento: this.form.tipo_alojamiento || 'Un alojamiento entero',
+                        direccion: this.form.direccion || '',
+                        capacidad_huespedes: Number(this.form.capacidad_huespedes || 1),
+                        habitaciones: Number(this.form.habitaciones || 1),
+                        camas: Number(this.form.camas || 1),
+                        banos: Number(this.form.banos || 1),
+                        descripcion: this.form.descripcion || '',
+                        precio_noche: Number(this.form.precio_noche || 0),
+                        comodidades: this.form.comodidades || [],
+                        wifi_red: this.form.wifi_red || '',
+                        wifi_pass: this.form.wifi_pass || '',
+                        cerradura_codigo: this.form.cerradura_codigo || '',
+                        link_airbnb: this.form.link_airbnb || '',
+                        link_booking: this.form.link_booking || '',
+                        fotos: this.form.fotos || [],
+                        foto_categorias: (this.form.fotos || []).map(() => 'Sin asignar'),
+                        lat: null, // Se llenará en el editor visual
+                        lng: null  // Se llenará en el editor visual
                     };
 
                     try {
-                        // 1. Guardamos el paquete en el disco duro del navegador
+                        // Intentamos guardar en localStorage (Funciona si las fotos no son muy pesadas)
                         localStorage.setItem('gv_borrador_propiedad', JSON.stringify(borrador));
-
-                        // 2. ¡Lanzamos al usuario al nuevo Editor Premium!
                         window.location.href = 'editor_suite.html?borrador=true';
-
                     } catch (e) {
-                        // Si subieron fotos gigantescas que bloquean la memoria temporal:
                         console.error("Error guardando en memoria:", e);
-                        alert("Las fotos son muy pesadas para este paso rápido. Sube solo 1 o 2 aquí, y luego agregas el resto directamente dentro del Editor Visual.");
 
-                        // Desbloqueamos el botón por si quieren intentar de nuevo
-                        this.paso = 3;
+                        // Salvavidas inteligente: Si la memoria explota por las fotos, las quitamos y avanzamos.
+                        alert("Has subido muchas fotos de alta calidad y la memoria rápida del navegador se llenó.\n\nSe guardarán todos tus datos y textos, pero por favor vuelve a subir las fotos directamente dentro del Editor Visual (allí no hay límite de memoria).");
+
+                        borrador.fotos = [];
+                        borrador.foto_categorias = [];
+
+                        try {
+                            localStorage.setItem('gv_borrador_propiedad', JSON.stringify(borrador));
+                            window.location.href = 'editor_suite.html?borrador=true';
+                        } catch (err2) {
+                            alert("Error crítico del navegador. Por favor reinícialo.");
+                            this.cargando = false;
+                        }
                     }
                 },
 

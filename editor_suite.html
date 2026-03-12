@@ -724,7 +724,6 @@
                 // Categorías base. Si el usuario añade más, se guardan en la DB.
                 categoriasCreadas: ['Sala', 'Cocina completa', 'Comedor', 'Habitación', 'Baño completo', 'Área de trabajo'],
 
-                // ... (listaComodidadesCategorizadas y listaComodidadesVisuales se mantienen igual) ...
                 listaComodidadesCategorizadas: {
                     "Favoritos de los huéspedes": [
                         { id: 'Wifi', nombre: 'Wifi', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>' },
@@ -812,6 +811,7 @@
                 },
 
                 async cargarPropiedad() {
+                    this.cargando = true;
                     try {
                         const response = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadId}`);
                         if (response.ok) {
@@ -1004,38 +1004,48 @@
                     }
                 },
 
+                // ✨ LÓGICA DE GUARDADO ACTUALIZADA ✨
                 async guardarCambios() {
                     this.guardando = true;
+
+                    // Limpieza estricta para que NestJS (Backend) no rechace nada
                     const payload = {
-                        titulo: this.propiedad.titulo,
-                        ciudad: this.propiedad.ciudad,
-                        departamento: this.propiedad.departamento,
-                        tipo_propiedad: this.propiedad.tipo_propiedad,
-                        tipo_alojamiento: this.propiedad.tipo_alojamiento,
-                        direccion: this.propiedad.direccion,
-                        capacidad_huespedes: Number(this.propiedad.capacidad_huespedes),
-                        habitaciones: Number(this.propiedad.habitaciones),
-                        camas: Number(this.propiedad.camas),
-                        banos: Number(this.propiedad.banos),
-                        descripcion: this.propiedad.descripcion,
-                        precio_noche: Number(this.propiedad.precio_noche),
+                        titulo: this.propiedad.titulo || 'Sin título',
+                        ciudad: this.propiedad.ciudad || '',
+                        departamento: this.propiedad.departamento || '',
+                        tipo_propiedad: this.propiedad.tipo_propiedad || 'Apartamento',
+                        tipo_alojamiento: this.propiedad.tipo_alojamiento || 'Un alojamiento entero',
+                        direccion: this.propiedad.direccion || '',
+
+                        // Forzamos a que sean números reales
+                        capacidad_huespedes: Number(this.propiedad.capacidad_huespedes) || 1,
+                        habitaciones: Number(this.propiedad.habitaciones) || 1,
+                        camas: Number(this.propiedad.camas) || 1,
+                        banos: Number(this.propiedad.banos) || 1,
+                        precio_noche: Number(this.propiedad.precio_noche) || 0,
+
+                        descripcion: this.propiedad.descripcion || '',
                         comodidades: this.propiedad.comodidades || [],
-                        wifi_red: this.propiedad.wifi_red,
-                        wifi_pass: this.propiedad.wifi_pass,
-                        cerradura_codigo: this.propiedad.cerradura_codigo,
-                        link_airbnb: this.propiedad.link_airbnb,
-                        link_booking: this.propiedad.link_booking,
-                        fotos: this.propiedad.fotos,
-                        foto_categorias: this.propiedad.foto_categorias,
-                        lat: this.propiedad.lat,
-                        lng: this.propiedad.lng
+                        wifi_red: this.propiedad.wifi_red || '',
+                        wifi_pass: this.propiedad.wifi_pass || '',
+                        cerradura_codigo: this.propiedad.cerradura_codigo || '',
+                        link_airbnb: this.propiedad.link_airbnb || '',
+                        link_booking: this.propiedad.link_booking || '',
+
+                        fotos: this.propiedad.fotos || [],
+                        foto_categorias: this.propiedad.foto_categorias || [],
+
+                        // Si el mapa no se tocó, mandamos 0 en vez de null para evitar errores
+                        lat: Number(this.propiedad.lat) || 0,
+                        lng: Number(this.propiedad.lng) || 0
                     };
 
                     let url = 'https://gestandovalor-backend.onrender.com/propiedades';
                     let method = 'POST';
 
                     if (!this.esBorrador && this.propiedadId) {
-                        url = `${url}/${this.propiedadId}`; method = 'PATCH';
+                        url = `${url}/${this.propiedadId}`;
+                        method = 'PATCH';
                     }
 
                     try {
@@ -1049,8 +1059,23 @@
                             alert(this.esBorrador ? '🎉 ¡Anuncio publicado oficialmente!' : '✅ ¡Diseño actualizado correctamente!');
                             if (this.esBorrador) localStorage.removeItem('gv_borrador_propiedad');
                             this.volver();
-                        } else { alert('Error al guardar en el servidor.'); }
-                    } catch (error) { alert('Error de conexión.'); } finally { this.guardando = false; }
+                        } else {
+                            // AQUÍ ATRAPAMOS EL MOTIVO EXACTO DEL RECHAZO
+                            const errorData = await response.json();
+                            console.error("Motivo del rechazo del backend:", errorData);
+
+                            let mensajeError = "El servidor rechazó los datos.";
+                            if (errorData.message) {
+                                mensajeError += "\nMotivo: " + (Array.isArray(errorData.message) ? errorData.message.join(', ') : errorData.message);
+                            }
+                            alert(mensajeError);
+                        }
+                    } catch (error) {
+                        console.error("Error de conexión:", error);
+                        alert('Error de conexión. Revisa la consola.');
+                    } finally {
+                        this.guardando = false;
+                    }
                 },
 
                 volver() { window.location.href = 'propiedades.html'; }
