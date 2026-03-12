@@ -783,8 +783,25 @@
                     }
                 },
 
+                // ✨ TRADUCTOR DE COMODIDADES INCORPORADO AQUÍ ✨
                 asegurarEstructuraDatos() {
                     if (!Array.isArray(this.propiedad.comodidades)) this.propiedad.comodidades = [];
+
+                    const diccionario = {
+                        'Wifi Rápido': 'Wifi',
+                        'Smart TV': 'TV',
+                        'Cocina equipada': 'Cocina',
+                        'Lavadora / Secadora': 'Lavadora',
+                        'Zona de Trabajo': 'Zona de trabajo',
+                        'Parqueadero': 'Parqueadero',
+                        'Aire acondicionado': 'Aire acondicionado',
+                        'Piscina': 'Piscina',
+                        'Jacuzzi': 'Jacuzzi'
+                    };
+
+                    // Traduce los nombres viejos a los IDs exactos del Editor
+                    this.propiedad.comodidades = this.propiedad.comodidades.map(item => diccionario[item] || item);
+
                     if (!Array.isArray(this.propiedad.fotos)) this.propiedad.fotos = [];
                     if (!Array.isArray(this.propiedad.foto_categorias) || this.propiedad.foto_categorias.length !== this.propiedad.fotos.length) {
                         this.propiedad.foto_categorias = new Array(this.propiedad.fotos.length).fill('Sin asignar');
@@ -830,6 +847,7 @@
                     }
                 },
 
+                // ✨ MAPA CORREGIDO PARA NO BORRAR TU DIRECCIÓN ✨
                 iniciarMapa() {
                     let lat = 4.8587, lng = -74.0581;
                     if (this.propiedad.lat && this.propiedad.lng) {
@@ -848,25 +866,35 @@
 
                     setTimeout(() => { this.mapa.invalidateSize(); }, 500);
 
-                    const buscarUbicacion = async (lati, longi) => {
+                    const buscarUbicacion = async (lati, longi, esMovimientoManual) => {
                         try {
                             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lati}&lon=${longi}`);
                             const data = await res.json();
                             if (data && data.address) {
-                                this.propiedad.direccion = data.address.road || data.address.neighbourhood || '';
-                                this.propiedad.ciudad = data.address.city || data.address.town || 'Chía';
-                                this.propiedad.departamento = data.address.state || 'Cundinamarca';
-                                this.propiedad.lat = lati; this.propiedad.lng = longi;
+                                // Solo sobreescribe si moviste el pin a mano, o si el campo venía en blanco
+                                if (esMovimientoManual || !this.propiedad.direccion) {
+                                    this.propiedad.direccion = data.address.road || data.address.neighbourhood || this.propiedad.direccion || '';
+                                }
+                                if (esMovimientoManual || !this.propiedad.ciudad) {
+                                    this.propiedad.ciudad = data.address.city || data.address.town || this.propiedad.ciudad || 'Chía';
+                                }
+                                if (esMovimientoManual || !this.propiedad.departamento) {
+                                    this.propiedad.departamento = data.address.state || this.propiedad.departamento || 'Cundinamarca';
+                                }
+                                this.propiedad.lat = lati;
+                                this.propiedad.lng = longi;
                             }
                         } catch (e) { console.log("Error mapa"); }
                     };
 
-                    if (!this.propiedad.lat) buscarUbicacion(lat, lng);
+                    // Al cargar por primera vez (false), respeta tus textos guardados
+                    if (!this.propiedad.lat) buscarUbicacion(lat, lng, false);
 
-                    this.marcador.on('dragend', e => buscarUbicacion(e.target.getLatLng().lat, e.target.getLatLng().lng));
+                    // Si tú lo arrastras o haces clic (true), actualiza la dirección
+                    this.marcador.on('dragend', e => buscarUbicacion(e.target.getLatLng().lat, e.target.getLatLng().lng, true));
                     this.mapa.on('click', e => {
                         this.marcador.setLatLng(e.latlng);
-                        buscarUbicacion(e.latlng.lat, e.latlng.lng);
+                        buscarUbicacion(e.latlng.lat, e.latlng.lng, true);
                     });
                 },
 
@@ -1004,7 +1032,7 @@
                     }
                 },
 
-                // ✨ LÓGICA DE GUARDADO ACTUALIZADA ✨
+                // ✨ LÓGICA DE GUARDADO ACTUALIZADA Y ESTRICTA ✨
                 async guardarCambios() {
                     this.guardando = true;
 
@@ -1035,7 +1063,7 @@
                         fotos: this.propiedad.fotos || [],
                         foto_categorias: this.propiedad.foto_categorias || [],
 
-                        // Si el mapa no se tocó, mandamos 0 en vez de null para evitar errores
+                        // Si el mapa no se tocó, mandamos 0 en vez de null para evitar errores de validación
                         lat: Number(this.propiedad.lat) || 0,
                         lng: Number(this.propiedad.lng) || 0
                     };
@@ -1060,7 +1088,7 @@
                             if (this.esBorrador) localStorage.removeItem('gv_borrador_propiedad');
                             this.volver();
                         } else {
-                            // AQUÍ ATRAPAMOS EL MOTIVO EXACTO DEL RECHAZO
+                            // AQUÍ ATRAPAMOS EL MOTIVO EXACTO DEL RECHAZO PARA TI
                             const errorData = await response.json();
                             console.error("Motivo del rechazo del backend:", errorData);
 
