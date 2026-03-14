@@ -9,6 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -204,324 +207,6 @@
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
                 x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    <div class="space-y-6">
-                        <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
-                            <div class="h-48 relative">
-                                <img :src="(propiedadActiva?.fotos && propiedadActiva.fotos.length > 0) ? propiedadActiva.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'"
-                                    alt="Cover" class="w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent"></div>
-                                <h2 class="absolute bottom-4 left-6 text-2xl font-extrabold text-white"
-                                    x-text="propiedadActiva?.titulo"></h2>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-sm text-gray-500 mb-6 flex items-start gap-2">
-                                    <svg class="w-5 h-5 text-gold shrink-0" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span
-                                        x-text="`${propiedadActiva?.direccion}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
-                                </p>
-                                <div class="space-y-4">
-                                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                                            Red Wi-Fi</p>
-                                        <p class="font-bold text-navy"
-                                            x-text="propiedadActiva?.wifi_red || 'No configurada'"></p>
-                                        <p class="text-xs text-gray-500 font-mono mt-0.5"
-                                            x-text="propiedadActiva?.wifi_pass ? `Clave: ${propiedadActiva?.wifi_pass}` : 'Sin clave'">
-                                        </p>
-                                    </div>
-                                    <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-                                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">
-                                            Cerradura Inteligente</p>
-                                        <p class="font-extrabold text-navy tracking-widest text-lg"
-                                            x-text="propiedadActiva?.cerradura_codigo || 'N/A'"></p>
-                                    </div>
-                                </div>
-
-                                <div class="mt-6 pt-6 border-t border-gray-100 flex gap-2">
-                                    <div class="flex-1 flex" x-show="propiedadActiva?.link_airbnb"
-                                        style="display: none;">
-                                        <button @click="agregarLinkRapido('airbnb')"
-                                            class="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-extrabold text-airbnb bg-red-50 hover:bg-red-100 transition-all px-3 py-2 rounded-l-lg border-y border-l border-red-200 shadow-sm"
-                                            title="Editar enlace">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                                <path
-                                                    d="M12.001 22.012c-4.436 0-8.243-3.235-9.673-7.514-.626-1.875-.626-3.882 0-5.757C3.593 5.093 6.941 2.012 11.233 2.012c1.782 0 3.535.617 4.965 1.745 2.115 1.666 3.411 4.187 3.593 6.98.05 1.157-.14 2.308-.553 3.391-.842 2.222-2.455 4.116-4.526 5.34-1.744 1.025-3.805 1.583-5.835 1.583-1.636 0-3.32-.416-4.71-1.285 2.21-1.343 3.867-3.41 4.67-5.845.247-.751.442-1.52.57-2.307.97 1.127 2.146 1.83 3.447 1.83 2.298 0 4.16-1.884 4.16-4.225 0-2.327-1.876-4.22-4.16-4.22s-4.16 1.893-4.16 4.22c0 .245.025.485.068.72-1.272.22-2.613.22-3.885 0 .043-.235.068-.475.068-.72 0-2.336 1.862-4.22 4.16-4.22 2.284 0 4.16 1.893 4.16 4.22 0 2.34-1.862 4.225-4.16 4.225-1.042 0-2.02-.455-2.735-1.18-.853 2.355-2.585 4.333-4.885 5.568.966.505 2.052.766 3.167.766 1.94 0 3.79-.624 5.334-1.84.453-.356.883-.733 1.288-1.13.416-.406.82-.843 1.2-1.295 1.266 1.173 2.656 2.035 4.135 2.54z" />
-                                            </svg>
-                                            Airbnb
-                                        </button>
-                                        <a :href="propiedadActiva?.link_airbnb" target="_blank"
-                                            class="flex items-center justify-center px-3 py-2 bg-red-50 hover:bg-airbnb hover:text-white text-airbnb transition-all rounded-r-lg border border-red-200 shadow-sm border-l-0"
-                                            title="Abrir enlace externo">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                    <button x-show="!propiedadActiva?.link_airbnb" @click="agregarLinkRapido('airbnb')"
-                                        class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4" />
-                                        </svg> Añadir Airbnb
-                                    </button>
-
-                                    <div class="flex-1 flex" x-show="propiedadActiva?.link_booking"
-                                        style="display: none;">
-                                        <button @click="agregarLinkRapido('booking')"
-                                            class="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-extrabold text-booking bg-blue-50 hover:bg-blue-100 transition-all px-3 py-2 rounded-l-lg border-y border-l border-blue-200 shadow-sm"
-                                            title="Editar enlace">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                                <path
-                                                    d="M2.5 4h19c.825 0 1.5.675 1.5 1.5v13c0 .825-.675 1.5-1.5 1.5h-19C1.675 20 1 19.325 1 18.5v-13C1 4.675 1.675 4 2.5 4zm4.187 4.167c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197H8.809c-.358-.895-1.112-1.488-2.122-1.488zm10.625 0c-1.396 0-2.383 1.13-2.383 2.766 0 1.635.987 2.766 2.383 2.766 1.01 0 1.764-.593 2.122-1.488h2.073c-.5 1.942-2.186 3.197-4.195 3.197-2.613 0-4.521-2.022-4.521-4.475 0-2.454 1.908-4.475 4.521-4.475 2.01 0 3.695 1.255 4.195 3.197h-2.073c-.358-.895-1.112-1.488-2.122-1.488z" />
-                                            </svg>
-                                            Booking
-                                        </button>
-                                        <a :href="propiedadActiva?.link_booking" target="_blank"
-                                            class="flex items-center justify-center px-3 py-2 bg-blue-50 hover:bg-booking hover:text-white text-booking transition-all rounded-r-lg border border-blue-200 shadow-sm border-l-0"
-                                            title="Abrir enlace externo">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                    <button x-show="!propiedadActiva?.link_booking"
-                                        @click="agregarLinkRapido('booking')"
-                                        class="flex items-center gap-1.5 text-[10px] font-extrabold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-navy transition-all px-3 py-2 rounded-lg border border-gray-200 shadow-sm flex-1 justify-center">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4" />
-                                        </svg> Añadir Booking
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 p-6">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div
-                                    class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-warning">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="font-extrabold text-navy text-sm uppercase tracking-wider">Liquidación
-                                        Mensual</h3>
-                                    <p class="text-xs text-gray-500">Reporte para el propietario.</p>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center mb-4">
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Periodo
-                                    Actual</span>
-                                <span class="text-lg font-extrabold text-navy" x-text="obtenerMesActual()"></span>
-                            </div>
-
-                            <div x-show="!liquidacionActual">
-                                <div class="mt-2">
-                                    <label
-                                        class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-white hover:bg-gray-50 transition-colors"
-                                        :class="archivoPDF ? 'border-success bg-green-50' : ''">
-                                        <div
-                                            class="flex flex-col items-center justify-center pt-3 pb-3 text-center px-4">
-                                            <svg x-show="!archivoPDF" class="w-6 h-6 text-gray-400 mb-1" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                            </svg>
-                                            <svg x-show="archivoPDF" style="display: none;"
-                                                class="w-6 h-6 text-success mb-1" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            <p class="text-xs font-bold truncate w-full"
-                                                :class="archivoPDF ? 'text-success' : 'text-gray-500'"
-                                                x-text="archivoPDF ? nombrePDF : 'Clic para elegir PDF'"></p>
-                                        </div>
-                                        <input type="file" accept="application/pdf" class="hidden"
-                                            @change="procesarPDF($event)" />
-                                    </label>
-                                </div>
-                                <button x-show="archivoPDF" style="display: none;" @click="subirLiquidacion()"
-                                    class="w-full mt-4 bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3 rounded-xl transition-transform active:scale-95 shadow-md flex justify-center items-center gap-2"
-                                    :disabled="subiendoPDF">
-                                    <span x-show="!subiendoPDF">Enviar Reporte</span>
-                                    <span x-show="subiendoPDF">Guardando...</span>
-                                    <svg x-show="!subiendoPDF" class="w-4 h-4" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div x-show="liquidacionActual" style="display: none;"
-                                class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-                                <div
-                                    class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-success mx-auto mb-3 shadow-sm border border-green-100">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <h4 class="font-extrabold text-navy mb-1">¡Archivo Listo!</h4>
-                                <p class="text-xs text-gray-500 truncate mb-4 px-2"
-                                    x-text="liquidacionActual?.nombre_archivo"></p>
-                                <div class="flex gap-2 justify-center">
-                                    <button
-                                        @click="descargarPDF(liquidacionActual.archivo_pdf, liquidacionActual.nombre_archivo)"
-                                        class="flex-1 bg-white border border-gray-200 hover:border-navy hover:text-navy text-gray-700 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg> Ver PDF
-                                    </button>
-                                    <button @click="eliminarLiquidacion(liquidacionActual.id)"
-                                        class="flex-1 bg-red-50 border border-red-100 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg> Quitar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 p-6">
-                            <h3
-                                class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg> Historial de Reportes
-                            </h3>
-                            <div class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
-                                <template x-for="liq in liquidacionesPropiedad" :key="liq.id">
-                                    <div
-                                        class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                        <div class="overflow-hidden mr-2">
-                                            <p class="font-bold text-navy text-xs" x-text="liq.mes_anio"></p>
-                                            <p class="text-[10px] text-gray-500 truncate" x-text="liq.nombre_archivo">
-                                            </p>
-                                        </div>
-                                        <button @click="descargarPDF(liq.archivo_pdf, liq.nombre_archivo)"
-                                            class="bg-white border border-gray-200 p-2 rounded-lg text-gold hover:bg-gold hover:text-white transition-colors shadow-sm shrink-0">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </template>
-                                <p x-show="liquidacionesPropiedad.length === 0"
-                                    class="text-center text-gray-400 py-4 text-xs font-medium">Aún no hay reportes para
-                                    esta propiedad.</p>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="lg:col-span-2">
-                        <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden h-full">
-                            <div
-                                class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                                <div>
-                                    <h2 class="text-2xl font-extrabold text-navy">Inventario en Vivo</h2>
-                                    <p class="text-sm text-gray-500 mt-1">Conectado a tu base de datos real.</p>
-                                </div>
-                                <span
-                                    class="px-3 py-1 bg-green-100 text-success text-xs font-bold rounded-full border border-green-200 shadow-sm flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span
-                                        x-text="propiedadActiva?.inventario ? 'Sincronizado' : 'Sin Inventario'"></span>
-                                </span>
-                            </div>
-
-                            <div x-show="!propiedadActiva?.inventario" class="p-12 text-center">
-                                <p class="text-gray-500 mb-4">Esta propiedad aún no tiene un registro de inventario
-                                    inicial.</p>
-                                <button
-                                    class="bg-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors">Crear
-                                    Inventario Inicial</button>
-                            </div>
-
-                            <div x-show="propiedadActiva?.inventario"
-                                class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div>
-                                    <h3
-                                        class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
-                                        Consumibles</h3>
-                                    <div class="space-y-5 mt-4">
-                                        <div>
-                                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-2">
-                                                <span>Papel Higiénico</span>
-                                                <span
-                                                    :class="propiedadActiva?.inventario?.papel_higienico < 2 ? 'text-danger' : 'text-success'"
-                                                    x-text="`${propiedadActiva?.inventario?.papel_higienico || 0} rollos`"></span>
-                                            </div>
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                <div :class="propiedadActiva?.inventario?.papel_higienico < 2 ? 'bg-danger' : 'bg-success'"
-                                                    class="h-2.5 rounded-full"
-                                                    :style="`width: ${Math.min((propiedadActiva?.inventario?.papel_higienico || 0) * 20, 100)}%`">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-2">
-                                                <span>Sobres de Café</span>
-                                                <span
-                                                    :class="propiedadActiva?.inventario?.cafe < 3 ? 'text-danger' : 'text-success'"
-                                                    x-text="`${propiedadActiva?.inventario?.cafe || 0} sobres`"></span>
-                                            </div>
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                <div :class="propiedadActiva?.inventario?.cafe < 3 ? 'bg-warning' : 'bg-success'"
-                                                    class="h-2.5 rounded-full"
-                                                    :style="`width: ${Math.min((propiedadActiva?.inventario?.cafe || 0) * 10, 100)}%`">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3
-                                        class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
-                                        Dotación Fija</h3>
-                                    <ul class="space-y-3 mt-4">
-                                        <li
-                                            class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                            <span class="text-sm font-bold text-navy">Toallas Grandes</span>
-                                            <span class="font-extrabold text-navy"
-                                                x-text="propiedadActiva?.inventario?.toallas_grandes || 0"></span>
-                                        </li>
-                                        <li
-                                            class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                            <span class="text-sm font-bold text-navy">Platos</span>
-                                            <span class="font-extrabold text-navy"
-                                                x-text="propiedadActiva?.inventario?.platos || 0"></span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -580,60 +265,57 @@
 
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-4">¿Dónde se encuentra?</h2>
-                        <div class="grid grid-cols-12 gap-3 mb-4">
-                            <div class="col-span-4 md:col-span-3">
-                                <label
-                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Vía</label>
-                                <select x-model="form.direccion_via"
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
-                                    <option value="Calle">Calle</option>
-                                    <option value="Carrera">Carrera</option>
-                                    <option value="Diagonal">Diagonal</option>
-                                    <option value="Transversal">Transversal</option>
-                                    <option value="Avenida">Avenida</option>
-                                    <option value="Vía">Vía</option>
-                                </select>
-                            </div>
-                            <div class="col-span-3 md:col-span-3">
-                                <label
-                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Número</label>
-                                <input x-model="form.direccion_numero" type="text" placeholder="Ej: 1d"
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
-                            </div>
-                            <div
-                                class="col-span-1 flex items-center justify-center pt-5 font-extrabold text-gray-400 text-lg">
-                                #
-                            </div>
-                            <div class="col-span-4 md:col-span-5">
-                                <label
-                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cruce</label>
-                                <input x-model="form.direccion_interseccion" type="text" placeholder="Ej: 11 - 01"
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+
+                        <div class="space-y-6">
+                            <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl">
+                                <label class="block text-sm font-bold text-navy mb-1 flex items-center gap-2">
+                                    Opción A: Usa un Link de Google Maps
+                                    <span
+                                        class="bg-blue-100 text-blue-600 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Recomendado</span>
+                                </label>
+                                <p class="text-xs text-gray-500 mb-3">Pega el enlace y el mapa extraerá la ubicación
+                                    exacta por ti.</p>
+                                <input x-model="form.link_google_maps" @input="procesarLinkGoogle()" type="text"
+                                    placeholder="Ej: https://maps.app.goo.gl/..."
+                                    class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm font-medium">
                             </div>
 
-                            <div class="col-span-12">
-                                <label
-                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Complemento
-                                    (Opcional)</label>
-                                <input x-model="form.direccion_complemento" type="text"
-                                    placeholder="Ej: Apto 401, Conjunto Los Pinos..."
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+                            <div class="flex items-center gap-3">
+                                <hr class="flex-1 border-gray-300">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">O búscalo
+                                    manual</span>
+                                <hr class="flex-1 border-gray-300">
                             </div>
 
-                            <div class="col-span-6">
-                                <label
-                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ciudad</label>
-                                <input x-model="form.ciudad" type="text"
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
-                            </div>
-                            <div class="col-span-6">
-                                <label
-                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Depto.</label>
-                                <input x-model="form.departamento" type="text"
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+                            <div>
+                                <label class="block text-sm font-bold text-navy mb-3">Opción B: Ciudad y Mapa</label>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label
+                                            class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ciudad</label>
+                                        <input x-model="form.ciudad" @change="centrarMapaCiudad()" type="text"
+                                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-navy text-sm font-medium">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Departamento</label>
+                                        <input x-model="form.departamento" @change="centrarMapaCiudad()" type="text"
+                                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-navy text-sm font-medium">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Arrastra
+                                        el pin a la ubicación exacta</label>
+                                    <div id="mapa-creacion"
+                                        class="w-full h-64 rounded-2xl border border-gray-200 z-10 relative overflow-hidden shadow-inner">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-6">Datos básicos</h2>
                         <div class="space-y-4">
@@ -679,40 +361,16 @@
                     </div>
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-2">Sube las fotos de tu espacio</h2>
-                        <p class="text-sm text-gray-500 mb-4">También podrás organizarlas o subir más en el Editor de
-                            Diseño Visual.</p>
                         <div class="flex items-center justify-center w-full">
                             <label
                                 class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white hover:bg-gray-50 hover:border-black transition-colors">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg class="w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
-                                        </path>
-                                    </svg>
                                     <p class="mb-2 text-sm text-gray-600 font-bold">Haz clic aquí para subir tus fotos
                                     </p>
                                 </div>
                                 <input type="file" multiple accept="image/*" class="hidden"
                                     @change="procesarFotos($event)" />
                             </label>
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"
-                            x-show="form.fotos && form.fotos.length > 0">
-                            <template x-for="(fotoUrl, index) in form.fotos" :key="index">
-                                <div
-                                    class="relative group rounded-xl overflow-hidden aspect-video shadow-sm border border-gray-100">
-                                    <img :src="fotoUrl" class="w-full h-full object-cover">
-                                    <button type="button" @click="eliminarFoto(index)"
-                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </template>
                         </div>
                     </div>
                 </div>
@@ -725,41 +383,6 @@
                             <input x-model="form.precio_noche" type="number"
                                 class="w-48 bg-transparent text-5xl font-extrabold text-navy text-center outline-none border-b-2 border-gray-300 focus:border-black pb-2">
                             <span class="text-xl font-bold text-gray-500">COP</span>
-                        </div>
-                    </div>
-                    <div class="pt-6 border-t border-gray-200">
-                        <h2 class="text-xl font-extrabold text-navy mb-4">Información Operativa Interna</h2>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="block text-xs font-bold text-gray-700 uppercase mb-2">Red
-                                        Wi-Fi</label><input x-model="form.wifi_red" type="text"
-                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
-                                </div>
-                                <div><label class="block text-xs font-bold text-gray-700 uppercase mb-2">Clave
-                                        Wi-Fi</label><input x-model="form.wifi_pass" type="text"
-                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
-                                </div>
-                            </div>
-                            <div><label class="block text-xs font-bold text-gray-700 uppercase mb-2">Código
-                                    Cerradura</label><input x-model="form.cerradura_codigo" type="text"
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-mono text-lg">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-6 border-t border-gray-200">
-                        <h2 class="text-xl font-extrabold text-navy mb-4">Enlaces de Publicación</h2>
-                        <div class="space-y-4">
-                            <div><label class="block text-xs font-bold text-airbnb uppercase mb-2">Link de
-                                    Airbnb</label><input x-model="form.link_airbnb" type="url"
-                                    placeholder="https://www.airbnb.com/h/..."
-                                    class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 outline-none focus:border-airbnb text-sm font-medium">
-                            </div>
-                            <div><label class="block text-xs font-bold text-booking uppercase mb-2">Link de
-                                    Booking</label><input x-model="form.link_booking" type="url"
-                                    placeholder="https://www.booking.com/hotel/..."
-                                    class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-booking text-sm font-medium">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -806,10 +429,13 @@
                 listaComodidades: ['Wifi Rápido', 'Smart TV', 'Cocina equipada', 'Lavadora / Secadora', 'Parqueadero', 'Aire acondicionado', 'Zona de Trabajo', 'Piscina', 'Jacuzzi'],
                 form: {},
 
+                // Variables del Mapa de Creación
+                mapaCreacion: null,
+                marcadorCreacion: null,
+
                 archivoPDF: null,
                 nombrePDF: '',
                 subiendoPDF: false,
-
                 liquidacionesPropiedad: [],
                 liquidacionActual: null,
 
@@ -850,15 +476,82 @@
                     });
                 },
 
-                // ✨ VARIABLES DE DIRECCIÓN SEPARADAS AÑADIDAS AQUÍ ✨
+                // ✨ FORMULARIO VACÍO CON LAT/LNG DIRECTOS ✨
                 getFormVacio() {
                     return {
                         tipo_propiedad: 'Apartamento', tipo_alojamiento: 'Un alojamiento entero', pais: 'Colombia',
-                        direccion_via: 'Calle', direccion_numero: '', direccion_interseccion: '', direccion_complemento: '',
                         ciudad: 'Chía', departamento: 'Cundinamarca', capacidad_huespedes: 2, habitaciones: 1, camas: 1, banos: 1,
+                        link_google_maps: '',
+                        lat: 4.8587, lng: -74.0581, // Chía por defecto
                         comodidades: [], fotos: [], titulo: '', descripcion: '', precio_noche: 150000, wifi_red: '', wifi_pass: '', cerradura_codigo: '',
                         link_airbnb: '', link_booking: ''
                     }
+                },
+
+                // ✨ INICIAR EL MAPA DENTRO DEL MODAL ✨
+                initMapaCreacion() {
+                    if (this.mapaCreacion) {
+                        this.mapaCreacion.invalidateSize();
+                        return;
+                    }
+
+                    this.mapaCreacion = L.map('mapa-creacion').setView([this.form.lat, this.form.lng], 13);
+                    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                        maxZoom: 20,
+                        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                    }).addTo(this.mapaCreacion);
+
+                    this.marcadorCreacion = L.marker([this.form.lat, this.form.lng], { draggable: true }).addTo(this.mapaCreacion);
+
+                    this.marcadorCreacion.on('dragend', e => {
+                        this.form.lat = e.target.getLatLng().lat;
+                        this.form.lng = e.target.getLatLng().lng;
+                    });
+
+                    this.mapaCreacion.on('click', e => {
+                        this.marcadorCreacion.setLatLng(e.latlng);
+                        this.form.lat = e.latlng.lat;
+                        this.form.lng = e.latlng.lng;
+                    });
+                },
+
+                // ✨ LECTOR DE LINK DE GOOGLE MAPS ✨
+                procesarLinkGoogle() {
+                    if (!this.form.link_google_maps) return;
+
+                    // Intentar sacar @lat,lng del enlace si es largo
+                    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+                    const match = this.form.link_google_maps.match(regex);
+
+                    if (match) {
+                        this.form.lat = parseFloat(match[1]);
+                        this.form.lng = parseFloat(match[2]);
+
+                        if (this.mapaCreacion && this.marcadorCreacion) {
+                            this.mapaCreacion.setView([this.form.lat, this.form.lng], 18);
+                            this.marcadorCreacion.setLatLng([this.form.lat, this.form.lng]);
+                        }
+                    }
+                },
+
+                // ✨ BUSCADOR DE CIUDAD ✨
+                async centrarMapaCiudad() {
+                    if (!this.form.ciudad) return;
+                    try {
+                        const query = `${this.form.ciudad}, ${this.form.departamento}, Colombia`;
+                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+                        const data = await res.json();
+
+                        if (data && data.length > 0) {
+                            this.form.lat = parseFloat(data[0].lat);
+                            this.form.lng = parseFloat(data[0].lon);
+
+                            if (this.mapaCreacion && this.marcadorCreacion) {
+                                this.mapaCreacion.setView([this.form.lat, this.form.lng], 13);
+                                this.marcadorCreacion.setLatLng([this.form.lat, this.form.lng]);
+                            }
+                        }
+                    } catch (e) { console.log("Error buscando ciudad"); }
                 },
 
                 async cargarPropiedades() {
@@ -880,6 +573,11 @@
                     this.modoEdicion = false;
                     this.form = this.getFormVacio();
                     this.modalNueva = true;
+
+                    // Darle tiempo al modal de abrirse antes de pintar el mapa
+                    setTimeout(() => {
+                        this.initMapaCreacion();
+                    }, 300);
                 },
 
                 abrirModalEditar() {
@@ -922,16 +620,8 @@
 
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
-                // ✨ ARMADO FINAL DE LA DIRECCIÓN ✨
                 async enviarDatos() {
-                    this.cargando = true;
-
-                    // Unimos la dirección antes de mandarla al borrador
-                    let dirFinal = `${this.form.direccion_via || ''} ${this.form.direccion_numero || ''} #${this.form.direccion_interseccion || ''}`.trim();
-                    if (this.form.direccion_complemento) {
-                        dirFinal += ` ${this.form.direccion_complemento}`;
-                    }
-                    if (dirFinal === "Calle  #" || dirFinal.trim() === "") dirFinal = ""; // Por si lo dejaron vacío
+                    this.cargando = true; // Botón dice "Preparando..."
 
                     const borrador = {
                         titulo: this.form.titulo || '',
@@ -940,7 +630,12 @@
                         tipo_propiedad: this.form.tipo_propiedad || 'Apartamento',
                         tipo_alojamiento: this.form.tipo_alojamiento || 'Un alojamiento entero',
 
-                        direccion: dirFinal, // <-- Usamos la armada
+                        // Mandamos el link o un texto genérico si no lo usaron
+                        direccion: this.form.link_google_maps || 'Ubicación seleccionada en el mapa',
+
+                        // ✨ AQUÍ ENVIAMOS LAS COORDENADAS EXACTAS AL EDITOR ✨
+                        lat: this.form.lat,
+                        lng: this.form.lng,
 
                         capacidad_huespedes: Number(this.form.capacidad_huespedes || 1),
                         habitaciones: Number(this.form.habitaciones || 1),
@@ -955,9 +650,7 @@
                         link_airbnb: this.form.link_airbnb || '',
                         link_booking: this.form.link_booking || '',
                         fotos: this.form.fotos || [],
-                        foto_categorias: (this.form.fotos || []).map(() => 'Sin asignar'),
-                        lat: null,
-                        lng: null
+                        foto_categorias: (this.form.fotos || []).map(() => 'Sin asignar')
                     };
 
                     try {
