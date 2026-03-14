@@ -209,6 +209,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     <div class="space-y-6">
+
                         <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
                             <div class="h-48 relative">
                                 <img :src="(propiedadActiva?.fotos && propiedadActiva.fotos.length > 0) ? propiedadActiva.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'"
@@ -227,7 +228,7 @@
                                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
                                     <span
-                                        x-text="`${propiedadActiva?.direccion}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
+                                        x-text="`${propiedadActiva?.direccion || 'Dirección no definida'}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
                                 </p>
                                 <div class="space-y-4">
                                     <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -303,6 +304,102 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 4v16m8-8H4" />
                                         </svg> Añadir Booking
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div
+                                    class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-warning">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-extrabold text-navy text-sm uppercase tracking-wider">Liquidación
+                                        Mensual</h3>
+                                    <p class="text-xs text-gray-500">Reporte para el propietario.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center mb-4">
+                                <span
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Periodo
+                                    Actual</span>
+                                <span class="text-lg font-extrabold text-navy" x-text="obtenerMesActual()"></span>
+                            </div>
+
+                            <div x-show="!liquidacionActual">
+                                <div class="mt-2">
+                                    <label
+                                        class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+                                        :class="archivoPDF ? 'border-success bg-green-50' : ''">
+                                        <div
+                                            class="flex flex-col items-center justify-center pt-3 pb-3 text-center px-4">
+                                            <svg x-show="!archivoPDF" class="w-6 h-6 text-gray-400 mb-1" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                            </svg>
+                                            <svg x-show="archivoPDF" style="display: none;"
+                                                class="w-6 h-6 text-success mb-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <p class="text-xs font-bold truncate w-full"
+                                                :class="archivoPDF ? 'text-success' : 'text-gray-500'"
+                                                x-text="archivoPDF ? nombrePDF : 'Clic para elegir PDF'"></p>
+                                        </div>
+                                        <input type="file" accept="application/pdf" class="hidden"
+                                            @change="procesarPDF($event)" />
+                                    </label>
+                                </div>
+                                <button x-show="archivoPDF" style="display: none;" @click="subirLiquidacion()"
+                                    class="w-full mt-4 bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3 rounded-xl transition-transform active:scale-95 shadow-md flex justify-center items-center gap-2"
+                                    :disabled="subiendoPDF">
+                                    <span x-show="!subiendoPDF">Enviar Reporte</span>
+                                    <span x-show="subiendoPDF">Guardando...</span>
+                                    <svg x-show="!subiendoPDF" class="w-4 h-4" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div x-show="liquidacionActual" style="display: none;"
+                                class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+                                <div
+                                    class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-success mx-auto mb-3 shadow-sm border border-green-100">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h4 class="font-extrabold text-navy mb-1">¡Archivo Listo!</h4>
+                                <p class="text-xs text-gray-500 truncate mb-4 px-2"
+                                    x-text="liquidacionActual?.nombre_archivo"></p>
+                                <div class="flex gap-2 justify-center">
+                                    <button
+                                        @click="descargarPDF(liquidacionActual.archivo_pdf, liquidacionActual.nombre_archivo)"
+                                        class="flex-1 bg-white border border-gray-200 hover:border-navy hover:text-navy text-gray-700 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg> Ver PDF
+                                    </button>
+                                    <button @click="eliminarLiquidacion(liquidacionActual.id)"
+                                        class="flex-1 bg-red-50 border border-red-100 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg> Quitar
                                     </button>
                                 </div>
                             </div>
@@ -594,6 +691,22 @@
                                     @change="procesarFotos($event)" />
                             </label>
                         </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"
+                            x-show="form.fotos && form.fotos.length > 0">
+                            <template x-for="(fotoUrl, index) in form.fotos" :key="index">
+                                <div
+                                    class="relative group rounded-xl overflow-hidden aspect-video shadow-sm border border-gray-100">
+                                    <img :src="fotoUrl" class="w-full h-full object-cover">
+                                    <button type="button" @click="eliminarFoto(index)"
+                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
 
@@ -605,6 +718,42 @@
                             <input x-model="form.precio_noche" type="number"
                                 class="w-48 bg-transparent text-5xl font-extrabold text-navy text-center outline-none border-b-2 border-gray-300 focus:border-black pb-2">
                             <span class="text-xl font-bold text-gray-500">COP</span>
+                        </div>
+                    </div>
+                    <div class="pt-6 border-t border-gray-200">
+                        <h2 class="text-xl font-extrabold text-navy mb-4">Información Operativa Interna</h2>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="block text-xs font-bold text-gray-700 uppercase mb-2">Red
+                                        Wi-Fi</label><input x-model="form.wifi_red" type="text"
+                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
+                                </div>
+                                <div><label class="block text-xs font-bold text-gray-700 uppercase mb-2">Clave
+                                        Wi-Fi</label><input x-model="form.wifi_pass" type="text"
+                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-medium">
+                                </div>
+                            </div>
+                            <div><label class="block text-xs font-bold text-gray-700 uppercase mb-2">Código
+                                    Cerradura</label><input x-model="form.cerradura_codigo" type="text"
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black font-mono text-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-gray-200">
+                        <h2 class="text-xl font-extrabold text-navy mb-4">Enlaces de Publicación</h2>
+                        <div class="space-y-4">
+                            <div><label class="block text-xs font-bold text-airbnb uppercase mb-2">Link de
+                                    Airbnb</label><input x-model="form.link_airbnb" type="url"
+                                    placeholder="https://www.airbnb.com/h/..."
+                                    class="w-full bg-white border border-red-200 rounded-xl px-4 py-3 outline-none focus:border-airbnb text-sm font-medium">
+                            </div>
+                            <div><label class="block text-xs font-bold text-booking uppercase tracking-wider mb-2">Link
+                                    de
+                                    Booking</label><input x-model="form.link_booking" type="url"
+                                    placeholder="https://www.booking.com/hotel/..."
+                                    class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-booking text-sm font-medium">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -704,6 +853,7 @@
                         tipo_propiedad: 'Apartamento', tipo_alojamiento: 'Un alojamiento entero', pais: 'Colombia',
                         ciudad: 'Chía', departamento: 'Cundinamarca', capacidad_huespedes: 2, habitaciones: 1, camas: 1, banos: 1,
                         link_google_maps: '',
+                        direccion: '', // Agregado por seguridad para la BD
                         lat: 4.8587, lng: -74.0581, // Chía por defecto
                         comodidades: [], fotos: [], titulo: '', descripcion: '', precio_noche: 150000, wifi_red: '', wifi_pass: '', cerradura_codigo: '',
                         link_airbnb: '', link_booking: ''
