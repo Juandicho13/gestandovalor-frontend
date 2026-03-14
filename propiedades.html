@@ -228,7 +228,7 @@
                                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
                                     <span
-                                        x-text="`${propiedadActiva?.direccion || 'Dirección no definida'}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
+                                        x-text="`${propiedadActiva?.direccion || 'Ubicada en el mapa'}, ${propiedadActiva?.ciudad}, ${propiedadActiva?.departamento}`"></span>
                                 </p>
                                 <div class="space-y-4">
                                     <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -584,52 +584,27 @@
 
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-4">¿Dónde se encuentra?</h2>
-
-                        <div class="space-y-6">
-                            <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl">
-                                <label class="block text-sm font-bold text-navy mb-1 flex items-center gap-2">
-                                    Opción A: Usa un Link de Google Maps
-                                    <span
-                                        class="bg-blue-100 text-blue-600 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Recomendado</span>
-                                </label>
-                                <p class="text-xs text-gray-500 mb-3">Pega el enlace y el mapa extraerá la ubicación
-                                    exacta por ti.</p>
-                                <input x-model="form.link_google_maps" @input="procesarLinkGoogle()" type="text"
-                                    placeholder="Ej: https://maps.app.goo.gl/..."
-                                    class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm font-medium">
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <hr class="flex-1 border-gray-300">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">O búscalo
-                                    manual</span>
-                                <hr class="flex-1 border-gray-300">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-bold text-navy mb-3">Opción B: Ciudad y Mapa</label>
-                                <div class="grid grid-cols-2 gap-4 mb-4">
-                                    <div>
-                                        <label
-                                            class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ciudad</label>
-                                        <input x-model="form.ciudad" @change="centrarMapaCiudad()" type="text"
-                                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-navy text-sm font-medium">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Departamento</label>
-                                        <input x-model="form.departamento" @change="centrarMapaCiudad()" type="text"
-                                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-navy text-sm font-medium">
-                                    </div>
-                                </div>
-
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label
-                                        class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Arrastra
-                                        el pin a la ubicación exacta</label>
-                                    <div id="mapa-creacion"
-                                        class="w-full h-64 rounded-2xl border border-gray-200 z-10 relative overflow-hidden shadow-inner">
-                                    </div>
+                                        class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ciudad</label>
+                                    <input x-model="form.ciudad" @change="centrarMapaCiudad()" type="text"
+                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-navy text-sm font-medium">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Departamento</label>
+                                    <input x-model="form.departamento" @change="centrarMapaCiudad()" type="text"
+                                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-navy text-sm font-medium">
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Arrastra
+                                    el pin a la ubicación exacta</label>
+                                <div id="mapa-creacion"
+                                    class="w-full h-64 rounded-2xl border border-gray-200 z-10 relative overflow-hidden shadow-inner">
                                 </div>
                             </div>
                         </div>
@@ -800,7 +775,6 @@
                 listaComodidades: ['Wifi Rápido', 'Smart TV', 'Cocina equipada', 'Lavadora / Secadora', 'Parqueadero', 'Aire acondicionado', 'Zona de Trabajo', 'Piscina', 'Jacuzzi'],
                 form: {},
 
-                // Variables del Mapa de Creación
                 mapaCreacion: null,
                 marcadorCreacion: null,
 
@@ -847,20 +821,16 @@
                     });
                 },
 
-                // ✨ FORMULARIO VACÍO CON LAT/LNG DIRECTOS ✨
                 getFormVacio() {
                     return {
                         tipo_propiedad: 'Apartamento', tipo_alojamiento: 'Un alojamiento entero', pais: 'Colombia',
                         ciudad: 'Chía', departamento: 'Cundinamarca', capacidad_huespedes: 2, habitaciones: 1, camas: 1, banos: 1,
-                        link_google_maps: '',
-                        direccion: '', // Agregado por seguridad para la BD
-                        lat: 4.8587, lng: -74.0581, // Chía por defecto
+                        lat: 4.8587, lng: -74.0581,
                         comodidades: [], fotos: [], titulo: '', descripcion: '', precio_noche: 150000, wifi_red: '', wifi_pass: '', cerradura_codigo: '',
                         link_airbnb: '', link_booking: ''
                     }
                 },
 
-                // ✨ INICIAR EL MAPA DENTRO DEL MODAL ✨
                 initMapaCreacion() {
                     if (this.mapaCreacion) {
                         this.mapaCreacion.invalidateSize();
@@ -887,26 +857,6 @@
                     });
                 },
 
-                // ✨ LECTOR DE LINK DE GOOGLE MAPS ✨
-                procesarLinkGoogle() {
-                    if (!this.form.link_google_maps) return;
-
-                    // Intentar sacar @lat,lng del enlace si es largo
-                    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-                    const match = this.form.link_google_maps.match(regex);
-
-                    if (match) {
-                        this.form.lat = parseFloat(match[1]);
-                        this.form.lng = parseFloat(match[2]);
-
-                        if (this.mapaCreacion && this.marcadorCreacion) {
-                            this.mapaCreacion.setView([this.form.lat, this.form.lng], 18);
-                            this.marcadorCreacion.setLatLng([this.form.lat, this.form.lng]);
-                        }
-                    }
-                },
-
-                // ✨ BUSCADOR DE CIUDAD ✨
                 async centrarMapaCiudad() {
                     if (!this.form.ciudad) return;
                     try {
@@ -946,7 +896,6 @@
                     this.form = this.getFormVacio();
                     this.modalNueva = true;
 
-                    // Darle tiempo al modal de abrirse antes de pintar el mapa
                     setTimeout(() => {
                         this.initMapaCreacion();
                     }, 300);
@@ -993,7 +942,7 @@
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
                 async enviarDatos() {
-                    this.cargando = true; // Botón dice "Preparando..."
+                    this.cargando = true;
 
                     const borrador = {
                         titulo: this.form.titulo || '',
@@ -1002,10 +951,7 @@
                         tipo_propiedad: this.form.tipo_propiedad || 'Apartamento',
                         tipo_alojamiento: this.form.tipo_alojamiento || 'Un alojamiento entero',
 
-                        // Mandamos el link o un texto genérico si no lo usaron
-                        direccion: this.form.link_google_maps || 'Ubicación seleccionada en el mapa',
-
-                        // ✨ AQUÍ ENVIAMOS LAS COORDENADAS EXACTAS AL EDITOR ✨
+                        direccion: 'Ubicación seleccionada en el mapa',
                         lat: this.form.lat,
                         lng: this.form.lng,
 
