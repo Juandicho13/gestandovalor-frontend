@@ -9,6 +9,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -22,6 +26,37 @@
             }
         }
     </script>
+    <style>
+        .flatpickr-calendar {
+            border-radius: 24px !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+            border: none !important;
+            padding: 20px !important;
+            font-family: sans-serif;
+            z-index: 9999 !important;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            background: #0B132B !important;
+            border-color: #0B132B !important;
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .flatpickr-day.inRange {
+            box-shadow: -5px 0 0 #f3f4f6, 5px 0 0 #f3f4f6 !important;
+            background: #f3f4f6 !important;
+            border-color: #f3f4f6 !important;
+            color: #0B132B !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: #D4AF37 !important;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-white" x-data="resultadosApp()" x-init="initApp()">
@@ -32,30 +67,118 @@
     </div>
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-4 md:px-10 border-b bg-navy shadow-sm">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-md overflow-visible border-white/10 w-full max-w-full h-24 rounded-none px-4 md:px-10 border-b bg-navy/90 shadow-sm">
 
         <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 w-[50px] md:w-[120px]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
 
-        <div class="flex-1 flex justify-center mx-2 md:mx-4 transition-all duration-700">
-            <a href="alojamientos.html" title="Cambiar búsqueda"
-                class="flex items-center bg-white border border-gray-200 shadow-md rounded-full py-1.5 md:py-2 px-2 md:px-4 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group w-auto max-w-full">
-                <div class="px-2 md:px-4 border-r border-gray-200 text-[10px] md:text-sm font-bold text-navy truncate max-w-[80px] md:max-w-[200px]"
-                    x-text="filtros.loc || 'Cualquier destino'"></div>
-                <div class="px-2 md:px-4 border-r border-gray-200 text-[10px] md:text-sm font-bold text-navy whitespace-nowrap"
-                    x-text="textoFechas()"></div>
-                <div class="px-2 md:px-4 text-[10px] md:text-sm font-bold text-gray-500 whitespace-nowrap"
-                    x-text="filtros.pax ? `${filtros.pax} huéspedes` : '¿Cuántos?'"></div>
-                <div
-                    class="bg-navy rounded-full p-1.5 md:p-2 ml-1 md:ml-2 group-hover:bg-gold transition-colors shrink-0">
-                    <svg class="w-3 h-3 md:w-4 md:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        <div class="flex-1 flex justify-center mx-2 md:mx-4 transition-all duration-700 z-[60]">
+            <div
+                class="flex items-center bg-white/5 border border-white/10 shadow-sm rounded-full py-1.5 md:py-2 px-2 md:px-4 backdrop-blur-sm relative">
+
+                <div class="relative cursor-pointer px-2 md:px-4 border-r border-white/20 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group"
+                    @click.stop="openLocation = !openLocation; openGuests = false">
+                    <div class="text-[10px] md:text-sm font-bold truncate max-w-[80px] md:max-w-[120px]"
+                        x-text="filtros.loc || 'Destino'"></div>
+
+                    <div x-show="openLocation" @click.away="openLocation = false" x-transition.opacity
+                        class="absolute top-[180%] left-0 w-64 bg-white rounded-2xl shadow-2xl py-2 z-50 border border-gray-100 text-left text-navy cursor-default"
+                        style="display: none;">
+                        <template x-for="lugar in lugaresDisponibles" :key="lugar">
+                            <div @click.stop="filtros.loc = lugar; openLocation = false; aplicarFiltrosYURL();"
+                                class="px-6 py-3 hover:bg-gray-50 font-bold cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                                x-text="lugar"></div>
+                        </template>
+                        <div x-show="lugaresDisponibles.length === 0" class="px-6 py-3 text-gray-400 text-sm">Cargando
+                            destinos...</div>
+                    </div>
+                </div>
+
+                <div id="nav-datepicker-trigger"
+                    class="relative cursor-pointer px-2 md:px-4 border-r border-white/20 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group">
+                    <div class="text-[10px] md:text-sm font-bold whitespace-nowrap" x-text="textoFechas()"></div>
+                    <input id="nav-calendar" type="text"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                </div>
+
+                <div class="relative cursor-pointer px-2 md:px-4 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group"
+                    @click.stop="openGuests = !openGuests; openLocation = false">
+                    <div class="text-[10px] md:text-sm font-bold whitespace-nowrap"
+                        x-text="filtros.pax > 0 ? `${filtros.pax} huéspedes` : '¿Cuántos?'"></div>
+
+                    <div x-show="openGuests" @click.away="openGuests = false" x-transition.opacity
+                        class="absolute top-[180%] right-0 md:left-0 w-[300px] md:w-[350px] bg-white rounded-[32px] shadow-2xl p-6 z-50 border border-gray-100 text-left text-navy cursor-default"
+                        style="display: none;">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                            <div>
+                                <div class="font-bold">Adultos</div>
+                                <div class="text-xs text-gray-500">Edad 13+</div>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <button @click.stop="tempAdults > 0 ? tempAdults-- : null"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                <span x-text="tempAdults" class="font-extrabold w-4 text-center"></span>
+                                <button @click.stop="tempAdults++"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                            <div>
+                                <div class="font-bold">Niños</div>
+                                <div class="text-xs text-gray-500">Edades 2 – 12</div>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <button @click.stop="tempChildren > 0 ? tempChildren-- : null"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                <span x-text="tempChildren" class="font-extrabold w-4 text-center"></span>
+                                <button @click.stop="tempChildren++"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                            <div>
+                                <div class="font-bold">Bebés</div>
+                                <div class="text-xs text-gray-500">Menos de 2 años</div>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <button @click.stop="tempInfants > 0 ? tempInfants-- : null"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                <span x-text="tempInfants" class="font-extrabold w-4 text-center"></span>
+                                <button @click.stop="tempInfants++"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                            <div>
+                                <div class="font-bold">Mascotas</div>
+                                <div class="text-xs text-gray-500 underline">¿Traes un animal?</div>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <button @click.stop="tempPets > 0 ? tempPets-- : null"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                <span x-text="tempPets" class="font-extrabold w-4 text-center"></span>
+                                <button @click.stop="tempPets++"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
+                            </div>
+                        </div>
+                        <div class="pt-4 flex justify-end">
+                            <button @click.stop="aplicarHuespedes()"
+                                class="bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded-xl transition-colors shadow-md">Aplicar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button @click.stop="aplicarFiltrosYURL()"
+                    class="bg-gold hover:bg-yellow-500 rounded-full p-1.5 md:p-2 ml-1 md:ml-2 text-navy transition-colors shrink-0 shadow-sm hover:scale-105">
+                    <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" stroke-width="3"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                </div>
-            </a>
+                </button>
+            </div>
         </div>
 
         <div class="w-[50px] md:w-[120px] flex-shrink-0 hidden sm:block"></div>
@@ -75,14 +198,13 @@
             </svg>
             <h3 class="text-xl font-bold text-navy">No encontramos suites con esos criterios</h3>
             <p class="text-gray-500 mt-2">Intenta cambiar las fechas, el destino o reducir la cantidad de huéspedes.</p>
-            <a href="alojamientos.html"
-                class="inline-block mt-6 px-6 py-3 bg-navy text-white rounded-full font-bold hover:bg-gray-800 transition-colors">Volver
-                a buscar</a>
+            <button @click="limpiarFiltros()"
+                class="inline-block mt-6 px-6 py-3 bg-navy text-white rounded-full font-bold hover:bg-gray-800 transition-colors">Borrar
+                filtros</button>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10"
             x-show="propiedadesFiltradas.length > 0">
-
             <template x-for="prop in propiedadesFiltradas" :key="prop.id">
                 <a :href="`suite.html?id=${prop.id}&in=${filtros.in}&out=${filtros.out}&pax=${filtros.pax}`"
                     class="group cursor-pointer flex flex-col">
@@ -121,56 +243,8 @@
                     </div>
                 </a>
             </template>
-
         </div>
-
     </main>
-
-    <footer class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10 mt-10">
-        <div
-            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
-        </div>
-        <div
-            class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Tu apartamento puede generar
-                más.<br><span class="text-gold">Nosotros lo hacemos posible.</span></h2>
-            <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
-            <div class="mb-10">
-                <div class="inline-flex items-center gap-3 mb-2">
-                    <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
-                    <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
-                            class="font-light text-gray-400">Apartasuites</span></span>
-                </div>
-                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">Administración estratégica para
-                    rentas cortas</p>
-            </div>
-
-            <div class="flex justify-center gap-8 mb-16">
-                <a href="#"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300"><svg
-                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
-                        <path
-                            d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
-                    </svg></a>
-                <a href="#"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300"><svg
-                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg></a>
-            </div>
-
-            <div
-                class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-                <p>© 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
 
     <script>
         function resultadosApp() {
@@ -178,6 +252,19 @@
                 cargando: true,
                 todasPropiedades: [],
                 propiedadesFiltradas: [],
+                lugaresDisponibles: [],
+
+                openLocation: false,
+                openGuests: false,
+
+                // Contadores temporales para el menú de huéspedes
+                tempAdults: 0,
+                tempChildren: 0,
+                tempInfants: 0,
+                tempPets: 0,
+
+                fp: null,
+
                 filtros: {
                     loc: '',
                     in: '',
@@ -188,7 +275,13 @@
                 async initApp() {
                     this.activarNavbarDinamica();
                     this.leerFiltrosURL();
+
+                    // Si viene con huéspedes en la URL, se los ponemos a los adultos temporales
+                    if (this.filtros.pax > 0) this.tempAdults = this.filtros.pax;
+
                     await this.cargarDesdeBD();
+                    this.extraerUbicacionesUnicas();
+                    this.initCalendario();
                 },
 
                 leerFiltrosURL() {
@@ -197,6 +290,36 @@
                     this.filtros.in = params.get('in') || '';
                     this.filtros.out = params.get('out') || '';
                     this.filtros.pax = parseInt(params.get('pax')) || 0;
+                },
+
+                initCalendario() {
+                    this.fp = flatpickr("#nav-calendar", {
+                        mode: "range",
+                        minDate: "today",
+                        dateFormat: "Y-m-d",
+                        locale: "es",
+                        showMonths: window.innerWidth > 768 ? 2 : 1,
+                        defaultDate: [this.filtros.in, this.filtros.out].filter(Boolean),
+                        onChange: (selectedDates, dateStr, instance) => {
+                            if (selectedDates.length === 2) {
+                                this.filtros.in = instance.formatDate(selectedDates[0], "Y-m-d");
+                                this.filtros.out = instance.formatDate(selectedDates[1], "Y-m-d");
+                                this.aplicarFiltrosYURL();
+                            } else {
+                                this.filtros.in = '';
+                                this.filtros.out = '';
+                            }
+                        }
+                    });
+
+                    const triggerDiv = document.getElementById('nav-datepicker-trigger');
+                    if (triggerDiv) {
+                        triggerDiv.addEventListener('click', () => {
+                            this.openLocation = false;
+                            this.openGuests = false;
+                            this.fp.open();
+                        });
+                    }
                 },
 
                 async cargarDesdeBD() {
@@ -208,27 +331,60 @@
                         }
                     } catch (error) {
                         console.error('Error cargando propiedades:', error);
-                        alert("Hubo un problema conectando con la base de datos.");
                     } finally {
                         this.cargando = false;
                     }
                 },
 
+                extraerUbicacionesUnicas() {
+                    const lugaresSet = new Set();
+                    this.todasPropiedades.forEach(p => {
+                        if (p.ciudad) {
+                            const str = p.departamento ? `${p.ciudad}, ${p.departamento}` : p.ciudad;
+                            lugaresSet.add(str);
+                        }
+                    });
+                    this.lugaresDisponibles = Array.from(lugaresSet).sort();
+                },
+
+                // Esta función se ejecuta SOLO cuando le dan al botón "Aplicar"
+                aplicarHuespedes() {
+                    // Calculamos el total y lo pasamos al filtro real
+                    this.filtros.pax = this.tempAdults + this.tempChildren;
+                    this.openGuests = false;
+                    this.aplicarFiltrosYURL();
+                },
+
+                aplicarFiltrosYURL() {
+                    const url = new URL(window.location);
+                    if (this.filtros.loc) url.searchParams.set('loc', this.filtros.loc); else url.searchParams.delete('loc');
+                    if (this.filtros.in) url.searchParams.set('in', this.filtros.in); else url.searchParams.delete('in');
+                    if (this.filtros.out) url.searchParams.set('out', this.filtros.out); else url.searchParams.delete('out');
+                    if (this.filtros.pax > 0) url.searchParams.set('pax', this.filtros.pax); else url.searchParams.delete('pax');
+
+                    window.history.pushState({}, '', url);
+                    this.aplicarFiltros();
+                },
+
+                limpiarFiltros() {
+                    this.filtros = { loc: '', in: '', out: '', pax: 0 };
+                    this.tempAdults = 0;
+                    this.tempChildren = 0;
+                    this.tempInfants = 0;
+                    this.tempPets = 0;
+                    if (this.fp) this.fp.clear();
+                    this.aplicarFiltrosYURL();
+                },
+
                 aplicarFiltros() {
                     this.propiedadesFiltradas = this.todasPropiedades.filter(prop => {
-                        // Filtro 1: Capacidad de huéspedes
-                        if (this.filtros.pax > 0 && prop.capacidad_huespedes < this.filtros.pax) {
-                            return false;
-                        }
+                        if (this.filtros.pax > 0 && prop.capacidad_huespedes < this.filtros.pax) return false;
 
-                        // Filtro 2: Ubicación (Ciudad o Departamento)
-                        if (this.filtros.loc && this.filtros.loc !== 'Cualquier destino') {
-                            const termino = this.filtros.loc.toLowerCase();
+                        if (this.filtros.loc && this.filtros.loc !== 'Destino') {
+                            const termino = this.filtros.loc.split(',')[0].toLowerCase().trim(); // Busca solo "Chía"
                             const ciudad = (prop.ciudad || '').toLowerCase();
                             const depto = (prop.departamento || '').toLowerCase();
-                            if (!ciudad.includes(termino) && !depto.includes(termino)) {
-                                return false;
-                            }
+                            if (!ciudad.includes(termino) && !depto.includes(termino)) return false;
                         }
 
                         return true;
@@ -236,13 +392,10 @@
                 },
 
                 textoFechas() {
-                    if (!this.filtros.in || !this.filtros.out) return 'Fechas flexibles';
-
+                    if (!this.filtros.in || !this.filtros.out) return 'Fechas';
                     const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-                    // Convertimos la fecha (asegurando zona horaria local para evitar saltos de día)
                     const dIn = new Date(this.filtros.in + "T12:00:00");
                     const dOut = new Date(this.filtros.out + "T12:00:00");
-
                     return `${dIn.getDate()} ${meses[dIn.getMonth()]} – ${dOut.getDate()} ${meses[dOut.getMonth()]}`;
                 },
 
@@ -253,18 +406,17 @@
                 activarNavbarDinamica() {
                     const navbar = document.getElementById('navbar');
                     const logo = document.getElementById('nav-logo-combined');
-                    // Hacemos el ancho más grande para acomodar la nueva barra
-                    const largoPildora = 'max-w-[800px]';
+                    const largoPildora = 'max-w-[850px]';
 
                     window.addEventListener('scroll', () => {
                         if (window.scrollY > 50) {
                             logo.classList.replace('h-16', 'h-10');
-                            navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy', 'shadow-sm');
-                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/95');
+                            navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy/90');
+                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-16', 'rounded-full', 'px-6', 'shadow-[0_20px_40px_rgba(0,0,0,0.3)]', 'border', 'bg-navy/80');
                         } else {
                             logo.classList.replace('h-10', 'h-16');
-                            navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/95');
-                            navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy', 'shadow-sm');
+                            navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-16', 'rounded-full', 'px-6', 'shadow-[0_20px_40px_rgba(0,0,0,0.3)]', 'border', 'bg-navy/80');
+                            navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy/90');
                         }
                     });
                 }
