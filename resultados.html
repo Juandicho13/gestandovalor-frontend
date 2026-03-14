@@ -32,69 +32,38 @@
     </div>
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
-        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-4 md:px-10 border-b bg-navy shadow-sm">
+
+        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 w-[50px] md:w-[120px]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
 
-        <div
-            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
-            <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
-            <a href="alojamientos.html"
-                class="text-sm font-medium hover:text-gold transition-colors text-white border-b-2 border-gold pb-1">Alojamientos</a>
-            <a href="login.html"
-                class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar
-                Sesión</a>
-        </div>
-
-        <div class="flex items-center gap-4 flex-shrink-0">
-            <button @click="openContact = true"
-                class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
-        </div>
-    </nav>
-
-    <main class="pt-32 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando" style="display: none;">
-
-        <div
-            class="mb-8 sticky top-28 z-40 bg-white/95 backdrop-blur-md py-4 border-b border-gray-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-
-            <a href="index.html"
-                class="flex items-center bg-white border border-gray-200 shadow-sm rounded-full py-2 px-4 cursor-pointer hover:shadow-md transition-shadow group">
-                <div class="px-4 border-r border-gray-200 text-sm font-bold text-navy"
+        <div class="flex-1 flex justify-center mx-2 md:mx-4 transition-all duration-700">
+            <a href="alojamientos.html" title="Cambiar búsqueda"
+                class="flex items-center bg-white border border-gray-200 shadow-md rounded-full py-1.5 md:py-2 px-2 md:px-4 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group w-auto max-w-full">
+                <div class="px-2 md:px-4 border-r border-gray-200 text-[10px] md:text-sm font-bold text-navy truncate max-w-[80px] md:max-w-[200px]"
                     x-text="filtros.loc || 'Cualquier destino'"></div>
-                <div class="px-4 border-r border-gray-200 text-sm font-bold text-navy" x-text="textoFechas()"></div>
-                <div class="px-4 text-sm font-bold text-gray-500"
+                <div class="px-2 md:px-4 border-r border-gray-200 text-[10px] md:text-sm font-bold text-navy whitespace-nowrap"
+                    x-text="textoFechas()"></div>
+                <div class="px-2 md:px-4 text-[10px] md:text-sm font-bold text-gray-500 whitespace-nowrap"
                     x-text="filtros.pax ? `${filtros.pax} huéspedes` : '¿Cuántos?'"></div>
-                <div class="bg-navy rounded-full p-2 ml-2 group-hover:bg-gold transition-colors">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div
+                    class="bg-navy rounded-full p-1.5 md:p-2 ml-1 md:ml-2 group-hover:bg-gold transition-colors shrink-0">
+                    <svg class="w-3 h-3 md:w-4 md:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
             </a>
-
-            <div class="flex gap-3 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0">
-                <button
-                    class="whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-navy hover:border-navy transition-colors flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                    Filtros
-                </button>
-                <button
-                    class="whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-navy hover:border-navy transition-colors">Precio</button>
-                <button
-                    class="whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-navy hover:border-navy transition-colors">Pet
-                    Friendly</button>
-                <button
-                    class="whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 text-sm font-bold text-navy hover:border-navy transition-colors">Piscina</button>
-            </div>
         </div>
 
-        <h1 class="text-2xl font-extrabold text-navy mb-6"
+        <div class="w-[50px] md:w-[120px] flex-shrink-0 hidden sm:block"></div>
+    </nav>
+
+    <main class="pt-32 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando" style="display: none;">
+
+        <h1 class="text-2xl font-extrabold text-navy mb-6 mt-4"
             x-text="`${propiedadesFiltradas.length} alojamiento${propiedadesFiltradas.length !== 1 ? 's' : ''} encontrado${propiedadesFiltradas.length !== 1 ? 's' : ''}`">
         </h1>
 
@@ -106,7 +75,7 @@
             </svg>
             <h3 class="text-xl font-bold text-navy">No encontramos suites con esos criterios</h3>
             <p class="text-gray-500 mt-2">Intenta cambiar las fechas, el destino o reducir la cantidad de huéspedes.</p>
-            <a href="index.html"
+            <a href="alojamientos.html"
                 class="inline-block mt-6 px-6 py-3 bg-navy text-white rounded-full font-bold hover:bg-gray-800 transition-colors">Volver
                 a buscar</a>
         </div>
@@ -181,7 +150,7 @@
 
             <div class="flex justify-center gap-8 mb-16">
                 <a href="#"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300"><svg
                         class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                         <path
                             d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
@@ -189,26 +158,16 @@
                             d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
                     </svg></a>
                 <a href="#"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300"><svg
                         class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                         <path
                             d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg></a>
-                <a href="mailto:info@gestandovalor.com"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
-                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
                     </svg></a>
             </div>
 
             <div
                 class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
                 <p>© 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
-                <div class="flex gap-6">
-                    <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
-                    <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
-                </div>
             </div>
         </div>
     </footer>
@@ -217,7 +176,6 @@
         function resultadosApp() {
             return {
                 cargando: true,
-                openContact: false,
                 todasPropiedades: [],
                 propiedadesFiltradas: [],
                 filtros: {
@@ -264,7 +222,7 @@
                         }
 
                         // Filtro 2: Ubicación (Ciudad o Departamento)
-                        if (this.filtros.loc) {
+                        if (this.filtros.loc && this.filtros.loc !== 'Cualquier destino') {
                             const termino = this.filtros.loc.toLowerCase();
                             const ciudad = (prop.ciudad || '').toLowerCase();
                             const depto = (prop.departamento || '').toLowerCase();
@@ -281,8 +239,9 @@
                     if (!this.filtros.in || !this.filtros.out) return 'Fechas flexibles';
 
                     const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-                    const dIn = new Date(this.filtros.in + "T00:00:00");
-                    const dOut = new Date(this.filtros.out + "T00:00:00");
+                    // Convertimos la fecha (asegurando zona horaria local para evitar saltos de día)
+                    const dIn = new Date(this.filtros.in + "T12:00:00");
+                    const dOut = new Date(this.filtros.out + "T12:00:00");
 
                     return `${dIn.getDate()} ${meses[dIn.getMonth()]} – ${dOut.getDate()} ${meses[dOut.getMonth()]}`;
                 },
@@ -294,17 +253,18 @@
                 activarNavbarDinamica() {
                     const navbar = document.getElementById('navbar');
                     const logo = document.getElementById('nav-logo-combined');
-                    const largoPildora = 'max-w-[760px]';
+                    // Hacemos el ancho más grande para acomodar la nueva barra
+                    const largoPildora = 'max-w-[800px]';
 
                     window.addEventListener('scroll', () => {
                         if (window.scrollY > 50) {
                             logo.classList.replace('h-16', 'h-10');
-                            navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                            navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy', 'shadow-sm');
+                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/95');
                         } else {
                             logo.classList.replace('h-10', 'h-16');
-                            navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                            navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                            navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/95');
+                            navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy', 'shadow-sm');
                         }
                     });
                 }
