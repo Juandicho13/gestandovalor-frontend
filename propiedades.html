@@ -577,23 +577,60 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="pt-6 border-t border-gray-200">
                         <h2 class="text-xl font-extrabold text-navy mb-4">¿Dónde se encuentra?</h2>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="col-span-2">
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Dirección exacta</label>
-                                <input x-model="form.direccion" type="text"
-                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                        <div class="grid grid-cols-12 gap-3 mb-4">
+                            <div class="col-span-4 md:col-span-3">
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Vía</label>
+                                <select x-model="form.direccion_via"
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+                                    <option value="Calle">Calle</option>
+                                    <option value="Carrera">Carrera</option>
+                                    <option value="Diagonal">Diagonal</option>
+                                    <option value="Transversal">Transversal</option>
+                                    <option value="Avenida">Avenida</option>
+                                    <option value="Vía">Vía</option>
+                                </select>
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Ciudad</label>
+                            <div class="col-span-3 md:col-span-3">
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Número</label>
+                                <input x-model="form.direccion_numero" type="text" placeholder="Ej: 1d"
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+                            </div>
+                            <div
+                                class="col-span-1 flex items-center justify-center pt-5 font-extrabold text-gray-400 text-lg">
+                                #
+                            </div>
+                            <div class="col-span-4 md:col-span-5">
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cruce</label>
+                                <input x-model="form.direccion_interseccion" type="text" placeholder="Ej: 11 - 01"
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+                            </div>
+
+                            <div class="col-span-12">
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Complemento
+                                    (Opcional)</label>
+                                <input x-model="form.direccion_complemento" type="text"
+                                    placeholder="Ej: Apto 401, Conjunto Los Pinos..."
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
+                            </div>
+
+                            <div class="col-span-6">
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ciudad</label>
                                 <input x-model="form.ciudad" type="text"
-                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Departamento</label>
+                            <div class="col-span-6">
+                                <label
+                                    class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Depto.</label>
                                 <input x-model="form.departamento" type="text"
-                                    class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-navy font-medium">
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 outline-none focus:border-navy font-medium text-sm">
                             </div>
                         </div>
                     </div>
@@ -813,9 +850,11 @@
                     });
                 },
 
+                // ✨ VARIABLES DE DIRECCIÓN SEPARADAS AÑADIDAS AQUÍ ✨
                 getFormVacio() {
                     return {
-                        tipo_propiedad: 'Apartamento', tipo_alojamiento: 'Un alojamiento entero', pais: 'Colombia', direccion: '',
+                        tipo_propiedad: 'Apartamento', tipo_alojamiento: 'Un alojamiento entero', pais: 'Colombia',
+                        direccion_via: 'Calle', direccion_numero: '', direccion_interseccion: '', direccion_complemento: '',
                         ciudad: 'Chía', departamento: 'Cundinamarca', capacidad_huespedes: 2, habitaciones: 1, camas: 1, banos: 1,
                         comodidades: [], fotos: [], titulo: '', descripcion: '', precio_noche: 150000, wifi_red: '', wifi_pass: '', cerradura_codigo: '',
                         link_airbnb: '', link_booking: ''
@@ -883,18 +922,26 @@
 
                 eliminarFoto(index) { this.form.fotos.splice(index, 1); },
 
-                // ✨ FUNCIÓN SOLUCIONADA: Toma todo de this.form y salva la memoria ✨
+                // ✨ ARMADO FINAL DE LA DIRECCIÓN ✨
                 async enviarDatos() {
-                    this.cargando = true; // Botón dice "Preparando..."
+                    this.cargando = true;
 
-                    // 1. Extraemos los datos estrictamente del objeto "form"
+                    // Unimos la dirección antes de mandarla al borrador
+                    let dirFinal = `${this.form.direccion_via || ''} ${this.form.direccion_numero || ''} #${this.form.direccion_interseccion || ''}`.trim();
+                    if (this.form.direccion_complemento) {
+                        dirFinal += ` ${this.form.direccion_complemento}`;
+                    }
+                    if (dirFinal === "Calle  #" || dirFinal.trim() === "") dirFinal = ""; // Por si lo dejaron vacío
+
                     const borrador = {
                         titulo: this.form.titulo || '',
                         ciudad: this.form.ciudad || '',
                         departamento: this.form.departamento || '',
                         tipo_propiedad: this.form.tipo_propiedad || 'Apartamento',
                         tipo_alojamiento: this.form.tipo_alojamiento || 'Un alojamiento entero',
-                        direccion: this.form.direccion || '',
+
+                        direccion: dirFinal, // <-- Usamos la armada
+
                         capacidad_huespedes: Number(this.form.capacidad_huespedes || 1),
                         habitaciones: Number(this.form.habitaciones || 1),
                         camas: Number(this.form.camas || 1),
@@ -909,18 +956,15 @@
                         link_booking: this.form.link_booking || '',
                         fotos: this.form.fotos || [],
                         foto_categorias: (this.form.fotos || []).map(() => 'Sin asignar'),
-                        lat: null, // Se llenará en el editor visual
-                        lng: null  // Se llenará en el editor visual
+                        lat: null,
+                        lng: null
                     };
 
                     try {
-                        // Intentamos guardar en localStorage (Funciona si las fotos no son muy pesadas)
                         localStorage.setItem('gv_borrador_propiedad', JSON.stringify(borrador));
                         window.location.href = 'editor_suite.html?borrador=true';
                     } catch (e) {
                         console.error("Error guardando en memoria:", e);
-
-                        // Salvavidas inteligente: Si la memoria explota por las fotos, las quitamos y avanzamos.
                         alert("Has subido muchas fotos de alta calidad y la memoria rápida del navegador se llenó.\n\nSe guardarán todos tus datos y textos, pero por favor vuelve a subir las fotos directamente dentro del Editor Visual (allí no hay límite de memoria).");
 
                         borrador.fotos = [];
