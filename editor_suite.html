@@ -783,7 +783,6 @@
                     }
                 },
 
-                // ✨ TRADUCTOR DE COMODIDADES INCORPORADO AQUÍ ✨
                 asegurarEstructuraDatos() {
                     if (!Array.isArray(this.propiedad.comodidades)) this.propiedad.comodidades = [];
 
@@ -847,11 +846,17 @@
                     }
                 },
 
-                // ✨ MAPA CORREGIDO PARA NO BORRAR TU DIRECCIÓN ✨
+                // ✨ MAPA CORREGIDO: Guarda Chía si no se mueve ✨
                 iniciarMapa() {
-                    let lat = 4.8587, lng = -74.0581;
+                    let lat = 4.8587, lng = -74.0581; // Por defecto Chía
+
                     if (this.propiedad.lat && this.propiedad.lng) {
-                        lat = this.propiedad.lat; lng = this.propiedad.lng;
+                        lat = this.propiedad.lat;
+                        lng = this.propiedad.lng;
+                    } else {
+                        // Guardamos las de Chía por defecto para que no quede en 0
+                        this.propiedad.lat = lat;
+                        this.propiedad.lng = lng;
                     }
 
                     this.mapa = L.map('mapa-interactivo').setView([lat, lng], 16);
@@ -871,7 +876,6 @@
                             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lati}&lon=${longi}`);
                             const data = await res.json();
                             if (data && data.address) {
-                                // Solo sobreescribe si moviste el pin a mano, o si el campo venía en blanco
                                 if (esMovimientoManual || !this.propiedad.direccion) {
                                     this.propiedad.direccion = data.address.road || data.address.neighbourhood || this.propiedad.direccion || '';
                                 }
@@ -887,14 +891,18 @@
                         } catch (e) { console.log("Error mapa"); }
                     };
 
-                    // Al cargar por primera vez (false), respeta tus textos guardados
                     if (!this.propiedad.lat) buscarUbicacion(lat, lng, false);
 
-                    // Si tú lo arrastras o haces clic (true), actualiza la dirección
-                    this.marcador.on('dragend', e => buscarUbicacion(e.target.getLatLng().lat, e.target.getLatLng().lng, true));
+                    this.marcador.on('dragend', e => {
+                        this.propiedad.lat = e.target.getLatLng().lat;
+                        this.propiedad.lng = e.target.getLatLng().lng;
+                        buscarUbicacion(this.propiedad.lat, this.propiedad.lng, true);
+                    });
                     this.mapa.on('click', e => {
                         this.marcador.setLatLng(e.latlng);
-                        buscarUbicacion(e.latlng.lat, e.latlng.lng, true);
+                        this.propiedad.lat = e.latlng.lat;
+                        this.propiedad.lng = e.latlng.lng;
+                        buscarUbicacion(this.propiedad.lat, this.propiedad.lng, true);
                     });
                 },
 
@@ -940,7 +948,6 @@
                     this.draggedIndex = null;
                 },
 
-                // ✨ LÓGICA DE CATEGORÍAS TIPO AIRBNB ✨
                 abrirModalFotosInicial() {
                     this.vistaModalFotos = 'inicio';
                     this.modalFotos = true;
@@ -976,7 +983,6 @@
                         grupos[cat].push({ url: fotoUrl, index: index });
                     });
 
-                    // Devolver solo las que tienen fotos, o todas si estamos administrando
                     return Object.keys(grupos).map(key => ({
                         nombre: key,
                         fotos: grupos[key]
@@ -1007,9 +1013,7 @@
 
                 eliminarCategoria() {
                     if (confirm(`¿Estás seguro de eliminar el espacio "${this.categoriaSeleccionada}"? Las fotos no se borrarán, solo quedarán "Sin asignar".`)) {
-                        // Pasamos las fotos a 'Sin asignar'
                         this.propiedad.foto_categorias = this.propiedad.foto_categorias.map(c => c === this.categoriaSeleccionada ? 'Sin asignar' : c);
-                        // Quitamos la categoría de la lista
                         this.categoriasCreadas = this.categoriasCreadas.filter(c => c !== this.categoriaSeleccionada);
                         this.vistaModalFotos = 'inicio';
                     }
@@ -1032,11 +1036,9 @@
                     }
                 },
 
-                // ✨ LÓGICA DE GUARDADO ACTUALIZADA Y ESTRICTA ✨
                 async guardarCambios() {
                     this.guardando = true;
 
-                    // Limpieza estricta para que NestJS (Backend) no rechace nada
                     const payload = {
                         titulo: this.propiedad.titulo || 'Sin título',
                         ciudad: this.propiedad.ciudad || '',
@@ -1045,7 +1047,6 @@
                         tipo_alojamiento: this.propiedad.tipo_alojamiento || 'Un alojamiento entero',
                         direccion: this.propiedad.direccion || '',
 
-                        // Forzamos a que sean números reales
                         capacidad_huespedes: Number(this.propiedad.capacidad_huespedes) || 1,
                         habitaciones: Number(this.propiedad.habitaciones) || 1,
                         camas: Number(this.propiedad.camas) || 1,
@@ -1063,9 +1064,9 @@
                         fotos: this.propiedad.fotos || [],
                         foto_categorias: this.propiedad.foto_categorias || [],
 
-                        // Si el mapa no se tocó, mandamos 0 en vez de null para evitar errores de validación
-                        lat: Number(this.propiedad.lat) || 0,
-                        lng: Number(this.propiedad.lng) || 0
+                        // ✨ ESTO FUE LO QUE CAMBIAMOS AQUÍ TAMBIÉN ✨
+                        lat: this.propiedad.lat ? Number(this.propiedad.lat) : 4.8587,
+                        lng: this.propiedad.lng ? Number(this.propiedad.lng) : -74.0581
                     };
 
                     let url = 'https://gestandovalor-backend.onrender.com/propiedades';
@@ -1088,7 +1089,6 @@
                             if (this.esBorrador) localStorage.removeItem('gv_borrador_propiedad');
                             this.volver();
                         } else {
-                            // AQUÍ ATRAPAMOS EL MOTIVO EXACTO DEL RECHAZO PARA TI
                             const errorData = await response.json();
                             console.error("Motivo del rechazo del backend:", errorData);
 
