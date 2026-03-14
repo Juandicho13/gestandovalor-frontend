@@ -125,10 +125,11 @@
             <input type="text" x-model="propiedad.titulo" placeholder="Escribe un título increíble aquí..."
                 class="w-full editable-field text-3xl md:text-4xl font-extrabold text-navy leading-tight mb-2 p-2">
             <div class="flex items-center gap-2 mt-2 px-2">
-                <input type="text" x-model="propiedad.ciudad" placeholder="Ciudad"
+                <input type="text" x-model="propiedad.ciudad" @change="buscarCoordenadasPorTexto()" placeholder="Ciudad"
                     class="editable-field text-sm text-gray-600 font-bold p-1 underline w-32">
                 <span class="text-gray-400">,</span>
-                <input type="text" x-model="propiedad.departamento" placeholder="Departamento"
+                <input type="text" x-model="propiedad.departamento" @change="buscarCoordenadasPorTexto()"
+                    placeholder="Departamento"
                     class="editable-field text-sm text-gray-600 font-bold p-1 underline w-40">
                 <span class="text-gray-600 font-medium text-sm">, Colombia</span>
             </div>
@@ -259,8 +260,9 @@
                     <div class="flex justify-between items-end mb-6">
                         <div>
                             <h2 class="text-2xl font-extrabold text-navy mb-2">A dónde irás</h2>
-                            <p class="text-gray-600 font-medium">Haz clic o mueve el marcador rojo para establecer la
-                                ubicación exacta. La ciudad se llena sola.</p>
+                            <p class="text-gray-600 font-medium">El mapa se centra en tu ciudad. Arrastra el marcador
+                                azul a la ubicación exacta de la propiedad. La dirección escrita arriba no se alterará.
+                            </p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -268,15 +270,15 @@
                                 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Dirección
                                 exacta</label><input x-model="propiedad.direccion" type="text"
                                 class="w-full editable-field p-3 border border-gray-200 rounded-xl text-sm"
-                                placeholder="Ej: Calle 1 #2-3"></div>
+                                placeholder="Ej: Carrera 1D # 11 - 01"></div>
                         <div><label
                                 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Ciudad</label><input
-                                x-model="propiedad.ciudad" type="text"
+                                x-model="propiedad.ciudad" @change="buscarCoordenadasPorTexto()" type="text"
                                 class="w-full editable-field p-3 border border-gray-200 rounded-xl text-sm"
                                 placeholder="Ej: Chía"></div>
                         <div><label
                                 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Departamento</label><input
-                                x-model="propiedad.departamento" type="text"
+                                x-model="propiedad.departamento" @change="buscarCoordenadasPorTexto()" type="text"
                                 class="w-full editable-field p-3 border border-gray-200 rounded-xl text-sm"
                                 placeholder="Ej: Cundinamarca"></div>
                     </div>
@@ -844,14 +846,11 @@
                     }
                 },
 
-                // ✨ FUNCIÓN NUEVA: El mapa lee el texto y busca las coordenadas automáticamente
+                // ✨ FUNCIÓN NUEVA: El mapa busca SOLO la ciudad y departamento, no la dirección exacta
                 async buscarCoordenadasPorTexto() {
-                    if (!this.propiedad.direccion || !this.propiedad.ciudad) return;
+                    if (!this.propiedad.ciudad) return;
                     try {
-                        // Unimos la dirección para buscarla en el satélite (Ej: Carrera 1D #11 01, Chía, Colombia)
-                        // Le quitamos el complemento (Apto 406) para no confundir al GPS
-                        const direccionLimpia = this.propiedad.direccion.split(' ')[0] + ' ' + this.propiedad.direccion.split(' ')[1];
-                        const query = `${direccionLimpia}, ${this.propiedad.ciudad}, Colombia`;
+                        const query = `${this.propiedad.ciudad}, ${this.propiedad.departamento || 'Colombia'}`;
 
                         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
                         const data = await res.json();
@@ -860,21 +859,23 @@
                             const nuevaLat = parseFloat(data[0].lat);
                             const nuevaLng = parseFloat(data[0].lon);
 
-                            this.propiedad.lat = nuevaLat;
-                            this.propiedad.lng = nuevaLng;
+                            if (this.mapa) {
+                                this.mapa.setView([nuevaLat, nuevaLng], 14); // Zoom 14 = vista de ciudad
 
-                            // Movemos el mapa y el pin de forma automática al destino
-                            if (this.mapa && this.marcador) {
-                                this.mapa.setView([nuevaLat, nuevaLng], 17);
-                                this.marcador.setLatLng([nuevaLat, nuevaLng]);
+                                // Solo movemos el pin al centro si apenas están creando el anuncio
+                                if (!this.propiedad.lat || this.propiedad.lat === 4.8587) {
+                                    this.propiedad.lat = nuevaLat;
+                                    this.propiedad.lng = nuevaLng;
+                                    if (this.marcador) this.marcador.setLatLng([nuevaLat, nuevaLng]);
+                                }
                             }
                         }
                     } catch (e) {
-                        console.log("No se pudo ubicar automáticamente, el usuario deberá mover el pin.");
+                        console.log("Error al centrar la ciudad.");
                     }
                 },
 
-                // ✨ FUNCIÓN ACTUALIZADA: Con protección para no borrar tu dirección
+                // ✨ FUNCIÓN ACTUALIZADA: 100% manual y segura para no reescribir textos
                 iniciarMapa() {
                     let lat = 4.8587, lng = -74.0581; // Por defecto Chía
                     let tieneCoordenadasViejas = this.propiedad.lat && this.propiedad.lng && this.propiedad.lat !== 4.8587;
@@ -887,7 +888,9 @@
                         this.propiedad.lng = lng;
                     }
 
-                    this.mapa = L.map('mapa-interactivo').setView([lat, lng], 16);
+                    // Si ya tenía coordenadas exactas, acercamos más la cámara (zoom 16). Si no, lo dejamos más general (zoom 13).
+                    let zoomLevel = tieneCoordenadasViejas ? 16 : 13;
+                    this.mapa = L.map('mapa-interactivo').setView([lat, lng], zoomLevel);
 
                     L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
                         maxZoom: 20,
@@ -899,41 +902,20 @@
 
                     setTimeout(() => { this.mapa.invalidateSize(); }, 500);
 
-                    // 🚀 MAGIA: Si viene del formulario 1 y no tenía coordenadas previas, buscamos el texto en el mapa
-                    if (!tieneCoordenadasViejas && this.propiedad.direccion) {
+                    // Si es nuevo, centramos la cámara en la ciudad automáticamente
+                    if (!tieneCoordenadasViejas && this.propiedad.ciudad) {
                         this.buscarCoordenadasPorTexto();
                     }
 
-                    const buscarUbicacionInversa = async (lati, longi) => {
-                        try {
-                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lati}&lon=${longi}`);
-                            const data = await res.json();
-                            if (data && data.address) {
-                                // 🛡️ ESCUDO: Solo rellenamos texto si el usuario dejó la cajita vacía. 
-                                // Así JAMÁS borramos su "Valle de luna T2 406" aunque mueva el pin a mano para ajustarlo.
-                                if (!this.propiedad.direccion) {
-                                    this.propiedad.direccion = data.address.road || data.address.neighbourhood || '';
-                                }
-                                if (!this.propiedad.ciudad) {
-                                    this.propiedad.ciudad = data.address.city || data.address.town || 'Chía';
-                                }
-                                this.propiedad.lat = lati;
-                                this.propiedad.lng = longi;
-                            }
-                        } catch (e) { console.log("Error mapa"); }
-                    };
-
-                    // Guardamos los números apenas se mueve el pin
+                    // 🚀 MAGIA: Mover el pin SOLO actualiza latitud y longitud. ¡NUNCA toca tus textos!
                     this.marcador.on('dragend', e => {
                         this.propiedad.lat = e.target.getLatLng().lat;
                         this.propiedad.lng = e.target.getLatLng().lng;
-                        buscarUbicacionInversa(this.propiedad.lat, this.propiedad.lng);
                     });
                     this.mapa.on('click', e => {
                         this.marcador.setLatLng(e.latlng);
                         this.propiedad.lat = e.latlng.lat;
                         this.propiedad.lng = e.latlng.lng;
-                        buscarUbicacionInversa(this.propiedad.lat, this.propiedad.lng);
                     });
                 },
 
