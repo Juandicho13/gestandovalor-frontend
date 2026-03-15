@@ -257,9 +257,8 @@
 
             </div>
 
-            <div class="w-full lg:w-[35%] xl:w-[30%] relative">
-                <div
-                    class="sticky top-32 bg-navy border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-6 lg:p-8 z-30">
+            <div class="w-full lg:w-[35%] xl:w-[30%] relative z-40">
+                <div class="sticky top-32 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-6 lg:p-8">
 
                     <div class="flex justify-between items-end mb-8">
                         <div>
@@ -270,17 +269,18 @@
                     </div>
 
                     <div
-                        class="border-2 border-white/20 rounded-2xl mb-6 overflow-hidden focus-within:border-gold transition-colors">
+                        class="border border-white/20 rounded-2xl mb-6 focus-within:border-gold transition-colors relative">
 
-                        <div class="flex border-b-2 border-white/20 relative cursor-pointer" id="date-trigger">
-                            <div class="w-1/2 p-4 border-r-2 border-white/20 relative pointer-events-none">
+                        <div class="flex border-b border-white/20 relative cursor-pointer hover:bg-white/5 transition-colors rounded-t-2xl"
+                            id="date-trigger">
+                            <div class="w-1/2 p-3 sm:p-4 border-r border-white/20 relative pointer-events-none">
                                 <label
                                     class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Llegada</label>
                                 <input type="text" x-model="checkinLabel" placeholder="Agregar fecha"
                                     class="w-full text-sm font-bold text-white outline-none bg-transparent mt-1 placeholder-white/50"
                                     readonly>
                             </div>
-                            <div class="w-1/2 p-4 relative pointer-events-none">
+                            <div class="w-1/2 p-3 sm:p-4 relative pointer-events-none">
                                 <label
                                     class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Salida</label>
                                 <input type="text" x-model="checkoutLabel" placeholder="Agregar fecha"
@@ -290,7 +290,7 @@
                             <input id="suite-calendar" type="text" class="absolute inset-0 opacity-0 cursor-pointer">
                         </div>
 
-                        <div class="p-4 cursor-pointer relative hover:bg-white/5 transition-colors"
+                        <div class="p-3 sm:p-4 cursor-pointer relative hover:bg-white/5 transition-colors rounded-b-2xl"
                             @click="openWidgetGuests = !openWidgetGuests">
                             <label
                                 class="block text-[10px] font-bold uppercase tracking-widest text-white/70 pointer-events-none">Huéspedes</label>
@@ -309,87 +309,87 @@
                             </div>
 
                             <div x-show="openWidgetGuests" @click.away="openWidgetGuests = false"
-                                class="absolute top-[110%] right-0 w-[320px] bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.28)] p-4 z-50 cursor-default text-left"
+                                class="absolute top-[110%] right-0 w-[300px] md:w-[320px] bg-white rounded-3xl shadow-[0_15px_40px_rgba(0,0,0,0.3)] p-6 z-[100] cursor-default text-left border border-gray-100"
                                 style="display: none;" x-transition.opacity>
 
-                                <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                                <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
-                                        <div class="font-bold text-gray-800 text-base">Adultos</div>
-                                        <div class="text-sm text-gray-500">Edad: 13 o más</div>
+                                        <div class="font-bold text-navy text-base">Adultos</div>
+                                        <div class="text-sm text-gray-400 font-medium">Edad 13+</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="adults > 1 ? adults-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="adults <= 1">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28"></path>
                                             </svg>
                                         </button>
                                         <span x-text="adults"
-                                            class="text-gray-800 w-4 text-center text-base font-medium">1</span>
+                                            class="text-navy w-4 text-center text-base font-extrabold">1</span>
                                         <button @click.stop="adults++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28m-14-14v28"></path>
                                             </svg>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                                <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
-                                        <div class="font-bold text-gray-800 text-base">Niños</div>
-                                        <div class="text-sm text-gray-500">De 2 a 12 años</div>
+                                        <div class="font-bold text-navy text-base">Niños</div>
+                                        <div class="text-sm text-gray-400 font-medium">Edades 2 – 12</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="children > 0 ? children-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="children <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28"></path>
                                             </svg>
                                         </button>
                                         <span x-text="children"
-                                            class="text-gray-800 w-4 text-center text-base font-medium">0</span>
+                                            class="text-navy w-4 text-center text-base font-extrabold">0</span>
                                         <button @click.stop="children++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28m-14-14v28"></path>
                                             </svg>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                                <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
-                                        <div class="font-bold text-gray-800 text-base">Bebés</div>
-                                        <div class="text-sm text-gray-500">Menos de 2 años</div>
+                                        <div class="font-bold text-navy text-base">Bebés</div>
+                                        <div class="text-sm text-gray-400 font-medium">Menos de 2 años</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="infants > 0 ? infants-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="infants <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28"></path>
                                             </svg>
                                         </button>
                                         <span x-text="infants"
-                                            class="text-gray-800 w-4 text-center text-base font-medium">0</span>
+                                            class="text-navy w-4 text-center text-base font-extrabold">0</span>
                                         <button @click.stop="infants++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28m-14-14v28"></path>
                                             </svg>
                                         </button>
@@ -398,44 +398,37 @@
 
                                 <div class="flex justify-between items-center py-4">
                                     <div>
-                                        <div class="font-bold text-gray-800 text-base">Mascotas</div>
+                                        <div class="font-bold text-navy text-base">Mascotas</div>
                                         <a href="#"
-                                            class="text-sm text-gray-800 underline font-medium hover:text-black">¿Traes
-                                            un animal de servicio?</a>
+                                            class="text-sm text-gray-500 underline font-medium hover:text-navy">¿Traes
+                                            un animal?</a>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="pets > 0 ? pets-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="pets <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28"></path>
                                             </svg>
                                         </button>
                                         <span x-text="pets"
-                                            class="text-gray-800 w-4 text-center text-base font-medium">0</span>
+                                            class="text-navy w-4 text-center text-base font-extrabold">0</span>
                                         <button @click.stop="pets++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
+                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
                                                 <path d="m2 16h28m-14-14v28"></path>
                                             </svg>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="pt-2 pb-2">
-                                    <p class="text-[13px] text-gray-500 font-medium leading-relaxed">
-                                        Este alojamiento tiene una capacidad máxima de <span
-                                            x-text="propiedad.capacidad_huespedes"></span> huéspedes, sin incluir bebés.
-                                        Si vienes con más de 2 mascotas, avísale al anfitrión.
-                                    </p>
-                                </div>
                                 <div class="flex justify-end pt-2">
                                     <button @click.stop="openWidgetGuests = false"
-                                        class="font-bold text-gray-800 underline text-sm hover:text-black focus:outline-none">Cerrar</button>
+                                        class="font-bold text-navy underline text-sm hover:text-gold transition-colors focus:outline-none">Cerrar</button>
                                 </div>
                             </div>
                         </div>
