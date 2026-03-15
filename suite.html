@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loft acogedor con ducha de hidromasaje - GestandoValor</title>
+    <title>Reserva tu Suite - GestandoValor</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -67,7 +67,7 @@
             margin: 0;
         }
 
-        /* Custom scrollbar modal */
+        /* Scrollbar modal Apple */
         .modal-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -114,7 +114,7 @@
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
-            <button
+            <button @click="openContact = true"
                 class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
         </div>
     </nav>
@@ -124,8 +124,7 @@
         <section class="mb-8">
             <h1 class="text-3xl md:text-4xl font-extrabold text-navy leading-tight mb-3" x-text="propiedad.titulo"></h1>
             <div class="flex justify-between items-center text-sm text-gray-600 font-medium">
-                <p class="underline cursor-pointer hover:text-navy"
-                    x-text="`${propiedad.ciudad}, ${propiedad.departamento}, Colombia`"></p>
+                <p class="underline" x-text="`${propiedad.ciudad}, ${propiedad.departamento}, Colombia`"></p>
                 <div class="flex gap-4">
                     <button
                         class="flex items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-xl transition-colors text-navy font-bold"><svg
@@ -155,7 +154,6 @@
                             <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
                             </div>
                         </div>
-
                         <template x-for="i in [1, 2, 3, 4]">
                             <div class="hidden md:block relative group cursor-pointer overflow-hidden bg-gray-200">
                                 <template x-if="propiedad.fotos[i]">
@@ -186,9 +184,7 @@
                                 x-text="`${propiedad.habitaciones} habitación${propiedad.habitaciones > 1 ? 'es' : ''}`">
                             </li><span>·</span>
                             <li x-text="`${propiedad.camas} cama${propiedad.camas > 1 ? 's' : ''}`"></li><span>·</span>
-                            <li
-                                x-text="`${propiedad.banos} baño${propiedad.banos > 1 ? 's' : ''} completo${propiedad.banos > 1 ? 's' : ''}`">
-                            </li>
+                            <li x-text="`${propiedad.banos} baño${propiedad.banos > 1 ? 's' : ''}`"></li>
                         </ol>
                     </div>
                 </div>
@@ -211,9 +207,7 @@
 
                 <div class="py-8 border-b border-gray-100">
                     <h2 class="text-2xl font-extrabold text-navy mb-4">Acerca de este espacio</h2>
-
-                    <p class="text-gray-600 leading-relaxed text-lg" x-text="obtenerResumen()"></p>
-
+                    <p class="text-gray-600 leading-relaxed text-lg" x-html="obtenerResumen()"></p>
                     <button x-show="necesitaBotonVerMas()" @click="openModalText = true"
                         class="font-bold text-navy underline mt-6 hover:text-gold transition-colors flex items-center gap-1 group">Mostrar
                         más <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
@@ -224,22 +218,16 @@
 
                 <div class="py-8 border-b border-gray-100">
                     <h2 class="text-2xl font-extrabold text-navy mb-6">¿Qué hay en el alojamiento?</h2>
-
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
                         <template x-for="comodidad in propiedad.comodidades.slice(0, 6)" :key="comodidad">
-                            <div
-                                class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-md hover:border-gold transition-all duration-300 group cursor-default">
-                                <div
-                                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-navy group-hover:text-gold transition-colors">
-                                    <div x-html="obtenerIcono(comodidad)" class="w-5 h-5"></div>
-                                </div>
-                                <span class="font-bold text-gray-700 text-sm" x-text="comodidad"></span>
+                            <div class="flex items-center gap-4 text-gray-700">
+                                <div x-html="obtenerIcono(comodidad)" class="w-6 h-6 text-navy shrink-0"></div>
+                                <span class="font-medium" x-text="comodidad"></span>
                             </div>
                         </template>
                     </div>
-
                     <button x-show="propiedad.comodidades.length > 6"
-                        class="mt-8 border-2 border-navy text-navy font-bold py-3 px-6 rounded-xl hover:bg-navy hover:text-white transition-colors">
+                        class="mt-8 border border-gray-900 text-gray-900 font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors">
                         Mostrar las <span x-text="propiedad.comodidades.length"></span> amenidades
                     </button>
                 </div>
@@ -254,16 +242,15 @@
                     </div>
 
                     <div
-                        class="relative w-full h-[450px] rounded-[32px] overflow-hidden shadow-xl border border-gray-100 group">
+                        class="relative w-full h-[450px] rounded-[32px] overflow-hidden shadow-xl border border-gray-100">
                         <button @click="centrarMapa()"
-                            class="absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur-sm text-navy font-bold py-2.5 px-4 rounded-full shadow-lg border border-gray-200 flex items-center gap-2 hover:bg-white hover:scale-105 transition-all duration-300">
-                            <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur-sm text-navy font-bold py-2.5 px-4 rounded-full shadow-lg border border-gray-200 flex items-center gap-2 hover:bg-white transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 12h2m14 0h2M12 3v2m0 14v2M5.293 5.293l1.414 1.414m10.586 10.586l1.414 1.414M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                                    d="M3 12h2m14 0h2M12 3v2m0 14v2M5.293 5.293l1.414 1.414m10.586 10.586l1.414 1.414M5.293 18.707l1.414-1.414m10.586-10.586l1.414-1.414M12 15a3 3 0 100-6 3 3 0 000 6z" />
                             </svg>
-                            Centrar mapa
+                            Centrar
                         </button>
-
                         <div id="mapa-suite" class="w-full h-full z-10"></div>
                     </div>
                 </div>
@@ -289,14 +276,14 @@
                             <div class="w-1/2 p-4 border-r-2 border-white/20 relative pointer-events-none">
                                 <label
                                     class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Llegada</label>
-                                <input type="text" x-model="checkinLabel" placeholder="Agregar"
+                                <input type="text" x-model="checkinLabel" placeholder="Agregar fecha"
                                     class="w-full text-sm font-bold text-white outline-none bg-transparent mt-1 placeholder-white/50"
                                     readonly>
                             </div>
                             <div class="w-1/2 p-4 relative pointer-events-none">
                                 <label
                                     class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Salida</label>
-                                <input type="text" x-model="checkoutLabel" placeholder="Agregar"
+                                <input type="text" x-model="checkoutLabel" placeholder="Agregar fecha"
                                     class="w-full text-sm font-bold text-white outline-none bg-transparent mt-1 placeholder-white/50"
                                     readonly>
                             </div>
@@ -322,7 +309,7 @@
                             </div>
 
                             <div x-show="openWidgetGuests" @click.away="openWidgetGuests = false"
-                                class="absolute top-[110%] right-0 w-[320px] bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.28)] p-4 z-50 cursor-default text-left"
+                                class="absolute top-[110%] right-0 w-[320px] bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.28)] p-6 z-50 cursor-default text-left border border-gray-100"
                                 style="display: none;" x-transition.opacity>
 
                                 <div class="flex justify-between items-center py-4 border-b border-gray-100">
@@ -332,7 +319,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="adults > 1 ? adults-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="adults <= 1">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -343,7 +330,7 @@
                                         <span x-text="adults"
                                             class="text-gray-800 w-4 text-center text-base font-medium">1</span>
                                         <button @click.stop="adults++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -360,7 +347,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="children > 0 ? children-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="children <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -371,7 +358,7 @@
                                         <span x-text="children"
                                             class="text-gray-800 w-4 text-center text-base font-medium">0</span>
                                         <button @click.stop="children++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -388,7 +375,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="infants > 0 ? infants-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="infants <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -399,7 +386,7 @@
                                         <span x-text="infants"
                                             class="text-gray-800 w-4 text-center text-base font-medium">0</span>
                                         <button @click.stop="infants++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -418,7 +405,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="pets > 0 ? pets-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="pets <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -429,7 +416,7 @@
                                         <span x-text="pets"
                                             class="text-gray-800 w-4 text-center text-base font-medium">0</span>
                                         <button @click.stop="pets++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -439,16 +426,16 @@
                                     </div>
                                 </div>
 
-                                <div class="pt-2 pb-2">
-                                    <p class="text-[13px] text-gray-500 font-medium leading-relaxed">
+                                <div class="pt-2">
+                                    <p class="text-xs text-gray-500 leading-relaxed mb-4">
                                         Este alojamiento tiene una capacidad máxima de <span
                                             x-text="propiedad.capacidad_huespedes"></span> huéspedes, sin incluir bebés.
                                         Si vienes con más de 2 mascotas, avísale al anfitrión.
                                     </p>
-                                </div>
-                                <div class="flex justify-end pt-2">
-                                    <button @click.stop="openWidgetGuests = false"
-                                        class="font-bold text-gray-800 underline text-sm hover:text-black focus:outline-none">Cerrar</button>
+                                    <div class="flex justify-end">
+                                        <button @click.stop="openWidgetGuests = false"
+                                            class="font-bold text-gray-800 underline text-sm hover:text-black focus:outline-none">Cerrar</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -524,9 +511,51 @@
             class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center text-white">
-            <h2 class="text-2xl font-bold">GestandoValor Apartasuites</h2>
-            <p class="text-sm text-gray-400 mt-2">© 2026 Todos los derechos reservados.</p>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Tu apartamento puede generar
+                más.<br><span class="text-gold">Nosotros lo hacemos posible.</span></h2>
+            <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+            <div class="mb-10">
+                <div class="inline-flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
+                    <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
+                            class="font-light text-gray-400">Apartasuites</span></span>
+                </div>
+                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">Administración estratégica para
+                    rentas cortas</p>
+            </div>
+
+            <div class="flex justify-center gap-8 mb-16">
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
+                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
+                        <path
+                            d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                    </svg></a>
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
+                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg></a>
+                <a href="mailto:info@gestandovalor.com"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
+                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg></a>
+            </div>
+
+            <div
+                class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+                <p>© 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
+                    <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
+                </div>
+            </div>
         </div>
     </footer>
 
