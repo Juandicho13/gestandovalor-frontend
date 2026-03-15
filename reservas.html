@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas y Calendario - GestandoValor</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        navy: '#0B132B', 
-                        gold: '#D4AF37', 
+                        navy: '#0B132B',
+                        gold: '#D4AF37',
                         lightGray: '#F9FAFB',
                         airbnb: '#FF5A5F',
                         booking: '#003580',
@@ -25,75 +30,143 @@
         }
     </script>
     <style>
-        /* Ocultar barra de scroll para las miniaturas */
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* Ajustes Calendarios Modales */
+        .flatpickr-calendar {
+            border-radius: 20px !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+            border: none !important;
+            z-index: 99999 !important;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            background: #0B132B !important;
+            border-color: #0B132B !important;
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .flatpickr-day.inRange {
+            box-shadow: -5px 0 0 #f3f4f6, 5px 0 0 #f3f4f6 !important;
+            background: #f3f4f6 !important;
+            border-color: #f3f4f6 !important;
+            color: #0B132B !important;
+        }
     </style>
 </head>
-<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="{ mobileMenuOpen: false, propiedadSeleccionada: 'apto511', modalEditarReserva: false }">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
-        
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="reservasApp()" x-init="initApp()"
+    :class="(modalReserva || modalPrecios) ? 'overflow-hidden' : ''">
+
+    <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
+        <p class="font-bold text-navy animate-pulse">Sincronizando sistema...</p>
+    </div>
+
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+                class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+        <div
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="admin_dashboard.html" class="text-sm font-medium hover:text-gold transition-colors">Mi Panel</a>
             <a href="solicitudes.html" class="text-sm font-medium hover:text-gold transition-colors">Solicitudes</a>
             <a href="reservas.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Reservas</a>
             <a href="operacion.html" class="text-sm font-medium hover:text-gold transition-colors">Operación</a>
             <a href="propiedades.html" class="text-sm font-medium hover:text-gold transition-colors">Propiedades</a>
-            
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            
-            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Salir
+            <a href="login.html"
+                class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg> Salir
             </a>
         </div>
-
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">
-                E
-            </div>
+            <div
+                class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">
+                E</div>
         </div>
-
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
         </button>
     </nav>
 
-    <div x-show="mobileMenuOpen" style="display: none;" class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+    <div x-show="mobileMenuOpen" style="display: none;"
+        class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
         <div class="flex flex-col items-center gap-8 w-full mt-10">
             <a href="admin_dashboard.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Mi Panel</a>
             <a href="solicitudes.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Solicitudes</a>
             <a href="reservas.html" class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Reservas</a>
             <a href="operacion.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Operación</a>
             <a href="propiedades.html" class="text-2xl font-medium text-gray-300 hover:text-gold">Propiedades</a>
-            <a href="login.html" class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">Salir</a>
+            <a href="login.html"
+                class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">Salir</a>
         </div>
     </div>
 
     <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
-        
+        <div
+            class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none">
+        </div>
         <div class="w-[95%] max-w-[1600px] mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Channel Manager</span>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Channel
+                        Manager</span>
                     <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Calendario de Reservas</h1>
                 </div>
-                <div class="flex gap-4">
-                    <button class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Sincronizar Canales
+                <div class="flex flex-wrap gap-4">
+                    <button
+                        class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Sincronizar
                     </button>
-                    <button class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Nueva Reserva Directa
+                    <button @click="abrirModalPrecios()"
+                        class="bg-white hover:bg-gray-100 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Definir Tarifas
+                    </button>
+                    <button @click="abrirModalNueva()"
+                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Añadir Reserva Manual
                     </button>
                 </div>
             </div>
@@ -102,166 +175,165 @@
 
     <section class="py-12 -mt-10 relative z-20 min-h-screen">
         <div class="w-[95%] max-w-[1600px] mx-auto px-6 lg:px-8">
-            
             <div class="flex flex-col lg:flex-row gap-8">
-                
-                <div class="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar lg:w-24 shrink-0 pb-4 lg:pb-0 z-30">
-                    
-                    <button @click="propiedadSeleccionada = 'apto511'" 
-                            class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
-                            :class="propiedadSeleccionada === 'apto511' ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'">
-                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80" class="w-full h-full object-cover" alt="Apto 511" title="Apto 511 (Chía)">
-                        <div x-show="propiedadSeleccionada === 'apto511'" class="absolute inset-0 border-2 border-gold rounded-2xl pointer-events-none"></div>
-                    </button>
 
-                    <button @click="propiedadSeleccionada = 'penthouse'" 
+                <div
+                    class="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar lg:w-24 shrink-0 pb-4 lg:pb-0 z-30">
+                    <template x-for="prop in propiedades" :key="prop.id">
+                        <button @click="seleccionarPropiedad(prop)"
                             class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
-                            :class="propiedadSeleccionada === 'penthouse' ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'">
-                        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=200&q=80" class="w-full h-full object-cover" alt="Penthouse" title="Penthouse Bogotá">
-                    </button>
+                            :class="propiedadActiva?.id === prop.id ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'"
+                            :title="prop.titulo">
+                            <img :src="(prop.fotos && prop.fotos.length > 0) ? prop.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80'"
+                                class="w-full h-full object-cover">
+                            <div x-show="propiedadActiva?.id === prop.id"
+                                class="absolute inset-0 border-2 border-gold rounded-2xl pointer-events-none"></div>
+                        </button>
+                    </template>
 
-                    <button @click="propiedadSeleccionada = 'torrea'" 
-                            class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
-                            :class="propiedadSeleccionada === 'torrea' ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'">
-                        <img src="https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?w=200&q=80" class="w-full h-full object-cover" alt="Torre A" title="Torre A (Chía)">
-                    </button>
-                    
-                    <button class="w-16 h-16 rounded-2xl border-2 border-dashed border-gray-300 text-gray-400 hover:text-gold hover:border-gold transition-colors flex items-center justify-center shrink-0 shadow-sm bg-white/50" title="Añadir propiedad">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    </button>
+                    <a href="propiedades.html"
+                        class="w-16 h-16 rounded-2xl border-2 border-dashed border-gray-300 text-gray-400 hover:text-gold hover:border-gold transition-colors flex items-center justify-center shrink-0 shadow-sm bg-white/50"
+                        title="Añadir propiedad">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </a>
                 </div>
 
-                <div class="flex-1 min-w-0 flex flex-col gap-8">
-                    
-                    <div class="bg-white rounded-[40px] shadow-2xl border border-gray-100 p-6 md:p-8 overflow-hidden relative">
-                        <div class="absolute top-8 right-8 text-right hidden md:block opacity-10">
-                            <h2 class="text-6xl font-black text-navy uppercase tracking-tighter" x-text="propiedadSeleccionada === 'apto511' ? 'Apto 511' : (propiedadSeleccionada === 'penthouse' ? 'Penthouse' : 'Torre A')"></h2>
+                <div class="flex-1 min-w-0 flex flex-col gap-8" x-show="propiedadActiva" style="display: none;">
+
+                    <div
+                        class="bg-white rounded-[40px] shadow-2xl border border-gray-100 p-6 md:p-8 overflow-hidden relative">
+                        <div class="absolute top-8 right-8 text-right hidden md:block opacity-5 pointer-events-none">
+                            <h2 class="text-5xl font-black text-navy uppercase tracking-tighter line-clamp-1 max-w-sm"
+                                x-text="propiedadActiva?.titulo"></h2>
                         </div>
 
                         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 relative z-10">
                             <div class="flex items-center gap-4">
-                                <h2 class="text-3xl font-extrabold text-navy">Marzo 2026</h2>
+                                <h2 class="text-3xl font-extrabold text-navy capitalize" x-text="mesActualTexto"></h2>
                                 <div class="flex gap-2">
-                                    <button class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-navy border border-gray-200 shadow-sm">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                                    </button>
-                                    <button class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-navy border border-gray-200 shadow-sm">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                    </button>
+                                    <button @click="cambiarMes(-1)"
+                                        class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-navy border border-gray-200 shadow-sm"><svg
+                                            class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 19l-7-7 7-7" />
+                                        </svg></button>
+                                    <button @click="cambiarMes(1)"
+                                        class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors text-navy border border-gray-200 shadow-sm"><svg
+                                            class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg></button>
                                 </div>
                             </div>
 
-                            <div class="flex gap-5 text-xs font-bold text-gray-500 bg-gray-50/80 backdrop-blur-sm p-3 px-5 rounded-xl border border-gray-100 shadow-inner">
-                                <span class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-airbnb"></div> Airbnb</span>
-                                <span class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-booking"></div> Booking</span>
-                                <span class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-directo"></div> Directa</span>
+                            <div
+                                class="flex gap-5 text-xs font-bold text-gray-500 bg-gray-50/80 backdrop-blur-sm p-3 px-5 rounded-xl border border-gray-100 shadow-inner">
+                                <span class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded bg-airbnb"></div> Airbnb
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded bg-booking"></div> Booking
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded bg-directo"></div> Directa
+                                </span>
                             </div>
                         </div>
 
-                        <div class="w-full overflow-x-auto pb-2 relative z-10">
-                            <div class="min-w-[900px] border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
-                                
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Lunes</div>
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Martes</div>
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Miércoles</div>
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Jueves</div>
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Viernes</div>
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Sábado</div>
-                                <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Domingo</div>
+                        <div class="w-full overflow-x-auto pb-2 relative z-10 custom-scroll">
+                            <div
+                                class="min-w-[900px] border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
+                                <template x-for="dia in ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']">
+                                    <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest"
+                                        x-text="dia"></div>
+                                </template>
 
-                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">23</span></div>
-                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">24</span></div>
-                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">25</span></div>
-                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">26</span></div>
-                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">27</span></div>
-                                <div class="bg-gray-50 p-4 min-h-[140px]"><span class="text-gray-400 font-bold text-base">28</span></div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base mb-2 block">1</span>
-                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
-                                </div>
+                                <template x-for="(diaObj, index) in diasCalendario" :key="index">
+                                    <div class="p-4 min-h-[120px] transition-colors relative"
+                                        :class="obtenerClaseCajaCalendario(diaObj)">
 
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors relative">
-                                    <span class="text-navy font-bold text-base block mb-1">2</span>
-                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
-                                </div>
-                                <div class="bg-airbnb/10 border-l-[6px] border-airbnb p-4 min-h-[140px] cursor-pointer hover:bg-airbnb/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
-                                    <span class="text-airbnb font-extrabold text-base block mb-2">3</span>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="w-6 h-6 rounded-full bg-airbnb text-white flex items-center justify-center text-[10px] font-bold">CR</div>
-                                        <div class="text-airbnb font-bold text-sm">Carlos R.</div>
+                                        <span class="font-extrabold text-base block mb-2"
+                                            :class="diaObj.reserva ? 'text-current' : (diaObj.esMesActual ? 'text-navy' : 'text-gray-300')"
+                                            x-text="diaObj.dia"></span>
+
+                                        <template x-if="diaObj.reserva && diaObj.esInicio">
+                                            <div @click="editarReserva(diaObj.reserva)"
+                                                class="cursor-pointer hover:opacity-80 transition-opacity">
+                                                <div class="flex items-center gap-1.5 mb-1 text-current">
+                                                    <div class="w-6 h-6 rounded-full bg-current text-white flex items-center justify-center text-[10px] font-bold shrink-0"
+                                                        x-text="obtenerIniciales(diaObj.reserva.huesped)"></div>
+                                                    <div class="font-bold text-sm truncate"
+                                                        x-text="diaObj.reserva.huesped.split(' ')[0]"></div>
+                                                </div>
+                                                <div
+                                                    class="text-current opacity-80 text-[10px] font-bold bg-white/50 inline-block px-1.5 py-0.5 rounded truncate w-full">
+                                                    In: 15:00</div>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="diaObj.reserva && diaObj.esFin && !diaObj.esInicio">
+                                            <div
+                                                class="text-current opacity-80 text-[10px] font-bold bg-white/50 inline-block px-1.5 py-0.5 rounded">
+                                                Out: 11:00</div>
+                                        </template>
+
+                                        <template x-if="!diaObj.reserva && diaObj.esMesActual">
+                                            <span class="text-gray-400 text-[11px] font-bold block mt-4"
+                                                :class="diaObj.tienePrecioEspecial ? 'text-gold' : ''"
+                                                x-text="formatearK(diaObj.precio)"></span>
+                                        </template>
                                     </div>
-                                    <div class="text-airbnb/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-in 15:00</div>
-                                </div>
-                                <div class="bg-airbnb/10 border-l-[6px] border-airbnb p-4 min-h-[140px] cursor-pointer hover:bg-airbnb/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
-                                    <span class="text-airbnb font-extrabold text-base block mb-2">4</span>
-                                </div>
-                                <div class="bg-airbnb/10 border-l-[6px] border-airbnb p-4 min-h-[140px] cursor-pointer hover:bg-airbnb/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
-                                    <span class="text-airbnb font-extrabold text-base block mb-2">5</span>
-                                    <div class="text-airbnb/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-out 11:00</div>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">6</span>
-                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">7</span>
-                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">8</span>
-                                    <span class="text-gray-400 text-xs font-bold">$121K</span>
-                                </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">9</span>
-                                    <span class="text-gray-400 text-xs font-bold">$121K</span>
-                                </div>
-                                <div class="bg-booking/10 border-l-[6px] border-booking p-4 min-h-[140px] cursor-pointer hover:bg-booking/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
-                                    <span class="text-booking font-extrabold text-base block mb-2">10</span>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="w-6 h-6 rounded-full bg-booking text-white flex items-center justify-center text-[10px] font-bold">LM</div>
-                                        <div class="text-booking font-bold text-sm">Laura M.</div>
-                                    </div>
-                                    <div class="text-booking/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-in 14:00</div>
-                                </div>
-                                <div class="bg-booking/10 border-l-[6px] border-booking p-4 min-h-[140px] cursor-pointer hover:bg-booking/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
-                                    <span class="text-booking font-extrabold text-base block mb-2">11</span>
-                                </div>
-                                <div class="bg-booking/10 border-l-[6px] border-booking p-4 min-h-[140px] cursor-pointer hover:bg-booking/20 transition-colors shadow-inner" @click="modalEditarReserva = true">
-                                    <span class="text-booking font-extrabold text-base block mb-2">12</span>
-                                    <div class="text-booking/80 text-xs font-bold bg-white/50 inline-block px-2 py-0.5 rounded">Check-out 11:00</div>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">13</span>
-                                    <span class="text-gray-400 text-xs font-bold">$121K</span>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">14</span>
-                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors">
-                                    <span class="text-navy font-bold text-base block mb-1">15</span>
-                                    <span class="text-gray-400 text-xs font-bold">$150K</span>
-                                </div>
-
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors border-2 border-gold relative shadow-md">
-                                    <span class="text-gold font-extrabold text-base block mb-1">16 (Hoy)</span>
-                                    <div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-gold animate-pulse"></div>
-                                </div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">17</span></div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">18</span></div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">19</span></div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">20</span></div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">21</span></div>
-                                <div class="bg-white p-4 min-h-[140px] hover:bg-gray-50 transition-colors"><span class="text-navy font-bold text-base block mb-1">22</span></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center text-success shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg></div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ingresos del Mes
+                                </p>
+                                <h3 class="text-2xl font-extrabold text-navy" x-text="formatearDinero(stats.ingresos)">
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                </svg></div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Noches Vendidas</p>
+                                <h3 class="text-2xl font-extrabold text-navy" x-text="stats.noches"></h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg></div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Huéspedes</p>
+                                <h3 class="text-2xl font-extrabold text-navy" x-text="stats.huespedes"></h3>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
                         <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50">
-                            <h2 class="text-xl font-extrabold text-navy">Reservas Confirmadas</h2>
-                            <p class="text-sm text-gray-500 mt-1">Huéspedes del mes para la propiedad seleccionada.</p>
+                            <h2 class="text-xl font-extrabold text-navy">Historial de Reservas</h2>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -276,126 +348,200 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
-                                    
-                                    <tr class="hover:bg-gray-50 transition-colors group">
-                                        <td class="p-6 border-b border-gray-100">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full bg-airbnb text-white flex items-center justify-center font-bold shadow-sm">CR</div>
-                                                <div>
-                                                    <h3 class="text-sm font-bold text-navy">Carlos Ramírez</h3>
-                                                    <p class="text-xs text-gray-500">2 Huéspedes</p>
+                                    <template x-for="res in reservas" :key="res.id">
+                                        <tr class="hover:bg-gray-50 transition-colors group">
+                                            <td class="p-6 border-b border-gray-100">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold shadow-sm"
+                                                        :class="obtenerColorCanal(res.canal, 'bg')"
+                                                        x-text="obtenerIniciales(res.huesped)"></div>
+                                                    <div>
+                                                        <h3 class="text-sm font-bold text-navy" x-text="res.huesped">
+                                                        </h3>
+                                                        <p class="text-xs text-gray-500"
+                                                            x-text="`${res.cantidad_huespedes} Huésped${res.cantidad_huespedes > 1 ? 'es' : ''}`">
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 03</span>
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 05</span>
-                                            </div>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-airbnb/10 text-airbnb text-xs font-bold border border-airbnb/20 shadow-sm">Airbnb</span>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100 text-right">
-                                            <span class="text-sm font-bold text-navy">$450.000</span>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100 text-center">
-                                            <button @click="modalEditarReserva = true" class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all hover:scale-105" title="Editar Reserva">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                            </button>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-gray-50 transition-colors group">
-                                        <td class="p-6 border-b border-gray-100">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full bg-booking text-white flex items-center justify-center font-bold shadow-sm">LM</div>
-                                                <div>
-                                                    <h3 class="text-sm font-bold text-navy">Laura Martínez</h3>
-                                                    <p class="text-xs text-gray-500">1 Huésped</p>
+                                            </td>
+                                            <td class="p-6 border-b border-gray-100">
+                                                <div class="flex items-center gap-2">
+                                                    <span
+                                                        class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm"
+                                                        x-text="formatearFechaCorta(res.check_in)"></span>
+                                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                    </svg>
+                                                    <span
+                                                        class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm"
+                                                        x-text="formatearFechaCorta(res.check_out)"></span>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 10</span>
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                                <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1.5 rounded-lg shadow-sm">Mar 12</span>
-                                            </div>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-booking/10 text-booking text-xs font-bold border border-booking/20 shadow-sm">Booking.com</span>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100 text-right">
-                                            <span class="text-sm font-bold text-navy">$380.000</span>
-                                        </td>
-                                        <td class="p-6 border-b border-gray-100 text-center">
-                                            <button @click="modalEditarReserva = true" class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all hover:scale-105" title="Editar Reserva">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                            </button>
-                                        </td>
+                                            </td>
+                                            <td class="p-6 border-b border-gray-100">
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border shadow-sm"
+                                                    :class="obtenerColorCanal(res.canal, 'badge')"
+                                                    x-text="res.canal"></span>
+                                            </td>
+                                            <td class="p-6 border-b border-gray-100 text-right">
+                                                <span class="text-sm font-bold text-navy"
+                                                    x-text="formatearDinero(res.monto_total)"></span>
+                                            </td>
+                                            <td class="p-6 border-b border-gray-100 text-center">
+                                                <button @click="editarReserva(res)"
+                                                    class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all hover:scale-105"
+                                                    title="Editar Reserva">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr x-show="reservas.length === 0" style="display: none;">
+                                        <td colspan="5" class="p-12 text-center text-gray-500">Aún no hay reservas
+                                            registradas para este apartamento.</td>
                                     </tr>
-
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </section>
 
-    <div x-show="modalEditarReserva" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalEditarReserva = false"></div>
-        
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8"
-             x-transition:enter="ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
-            
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-extrabold text-navy">Modificar Reserva</h3>
-                <button @click="modalEditarReserva = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <div x-show="modalPrecios" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/90 backdrop-blur-sm" @click="modalPrecios = false"></div>
+
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-xl relative z-10 overflow-hidden transform transition-all"
+            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100">
+
+            <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h3 class="text-2xl font-extrabold text-navy">Definir Tarifas</h3>
+                    <p class="text-sm text-gray-500 mt-1" x-text="propiedadActiva?.titulo"></p>
+                </div>
+                <button @click="modalPrecios = false"
+                    class="text-gray-400 hover:text-navy bg-white rounded-full p-2 shadow-sm border border-gray-100"><svg
+                        class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
             </div>
 
-            <form class="space-y-4" onsubmit="event.preventDefault(); alert('Reserva actualizada exitosamente.'); document.querySelector('[x-data]').__x.$data.modalEditarReserva = false;">
-                
+            <div class="p-8">
+                <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                    <button @click="tipoTarifa = 'general'"
+                        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all"
+                        :class="tipoTarifa === 'general' ? 'bg-white text-navy shadow-sm' : 'text-gray-500 hover:text-navy'">Precio
+                        Base</button>
+                    <button @click="tipoTarifa = 'fechas'"
+                        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all"
+                        :class="tipoTarifa === 'fechas' ? 'bg-white text-navy shadow-sm' : 'text-gray-500 hover:text-navy'">Por
+                        Fechas</button>
+                </div>
+
+                <form class="space-y-6" @submit.prevent="guardarTarifas()">
+
+                    <div x-show="tipoTarifa === 'fechas'" x-transition>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Selecciona
+                            las fechas a modificar</label>
+                        <input id="tarifa-calendar" type="text"
+                            placeholder="Ej: 20 Mar a 24 Mar (o doble clic para un día)"
+                            class="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3.5 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer transition-colors shadow-sm">
+                        <p class="text-[11px] text-gray-400 mt-2">* Haz clic en una fecha y luego en otra para un rango.
+                            Haz doble clic en una fecha para cambiar solo ese día.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
+                            x-text="tipoTarifa === 'general' ? 'Nuevo Precio General (por noche)' : 'Precio Especial (por noche)'"></label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                            <input type="number" x-model="formTarifa.precio" required
+                                class="w-full bg-white border-2 border-gray-200 rounded-xl pl-8 pr-4 py-3.5 outline-none focus:border-gold text-lg text-navy font-extrabold transition-colors shadow-sm"
+                                placeholder="150000">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100 flex gap-3">
+                        <button type="button" @click="modalPrecios = false"
+                            class="w-1/3 bg-gray-50 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-100 transition-colors shadow-sm">Cancelar</button>
+                        <button type="submit"
+                            class="w-2/3 bg-navy text-white font-bold py-4 rounded-xl hover:bg-blue-900 transition-colors shadow-lg">Aplicar
+                            Tarifa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="modalReserva" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReserva = false"></div>
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-extrabold text-navy"
+                    x-text="formReserva.id ? 'Modificar Reserva' : 'Nueva Reserva Manual'"></h3>
+                <button @click="modalReserva = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <form class="space-y-4" @submit.prevent="guardarReserva()">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre del Huésped</label>
-                        <input type="text" value="Carlos Ramírez" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre del
+                            Huésped</label>
+                        <input type="text" x-model="formReserva.huesped" required
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy font-bold">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Fechas
+                            (Check-In a Check-Out)</label>
+                        <input id="modal-calendar" type="text" placeholder="Seleccionar fechas"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Check-In</label>
-                        <input type="date" value="2026-03-03" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Huéspedes
+                            (Pax)</label>
+                        <input type="number" min="1" x-model="formReserva.cantidad_huespedes" required
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy font-bold">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Check-Out</label>
-                        <input type="date" value="2026-03-05" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Monto Total
+                            (COP)</label>
+                        <input type="number" x-model="formReserva.monto_total" required
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy font-bold">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Monto Total (COP)</label>
-                        <input type="text" value="$450.000" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Canal</label>
-                        <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy cursor-pointer">
-                            <option selected>Airbnb</option>
-                            <option>Booking.com</option>
-                            <option>Directa</option>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Canal de
+                            Venta</label>
+                        <select x-model="formReserva.canal"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
+                            <option value="Airbnb">Airbnb</option>
+                            <option value="Booking.com">Booking.com</option>
+                            <option value="Directa">Directa</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="pt-4 flex gap-3">
-                    <button type="button" class="w-1/3 bg-red-50 text-danger font-bold py-4 rounded-xl hover:bg-red-100 transition-colors shadow-sm">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="w-2/3 bg-navy text-white font-bold py-4 rounded-xl hover:bg-blue-900 transition-colors shadow-lg">
-                        Guardar Cambios
-                    </button>
+                    <button type="button" @click="modalReserva = false"
+                        class="w-1/3 bg-gray-100 text-gray-500 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors shadow-sm">Cancelar</button>
+                    <button type="submit"
+                        class="w-2/3 bg-gold text-navy font-bold py-4 rounded-xl hover:bg-yellow-500 transition-colors shadow-lg">Guardar</button>
                 </div>
             </form>
         </div>
@@ -405,13 +551,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[700px]'; 
+            const largoPildora = 'max-w-[700px]';
 
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10'); 
+                    logo.classList.replace('h-16', 'h-10');
                     navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
                 } else {
                     logo.classList.replace('h-10', 'h-16');
                     navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
@@ -419,6 +565,295 @@
                 }
             });
         });
+
+        function reservasApp() {
+            return {
+                mobileMenuOpen: false,
+                cargando: true,
+
+                propiedades: [],
+                propiedadActiva: null,
+                reservas: [],
+
+                // Tarifas Dinámicas
+                modalPrecios: false,
+                tipoTarifa: 'general', // 'general' o 'fechas'
+                formTarifa: { precio: '', inicio: '', fin: '' },
+                tarifasEspeciales: [], // Array con {inicio, fin, precio}
+                fpTarifas: null,
+
+                // Calendario Visual
+                fechaCalendario: new Date(),
+                mesActualTexto: '',
+                diasCalendario: [],
+
+                // Modal Reservas
+                modalReserva: false,
+                fpModal: null,
+                formReserva: { id: null, huesped: '', check_in: '', check_out: '', monto_total: 0, canal: 'Directa', cantidad_huespedes: 1 },
+
+                stats: { ingresos: 0, noches: 0, huespedes: 0 },
+
+                async initApp() {
+                    await this.cargarPropiedades();
+                    this.cargando = false;
+                },
+
+                async cargarPropiedades() {
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        if (res.ok) {
+                            this.propiedades = await res.json();
+                            if (this.propiedades.length > 0) {
+                                this.seleccionarPropiedad(this.propiedades[0]);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error al cargar propiedades", e);
+                    }
+                },
+
+                async seleccionarPropiedad(prop) {
+                    this.propiedadActiva = prop;
+                    this.cargando = true;
+                    this.fechaCalendario = new Date();
+
+                    // Limpiamos tarifas y reservas anteriores al cambiar de apto
+                    this.tarifasEspeciales = [];
+
+                    try {
+                        // Simulación de BD
+                        this.reservas = [
+                            { id: 1, huesped: 'Carlos Ramírez', check_in: '2026-03-03', check_out: '2026-03-05', canal: 'Airbnb', monto_total: 450000, cantidad_huespedes: 2 },
+                            { id: 2, huesped: 'Laura Martínez', check_in: '2026-03-10', check_out: '2026-03-12', canal: 'Booking.com', monto_total: 380000, cantidad_huespedes: 1 }
+                        ];
+
+                        this.calcularStats();
+                        this.generarMesVisual();
+                    } catch (e) {
+                        console.error(e);
+                    } finally {
+                        this.cargando = false;
+                    }
+                },
+
+                // ✨ LÓGICA DE PRECIOS DINÁMICOS ✨
+                abrirModalPrecios() {
+                    this.formTarifa = { precio: this.propiedadActiva.precio_noche, inicio: '', fin: '' };
+                    this.tipoTarifa = 'general';
+                    this.modalPrecios = true;
+
+                    // Inicializar Flatpickr del modal de precios
+                    const that = this;
+                    setTimeout(() => {
+                        if (this.fpTarifas) this.fpTarifas.destroy();
+                        this.fpTarifas = flatpickr("#tarifa-calendar", {
+                            mode: "range",
+                            minDate: "today",
+                            dateFormat: "Y-m-d",
+                            locale: "es",
+                            onChange: function (selectedDates, dateStr, instance) {
+                                if (selectedDates.length === 1) {
+                                    // Si da doble clic o selecciona 1 dia
+                                    that.formTarifa.inicio = instance.formatDate(selectedDates[0], "Y-m-d");
+                                    that.formTarifa.fin = instance.formatDate(selectedDates[0], "Y-m-d");
+                                } else if (selectedDates.length === 2) {
+                                    that.formTarifa.inicio = instance.formatDate(selectedDates[0], "Y-m-d");
+                                    that.formTarifa.fin = instance.formatDate(selectedDates[1], "Y-m-d");
+                                }
+                            }
+                        });
+                    }, 50);
+                },
+
+                guardarTarifas() {
+                    if (!this.formTarifa.precio || this.formTarifa.precio <= 0) {
+                        alert("Por favor ingresa un precio válido.");
+                        return;
+                    }
+
+                    if (this.tipoTarifa === 'general') {
+                        // Cambiar precio de todo el apartamento (Actualizar en BD)
+                        this.propiedadActiva.precio_noche = Number(this.formTarifa.precio);
+                        console.log("Nuevo Precio Base guardado en BD:", this.propiedadActiva.precio_noche);
+                    } else {
+                        // Tarifas por fechas
+                        if (!this.formTarifa.inicio || !this.formTarifa.fin) {
+                            alert("Por favor selecciona un rango de fechas.");
+                            return;
+                        }
+                        this.tarifasEspeciales.push({
+                            inicio: this.formTarifa.inicio,
+                            fin: this.formTarifa.fin,
+                            precio: Number(this.formTarifa.precio)
+                        });
+                        console.log("Nueva Tarifa Especial agregada:", this.tarifasEspeciales);
+                    }
+
+                    // Repintar calendario para actualizar los precios de las cajas
+                    this.generarMesVisual();
+                    this.modalPrecios = false;
+                },
+
+                obtenerPrecioPorDia(fechaStr) {
+                    if (!fechaStr) return 0;
+
+                    // 1. Prioridad: Tarifa Especial (por fechas)
+                    // Busca si la fecha cae dentro de un rango especial
+                    let tarifaEspecial = this.tarifasEspeciales.find(t => fechaStr >= t.inicio && fechaStr <= t.fin);
+
+                    if (tarifaEspecial) {
+                        return tarifaEspecial.precio;
+                    }
+
+                    // 2. Si no hay especial, devuelve el base
+                    return this.propiedadActiva?.precio_noche || 0;
+                },
+                // ✨ FIN LÓGICA PRECIOS ✨
+
+                calcularStats() {
+                    let totalDinero = 0;
+                    let totalNoches = 0;
+                    let totalPax = 0;
+                    this.reservas.forEach(r => {
+                        totalDinero += Number(r.monto_total);
+                        totalPax += Number(r.cantidad_huespedes);
+                        const inD = new Date(r.check_in);
+                        const outD = new Date(r.check_out);
+                        const noches = Math.ceil(Math.abs(outD - inD) / (1000 * 60 * 60 * 24));
+                        totalNoches += noches;
+                    });
+                    this.stats = { ingresos: totalDinero, noches: totalNoches, huespedes: totalPax };
+                },
+
+                cambiarMes(direccion) {
+                    this.fechaCalendario.setMonth(this.fechaCalendario.getMonth() + direccion);
+                    this.generarMesVisual();
+                },
+
+                generarMesVisual() {
+                    const year = this.fechaCalendario.getFullYear();
+                    const month = this.fechaCalendario.getMonth();
+
+                    this.mesActualTexto = this.fechaCalendario.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+
+                    const primerDiaMes = new Date(year, month, 1);
+                    const ultimoDiaMes = new Date(year, month + 1, 0);
+                    const diasEnMes = ultimoDiaMes.getDate();
+                    let primerDiaIndex = primerDiaMes.getDay();
+
+                    let diasArray = [];
+
+                    const ultimoDiaMesAnterior = new Date(year, month, 0).getDate();
+                    for (let i = 0; i < primerDiaIndex; i++) {
+                        diasArray.unshift({ dia: ultimoDiaMesAnterior - i, fecha: null, esMesActual: false, reserva: null });
+                    }
+
+                    for (let i = 1; i <= diasEnMes; i++) {
+                        let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                        let reservaActual = this.reservas.find(r => dateStr >= r.check_in && dateStr <= r.check_out);
+
+                        // ✨ Obtener el precio que le toca a ese día ✨
+                        let precioDelDia = this.obtenerPrecioPorDia(dateStr);
+
+                        // Saber si tiene precio especial para colorearlo de dorado
+                        let tienePrecioEspecial = precioDelDia !== Number(this.propiedadActiva?.precio_noche);
+
+                        diasArray.push({
+                            dia: i,
+                            fecha: dateStr,
+                            esMesActual: true,
+                            reserva: reservaActual || null,
+                            esInicio: reservaActual && dateStr === reservaActual.check_in,
+                            esFin: reservaActual && dateStr === reservaActual.check_out,
+                            precio: precioDelDia,
+                            tienePrecioEspecial: tienePrecioEspecial
+                        });
+                    }
+                    this.diasCalendario = diasArray;
+                },
+
+                obtenerClaseCajaCalendario(diaObj) {
+                    if (!diaObj.esMesActual) return 'bg-gray-50/50';
+                    if (!diaObj.reserva) {
+                        // Si no hay reserva pero tiene precio especial, poner borde sutil dorado
+                        if (diaObj.tienePrecioEspecial) return 'bg-white hover:bg-gray-50 border border-gold/30 shadow-sm';
+                        return 'bg-white hover:bg-gray-50 border-transparent border-b border-r border-gray-100';
+                    }
+
+                    let base = 'shadow-inner cursor-pointer text-white ';
+                    let colorCode = '';
+                    if (diaObj.reserva.canal.includes('Airbnb')) colorCode = 'airbnb';
+                    else if (diaObj.reserva.canal.includes('Booking')) colorCode = 'booking';
+                    else colorCode = 'directo';
+
+                    base += `bg-${colorCode}/10 text-${colorCode} border-b border-gray-100 `;
+
+                    if (diaObj.esInicio) base += `border-l-4 border-l-${colorCode} rounded-l-xl `;
+                    else if (diaObj.esFin) base += `border-r-4 border-r-${colorCode} rounded-r-xl `;
+                    else base += `border-y border-y-${colorCode}/20 `;
+                    return base;
+                },
+
+                abrirModalNueva() {
+                    this.formReserva = { id: null, huesped: '', check_in: '', check_out: '', monto_total: '', canal: 'Directa', cantidad_huespedes: 1 };
+                    this.initFlatpickrReserva();
+                    this.modalReserva = true;
+                },
+
+                editarReserva(res) {
+                    this.formReserva = { ...res };
+                    this.initFlatpickrReserva([res.check_in, res.check_out]);
+                    this.modalReserva = true;
+                },
+
+                initFlatpickrReserva(defaultDates = []) {
+                    const that = this;
+                    setTimeout(() => {
+                        if (this.fpModal) this.fpModal.destroy();
+                        this.fpModal = flatpickr("#modal-calendar", {
+                            mode: "range",
+                            dateFormat: "Y-m-d",
+                            defaultDate: defaultDates,
+                            locale: "es",
+                            onChange: function (selectedDates, dateStr, instance) {
+                                if (selectedDates.length === 2) {
+                                    that.formReserva.check_in = instance.formatDate(selectedDates[0], "Y-m-d");
+                                    that.formReserva.check_out = instance.formatDate(selectedDates[1], "Y-m-d");
+                                }
+                            }
+                        });
+                    }, 50);
+                },
+
+                guardarReserva() {
+                    if (!this.formReserva.check_in || !this.formReserva.check_out) { alert("Selecciona fechas."); return; }
+                    if (!this.formReserva.id) {
+                        this.formReserva.id = Date.now();
+                        this.reservas.push({ ...this.formReserva });
+                    } else {
+                        let idx = this.reservas.findIndex(r => r.id === this.formReserva.id);
+                        if (idx > -1) this.reservas[idx] = { ...this.formReserva };
+                    }
+                    this.calcularStats();
+                    this.generarMesVisual();
+                    this.modalReserva = false;
+                },
+
+                formatearDinero(valor) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor || 0); },
+                formatearK(valor) { if (!valor) return ''; return '$' + (valor / 1000).toFixed(0) + 'K'; },
+                formatearFechaCorta(fechaStr) { const d = new Date(fechaStr + "T12:00:00"); return d.toLocaleDateString('es-CO', { month: 'short', day: '2-digit' }).replace('.', ''); },
+                obtenerIniciales(nombre) { if (!nombre) return 'GV'; return nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(); },
+                obtenerColorCanal(canal, tipo) {
+                    let c = 'directo';
+                    if (canal.includes('Airbnb')) c = 'airbnb';
+                    if (canal.includes('Booking')) c = 'booking';
+                    if (tipo === 'bg') return `bg-${c}`;
+                    if (tipo === 'badge') return `bg-${c}/10 text-${c} border-${c}/20`;
+                }
+            }
+        }
     </script>
 </body>
+
 </html>
