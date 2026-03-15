@@ -309,7 +309,7 @@
                             </div>
 
                             <div x-show="openWidgetGuests" @click.away="openWidgetGuests = false"
-                                class="absolute top-[110%] right-0 w-[320px] bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.28)] p-6 z-50 cursor-default text-left border border-gray-100"
+                                class="absolute top-[110%] right-0 w-[320px] bg-white rounded-2xl shadow-[0_8px_28px_rgba(0,0,0,0.28)] p-4 z-50 cursor-default text-left"
                                 style="display: none;" x-transition.opacity>
 
                                 <div class="flex justify-between items-center py-4 border-b border-gray-100">
@@ -319,7 +319,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="adults > 1 ? adults-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="adults <= 1">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -330,7 +330,7 @@
                                         <span x-text="adults"
                                             class="text-gray-800 w-4 text-center text-base font-medium">1</span>
                                         <button @click.stop="adults++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -347,7 +347,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="children > 0 ? children-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="children <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -358,7 +358,7 @@
                                         <span x-text="children"
                                             class="text-gray-800 w-4 text-center text-base font-medium">0</span>
                                         <button @click.stop="children++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -375,7 +375,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="infants > 0 ? infants-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="infants <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -386,7 +386,7 @@
                                         <span x-text="infants"
                                             class="text-gray-800 w-4 text-center text-base font-medium">0</span>
                                         <button @click.stop="infants++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -405,7 +405,7 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="pets > 0 ? pets-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:hover:border-gray-200 disabled:cursor-not-allowed transition-colors"
                                             :disabled="pets <= 0">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
@@ -416,7 +416,7 @@
                                         <span x-text="pets"
                                             class="text-gray-800 w-4 text-center text-base font-medium">0</span>
                                         <button @click.stop="pets++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-800 transition-colors">
                                             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
                                                 aria-hidden="true" role="presentation" focusable="false"
                                                 style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -426,16 +426,16 @@
                                     </div>
                                 </div>
 
-                                <div class="pt-2">
-                                    <p class="text-xs text-gray-500 leading-relaxed mb-4">
+                                <div class="pt-2 pb-2">
+                                    <p class="text-[13px] text-gray-500 font-medium leading-relaxed">
                                         Este alojamiento tiene una capacidad máxima de <span
                                             x-text="propiedad.capacidad_huespedes"></span> huéspedes, sin incluir bebés.
                                         Si vienes con más de 2 mascotas, avísale al anfitrión.
                                     </p>
-                                    <div class="flex justify-end">
-                                        <button @click.stop="openWidgetGuests = false"
-                                            class="font-bold text-gray-800 underline text-sm hover:text-black focus:outline-none">Cerrar</button>
-                                    </div>
+                                </div>
+                                <div class="flex justify-end pt-2">
+                                    <button @click.stop="openWidgetGuests = false"
+                                        class="font-bold text-gray-800 underline text-sm hover:text-black focus:outline-none">Cerrar</button>
                                 </div>
                             </div>
                         </div>
