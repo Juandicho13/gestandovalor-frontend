@@ -61,14 +61,14 @@
             <a href="empleado_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi
                 Panel</a>
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            <a href="login.html"
+            <button @click="cerrarSesion()"
                 class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 Salir
-            </a>
+            </button>
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
@@ -145,7 +145,7 @@
             <div class="space-y-6">
                 <h2 class="text-2xl font-extrabold text-navy mb-6">Agenda asignada</h2>
 
-                <div x-show="tareasPendientes.length === 0"
+                <div x-show="tareasPendientes.length === 0 && !cargando"
                     class="bg-white rounded-[30px] shadow-sm border border-gray-100 p-10 text-center">
                     <span class="text-4xl block mb-4">🎉</span>
                     <h3 class="text-xl font-bold text-navy">¡Estás al día!</h3>
@@ -158,13 +158,13 @@
                         <div class="px-6 py-3 flex items-center justify-between border-b" :class="{
                                 'bg-red-50 border-red-100': tarea.urgencia === 'Urgente',
                                 'bg-yellow-50 border-yellow-100': tarea.urgencia === 'Normal',
-                                'bg-gray-100 border-gray-200': tarea.urgencia === 'Flexible'
+                                'bg-gray-100 border-gray-200': (!tarea.urgencia || tarea.urgencia === 'Flexible')
                              }">
                             <span class="font-extrabold text-xs uppercase tracking-widest flex items-center gap-2"
                                 :class="{
                                     'text-danger': tarea.urgencia === 'Urgente',
                                     'text-warning': tarea.urgencia === 'Normal',
-                                    'text-gray-600': tarea.urgencia === 'Flexible'
+                                    'text-gray-600': (!tarea.urgencia || tarea.urgencia === 'Flexible')
                                   }">
                                 <span
                                     x-text="tarea.urgencia === 'Urgente' ? '🔥 Urgente' : (tarea.urgencia === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
@@ -555,8 +555,8 @@
         function appAseo() {
             return {
                 cargando: true,
-                empleadoId: localStorage.getItem('usuario_id') || null,
-                empleadoNombre: localStorage.getItem('usuario_nombre') || 'Equipo',
+                empleadoId: null,
+                empleadoNombre: 'Equipo',
                 iniciales: 'EA',
 
                 tareasPendientes: [],
@@ -575,24 +575,22 @@
                 azucar: 0, te: 0, cafe: 0, papel: 0, jabon_barra: 0, shampoo: 0, toallas_grandes: 0, toallas_pequenas: 0,
 
                 async initApp() {
-                    // Si el usuario no ha iniciado sesión, cargamos un dato de prueba visual
-                    if (!this.empleadoId) {
-                        this.empleadoNombre = "Ricardo";
-                        this.iniciales = "RP";
-                        this.tareasPendientes = [
-                            { id: '1', urgencia: 'Urgente', propiedad: { titulo: 'Apto 511', ciudad: 'Chía', cerradura_codigo: '1492 #' } },
-                            { id: '2', urgencia: 'Normal', propiedad: { titulo: 'Penthouse Bogotá', ciudad: 'Bogotá D.C.', cerradura_codigo: '8899 *' } },
-                            { id: '3', urgencia: 'Flexible', propiedad: { titulo: 'Torre A', ciudad: 'Chía', cerradura_codigo: '1122' } }
-                        ];
-                        this.cargando = false;
-                        return;
+                    // LEER AL USUARIO DESDE EL LOCALSTORAGE DE FORMA CORRECTA
+                    const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
+                    if (usuarioGuardado) {
+                        const usuario = JSON.parse(usuarioGuardado);
+                        this.empleadoId = usuario.id;
+                        this.empleadoNombre = usuario.nombre;
+
+                        // Establecer iniciales
+                        const partes = this.empleadoNombre.split(' ');
+                        this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
+
+                        await this.cargarTareasDesdeBD();
+                    } else {
+                        // Si por algún motivo entra sin login, lo mandamos afuera
+                        window.location.href = 'login.html';
                     }
-
-                    // Establecer iniciales
-                    const partes = this.empleadoNombre.split(' ');
-                    this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
-
-                    await this.cargarTareasDesdeBD();
                 },
 
                 async cargarTareasDesdeBD() {
@@ -629,36 +627,33 @@
                 async finalizarAseo() {
                     clearInterval(this.intervalo);
 
-                    // Si estamos con el usuario real, mandamos el cierre al backend incluyendo el tiempo
-                    if (this.empleadoId !== 'ID_DE_PRUEBA' && this.tareaActiva.id) {
-                        this.cargando = true;
-                        try {
-                            await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    estado: 'Completada',
-                                    tiempo_segundos: this.segundos, // El tiempo se envía aquí
-                                    completed_at: new Date().toISOString()
-                                })
-                            });
-                            await this.cargarTareasDesdeBD();
-                        } catch (e) {
-                            console.error(e);
-                        } finally {
-                            this.cargando = false;
-                        }
-                    } else {
-                        // Simulación visual si es prueba
-                        this.tareasPendientes = this.tareasPendientes.filter(t => t.id !== this.tareaActiva.id);
-                        this.tareasCompletadas++;
+                    this.cargando = true;
+                    try {
+                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                estado: 'Completada',
+                                tiempo_segundos: this.segundos,
+                                completed_at: new Date().toISOString()
+                            })
+                        });
+                        await this.cargarTareasDesdeBD();
+                    } catch (e) {
+                        console.error(e);
+                    } finally {
+                        this.cargando = false;
                     }
 
-                    // ✨ NUEVA ALERTA: No muestra el tiempo, solo confirmación ✨
                     alert(`¡Aseo finalizado exitosamente!\nReporte e inventario enviados al Ama de Llaves.`);
                     this.aseoActivo = false;
                     this.tareaActiva = null;
                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                cerrarSesion() {
+                    localStorage.removeItem('gv_usuario_actual');
+                    window.location.href = 'login.html';
                 }
             }
         }
