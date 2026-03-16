@@ -363,15 +363,28 @@
                                             <td class="p-6 text-right font-bold text-navy"
                                                 x-text="formatearDinero(res.monto_total)"></td>
                                             <td class="p-6 text-center">
-                                                <button @click="editarReserva(res)"
-                                                    class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                    </svg>
-                                                </button>
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <button @click="editarReserva(res)"
+                                                        class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-gold hover:text-gold text-gray-500 rounded-xl transition-all"
+                                                        title="Editar">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                        </svg>
+                                                    </button>
+                                                    <button @click="borrarReservaDirecto(res.id)"
+                                                        class="p-2.5 bg-white border border-gray-200 shadow-sm hover:border-red-500 hover:text-red-500 text-gray-500 rounded-xl transition-all"
+                                                        title="Eliminar">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </template>
@@ -472,13 +485,6 @@
                         </p>
                     </div>
                 </div>
-                <button type="button" @click="eliminarReserva()" x-show="formReserva.id"
-                    class="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors mr-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
                 <button type="button" @click="modalReserva = false"
                     class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2.5 rounded-full transition-colors focus:outline-none">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -626,7 +632,6 @@
                 propiedades: [],
                 propiedadActiva: null,
 
-                // ✨ AHORA CONECTADAS AL SERVIDOR ✨
                 reservas: [],
                 tarifasEspeciales: [],
 
@@ -674,7 +679,7 @@
                     this.rangoSeleccionado = [];
 
                     try {
-                        // ✨ LLAMADOS REALES AL BACKEND (RENDER) ✨
+                        // ✨ LLAMADOS 100% REALES AL BACKEND ✨
                         const [resReservas, resTarifas] = await Promise.all([
                             fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${prop.id}`),
                             fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${prop.id}`)
@@ -812,7 +817,6 @@
                 obtenerPrecioPorDia(fechaStr) {
                     if (!fechaStr) return 0;
 
-                    // Asegurar comparación de fechas correcta ignorando horas
                     const f = new Date(fechaStr + "T12:00:00").getTime();
 
                     let tarifaEspecial = this.tarifasEspeciales.find(t => {
@@ -828,7 +832,6 @@
                 calcularStats() {
                     let totalDinero = 0; let totalNoches = 0; let totalPax = 0;
 
-                    // Solo calculamos del mes actual
                     const year = this.fechaCalendario.getFullYear();
                     const month = this.fechaCalendario.getMonth();
                     const iniMes = new Date(year, month, 1).getTime();
@@ -836,7 +839,6 @@
 
                     this.reservas.forEach(r => {
                         const rIn = new Date(r.check_in).getTime();
-                        // Si la reserva toca el mes
                         if (rIn >= iniMes && rIn <= finMes) {
                             totalDinero += Number(r.monto_total);
                             totalPax += Number(r.cantidad_huespedes);
@@ -874,7 +876,6 @@
                     for (let i = 1; i <= diasEnMes; i++) {
                         let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
 
-                        // Validar con fechas reales para evitar husos horarios
                         const dStrTime = new Date(dateStr + "T12:00:00").getTime();
 
                         let reservaActual = this.reservas.find(r => {
@@ -944,7 +945,6 @@
 
                 editarReserva(res) {
                     this.formReserva = { ...res };
-                    // Parse fechas
                     this.formReserva.check_in = res.check_in.split('T')[0];
                     this.formReserva.check_out = res.check_out.split('T')[0];
 
@@ -971,6 +971,7 @@
                     }, 50);
                 },
 
+                // ✨ LÓGICA REFINADA Y CONECTADA PARA GUARDAR ✨
                 async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
                     this.cargando = true;
@@ -990,7 +991,7 @@
 
                     if (this.formReserva.id) {
                         url += `/${this.formReserva.id}`;
-                        method = 'PATCH';
+                        method = 'PATCH'; // Suponiendo que el backend soporta PATCH para editar
                     }
 
                     try {
@@ -1014,29 +1015,34 @@
                             this.generarMesVisual();
                             this.modalReserva = false;
                         } else {
-                            alert("Las fechas seleccionadas ya están ocupadas o hubo un error.");
+                            // ✨ MEJORA: LEER EL ERROR REAL DEL BACKEND ✨
+                            const errorData = await res.json();
+                            console.error("Backend error:", errorData);
+                            alert(`No se pudo guardar:\n${errorData.message || 'Las fechas seleccionadas ya están ocupadas.'}`);
                         }
                     } catch (e) {
                         console.error(e);
-                        alert("Error conectando con el servidor.");
+                        alert("Error conectando con el servidor. Revisa tu conexión a internet.");
                     } finally {
                         this.cargando = false;
                     }
                 },
 
-                async eliminarReserva() {
-                    if (!confirm("¿Estás seguro de borrar esta reserva?")) return;
+                // ✨ NUEVO BOTÓN BORRAR DIRECTO EN LA TABLA ✨
+                async borrarReservaDirecto(id) {
+                    if (!confirm("¿Estás seguro de borrar esta reserva permanentemente?")) return;
                     this.cargando = true;
                     try {
-                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/${this.formReserva.id}`, { method: 'DELETE' });
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/${id}`, { method: 'DELETE' });
                         if (res.ok) {
-                            this.reservas = this.reservas.filter(r => r.id !== this.formReserva.id);
+                            this.reservas = this.reservas.filter(r => r.id !== id);
                             this.calcularStats();
                             this.generarMesVisual();
-                            this.modalReserva = false;
+                        } else {
+                            alert("Error al borrar en el servidor.");
                         }
                     } catch (e) {
-                        alert("Error al borrar.");
+                        alert("Error de conexión al intentar borrar.");
                     } finally {
                         this.cargando = false;
                     }
@@ -1050,7 +1056,6 @@
                 formatearDinero(valor) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor || 0); },
                 formatearFechaCorta(fechaStr) {
                     const d = new Date(fechaStr);
-                    // Ajuste para evitar que el UTC le reste un día
                     const offsetDate = new Date(d.getTime() + Math.abs(d.getTimezoneOffset() * 60000));
                     return offsetDate.toLocaleDateString('es-CO', { month: 'short', day: '2-digit' }).replace('.', '');
                 },
