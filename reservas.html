@@ -895,6 +895,7 @@
                     };
                     this.cerrarAccionRango();
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
+                    this.recalcularTotal(); // ✨ AQUI LA MAGIA PARA QUE SALGA EL PRECIO DESDE EL INICIO
                     this.modalReserva = true;
                 },
 
@@ -1061,7 +1062,6 @@
                     let numMascotas = Number(this.formReserva.cantidad_mascotas) || 0;
                     let petPrice = this.propiedadActiva.precio_mascota || 0;
 
-                    // Suma Noches + Extras + Mascotas
                     let d = new Date(d1);
                     for (let i = 0; i < diffDays; i++) {
                         let dStr = getLocalDateString(d);
@@ -1070,7 +1070,6 @@
                         d.setDate(d.getDate() + 1);
                     }
 
-                    // Sumar Aseo (Pago ÚNICO por estadía)
                     let aseoUnico = this.propiedadActiva.tarifa_aseo || 0;
                     subtotal += aseoUnico;
 
