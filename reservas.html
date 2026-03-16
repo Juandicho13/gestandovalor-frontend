@@ -254,67 +254,46 @@
                                             :class="diaObj.esMesActual ? 'text-navy' : 'text-gray-300'"
                                             x-text="diaObj.dia"></span>
 
-                                        <div class="absolute top-8 left-1 right-1 bottom-1 flex gap-1 z-10">
-
-                                            <div class="flex-1 flex flex-col items-start justify-end pb-1"
-                                                x-show="diaObj.resSalida" @click.stop="editarReserva(diaObj.resSalida)">
-                                                <div class="bg-white/90 shadow-sm rounded px-1 py-0.5 border-l-2 cursor-pointer hover:scale-105 transition-transform w-full"
-                                                    :class="obtenerColorCanal(diaObj.resSalida?.canal, 'border')">
-                                                    <p
-                                                        class="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none">
-                                                        Out</p>
-                                                    <p class="text-[10px] font-bold text-navy truncate"
-                                                        x-text="formatearHora(diaObj.resSalida?.check_out)"></p>
-                                                </div>
-                                            </div>
-
-                                            <div x-show="!diaObj.resSalida && diaObj.resLlegada" class="flex-1"></div>
-
-                                            <div class="flex-1 flex flex-col items-end justify-end pb-1"
-                                                x-show="diaObj.resLlegada"
-                                                @click.stop="editarReserva(diaObj.resLlegada)">
-                                                <div
-                                                    class="flex items-center gap-1 mb-1 w-full justify-end bg-white/60 rounded-full pr-1 shadow-sm cursor-pointer">
-                                                    <div class="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0"
-                                                        :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'bg')"
-                                                        x-text="obtenerIniciales(diaObj.resLlegada?.huesped_nombre)">
-                                                    </div>
-                                                    <span class="text-[9px] font-bold text-navy truncate"
-                                                        x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
-                                                </div>
-                                                <div class="bg-white/90 shadow-sm rounded px-1 py-0.5 border-r-2 cursor-pointer hover:scale-105 transition-transform text-right w-full"
-                                                    :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'border')">
-                                                    <p
-                                                        class="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none">
-                                                        In <span
-                                                            x-text="diaObj.resLlegada?.cantidad_huespedes + 'p'"></span>
-                                                    </p>
-                                                    <p class="text-[10px] font-bold text-navy truncate"
-                                                        x-text="formatearHora(diaObj.resLlegada?.check_in)"></p>
-                                                </div>
-                                            </div>
-
-                                            <div class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-transform"
-                                                x-show="diaObj.resLlena" @click.stop="editarReserva(diaObj.resLlena)">
-                                                <div class="bg-white/90 px-2 py-1.5 rounded-xl shadow-sm text-center border-b-2 max-w-[90%]"
-                                                    :class="obtenerColorCanal(diaObj.resLlena?.canal, 'border')">
-                                                    <div class="flex items-center justify-center gap-1 mb-0.5">
-                                                        <div class="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0"
-                                                            :class="obtenerColorCanal(diaObj.resLlena?.canal, 'bg')"
-                                                            x-text="obtenerIniciales(diaObj.resLlena?.huesped_nombre)">
-                                                        </div>
-                                                        <span
-                                                            class="text-[10px] font-bold text-navy truncate max-w-[60px]"
-                                                            x-text="diaObj.resLlena?.huesped_nombre.split(' ')[0]"></span>
-                                                    </div>
+                                        <div x-show="diaObj.resSalida" class="absolute bottom-1 left-1 w-[47%] z-10"
+                                            @click.stop="editarReserva(diaObj.resSalida)">
+                                            <div class="bg-white/95 px-1 py-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] border-l-[3px] overflow-hidden"
+                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'border')">
+                                                <span class="text-[8px] font-black text-gray-400 block leading-none">OUT
                                                     <span
-                                                        class="text-[9px] font-bold text-gray-500 uppercase tracking-widest"
-                                                        x-text="diaObj.resLlena?.cantidad_huespedes + ' Pax'"></span>
-                                                </div>
+                                                        x-text="formatearHora(diaObj.resSalida?.check_out)"></span></span>
+                                                <span class="text-[10px] font-bold text-navy block truncate"
+                                                    x-text="diaObj.resSalida?.huesped_nombre.split(' ')[0]"></span>
+                                                <span class="text-[9px] font-bold text-blue-600 block leading-none"
+                                                    x-text="diaObj.resSalida?.cantidad_huespedes + ' pax'"></span>
                                             </div>
-
                                         </div>
 
+                                        <div x-show="diaObj.resLlegada"
+                                            class="absolute bottom-1 right-1 w-[47%] z-10 text-right"
+                                            @click.stop="editarReserva(diaObj.resLlegada)">
+                                            <div class="bg-white/95 px-1 py-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] border-r-[3px] overflow-hidden"
+                                                :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'border')">
+                                                <span class="text-[8px] font-black text-gray-400 block leading-none">IN
+                                                    <span
+                                                        x-text="formatearHora(diaObj.resLlegada?.check_in)"></span></span>
+                                                <span class="text-[10px] font-bold text-navy block truncate"
+                                                    x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
+                                                <span class="text-[9px] font-bold text-blue-600 block leading-none"
+                                                    x-text="diaObj.resLlegada?.cantidad_huespedes + ' pax'"></span>
+                                            </div>
+                                        </div>
+
+                                        <div x-show="diaObj.resLlena"
+                                            class="absolute bottom-1 left-2 right-2 z-20 text-center"
+                                            @click.stop="editarReserva(diaObj.resLlena)">
+                                            <div class="bg-white/95 px-2 py-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] border-b-[3px]"
+                                                :class="obtenerColorCanal(diaObj.resLlena?.canal, 'border')">
+                                                <span class="text-[11px] font-bold text-navy block truncate"
+                                                    x-text="diaObj.resLlena?.huesped_nombre"></span>
+                                                <span class="text-[10px] font-bold text-blue-600 block leading-none"
+                                                    x-text="diaObj.resLlena?.cantidad_huespedes + ' pax'"></span>
+                                            </div>
+                                        </div>
                                         <span
                                             class="absolute bottom-1 left-1 right-1 text-center text-[10px] font-bold pointer-events-none"
                                             x-show="!diaObj.resLlena && !diaObj.resLlegada && !diaObj.resSalida && diaObj.esMesActual"
@@ -333,7 +312,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ingresos del Mes
                                 </p>
@@ -347,7 +327,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Noches Vendidas</p>
                                 <h3 class="text-2xl font-extrabold text-navy" x-text="stats.noches"></h3>
@@ -359,7 +340,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Huéspedes</p>
                                 <h3 class="text-2xl font-extrabold text-navy" x-text="stats.huespedes"></h3>
@@ -706,6 +688,15 @@
             });
         });
 
+        // Utilidad para extraer la fecha local de forma segura y evitar que los dias se corran por zona horaria
+        function getLocalDateString(isoString) {
+            const d = new Date(isoString);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function reservasApp() {
             return {
                 mobileMenuOpen: false,
@@ -772,7 +763,7 @@
                         else this.tarifasEspeciales = [];
 
                         this.generarMesVisual();
-                        this.calcularStats(); // Se calcula visualmente basándose en el mes actual
+                        this.calcularStats();
                     } catch (e) {
                         console.error("Error cargando datos", e);
                         this.reservas = [];
@@ -878,23 +869,28 @@
                     return tarifaEspecial ? tarifaEspecial.precio : (this.propiedadActiva?.precio_noche || 0);
                 },
 
-                // ✨ CÁLCULO DE NOCHES VENDIDAS CORRECTO ✨
+                // ✨ REGLA 1: CALCULO DE NOCHES VENDIDAS ESTRICTO Y MATEMATICO ✨
                 calcularStats() {
                     let totalDinero = 0; let totalNoches = 0; let totalPax = 0;
-                    let reservasVistas = new Set();
+                    const mesVisual = this.fechaCalendario.getMonth();
+                    const anioVisual = this.fechaCalendario.getFullYear();
 
-                    // Solo sumamos lo que se dibuja en el calendario este mes
-                    this.diasCalendario.forEach(dia => {
-                        if (dia.esMesActual) {
-                            if (dia.resLlena) { totalNoches++; reservasVistas.add(dia.resLlena); }
-                            if (dia.resLlegada) { totalNoches++; reservasVistas.add(dia.resLlegada); }
-                            if (dia.resSalida && !dia.resLlegada) { reservasVistas.add(dia.resSalida); }
+                    this.reservas.forEach(r => {
+                        const dIn = new Date(r.check_in);
+                        const dOut = new Date(r.check_out);
+
+                        if (dIn.getMonth() === mesVisual && dIn.getFullYear() === anioVisual) {
+                            totalDinero += Number(r.monto_total);
+                            totalPax += Number(r.cantidad_huespedes);
+
+                            // Matemática de hotel: Diferencia de días
+                            let diffTime = Math.abs(dOut.getTime() - dIn.getTime());
+                            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                            // Asegurar la regla: mínimo 1 noche
+                            if (diffDays < 1) diffDays = 1;
+                            totalNoches += diffDays;
                         }
-                    });
-
-                    reservasVistas.forEach(r => {
-                        totalDinero += Number(r.monto_total);
-                        totalPax += Number(r.cantidad_huespedes);
                     });
 
                     this.stats = { ingresos: totalDinero, noches: totalNoches, huespedes: totalPax };
@@ -906,7 +902,6 @@
                     this.calcularStats();
                 },
 
-                // ✨ LOGICA DE CALENDARIO DIVIDIDO ✨
                 generarMesVisual() {
                     const year = this.fechaCalendario.getFullYear();
                     const month = this.fechaCalendario.getMonth();
@@ -931,12 +926,18 @@
                         let resLlena = null;
 
                         this.reservas.forEach(r => {
-                            const rInStr = new Date(r.check_in).toLocaleDateString('sv-SE');
-                            const rOutStr = new Date(r.check_out).toLocaleDateString('sv-SE');
+                            const rInStr = getLocalDateString(r.check_in);
+                            const rOutStr = getLocalDateString(r.check_out);
 
-                            if (dateStr === rInStr) resLlegada = r;
-                            if (dateStr === rOutStr) resSalida = r;
-                            if (dateStr > rInStr && dateStr < rOutStr) resLlena = r;
+                            if (dateStr === rInStr && dateStr === rOutStr) {
+                                resLlegada = r; resSalida = r;
+                            } else if (dateStr === rInStr) {
+                                resLlegada = r;
+                            } else if (dateStr === rOutStr) {
+                                resSalida = r;
+                            } else if (dateStr > rInStr && dateStr < rOutStr) {
+                                resLlena = r;
+                            }
                         });
 
                         let precioDelDia = this.obtenerPrecioPorDia(dateStr);
@@ -961,17 +962,18 @@
                     this.modalReserva = true;
                 },
 
+                // ✨ REGLA 3: LEER HORAS CORRECTAMENTE ✨
                 editarReserva(res) {
                     this.formReserva = { ...res };
 
-                    const inD = new Date(res.check_in);
-                    const outD = new Date(res.check_out);
+                    const dIn = new Date(res.check_in);
+                    const dOut = new Date(res.check_out);
 
-                    this.formReserva.check_in = inD.toLocaleDateString('sv-SE');
-                    this.formReserva.hora_llegada = inD.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+                    this.formReserva.check_in = getLocalDateString(res.check_in);
+                    this.formReserva.hora_llegada = dIn.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-                    this.formReserva.check_out = outD.toLocaleDateString('sv-SE');
-                    this.formReserva.hora_salida = outD.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+                    this.formReserva.check_out = getLocalDateString(res.check_out);
+                    this.formReserva.hora_salida = dOut.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
 
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
                     this.modalReserva = true;
@@ -996,16 +998,19 @@
                     }, 50);
                 },
 
+                // ✨ REGLA 3: GUARDAR HORA ENSAMBLADA ✨
                 async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
                     this.cargando = true;
 
-                    // Unimos las fechas seleccionadas con las horas seleccionadas en formato ISO
+                    const dateInString = this.formReserva.check_in + "T" + this.formReserva.hora_llegada + ":00";
+                    const dateOutString = this.formReserva.check_out + "T" + this.formReserva.hora_salida + ":00";
+
                     const payload = {
                         propiedad_id: this.propiedadActiva.id,
                         huesped_nombre: this.formReserva.huesped_nombre,
-                        check_in: new Date(`${this.formReserva.check_in}T${this.formReserva.hora_llegada}:00`).toISOString(),
-                        check_out: new Date(`${this.formReserva.check_out}T${this.formReserva.hora_salida}:00`).toISOString(),
+                        check_in: new Date(dateInString).toISOString(),
+                        check_out: new Date(dateOutString).toISOString(),
                         cantidad_huespedes: Number(this.formReserva.cantidad_huespedes),
                         monto_total: Number(this.formReserva.monto_total),
                         canal: this.formReserva.canal
@@ -1079,7 +1084,7 @@
                     if (tipo === 'bg') return `bg-${c}`;
                     if (tipo === 'text') return `text-${c}`;
                     if (tipo === 'border') return `border-${c}`;
-                    if (tipo === 'badge') return `bg-${c}/10 text-${c} border-${c}/20`;
+                    if (tipo === 'badge') return `bg-${c}/20 border-${c}/30`;
                     return '';
                 }
             }
