@@ -69,10 +69,10 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="reservasApp()" x-init="initApp()"
-    :class="(modalReserva || modalAccionRango) ? 'overflow-hidden' : ''">
+    :class="(modalReserva || modalAccionRango || modalConfigTarifas) ? 'overflow-hidden' : ''">
 
     <div
-        class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/10 border-airbnb/20 bg-airbnb/20 bg-booking text-booking border-booking bg-booking/10 border-booking/20 bg-booking/20 bg-directo text-directo border-directo bg-directo/10 border-directo/20 bg-directo/20">
+        class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/20 border-airbnb/30 bg-booking text-booking border-booking bg-booking/20 border-booking/30 bg-directo text-directo border-directo bg-directo/20 border-directo/30">
     </div>
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
@@ -127,28 +127,26 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Sincronizar
+                        </svg> Sincronizar
                     </button>
 
-                    <div class="flex items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1.5 pl-5 shadow-sm"
-                        x-show="propiedadActiva" style="display: none;">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-white/80 mr-3">Tarifa
-                            Base</span>
-                        <div class="bg-white rounded-full flex items-center px-4 py-2">
-                            <span class="text-gray-400 font-bold mr-1">$</span>
-                            <input type="number" x-model="precioBaseTemporal" @change="actualizarPrecioBase()"
-                                class="w-24 outline-none font-extrabold text-navy text-sm bg-transparent"
-                                title="Modificar tarifa base">
-                        </div>
-                    </div>
+                    <button @click="abrirModalConfigTarifas()" x-show="propiedadActiva" style="display: none;"
+                        class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Configurar Tarifas
+                    </button>
 
                     <button @click="abrirModalNueva()"
                         class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Añadir Reserva
+                        </svg> Añadir Reserva
                     </button>
                 </div>
             </div>
@@ -201,13 +199,11 @@
                                         </svg></button>
                                 </div>
                             </div>
-
                             <div class="flex items-center gap-4">
                                 <button x-show="rangoSeleccionado.length > 0"
                                     @click="rangoSeleccionado = []; generarMesVisual()" x-transition
                                     class="text-xs font-bold text-danger underline hover:text-red-600 transition-colors">Cancelar
                                     selección</button>
-
                                 <div
                                     class="flex gap-5 text-xs font-bold text-gray-500 bg-gray-50/80 backdrop-blur-sm p-3 px-5 rounded-xl border border-gray-100 shadow-inner">
                                     <span class="flex items-center gap-2">
@@ -226,7 +222,6 @@
                         <div class="w-full overflow-x-auto pb-2 relative z-10 custom-scroll">
                             <div
                                 class="min-w-[1000px] border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
-
                                 <template x-for="dia in ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']">
                                     <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest"
                                         x-text="dia"></div>
@@ -244,11 +239,9 @@
                                         <div x-show="diaObj.resSalida"
                                             class="absolute top-0 left-0 bottom-0 w-[50%] z-0"
                                             :class="obtenerColorCanal(diaObj.resSalida?.canal, 'band')"></div>
-
                                         <div x-show="diaObj.resLlegada"
                                             class="absolute top-0 right-0 bottom-0 w-[50%] z-0"
                                             :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'band')"></div>
-
                                         <div x-show="diaObj.resLlena" class="absolute inset-0 z-0"
                                             :class="obtenerColorCanal(diaObj.resLlena?.canal, 'band')"></div>
 
@@ -257,36 +250,26 @@
                                             x-text="diaObj.dia"></span>
 
                                         <div x-show="diaObj.resSalida"
-                                            class="absolute bottom-1 left-1 w-[48%] z-10 text-left cursor-pointer p-1"
+                                            class="absolute bottom-2 left-2 w-[45%] z-10 text-left cursor-pointer"
                                             @click.stop="editarReserva(diaObj.resSalida)">
-                                            <span class="font-bold text-xs truncate block leading-tight"
-                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
-                                                x-text="diaObj.resSalida?.huesped_nombre.split(' ')[0]"></span>
-                                            <span
-                                                class="font-black text-[9px] uppercase block leading-none opacity-50 mt-1"
-                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')">Check-out</span>
-                                            <span class="font-black text-[10px] block leading-none opacity-80 mt-0.5"
+                                            <span class="font-black text-xs block leading-none opacity-80 truncate"
                                                 :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
                                                 x-text="formatearHora(diaObj.resSalida?.check_out)"></span>
                                         </div>
 
                                         <div x-show="diaObj.resLlegada"
-                                            class="absolute bottom-1 right-1 w-[48%] z-10 text-right cursor-pointer p-1"
+                                            class="absolute bottom-2 right-2 w-[45%] z-10 text-right cursor-pointer"
                                             @click.stop="editarReserva(diaObj.resLlegada)">
-                                            <span class="font-bold text-xs truncate block leading-tight"
+                                            <span class="font-bold text-sm truncate block leading-none mb-1"
                                                 :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
                                                 x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
-                                            <span
-                                                class="font-black text-[9px] uppercase block leading-none opacity-50 mt-1"
-                                                :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')">Check-in</span>
-                                            <span class="font-black text-[10px] block leading-none opacity-80 mt-0.5"
+                                            <span class="font-black text-xs block leading-none opacity-80 truncate"
                                                 :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
                                                 x-text="formatearHora(diaObj.resLlegada?.check_in)"></span>
                                         </div>
 
                                         <div x-show="diaObj.resLlena" class="absolute inset-0 z-20 cursor-pointer"
-                                            @click.stop="editarReserva(diaObj.resLlena)">
-                                        </div>
+                                            @click.stop="editarReserva(diaObj.resLlena)"></div>
 
                                         <span
                                             class="absolute bottom-2 left-0 right-0 text-center text-[11px] font-bold pointer-events-none"
@@ -306,8 +289,7 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ingresos del Mes
                                 </p>
@@ -321,8 +303,7 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Noches Vendidas</p>
                                 <h3 class="text-2xl font-extrabold text-navy" x-text="stats.noches"></h3>
@@ -334,8 +315,7 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </div>
+                                </svg></div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Huéspedes</p>
                                 <h3 class="text-2xl font-extrabold text-navy" x-text="stats.huespedes"></h3>
@@ -455,48 +435,130 @@
         <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-sm relative z-10 overflow-hidden transform transition-all p-6"
             x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 scale-95"
             x-transition:enter-end="opacity-100 translate-y-0 scale-100">
-
             <div class="text-center mb-6">
                 <div class="w-12 h-12 bg-gray-50 text-navy rounded-full flex items-center justify-center mx-auto mb-3">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                </div>
+                    </svg></div>
                 <h3 class="text-xl font-extrabold text-navy">Fechas Seleccionadas</h3>
                 <p class="text-xs text-gray-500 mt-1 font-bold bg-gray-100 inline-block px-3 py-1 rounded-full"
                     x-text="textoRangoTarifa()"></p>
             </div>
-
             <div x-show="vistaAccionRango === 'opciones'" class="space-y-3">
                 <button @click="vistaAccionRango = 'tarifa'"
-                    class="w-full bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 text-gold font-bold py-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-full bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 text-gold font-bold py-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg> Modificar Tarifa
-                </button>
+                    </svg> Modificar Tarifa</button>
                 <button @click="abrirReservaDesdeRango()"
-                    class="w-full bg-navy hover:bg-blue-900 text-white font-bold py-4 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-full bg-navy hover:bg-blue-900 text-white font-bold py-4 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg> Añadir Reserva
-                </button>
+                    </svg> Añadir Reserva</button>
                 <button @click="cerrarAccionRango()"
                     class="w-full text-gray-500 font-bold py-3 hover:text-navy transition-colors text-sm mt-2">Cancelar</button>
             </div>
-
             <form x-show="vistaAccionRango === 'tarifa'" @submit.prevent="guardarTarifaRapida()" style="display: none;">
-                <div class="relative mb-6">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
-                    <input type="number" x-model="precioEspecialTemporal" required
+                <div class="relative mb-6"><span
+                        class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span><input
+                        type="number" x-model="precioEspecialTemporal" required
                         class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl pl-8 pr-4 py-4 outline-none focus:border-gold focus:bg-white text-2xl text-navy font-black text-center transition-colors shadow-inner">
                 </div>
-                <div class="flex gap-3">
-                    <button type="button" @click="vistaAccionRango = 'opciones'"
-                        class="w-1/2 bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors">Volver</button>
-                    <button type="submit"
+                <div class="flex gap-3"><button type="button" @click="vistaAccionRango = 'opciones'"
+                        class="w-1/2 bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors">Volver</button><button
+                        type="submit"
                         class="w-1/2 bg-navy text-white font-bold py-3.5 rounded-xl hover:bg-blue-900 transition-colors shadow-lg">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div x-show="modalConfigTarifas" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm transition-opacity" @click="modalConfigTarifas = false"
+            x-transition.opacity></div>
+        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-lg relative z-10 overflow-y-auto max-h-[90vh] custom-scroll transform transition-all p-8 sm:p-10"
+            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+            x-transition:leave-end="opacity-0 translate-y-8 scale-95">
+
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-14 h-14 bg-gray-50 text-gray-500 rounded-full flex items-center justify-center shrink-0 shadow-sm border border-gray-200">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-navy">Precios por Defecto</h3>
+                        <p class="text-xs text-gray-500 font-medium mt-1">Configura las reglas de cobro base.</p>
+                    </div>
+                </div>
+                <button type="button" @click="modalConfigTarifas = false"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2.5 rounded-full transition-colors focus:outline-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form @submit.prevent="guardarConfigTarifas()">
+                <div class="space-y-5">
+                    <div>
+                        <label
+                            class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Tarifa
+                            Base por Noche</label>
+                        <div class="relative group">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors font-black">$</span>
+                            <input type="number" x-model="formTarifas.precio_noche" required
+                                class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-8 pr-4 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold transition-colors shadow-sm">
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-extrabold text-blue-500 uppercase tracking-widest mb-1.5 ml-1">Huésped
+                                    Extra ($)</label>
+                                <input type="number" x-model="formTarifas.precio_huesped_extra"
+                                    class="w-full bg-white border border-blue-100 rounded-xl px-4 py-2.5 outline-none focus:border-blue-300 text-navy font-bold transition-colors shadow-sm"
+                                    placeholder="0">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-extrabold text-blue-500 uppercase tracking-widest mb-1.5 ml-1">A
+                                    partir de (Pax)</label>
+                                <input type="number" min="1" x-model="formTarifas.huespedes_base"
+                                    class="w-full bg-white border border-blue-100 rounded-xl px-4 py-2.5 outline-none focus:border-blue-300 text-navy font-bold transition-colors shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-4">
+                        <label
+                            class="block text-[10px] font-extrabold text-orange-500 uppercase tracking-widest mb-1.5 ml-1">Tarifa
+                            Mascota Única ($)</label>
+                        <input type="number" x-model="formTarifas.precio_mascota"
+                            class="w-full bg-white border border-orange-100 rounded-xl px-4 py-2.5 outline-none focus:border-orange-300 text-navy font-bold transition-colors shadow-sm"
+                            placeholder="0">
+                    </div>
+                </div>
+
+                <div class="pt-6 mt-4 border-t border-gray-100 flex gap-4">
+                    <button type="submit"
+                        class="w-full bg-navy text-white font-extrabold py-4 rounded-full hover:bg-blue-900 transition-transform active:scale-95 shadow-lg">Guardar
+                        Configuración</button>
                 </div>
             </form>
         </div>
@@ -591,66 +653,40 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="col-span-1">
                             <label
-                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Huéspedes
-                                (Pax)</label>
+                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Pax</label>
                             <div class="relative group">
                                 <span
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors"><svg
-                                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors"><svg
+                                        class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg></span>
-                                <input type="number" min="1" x-model="formReserva.cantidad_huespedes" required
-                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold transition-colors shadow-sm">
+                                <input type="number" min="1" x-model="formReserva.cantidad_huespedes"
+                                    @input="recalcularTotal()" required
+                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-9 pr-2 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold transition-colors shadow-sm">
                             </div>
                         </div>
-
-                        <div>
+                        <div class="col-span-1">
                             <label
-                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Canal
-                                de Venta</label>
-                            <div class="relative group">
-                                <span
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors"><svg
-                                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                    </svg></span>
-                                <select x-model="formReserva.canal"
-                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold cursor-pointer transition-colors shadow-sm appearance-none">
-                                    <option value="Airbnb">Airbnb</option>
-                                    <option value="Booking.com">Booking.com</option>
-                                    <option value="Directa">Directa</option>
-                                </select>
-                                <span
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><svg
-                                        class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg></span>
-                            </div>
+                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">¿Mascota?</label>
+                            <select x-model="formReserva.trae_mascota" @change="recalcularTotal()"
+                                class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-3 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold cursor-pointer transition-colors shadow-sm appearance-none text-center">
+                                <option value="no">No</option>
+                                <option value="si">Sí</option>
+                            </select>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4 mt-2">
-                        <div>
+                        <div class="col-span-1">
                             <label
-                                class="block text-[10px] font-extrabold text-blue-500 uppercase tracking-widest mb-1.5 ml-1">+
-                                Tarifa Mascotas ($)</label>
-                            <input type="number" x-model="formReserva.monto_mascotas" @input="recalcularTotal()"
-                                class="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-2.5 outline-none focus:border-blue-300 focus:bg-white text-navy font-bold transition-colors shadow-sm"
-                                placeholder="0">
-                        </div>
-                        <div>
-                            <label
-                                class="block text-[10px] font-extrabold text-blue-500 uppercase tracking-widest mb-1.5 ml-1">+
-                                Huésped Extra ($)</label>
-                            <input type="number" x-model="formReserva.monto_extras" @input="recalcularTotal()"
-                                class="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-2.5 outline-none focus:border-blue-300 focus:bg-white text-navy font-bold transition-colors shadow-sm"
-                                placeholder="0">
+                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Canal</label>
+                            <select x-model="formReserva.canal"
+                                class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-2 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold cursor-pointer transition-colors shadow-sm appearance-none text-center">
+                                <option value="Airbnb">Airbnb</option>
+                                <option value="Booking.com">Booking.com</option>
+                                <option value="Directa">Directa</option>
+                            </select>
                         </div>
                     </div>
 
@@ -665,8 +701,8 @@
                                 placeholder="0">
                         </div>
                         <p class="text-[10px] text-gray-400 font-bold ml-2 mt-1"
-                            x-show="formReserva.check_in && formReserva.check_out">* Se calcula automáticamente según
-                            las noches y extras seleccionados.</p>
+                            x-show="formReserva.check_in && formReserva.check_out">* Autocalculado según configuración
+                            de tarifas.</p>
                     </div>
                 </div>
 
@@ -713,33 +749,31 @@
 
         function reservasApp() {
             return {
-                mobileMenuOpen: false,
                 cargando: true,
-
                 propiedades: [],
                 propiedadActiva: null,
                 reservas: [],
                 tarifasEspeciales: [],
 
-                precioBaseTemporal: 0,
+                fechaCalendario: new Date(),
+                mesActualTexto: '',
+                diasCalendario: [],
                 rangoSeleccionado: [],
 
                 modalAccionRango: false,
                 vistaAccionRango: 'opciones',
                 precioEspecialTemporal: '',
 
-                fechaCalendario: new Date(),
-                mesActualTexto: '',
-                diasCalendario: [],
+                // ✨ NUEVO ESTADO: Config Tarifas ✨
+                modalConfigTarifas: false,
+                formTarifas: { precio_noche: 0, huespedes_base: 1, precio_huesped_extra: 0, precio_mascota: 0 },
 
                 modalReserva: false,
                 fpModal: null,
-
-                // Añadí variables para el calculo automático
                 formReserva: {
-                    id: null, huesped_nombre: '', check_in: '', check_out: '', hora_llegada: '15:00', hora_salida: '11:00',
-                    monto_total: '', canal: 'Directa', cantidad_huespedes: 1,
-                    monto_mascotas: '', monto_extras: ''
+                    id: null, huesped_nombre: '', check_in: '', check_out: '',
+                    hora_llegada: '15:00', hora_salida: '11:00', monto_total: '',
+                    canal: 'Directa', cantidad_huespedes: 1, trae_mascota: 'no'
                 },
 
                 stats: { ingresos: 0, noches: 0, huespedes: 0 },
@@ -750,22 +784,15 @@
                 },
 
                 async cargarPropiedades() {
-                    try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
-                        if (res.ok) {
-                            this.propiedades = await res.json();
-                            if (this.propiedades.length > 0) {
-                                await this.seleccionarPropiedad(this.propiedades[0]);
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Error al cargar propiedades", e);
+                    const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                    if (res.ok) {
+                        this.propiedades = await res.json();
+                        if (this.propiedades.length > 0) await this.seleccionarPropiedad(this.propiedades[0]);
                     }
                 },
 
                 async seleccionarPropiedad(prop) {
                     this.propiedadActiva = prop;
-                    this.precioBaseTemporal = prop.precio_noche;
                     this.cargando = true;
                     this.fechaCalendario = new Date();
                     this.rangoSeleccionado = [];
@@ -784,13 +811,7 @@
 
                         this.generarMesVisual();
                         this.calcularStats();
-                    } catch (e) {
-                        console.error("Error cargando datos", e);
-                        this.reservas = [];
-                        this.tarifasEspeciales = [];
-                    } finally {
-                        this.cargando = false;
-                    }
+                    } finally { this.cargando = false; }
                 },
 
                 async sincronizar() {
@@ -798,20 +819,41 @@
                     alert("Datos sincronizados.");
                 },
 
-                async actualizarPrecioBase() {
-                    if (this.precioBaseTemporal > 0 && this.propiedadActiva) {
-                        this.cargando = true;
-                        try {
-                            const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`, {
-                                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ precio_noche: Number(this.precioBaseTemporal) })
-                            });
-                            if (res.ok) {
-                                this.propiedadActiva.precio_noche = Number(this.precioBaseTemporal);
-                                this.generarMesVisual();
-                            }
-                        } catch (e) { alert("Error al actualizar la tarifa."); } finally { this.cargando = false; }
-                    }
+                // ✨ NUEVO: ABRIR MODAL CONFIGURACIÓN ✨
+                abrirModalConfigTarifas() {
+                    this.formTarifas = {
+                        precio_noche: this.propiedadActiva.precio_noche || 0,
+                        huespedes_base: this.propiedadActiva.huespedes_base || 1,
+                        precio_huesped_extra: this.propiedadActiva.precio_huesped_extra || 0,
+                        precio_mascota: this.propiedadActiva.precio_mascota || 0
+                    };
+                    this.modalConfigTarifas = true;
+                },
+
+                // ✨ NUEVO: GUARDAR CONFIGURACIÓN ✨
+                async guardarConfigTarifas() {
+                    this.cargando = true;
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`, {
+                            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                precio_noche: Number(this.formTarifas.precio_noche),
+                                huespedes_base: Number(this.formTarifas.huespedes_base),
+                                precio_huesped_extra: Number(this.formTarifas.precio_huesped_extra),
+                                precio_mascota: Number(this.formTarifas.precio_mascota)
+                            })
+                        });
+                        if (res.ok) {
+                            this.propiedadActiva.precio_noche = Number(this.formTarifas.precio_noche);
+                            this.propiedadActiva.huespedes_base = Number(this.formTarifas.huespedes_base);
+                            this.propiedadActiva.precio_huesped_extra = Number(this.formTarifas.precio_huesped_extra);
+                            this.propiedadActiva.precio_mascota = Number(this.formTarifas.precio_mascota);
+                            this.generarMesVisual();
+                            this.modalConfigTarifas = false;
+                        } else {
+                            alert("Asegúrate de haber agregado las 3 columnas en la Base de Datos como indicó Gemini.");
+                        }
+                    } catch (e) { alert("Error de conexión"); } finally { this.cargando = false; }
                 },
 
                 seleccionarRangoTarifa(fecha) {
@@ -831,11 +873,8 @@
 
                 abrirReservaDesdeRango() {
                     this.formReserva = {
-                        id: null, huesped_nombre: '',
-                        check_in: this.rangoSeleccionado[0], check_out: this.rangoSeleccionado[1],
-                        hora_llegada: '15:00', hora_salida: '11:00',
-                        monto_total: '', canal: 'Directa', cantidad_huespedes: 1,
-                        monto_mascotas: '', monto_extras: ''
+                        id: null, huesped_nombre: '', check_in: this.rangoSeleccionado[0], check_out: this.rangoSeleccionado[1],
+                        hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, trae_mascota: 'no'
                     };
                     this.cerrarAccionRango();
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
@@ -938,36 +977,24 @@
                     for (let i = 1; i <= diasEnMes; i++) {
                         let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
 
-                        let resLlegada = null;
-                        let resSalida = null;
-                        let resLlena = null;
+                        let resLlegada = null; let resSalida = null; let resLlena = null;
 
                         this.reservas.forEach(r => {
                             const rInStr = getLocalDateString(r.check_in);
                             const rOutStr = getLocalDateString(r.check_out);
 
-                            if (dateStr === rInStr && dateStr === rOutStr) {
-                                resLlegada = r; resSalida = r;
-                            } else if (dateStr === rInStr) {
-                                resLlegada = r;
-                            } else if (dateStr === rOutStr) {
-                                resSalida = r;
-                            } else if (dateStr > rInStr && dateStr < rOutStr) {
-                                resLlena = r;
-                            }
+                            if (dateStr === rInStr && dateStr === rOutStr) { resLlegada = r; resSalida = r; }
+                            else if (dateStr === rInStr) resLlegada = r;
+                            else if (dateStr === rOutStr) resSalida = r;
+                            else if (dateStr > rInStr && dateStr < rOutStr) resLlena = r;
                         });
 
                         let precioDelDia = this.obtenerPrecioPorDia(dateStr);
 
                         diasArray.push({
-                            dia: i,
-                            fecha: dateStr,
-                            esMesActual: true,
-                            resLlena: resLlena,
-                            resLlegada: resLlegada,
-                            resSalida: resSalida,
-                            precio: precioDelDia,
-                            tienePrecioEspecial: precioDelDia !== Number(this.propiedadActiva?.precio_noche)
+                            dia: i, fecha: dateStr, esMesActual: true,
+                            resLlena: resLlena, resLlegada: resLlegada, resSalida: resSalida,
+                            precio: precioDelDia, tienePrecioEspecial: precioDelDia !== Number(this.propiedadActiva?.precio_noche)
                         });
                     }
                     this.diasCalendario = diasArray;
@@ -977,14 +1004,14 @@
                     this.formReserva = {
                         id: null, huesped_nombre: '', check_in: '', check_out: '',
                         hora_llegada: '15:00', hora_salida: '11:00', monto_total: '',
-                        canal: 'Directa', cantidad_huespedes: 1, monto_mascotas: '', monto_extras: ''
+                        canal: 'Directa', cantidad_huespedes: 1, trae_mascota: 'no'
                     };
                     this.initFlatpickrReserva();
                     this.modalReserva = true;
                 },
 
                 editarReserva(res) {
-                    this.formReserva = { ...res, monto_mascotas: '', monto_extras: '' };
+                    this.formReserva = { ...res, trae_mascota: 'no' };
 
                     const dIn = new Date(res.check_in);
                     const dOut = new Date(res.check_out);
@@ -1007,23 +1034,27 @@
                     let d1 = new Date(this.formReserva.check_in + "T12:00:00");
                     let d2 = new Date(this.formReserva.check_out + "T12:00:00");
 
-                    // Asegurar minimo 1 noche
                     let diffDays = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
                     if (diffDays < 1) diffDays = 1;
 
-                    // Sumar el precio de cada noche
+                    let baseGuests = this.propiedadActiva.huespedes_base || 1;
+                    let extraPrice = this.propiedadActiva.precio_huesped_extra || 0;
+                    let pax = Number(this.formReserva.cantidad_huespedes) || 1;
+                    let extraPaxCount = pax > baseGuests ? pax - baseGuests : 0;
+
                     let d = new Date(d1);
                     for (let i = 0; i < diffDays; i++) {
                         let dStr = getLocalDateString(d);
-                        subtotal += this.obtenerPrecioPorDia(dStr);
+                        let diaBase = this.obtenerPrecioPorDia(dStr);
+                        subtotal += diaBase + (extraPaxCount * extraPrice);
                         d.setDate(d.getDate() + 1);
                     }
 
-                    // Sumar tarifas extra
-                    let mascotas = Number(this.formReserva.monto_mascotas) || 0;
-                    let extras = Number(this.formReserva.monto_extras) || 0;
+                    if (this.formReserva.trae_mascota === 'si') {
+                        subtotal += (this.propiedadActiva.precio_mascota || 0);
+                    }
 
-                    this.formReserva.monto_total = subtotal + mascotas + extras;
+                    this.formReserva.monto_total = subtotal;
                 },
 
                 initFlatpickrReserva(defaultDates = []) {
@@ -1039,7 +1070,6 @@
                                 if (selectedDates.length === 2) {
                                     that.formReserva.check_in = instance.formatDate(selectedDates[0], "Y-m-d");
                                     that.formReserva.check_out = instance.formatDate(selectedDates[1], "Y-m-d");
-                                    // Recalcula el precio automaticamente apenas selecciona las fechas
                                     that.recalcularTotal();
                                 }
                             }
@@ -1054,7 +1084,6 @@
                     const dateInString = this.formReserva.check_in + "T" + this.formReserva.hora_llegada + ":00";
                     const dateOutString = this.formReserva.check_out + "T" + this.formReserva.hora_salida + ":00";
 
-                    // Como pediste, en BD solo se guarda el MONTO TOTAL. (Las casillas extras son solo para ayudar al calculo visual)
                     const payload = {
                         propiedad_id: this.propiedadActiva.id,
                         huesped_nombre: this.formReserva.huesped_nombre,
@@ -1135,6 +1164,8 @@
                     if (tipo === 'text') return `text-${c}`;
                     if (tipo === 'border') return `border-${c}`;
                     if (tipo === 'badge') return `bg-${c}/10 text-${c} border-${c}/20`;
+
+                    // Banda limpia y transparente
                     if (tipo === 'band') return `bg-${c}/20`;
 
                     return '';
