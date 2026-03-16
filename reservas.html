@@ -64,7 +64,7 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="reservasApp()" x-init="initApp()"
-    :class="(modalReserva || modalAccionRango || modalPrecios) ? 'overflow-hidden' : ''">
+    :class="(modalReserva || modalAccionRango) ? 'overflow-hidden' : ''">
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
@@ -113,7 +113,7 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-4">
 
-                    <button
+                    <button @click="sincronizar()"
                         class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -237,9 +237,9 @@
                                                 class="cursor-pointer hover:opacity-80 transition-opacity">
                                                 <div class="flex items-center gap-1.5 mb-1 text-current">
                                                     <div class="w-6 h-6 rounded-full bg-current text-white flex items-center justify-center text-[10px] font-bold shrink-0"
-                                                        x-text="obtenerIniciales(diaObj.reserva.huesped)"></div>
+                                                        x-text="obtenerIniciales(diaObj.reserva.huesped_nombre)"></div>
                                                     <div class="font-bold text-sm truncate"
-                                                        x-text="diaObj.reserva.huesped.split(' ')[0]"></div>
+                                                        x-text="diaObj.reserva.huesped_nombre.split(' ')[0]"></div>
                                                 </div>
                                                 <div
                                                     class="text-current opacity-80 text-[10px] font-bold bg-white/50 inline-block px-1.5 py-0.5 rounded truncate w-full">
@@ -270,7 +270,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ingresos del Mes
                                 </p>
@@ -284,7 +285,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Noches Vendidas</p>
                                 <h3 class="text-2xl font-extrabold text-navy" x-text="stats.noches"></h3>
@@ -296,7 +298,8 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Huéspedes</p>
                                 <h3 class="text-2xl font-extrabold text-navy" x-text="stats.huespedes"></h3>
@@ -326,9 +329,10 @@
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold shadow-sm"
                                                         :class="obtenerColorCanal(res.canal, 'bg')"
-                                                        x-text="obtenerIniciales(res.huesped)"></div>
+                                                        x-text="obtenerIniciales(res.huesped_nombre)"></div>
                                                     <div>
-                                                        <h3 class="text-sm font-bold text-navy" x-text="res.huesped">
+                                                        <h3 class="text-sm font-bold text-navy"
+                                                            x-text="res.huesped_nombre">
                                                         </h3>
                                                         <p class="text-xs text-gray-500"
                                                             x-text="`${res.cantidad_huespedes} Huéspedes`"></p>
@@ -371,6 +375,10 @@
                                             </td>
                                         </tr>
                                     </template>
+                                    <tr x-show="reservas.length === 0" style="display: none;">
+                                        <td colspan="5" class="p-12 text-center text-gray-500 font-medium">Aún no hay
+                                            reservas registradas para esta propiedad en el servidor.</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -464,7 +472,14 @@
                         </p>
                     </div>
                 </div>
-                <button @click="modalReserva = false"
+                <button type="button" @click="eliminarReserva()" x-show="formReserva.id"
+                    class="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors mr-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+                <button type="button" @click="modalReserva = false"
                     class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2.5 rounded-full transition-colors focus:outline-none">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -487,7 +502,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg></span>
-                            <input type="text" x-model="formReserva.huesped" required
+                            <input type="text" x-model="formReserva.huesped_nombre" required
                                 class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-3.5 outline-none focus:border-gold focus:bg-white text-navy font-bold transition-colors shadow-sm"
                                 placeholder="Ej. Juan Pérez">
                         </div>
@@ -610,11 +625,12 @@
 
                 propiedades: [],
                 propiedadActiva: null,
-                reservas: [],
 
-                // Variables Tarifas Visuales y Acciones
-                precioBaseTemporal: 0,
+                // ✨ AHORA CONECTADAS AL SERVIDOR ✨
+                reservas: [],
                 tarifasEspeciales: [],
+
+                precioBaseTemporal: 0,
                 rangoSeleccionado: [],
 
                 modalAccionRango: false,
@@ -627,7 +643,7 @@
 
                 modalReserva: false,
                 fpModal: null,
-                formReserva: { id: null, huesped: '', check_in: '', check_out: '', monto_total: '', canal: 'Directa', cantidad_huespedes: 1 },
+                formReserva: { id: null, huesped_nombre: '', check_in: '', check_out: '', monto_total: '', canal: 'Directa', cantidad_huespedes: 1 },
 
                 stats: { ingresos: 0, noches: 0, huespedes: 0 },
 
@@ -642,7 +658,7 @@
                         if (res.ok) {
                             this.propiedades = await res.json();
                             if (this.propiedades.length > 0) {
-                                this.seleccionarPropiedad(this.propiedades[0]);
+                                await this.seleccionarPropiedad(this.propiedades[0]);
                             }
                         }
                     } catch (e) {
@@ -655,27 +671,57 @@
                     this.precioBaseTemporal = prop.precio_noche;
                     this.cargando = true;
                     this.fechaCalendario = new Date();
-                    this.tarifasEspeciales = [];
                     this.rangoSeleccionado = [];
 
                     try {
-                        this.reservas = [
-                            { id: 1, huesped: 'Carlos Ramírez', check_in: '2026-03-03', check_out: '2026-03-05', canal: 'Airbnb', monto_total: 450000, cantidad_huespedes: 2 },
-                            { id: 2, huesped: 'Laura Martínez', check_in: '2026-03-10', check_out: '2026-03-12', canal: 'Booking.com', monto_total: 380000, cantidad_huespedes: 1 }
-                        ];
+                        // ✨ LLAMADOS REALES AL BACKEND (RENDER) ✨
+                        const [resReservas, resTarifas] = await Promise.all([
+                            fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${prop.id}`),
+                            fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${prop.id}`)
+                        ]);
+
+                        if (resReservas.ok) this.reservas = await resReservas.json();
+                        else this.reservas = [];
+
+                        if (resTarifas.ok) this.tarifasEspeciales = await resTarifas.json();
+                        else this.tarifasEspeciales = [];
+
                         this.calcularStats();
                         this.generarMesVisual();
                     } catch (e) {
-                        console.error(e);
+                        console.error("Error cargando datos de la propiedad", e);
+                        this.reservas = [];
+                        this.tarifasEspeciales = [];
                     } finally {
                         this.cargando = false;
                     }
                 },
 
-                actualizarPrecioBase() {
-                    if (this.precioBaseTemporal > 0) {
-                        this.propiedadActiva.precio_noche = Number(this.precioBaseTemporal);
-                        this.generarMesVisual();
+                async sincronizar() {
+                    await this.seleccionarPropiedad(this.propiedadActiva);
+                    alert("Datos sincronizados con el servidor.");
+                },
+
+                async actualizarPrecioBase() {
+                    if (this.precioBaseTemporal > 0 && this.propiedadActiva) {
+                        this.cargando = true;
+                        try {
+                            const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ precio_noche: Number(this.precioBaseTemporal) })
+                            });
+
+                            if (res.ok) {
+                                this.propiedadActiva.precio_noche = Number(this.precioBaseTemporal);
+                                this.generarMesVisual();
+                            }
+                        } catch (e) {
+                            console.error(e);
+                            alert("Error al actualizar la tarifa base en el servidor.");
+                        } finally {
+                            this.cargando = false;
+                        }
                     }
                 },
 
@@ -703,13 +749,9 @@
 
                 abrirReservaDesdeRango() {
                     this.formReserva = {
-                        id: null,
-                        huesped: '',
-                        check_in: this.rangoSeleccionado[0],
-                        check_out: this.rangoSeleccionado[1],
-                        monto_total: '',
-                        canal: 'Directa',
-                        cantidad_huespedes: 1
+                        id: null, huesped_nombre: '',
+                        check_in: this.rangoSeleccionado[0], check_out: this.rangoSeleccionado[1],
+                        monto_total: '', canal: 'Directa', cantidad_huespedes: 1
                     };
                     this.cerrarAccionRango();
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
@@ -722,14 +764,35 @@
                     this.generarMesVisual();
                 },
 
-                guardarTarifaRapida() {
+                async guardarTarifaRapida() {
                     if (this.rangoSeleccionado.length !== 2) return;
-                    this.tarifasEspeciales.push({
-                        inicio: this.rangoSeleccionado[0],
-                        fin: this.rangoSeleccionado[1],
+                    this.cargando = true;
+
+                    const payload = {
+                        propiedad_id: this.propiedadActiva.id,
+                        fecha_inicio: new Date(this.rangoSeleccionado[0] + "T12:00:00").toISOString(),
+                        fecha_fin: new Date(this.rangoSeleccionado[1] + "T12:00:00").toISOString(),
                         precio: Number(this.precioEspecialTemporal)
-                    });
-                    this.cerrarAccionRango();
+                    };
+
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/tarifas', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (res.ok) {
+                            const nuevaTarifa = await res.json();
+                            this.tarifasEspeciales.push(nuevaTarifa);
+                            this.cerrarAccionRango();
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert("Error al guardar tarifa en servidor.");
+                    } finally {
+                        this.cargando = false;
+                    }
                 },
 
                 estaEnRango(fecha) {
@@ -748,25 +811,46 @@
 
                 obtenerPrecioPorDia(fechaStr) {
                     if (!fechaStr) return 0;
-                    let tarifaEspecial = this.tarifasEspeciales.find(t => fechaStr >= t.inicio && fechaStr <= t.fin);
+
+                    // Asegurar comparación de fechas correcta ignorando horas
+                    const f = new Date(fechaStr + "T12:00:00").getTime();
+
+                    let tarifaEspecial = this.tarifasEspeciales.find(t => {
+                        const tIn = new Date(t.fecha_inicio).getTime();
+                        const tOut = new Date(t.fecha_fin).getTime();
+                        return f >= tIn && f <= tOut;
+                    });
+
                     if (tarifaEspecial) return tarifaEspecial.precio;
                     return this.propiedadActiva?.precio_noche || 0;
                 },
 
                 calcularStats() {
                     let totalDinero = 0; let totalNoches = 0; let totalPax = 0;
+
+                    // Solo calculamos del mes actual
+                    const year = this.fechaCalendario.getFullYear();
+                    const month = this.fechaCalendario.getMonth();
+                    const iniMes = new Date(year, month, 1).getTime();
+                    const finMes = new Date(year, month + 1, 0).getTime();
+
                     this.reservas.forEach(r => {
-                        totalDinero += Number(r.monto_total);
-                        totalPax += Number(r.cantidad_huespedes);
-                        const inD = new Date(r.check_in);
-                        const outD = new Date(r.check_out);
-                        totalNoches += Math.ceil(Math.abs(outD - inD) / (1000 * 60 * 60 * 24));
+                        const rIn = new Date(r.check_in).getTime();
+                        // Si la reserva toca el mes
+                        if (rIn >= iniMes && rIn <= finMes) {
+                            totalDinero += Number(r.monto_total);
+                            totalPax += Number(r.cantidad_huespedes);
+                            const inD = new Date(r.check_in);
+                            const outD = new Date(r.check_out);
+                            totalNoches += Math.ceil(Math.abs(outD - inD) / (1000 * 60 * 60 * 24));
+                        }
                     });
                     this.stats = { ingresos: totalDinero, noches: totalNoches, huespedes: totalPax };
                 },
 
                 cambiarMes(direccion) {
                     this.fechaCalendario.setMonth(this.fechaCalendario.getMonth() + direccion);
+                    this.calcularStats();
                     this.generarMesVisual();
                 },
 
@@ -789,7 +873,26 @@
 
                     for (let i = 1; i <= diasEnMes; i++) {
                         let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                        let reservaActual = this.reservas.find(r => dateStr >= r.check_in && dateStr <= r.check_out);
+
+                        // Validar con fechas reales para evitar husos horarios
+                        const dStrTime = new Date(dateStr + "T12:00:00").getTime();
+
+                        let reservaActual = this.reservas.find(r => {
+                            const rIn = new Date(r.check_in).getTime();
+                            const rOut = new Date(r.check_out).getTime();
+                            return dStrTime >= rIn && dStrTime <= rOut;
+                        });
+
+                        let esInicio = false;
+                        let esFin = false;
+
+                        if (reservaActual) {
+                            const rIn = new Date(reservaActual.check_in).getTime();
+                            const rOut = new Date(reservaActual.check_out).getTime();
+                            if (dStrTime === rIn) esInicio = true;
+                            if (dStrTime === rOut) esFin = true;
+                        }
+
                         let precioDelDia = this.obtenerPrecioPorDia(dateStr);
 
                         diasArray.push({
@@ -797,8 +900,8 @@
                             fecha: dateStr,
                             esMesActual: true,
                             reserva: reservaActual || null,
-                            esInicio: reservaActual && dateStr === reservaActual.check_in,
-                            esFin: reservaActual && dateStr === reservaActual.check_out,
+                            esInicio: esInicio,
+                            esFin: esFin,
                             precio: precioDelDia,
                             tienePrecioEspecial: precioDelDia !== Number(this.propiedadActiva?.precio_noche)
                         });
@@ -834,14 +937,18 @@
                 },
 
                 abrirModalNueva() {
-                    this.formReserva = { id: null, huesped: '', check_in: '', check_out: '', monto_total: '', canal: 'Directa', cantidad_huespedes: 1 };
+                    this.formReserva = { id: null, huesped_nombre: '', check_in: '', check_out: '', monto_total: '', canal: 'Directa', cantidad_huespedes: 1 };
                     this.initFlatpickrReserva();
                     this.modalReserva = true;
                 },
 
                 editarReserva(res) {
                     this.formReserva = { ...res };
-                    this.initFlatpickrReserva([res.check_in, res.check_out]);
+                    // Parse fechas
+                    this.formReserva.check_in = res.check_in.split('T')[0];
+                    this.formReserva.check_out = res.check_out.split('T')[0];
+
+                    this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
                     this.modalReserva = true;
                 },
 
@@ -864,18 +971,75 @@
                     }, 50);
                 },
 
-                guardarReserva() {
+                async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
-                    if (!this.formReserva.id) {
-                        this.formReserva.id = Date.now();
-                        this.reservas.push({ ...this.formReserva });
-                    } else {
-                        let idx = this.reservas.findIndex(r => r.id === this.formReserva.id);
-                        if (idx > -1) this.reservas[idx] = { ...this.formReserva };
+                    this.cargando = true;
+
+                    const payload = {
+                        propiedad_id: this.propiedadActiva.id,
+                        huesped_nombre: this.formReserva.huesped_nombre,
+                        check_in: new Date(this.formReserva.check_in + "T12:00:00").toISOString(),
+                        check_out: new Date(this.formReserva.check_out + "T12:00:00").toISOString(),
+                        cantidad_huespedes: Number(this.formReserva.cantidad_huespedes),
+                        monto_total: Number(this.formReserva.monto_total),
+                        canal: this.formReserva.canal
+                    };
+
+                    let url = 'https://gestandovalor-backend.onrender.com/reservas';
+                    let method = 'POST';
+
+                    if (this.formReserva.id) {
+                        url += `/${this.formReserva.id}`;
+                        method = 'PATCH';
                     }
-                    this.calcularStats();
-                    this.generarMesVisual();
-                    this.modalReserva = false;
+
+                    try {
+                        const res = await fetch(url, {
+                            method: method,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (res.ok) {
+                            const resGuardada = await res.json();
+
+                            if (!this.formReserva.id) {
+                                this.reservas.push(resGuardada);
+                            } else {
+                                let idx = this.reservas.findIndex(r => r.id === this.formReserva.id);
+                                if (idx > -1) this.reservas[idx] = resGuardada;
+                            }
+
+                            this.calcularStats();
+                            this.generarMesVisual();
+                            this.modalReserva = false;
+                        } else {
+                            alert("Las fechas seleccionadas ya están ocupadas o hubo un error.");
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert("Error conectando con el servidor.");
+                    } finally {
+                        this.cargando = false;
+                    }
+                },
+
+                async eliminarReserva() {
+                    if (!confirm("¿Estás seguro de borrar esta reserva?")) return;
+                    this.cargando = true;
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/${this.formReserva.id}`, { method: 'DELETE' });
+                        if (res.ok) {
+                            this.reservas = this.reservas.filter(r => r.id !== this.formReserva.id);
+                            this.calcularStats();
+                            this.generarMesVisual();
+                            this.modalReserva = false;
+                        }
+                    } catch (e) {
+                        alert("Error al borrar.");
+                    } finally {
+                        this.cargando = false;
+                    }
                 },
 
                 formatearPrecioCalendario(valor) {
@@ -884,7 +1048,12 @@
                 },
 
                 formatearDinero(valor) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor || 0); },
-                formatearFechaCorta(fechaStr) { const d = new Date(fechaStr + "T12:00:00"); return d.toLocaleDateString('es-CO', { month: 'short', day: '2-digit' }).replace('.', ''); },
+                formatearFechaCorta(fechaStr) {
+                    const d = new Date(fechaStr);
+                    // Ajuste para evitar que el UTC le reste un día
+                    const offsetDate = new Date(d.getTime() + Math.abs(d.getTimezoneOffset() * 60000));
+                    return offsetDate.toLocaleDateString('es-CO', { month: 'short', day: '2-digit' }).replace('.', '');
+                },
                 obtenerIniciales(nombre) { if (!nombre) return 'GV'; return nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(); },
                 obtenerColorCanal(canal, tipo) {
                     let c = 'directo';
