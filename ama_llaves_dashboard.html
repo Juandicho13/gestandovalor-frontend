@@ -28,7 +28,12 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="amaLlavesApp()" x-init="initApp()"
-    :class="(modalReportes || modalInspeccion) ? 'overflow-hidden' : ''">
+    :class="modalInspeccion ? 'overflow-hidden' : ''">
+
+    <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
+        <p class="font-bold text-navy animate-pulse">Sincronizando operaciones...</p>
+    </div>
 
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
@@ -43,24 +48,21 @@
                 Panel</a>
             <a href="ama_llaves_inventario.html"
                 class="text-sm font-medium hover:text-gold transition-colors">Inventario por Apto</a>
-            <button @click="modalReportes = true"
-                class="text-sm font-medium hover:text-gold transition-colors">Historial Novedades</button>
 
             <div class="h-5 w-px bg-white/20 ml-2"></div>
 
-            <a href="login.html"
+            <button @click="cerrarSesion()"
                 class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg> Salir
-            </a>
+            </button>
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
-            <div
-                class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white border border-gold font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                AL</div>
+            <div class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white border border-gold font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                x-text="iniciales">AL</div>
         </div>
     </nav>
 
@@ -72,18 +74,10 @@
                 <div>
                     <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Supervisión y
                         Calidad</span>
-                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, Andrea ✨</h1>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, <span
+                            x-text="nombreUsuario"></span> ✨</h1>
                     <p class="text-gray-400 mt-2">Control de inspecciones, asignación de aseo y estado de suites.</p>
                 </div>
-                <button onclick="window.location.href='ama_llaves_inventario.html'"
-                    class="bg-white/10 p-4 rounded-2xl border border-white/20 text-center backdrop-blur-md cursor-pointer hover:bg-white/20 transition-colors">
-                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Stock de Suites</p>
-                    <p class="text-sm font-extrabold text-gold flex items-center justify-center gap-1"><svg
-                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg> Ver Inventarios</p>
-                </button>
             </div>
         </div>
     </section>
@@ -103,7 +97,7 @@
                     <div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Limpiezas Pendientes
                         </p>
-                        <p class="text-2xl font-extrabold text-navy" x-text="proximasSalidas.length"></p>
+                        <p class="text-2xl font-extrabold text-navy" x-text="checkoutsSinAsignar.length"></p>
                     </div>
                 </div>
 
@@ -117,81 +111,107 @@
                     </div>
                     <div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Por Inspeccionar</p>
-                        <p class="text-2xl font-extrabold text-navy" x-text="porInspeccionar.length"></p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:-translate-y-1 transition-transform"
-                    @click="modalReportes = true">
-                    <div
-                        class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-danger flex-shrink-0">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Daños Nuevos</p>
-                        <p class="text-2xl font-extrabold text-navy">1</p>
+                        <p class="text-2xl font-extrabold text-navy" x-text="tareasCompletadas.length"></p>
                     </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                <div>
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-extrabold text-navy">Programar Limpiezas</h2>
-                        <span
-                            class="text-xs font-bold text-warning bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Próximos
-                            Check-outs</span>
+                <div class="space-y-8">
+
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-extrabold text-navy">Programar Limpiezas</h2>
+                            <span
+                                class="text-xs font-bold text-warning bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Próximos
+                                Check-outs</span>
+                        </div>
+
+                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                            <template x-for="reserva in checkoutsSinAsignar" :key="reserva.id">
+                                <div
+                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col gap-4">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex items-start gap-4">
+                                            <div
+                                                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-navy flex-shrink-0 shadow-sm border border-gray-200">
+                                                <span class="font-black text-xs"
+                                                    x-text="reserva.propiedad_nombre.substring(0, 4)"></span>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-md font-bold text-navy"
+                                                    x-text="`Huésped: ${reserva.huesped_nombre}`"></h3>
+                                                <p class="text-gray-500 text-xs font-medium">Sale el: <strong
+                                                        class="text-navy" x-text="reserva.fecha_salida"></strong> a las
+                                                    <strong class="text-navy" x-text="reserva.hora_salida"></strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                        <div class="flex flex-col sm:flex-row gap-2">
+                                            <select x-model="reserva.empleado_asignado"
+                                                class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
+                                                <option value="">Seleccionar personal...</option>
+                                                <template x-for="emp in empleadosAseo" :key="emp.id">
+                                                    <option :value="emp.id" x-text="emp.nombre"></option>
+                                                </template>
+                                            </select>
+                                            <select x-model="reserva.urgencia"
+                                                class="bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer shrink-0">
+                                                <option value="Normal">⚡ Normal</option>
+                                                <option value="Urgente">🔥 Urgente</option>
+                                                <option value="Flexible">☕ Flexible</option>
+                                            </select>
+                                            <button @click="asignarAseo(reserva)"
+                                                class="bg-navy hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg transition-colors text-xs shadow-sm shrink-0">
+                                                Agendar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div x-show="checkoutsSinAsignar.length === 0" class="p-8 text-center">
+                                <p class="text-gray-400 font-bold">No hay check-outs próximos sin asignar. 🙌</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
-
-                        <template x-for="reserva in proximasSalidas" :key="reserva.id">
-                            <div
-                                class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col gap-4">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-start gap-4">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-navy mb-4">Aseos Asignados (En progreso)</h3>
+                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                            <template x-for="tarea in tareasPendientes" :key="tarea.id">
+                                <div
+                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4">
+                                    <div class="flex items-center gap-4">
                                         <div
-                                            class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-navy flex-shrink-0 shadow-sm border border-gray-200">
-                                            <span class="font-black text-xs" x-text="reserva.propiedad_nombre"></span>
+                                            class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-navy shadow-sm border border-gray-200 shrink-0">
+                                            <span class="font-black text-xs">🏠</span>
                                         </div>
                                         <div>
-                                            <h3 class="text-md font-bold text-navy"
-                                                x-text="`Huésped: ${reserva.huesped}`"></h3>
-                                            <p class="text-gray-500 text-xs font-medium">Sale el: <strong
-                                                    class="text-navy" x-text="reserva.fecha_salida"></strong> a las
-                                                <strong class="text-navy" x-text="reserva.hora_salida"></strong></p>
+                                            <h4 class="text-sm font-bold text-navy"
+                                                x-text="tarea.propiedad?.titulo || 'Apartamento'"></h4>
+                                            <p class="text-gray-500 text-xs font-medium">Asignado a: <strong
+                                                    class="text-navy"
+                                                    x-text="tarea.empleado?.nombre || 'Desconocido'"></strong></p>
                                         </div>
                                     </div>
+                                    <span
+                                        class="text-[10px] font-extrabold px-2 py-1 rounded-md uppercase tracking-wider"
+                                        :class="{
+                                              'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
+                                              'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
+                                              'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || !tarea.urgencia
+                                          }" x-text="tarea.urgencia || 'Normal'">
+                                    </span>
                                 </div>
+                            </template>
 
-                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                                    <label
-                                        class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Asignar
-                                        personal de aseo:</label>
-                                    <div class="flex gap-2">
-                                        <select x-model="reserva.empleado_asignado"
-                                            class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
-                                            <option value="">Seleccionar personal...</option>
-                                            <template x-for="emp in empleadosAseo" :key="emp.id">
-                                                <option :value="emp.id" x-text="emp.nombre"></option>
-                                            </template>
-                                        </select>
-                                        <button @click="asignarAseo(reserva)"
-                                            class="bg-navy hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg transition-colors text-xs shadow-sm">
-                                            Agendar
-                                        </button>
-                                    </div>
-                                </div>
+                            <div x-show="tareasPendientes.length === 0" class="p-8 text-center">
+                                <p class="text-gray-400 font-bold">No has asignado aseos todavía. 📝</p>
                             </div>
-                        </template>
-
-                        <div x-show="proximasSalidas.length === 0" class="p-8 text-center">
-                            <p class="text-gray-400 font-bold">No hay reservas activas esperando asignación de aseo. 🙌
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -206,25 +226,30 @@
 
                     <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
 
-                        <template x-for="tarea in porInspeccionar" :key="tarea.id">
+                        <template x-for="tarea in tareasCompletadas" :key="tarea.id">
                             <div
                                 class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col gap-4">
                                 <div class="flex justify-between items-start">
                                     <div class="flex items-start gap-4">
                                         <div
                                             class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                                            <span class="font-bold text-xs" x-text="tarea.propiedad_nombre"></span>
+                                            <span class="font-bold text-xs"
+                                                x-text="tarea.propiedad?.titulo?.substring(0,2) || '🏠'"></span>
                                         </div>
                                         <div>
                                             <h3 class="text-lg font-bold text-navy"
-                                                x-text="`Apto ${tarea.propiedad_nombre}`"></h3>
+                                                x-text="tarea.propiedad?.titulo || 'Apartamento'"></h3>
                                             <span
                                                 class="inline-block mt-1 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200 uppercase tracking-wider"
-                                                x-text="`Aseado por: ${tarea.empleado_nombre}`"></span>
+                                                x-text="`Limpiado por: ${tarea.empleado?.nombre}`"></span>
                                         </div>
                                     </div>
                                     <span
-                                        class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100 uppercase">Terminado</span>
+                                        class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100 uppercase text-center leading-tight">
+                                        Terminado<br>
+                                        <span class="font-mono"
+                                            x-text="Math.floor(tarea.tiempo_segundos/60) + ' min'"></span>
+                                    </span>
                                 </div>
                                 <button @click="abrirInspeccion(tarea)"
                                     class="w-full mt-2 bg-gray-50 hover:bg-gray-100 text-navy border border-gray-200 font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2">
@@ -240,7 +265,7 @@
                             </div>
                         </template>
 
-                        <div x-show="porInspeccionar.length === 0" class="p-8 text-center">
+                        <div x-show="tareasCompletadas.length === 0" class="p-8 text-center">
                             <p class="text-gray-400 font-bold">No hay apartamentos esperando inspección. ✨</p>
                         </div>
 
@@ -261,9 +286,9 @@
                 <div>
                     <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
                         Empleado</span>
-                    <h3 class="text-2xl font-extrabold text-navy" x-text="propAInspeccionar"></h3>
-                    <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy">Ricardo (Tiempo: 45m
-                            12s)</strong></p>
+                    <h3 class="text-2xl font-extrabold text-navy" x-text="tareaAInspeccionar?.propiedad?.titulo"></h3>
+                    <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy"
+                            x-text="tareaAInspeccionar?.empleado?.nombre"></strong></p>
                 </div>
                 <button @click="modalInspeccion = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,96 +297,25 @@
                     </svg></button>
             </div>
 
-            <h4 class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-l-4 border-gold pl-2">
-                Insumos usados / dejados listos</h4>
-
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span
-                            class="text-lg">🧻</span> Papel Hig.</span>
-                    <span
-                        class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">2</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span
-                            class="text-lg">🧼</span> Kits Baño</span>
-                    <span
-                        class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">2</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span class="text-lg">☕</span>
-                        Café/Té</span>
-                    <span
-                        class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">4</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <span class="text-sm font-bold text-gray-700 flex items-center gap-2"><span
-                            class="text-lg">🛁</span> Toallas G.</span>
-                    <span
-                        class="font-mono font-extrabold text-navy bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">2</span>
-                </div>
-            </div>
-
             <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-8">
                 <p class="text-xs text-blue-800 font-bold flex items-center gap-2">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Al aprobar esta inspección, estos insumos se descontarán del <strong>armario privado de este
-                        apartamento</strong>.
+                    Verifica que el apartamento esté impecable antes de aprobar.
                 </p>
             </div>
 
             <div class="flex gap-4">
-                <button
-                    onclick="alert('Se ha notificado a Ricardo que debe regresar a corregir el aseo.'); document.querySelector('[x-data]').__x.$data.modalInspeccion = false;"
+                <button @click="modalInspeccion = false"
                     class="w-1/3 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-xl hover:bg-red-50 transition-colors">
-                    Rechazar
+                    Cerrar
                 </button>
-                <button
-                    onclick="alert('Aseo Aprobado. Insumos descontados del inventario del apartamento con éxito.'); document.querySelector('[x-data]').__x.$data.modalInspeccion = false;"
+                <button @click="aprobarInspeccion()"
                     class="w-2/3 bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
                     Aprobar Inspección
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <div x-show="modalReportes" style="display: none;"
-        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
-        <div
-            class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] overflow-y-auto">
-
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-extrabold text-navy">Historial de Novedades</h3>
-                    <p class="text-xs text-gray-500 mt-1 font-bold">Daños reportados por el equipo de aseo.</p>
-                </div>
-                <button @click="modalReportes = false"
-                    class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
-            </div>
-
-            <div class="space-y-4">
-                <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
-                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-danger shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-navy">Copa de vino rota</h4>
-                        <p class="text-xs text-gray-500 mt-1">Apto 511 • Reportado por: Ricardo (Hoy 10:30 AM)</p>
-                        <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100">"Encontré los
-                            vidrios debajo de la mesa de la sala."</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -371,7 +325,6 @@
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
             const largoPildora = 'max-w-[700px]';
-
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
                     logo.classList.replace('h-16', 'h-10');
@@ -385,52 +338,165 @@
             });
         });
 
-        // ✨ LÓGICA ALPINE PARA CONECTAR EL PANEL CON EL BACKEND ✨
+        // ✨ LÓGICA ALPINE CONECTADA AL BACKEND ✨
         function amaLlavesApp() {
             return {
-                modalReportes: false,
-                modalInspeccion: false,
-                propAInspeccionar: '',
+                cargando: true,
+                nombreUsuario: 'Equipo',
+                iniciales: 'AL',
 
+                propiedades: [],
                 empleadosAseo: [],
-                proximasSalidas: [], // Cambiado de checkoutsHoy a proximasSalidas
-                porInspeccionar: [],
+                reservas: [],
+                tareas: [],
 
-                initApp() {
-                    // Datos de prueba
-                    this.empleadosAseo = [
-                        { id: '1', nombre: 'Ricardo P.' },
-                        { id: '2', nombre: 'Camila M.' }
-                    ];
+                modalInspeccion: false,
+                tareaAInspeccionar: null,
 
-                    // Ahora incluye fechas futuras para que el Ama de Llaves programe
-                    this.proximasSalidas = [
-                        { id: 'r1', propiedad_id: 'p1', propiedad_nombre: 'A511', huesped: 'Juan Pérez', fecha_salida: 'Hoy', hora_salida: '11:00 a.m.', empleado_asignado: '' },
-                        { id: 'r2', propiedad_id: 'p2', propiedad_nombre: 'PH', huesped: 'María López', fecha_salida: '28 Mar', hora_salida: '12:00 p.m.', empleado_asignado: '' },
-                        { id: 'r3', propiedad_id: 'p3', propiedad_nombre: 'Torre A', huesped: 'Carlos Gómez', fecha_salida: '02 Abr', hora_salida: '11:00 a.m.', empleado_asignado: '' }
-                    ];
-
-                    this.porInspeccionar = [
-                        { id: 't1', propiedad_nombre: 'Torre A', empleado_nombre: 'Ricardo P.' }
-                    ];
-                },
-
-                asignarAseo(reserva) {
-                    if (!reserva.empleado_asignado) {
-                        alert("Por favor, selecciona un empleado de aseo.");
+                async initApp() {
+                    const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
+                    if (usuarioGuardado) {
+                        const usuario = JSON.parse(usuarioGuardado);
+                        this.nombreUsuario = usuario.nombre.split(' ')[0];
+                        this.iniciales = this.nombreUsuario.substring(0, 2).toUpperCase();
+                    } else {
+                        window.location.href = 'login.html';
                         return;
                     }
 
-                    const empleado = this.empleadosAseo.find(e => e.id === reserva.empleado_asignado);
-                    alert(`✅ ¡Aseo del ${reserva.propiedad_nombre} agendado a ${empleado.nombre}!\n\nEl sistema le enviará una alerta en su aplicación para el día ${reserva.fecha_salida}.`);
+                    await Promise.all([
+                        this.cargarPropiedades(),
+                        this.cargarEmpleados(),
+                        this.cargarReservas(),
+                        this.cargarTareas()
+                    ]);
 
-                    // Remover de la lista de asignación
-                    this.proximasSalidas = this.proximasSalidas.filter(r => r.id !== reserva.id);
+                    this.cargando = false;
+                },
+
+                async cargarPropiedades() {
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        if (res.ok) this.propiedades = await res.json();
+                    } catch (e) { console.error(e); }
+                },
+
+                async cargarEmpleados() {
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/usuarios');
+                        if (res.ok) {
+                            const all = await res.json();
+                            this.empleadosAseo = all.filter(u => u.rol === 'ASEO');
+                        }
+                    } catch (e) { console.error(e); }
+                },
+
+                async cargarReservas() {
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas');
+                        if (res.ok) {
+                            this.reservas = await res.json();
+                        }
+                    } catch (e) { console.error(e); }
+                },
+
+                async cargarTareas() {
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo');
+                        if (res.ok) {
+                            this.tareas = await res.json();
+                        }
+                    } catch (e) { console.error(e); }
+                },
+
+                get checkoutsSinAsignar() {
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+
+                    return this.reservas.filter(res => {
+                        const fOut = new Date(res.check_out);
+                        // Filtra reservas que salen de hoy en adelante
+                        if (fOut < hoy) return false;
+
+                        // Verifica si ese apartamento ya tiene una tarea pendiente asignada
+                        const yaAsignado = this.tareas.some(t => t.propiedad_id === res.propiedad_id && t.estado === 'Pendiente');
+                        return !yaAsignado;
+                    }).map(res => {
+                        const prop = this.propiedades.find(p => p.id === res.propiedad_id);
+                        return {
+                            ...res,
+                            propiedad_nombre: prop ? prop.titulo : 'Apto Desconocido',
+                            fecha_salida: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
+                            hora_salida: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                            empleado_asignado: '',
+                            urgencia: 'Normal'
+                        };
+                    });
+                },
+
+                get tareasPendientes() {
+                    return this.tareas.filter(t => t.estado === 'Pendiente');
+                },
+
+                get tareasCompletadas() {
+                    return this.tareas.filter(t => t.estado === 'Completada');
+                },
+
+                async asignarAseo(reserva) {
+                    if (!reserva.empleado_asignado) {
+                        alert("Por favor selecciona a un empleado.");
+                        return;
+                    }
+
+                    this.cargando = true;
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                propiedad_id: reserva.propiedad_id,
+                                empleado_id: reserva.empleado_asignado,
+                                urgencia: reserva.urgencia,
+                                estado: 'Pendiente'
+                            })
+                        });
+
+                        if (res.ok) {
+                            alert('✅ ¡Aseo asignado correctamente!\nAl recargar la página de Ricardo le aparecerá su tarea.');
+                            await this.cargarTareas(); // Mueve de "Programar" a "Asignados"
+                        } else {
+                            alert('Error al guardar en el servidor.');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Error de conexión.');
+                    }
+                    this.cargando = false;
                 },
 
                 abrirInspeccion(tarea) {
-                    this.propAInspeccionar = `Apto ${tarea.propiedad_nombre}`;
+                    this.tareaAInspeccionar = tarea;
                     this.modalInspeccion = true;
+                },
+
+                async aprobarInspeccion() {
+                    this.cargando = true;
+                    try {
+                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaAInspeccionar.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ estado: 'Inspeccionada' })
+                        });
+                        alert('✅ Inspección Aprobada.');
+                        this.modalInspeccion = false;
+                        await this.cargarTareas();
+                    } catch (e) { console.error(e); }
+                    this.cargando = false;
+                },
+
+                cerrarSesion() {
+                    localStorage.removeItem('gv_usuario_actual');
+                    window.location.href = 'login.html';
                 }
             }
         }
