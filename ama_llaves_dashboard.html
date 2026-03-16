@@ -160,7 +160,8 @@
                                                     x-text="`Huésped: ${reserva.huesped_nombre}`"></h3>
                                                 <p class="text-gray-500 text-xs font-medium">Sale el: <strong
                                                         class="text-navy" x-text="reserva.fecha_salida"></strong> a las
-                                                    <strong class="text-navy" x-text="reserva.hora_salida"></strong></p>
+                                                    <strong class="text-navy" x-text="reserva.hora_salida"></strong>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -472,19 +473,13 @@
                     } catch (e) { console.error(e); }
                 },
 
-                // ✨ COMPUTED PARA LOS REPORTES ✨
                 get tareasConReporte() {
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
                 },
 
+                // ✨ AQUÍ SE QUITÓ EL CANDADO DE TIEMPO ✨
                 get checkoutsSinAsignar() {
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-
                     return this.reservas.filter(res => {
-                        const fOut = new Date(res.check_out);
-                        if (fOut < hoy) return false;
-
                         const yaAsignado = this.tareas.some(t => t.propiedad_id === res.propiedad_id && t.estado === 'Pendiente');
                         return !yaAsignado;
                     }).map(res => {
