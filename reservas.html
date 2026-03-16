@@ -72,7 +72,7 @@
     :class="(modalReserva || modalAccionRango) ? 'overflow-hidden' : ''">
 
     <div
-        class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/10 border-airbnb/20 bg-booking text-booking border-booking bg-booking/10 border-booking/20 bg-directo text-directo border-directo bg-directo/10 border-directo/20">
+        class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/20 border-airbnb/30 bg-booking text-booking border-booking bg-booking/20 border-booking/30 bg-directo text-directo border-directo bg-directo/20 border-directo/30">
     </div>
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
@@ -233,7 +233,7 @@
                                 </template>
 
                                 <template x-for="(diaObj, index) in diasCalendario" :key="index">
-                                    <div class="min-h-[120px] bg-white relative transition-colors"
+                                    <div class="min-h-[120px] bg-white relative transition-colors border border-gray-50"
                                         :class="(!diaObj.esMesActual) ? 'opacity-40 bg-gray-50' : 'hover:bg-gray-50 cursor-pointer'"
                                         @click="if(diaObj.esMesActual) seleccionarRangoTarifa(diaObj.fecha)">
 
@@ -241,61 +241,48 @@
                                             class="absolute inset-0 bg-yellow-50/80 ring-2 ring-gold ring-inset z-0">
                                         </div>
 
-                                        <div x-show="diaObj.resLlena" class="absolute inset-0 opacity-20 z-0"
-                                            :class="obtenerColorCanal(diaObj.resLlena?.canal, 'bg')"></div>
-                                        <div x-show="diaObj.resSalida && !diaObj.resLlena"
-                                            class="absolute top-0 left-0 bottom-0 w-1/2 opacity-20 border-r border-white/50 z-0"
-                                            :class="obtenerColorCanal(diaObj.resSalida?.canal, 'bg')"></div>
-                                        <div x-show="diaObj.resLlegada && !diaObj.resLlena"
-                                            class="absolute top-0 right-0 bottom-0 w-1/2 opacity-20 border-l border-white/50 z-0"
-                                            :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'bg')"></div>
+                                        <div x-show="diaObj.resSalida"
+                                            class="absolute top-0 left-0 bottom-0 w-[50%] z-0"
+                                            :class="obtenerColorCanal(diaObj.resSalida?.canal, 'bg-soft')"></div>
+
+                                        <div x-show="diaObj.resLlegada"
+                                            class="absolute top-0 right-0 bottom-0 w-[50%] z-0"
+                                            :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'bg-soft')"></div>
+
+                                        <div x-show="diaObj.resLlena" class="absolute inset-0 z-0"
+                                            :class="obtenerColorCanal(diaObj.resLlena?.canal, 'bg-soft')"></div>
 
                                         <span class="absolute top-2 left-2 font-extrabold text-sm z-10"
                                             :class="diaObj.esMesActual ? 'text-navy' : 'text-gray-300'"
                                             x-text="diaObj.dia"></span>
 
-                                        <div x-show="diaObj.resSalida" class="absolute bottom-1 left-1 w-[47%] z-10"
+                                        <div x-show="diaObj.resSalida"
+                                            class="absolute bottom-2 left-2 w-[45%] z-10 text-left cursor-pointer"
                                             @click.stop="editarReserva(diaObj.resSalida)">
-                                            <div class="bg-white/95 px-1 py-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] border-l-[3px] overflow-hidden"
-                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'border')">
-                                                <span class="text-[8px] font-black text-gray-400 block leading-none">OUT
-                                                    <span
-                                                        x-text="formatearHora(diaObj.resSalida?.check_out)"></span></span>
-                                                <span class="text-[10px] font-bold text-navy block truncate"
-                                                    x-text="diaObj.resSalida?.huesped_nombre.split(' ')[0]"></span>
-                                                <span class="text-[9px] font-bold text-blue-600 block leading-none"
-                                                    x-text="diaObj.resSalida?.cantidad_huespedes + ' pax'"></span>
-                                            </div>
+                                            <span class="text-[10px] font-black opacity-60 block leading-none"
+                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')">OUT</span>
+                                            <span class="text-[11px] font-extrabold block truncate"
+                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
+                                                x-text="formatearHora(diaObj.resSalida?.check_out)"></span>
                                         </div>
 
                                         <div x-show="diaObj.resLlegada"
-                                            class="absolute bottom-1 right-1 w-[47%] z-10 text-right"
+                                            class="absolute bottom-2 right-2 w-[45%] z-10 text-right cursor-pointer"
                                             @click.stop="editarReserva(diaObj.resLlegada)">
-                                            <div class="bg-white/95 px-1 py-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] border-r-[3px] overflow-hidden"
-                                                :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'border')">
-                                                <span class="text-[8px] font-black text-gray-400 block leading-none">IN
-                                                    <span
-                                                        x-text="formatearHora(diaObj.resLlegada?.check_in)"></span></span>
-                                                <span class="text-[10px] font-bold text-navy block truncate"
-                                                    x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
-                                                <span class="text-[9px] font-bold text-blue-600 block leading-none"
-                                                    x-text="diaObj.resLlegada?.cantidad_huespedes + ' pax'"></span>
-                                            </div>
+                                            <span class="text-[11px] font-black block truncate leading-none mb-0.5"
+                                                :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
+                                                x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
+                                            <span class="text-[10px] font-extrabold block leading-none opacity-80"
+                                                :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
+                                                x-text="'In: ' + formatearHora(diaObj.resLlegada?.check_in)"></span>
                                         </div>
 
-                                        <div x-show="diaObj.resLlena"
-                                            class="absolute bottom-1 left-2 right-2 z-20 text-center"
+                                        <div x-show="diaObj.resLlena" class="absolute inset-0 z-20 cursor-pointer"
                                             @click.stop="editarReserva(diaObj.resLlena)">
-                                            <div class="bg-white/95 px-2 py-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] border-b-[3px]"
-                                                :class="obtenerColorCanal(diaObj.resLlena?.canal, 'border')">
-                                                <span class="text-[11px] font-bold text-navy block truncate"
-                                                    x-text="diaObj.resLlena?.huesped_nombre"></span>
-                                                <span class="text-[10px] font-bold text-blue-600 block leading-none"
-                                                    x-text="diaObj.resLlena?.cantidad_huespedes + ' pax'"></span>
-                                            </div>
                                         </div>
+
                                         <span
-                                            class="absolute bottom-1 left-1 right-1 text-center text-[10px] font-bold pointer-events-none"
+                                            class="absolute bottom-2 left-0 right-0 text-center text-[11px] font-bold pointer-events-none"
                                             x-show="!diaObj.resLlena && !diaObj.resLlegada && !diaObj.resSalida && diaObj.esMesActual"
                                             :class="diaObj.tienePrecioEspecial ? 'text-gold' : 'text-gray-400'"
                                             x-text="formatearPrecioCalendario(diaObj.precio)"></span>
@@ -688,7 +675,6 @@
             });
         });
 
-        // Utilidad para extraer la fecha local de forma segura y evitar que los dias se corran por zona horaria
         function getLocalDateString(isoString) {
             const d = new Date(isoString);
             const y = d.getFullYear();
@@ -869,7 +855,6 @@
                     return tarifaEspecial ? tarifaEspecial.precio : (this.propiedadActiva?.precio_noche || 0);
                 },
 
-                // ✨ REGLA 1: CALCULO DE NOCHES VENDIDAS ESTRICTO Y MATEMATICO ✨
                 calcularStats() {
                     let totalDinero = 0; let totalNoches = 0; let totalPax = 0;
                     const mesVisual = this.fechaCalendario.getMonth();
@@ -883,11 +868,9 @@
                             totalDinero += Number(r.monto_total);
                             totalPax += Number(r.cantidad_huespedes);
 
-                            // Matemática de hotel: Diferencia de días
                             let diffTime = Math.abs(dOut.getTime() - dIn.getTime());
                             let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                            // Asegurar la regla: mínimo 1 noche
                             if (diffDays < 1) diffDays = 1;
                             totalNoches += diffDays;
                         }
@@ -962,7 +945,6 @@
                     this.modalReserva = true;
                 },
 
-                // ✨ REGLA 3: LEER HORAS CORRECTAMENTE ✨
                 editarReserva(res) {
                     this.formReserva = { ...res };
 
@@ -998,7 +980,6 @@
                     }, 50);
                 },
 
-                // ✨ REGLA 3: GUARDAR HORA ENSAMBLADA ✨
                 async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
                     this.cargando = true;
@@ -1081,10 +1062,15 @@
                     let c = 'directo';
                     if (canal.includes('Airbnb')) c = 'airbnb';
                     if (canal.includes('Booking')) c = 'booking';
+
                     if (tipo === 'bg') return `bg-${c}`;
                     if (tipo === 'text') return `text-${c}`;
                     if (tipo === 'border') return `border-${c}`;
-                    if (tipo === 'badge') return `bg-${c}/20 border-${c}/30`;
+                    if (tipo === 'badge') return `bg-${c}/10 text-${c} border-${c}/20`;
+
+                    // NUEVO: Color suave para las bandas del calendario sin bordes marcados
+                    if (tipo === 'bg-soft') return `bg-${c}/20`;
+
                     return '';
                 }
             }
