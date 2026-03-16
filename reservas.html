@@ -72,7 +72,7 @@
     :class="(modalReserva || modalAccionRango || modalConfigTarifas) ? 'overflow-hidden' : ''">
 
     <div
-        class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/20 border-airbnb/30 bg-booking text-booking border-booking bg-booking/20 border-booking/30 bg-directo text-directo border-directo bg-directo/20 border-directo/30">
+        class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/10 border-airbnb/20 bg-airbnb/20 bg-booking text-booking border-booking bg-booking/10 border-booking/20 bg-booking/20 bg-directo text-directo border-directo bg-directo/10 border-directo/20 bg-directo/20">
     </div>
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
@@ -554,13 +554,23 @@
                         </div>
                     </div>
 
-                    <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-4">
-                        <label
-                            class="block text-[10px] font-extrabold text-orange-500 uppercase tracking-widest mb-1.5 ml-1">Tarifa
-                            Mascota Única ($)</label>
-                        <input type="number" x-model="formTarifas.precio_mascota"
-                            class="w-full bg-white border border-orange-100 rounded-xl px-4 py-2.5 outline-none focus:border-orange-300 text-navy font-bold transition-colors shadow-sm"
-                            placeholder="0">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-4">
+                            <label
+                                class="block text-[10px] font-extrabold text-orange-500 uppercase tracking-widest mb-1.5 ml-1">Mascota
+                                x Noche ($)</label>
+                            <input type="number" x-model="formTarifas.precio_mascota"
+                                class="w-full bg-white border border-orange-100 rounded-xl px-4 py-2.5 outline-none focus:border-orange-300 text-navy font-bold transition-colors shadow-sm"
+                                placeholder="0">
+                        </div>
+                        <div class="bg-green-50/50 border border-green-100 rounded-2xl p-4">
+                            <label
+                                class="block text-[10px] font-extrabold text-green-500 uppercase tracking-widest mb-1.5 ml-1">Aseo
+                                Único ($)</label>
+                            <input type="number" x-model="formTarifas.tarifa_aseo"
+                                class="w-full bg-white border border-green-100 rounded-xl px-4 py-2.5 outline-none focus:border-green-300 text-navy font-bold transition-colors shadow-sm"
+                                placeholder="0">
+                        </div>
                     </div>
                 </div>
 
@@ -680,12 +690,10 @@
                         </div>
                         <div class="col-span-1">
                             <label
-                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">¿Mascota?</label>
-                            <select x-model="formReserva.trae_mascota" @change="recalcularTotal()"
-                                class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-3 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold cursor-pointer transition-colors shadow-sm appearance-none text-center">
-                                <option value="no">No</option>
-                                <option value="si">Sí</option>
-                            </select>
+                                class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Mascotas</label>
+                            <input type="number" min="0" x-model="formReserva.cantidad_mascotas"
+                                @input="recalcularTotal()" required
+                                class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-4 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold transition-colors shadow-sm text-center">
                         </div>
                         <div class="col-span-1">
                             <label
@@ -710,8 +718,8 @@
                                 placeholder="0">
                         </div>
                         <p class="text-[10px] text-gray-400 font-bold ml-2 mt-1"
-                            x-show="formReserva.check_in && formReserva.check_out">* Autocalculado según configuración
-                            de tarifas.</p>
+                            x-show="formReserva.check_in && formReserva.check_out">* Autocalculado: Noches + Extras +
+                            Aseo Único.</p>
                     </div>
                 </div>
 
@@ -774,14 +782,14 @@
                 precioEspecialTemporal: '',
 
                 modalConfigTarifas: false,
-                formTarifas: { precio_noche: 0, huespedes_base: 1, precio_huesped_extra: 0, precio_mascota: 0 },
+                formTarifas: { precio_noche: 0, huespedes_base: 1, precio_huesped_extra: 0, precio_mascota: 0, tarifa_aseo: 0 },
 
                 modalReserva: false,
                 fpModal: null,
                 formReserva: {
                     id: null, huesped_nombre: '', check_in: '', check_out: '',
                     hora_llegada: '15:00', hora_salida: '11:00', monto_total: '',
-                    canal: 'Directa', cantidad_huespedes: 1, trae_mascota: 'no'
+                    canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
                 },
 
                 stats: { ingresos: 0, noches: 0, huespedes: 0 },
@@ -832,7 +840,8 @@
                         precio_noche: this.propiedadActiva.precio_noche || 0,
                         huespedes_base: this.propiedadActiva.huespedes_base || 1,
                         precio_huesped_extra: this.propiedadActiva.precio_huesped_extra || 0,
-                        precio_mascota: this.propiedadActiva.precio_mascota || 0
+                        precio_mascota: this.propiedadActiva.precio_mascota || 0,
+                        tarifa_aseo: this.propiedadActiva.tarifa_aseo || 0
                     };
                     this.modalConfigTarifas = true;
                 },
@@ -846,7 +855,8 @@
                                 precio_noche: Number(this.formTarifas.precio_noche),
                                 huespedes_base: Number(this.formTarifas.huespedes_base),
                                 precio_huesped_extra: Number(this.formTarifas.precio_huesped_extra),
-                                precio_mascota: Number(this.formTarifas.precio_mascota)
+                                precio_mascota: Number(this.formTarifas.precio_mascota),
+                                tarifa_aseo: Number(this.formTarifas.tarifa_aseo)
                             })
                         });
                         if (res.ok) {
@@ -854,11 +864,11 @@
                             this.propiedadActiva.huespedes_base = Number(this.formTarifas.huespedes_base);
                             this.propiedadActiva.precio_huesped_extra = Number(this.formTarifas.precio_huesped_extra);
                             this.propiedadActiva.precio_mascota = Number(this.formTarifas.precio_mascota);
+                            this.propiedadActiva.tarifa_aseo = Number(this.formTarifas.tarifa_aseo);
                             this.generarMesVisual();
                             this.modalConfigTarifas = false;
                         } else {
-                            // Alerta estándar, sin rastros de IA
-                            alert("Error al guardar la configuración. Inténtalo de nuevo.");
+                            alert("Error al guardar la configuración.");
                         }
                     } catch (e) { alert("Error de conexión"); } finally { this.cargando = false; }
                 },
@@ -881,7 +891,7 @@
                 abrirReservaDesdeRango() {
                     this.formReserva = {
                         id: null, huesped_nombre: '', check_in: this.rangoSeleccionado[0], check_out: this.rangoSeleccionado[1],
-                        hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, trae_mascota: 'no'
+                        hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
                     };
                     this.cerrarAccionRango();
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
@@ -1011,14 +1021,14 @@
                     this.formReserva = {
                         id: null, huesped_nombre: '', check_in: '', check_out: '',
                         hora_llegada: '15:00', hora_salida: '11:00', monto_total: '',
-                        canal: 'Directa', cantidad_huespedes: 1, trae_mascota: 'no'
+                        canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
                     };
                     this.initFlatpickrReserva();
                     this.modalReserva = true;
                 },
 
                 editarReserva(res) {
-                    this.formReserva = { ...res, trae_mascota: 'no' };
+                    this.formReserva = { ...res, cantidad_mascotas: 0 };
 
                     const dIn = new Date(res.check_in);
                     const dOut = new Date(res.check_out);
@@ -1048,17 +1058,21 @@
                     let pax = Number(this.formReserva.cantidad_huespedes) || 1;
                     let extraPaxCount = pax > baseGuests ? pax - baseGuests : 0;
 
+                    let numMascotas = Number(this.formReserva.cantidad_mascotas) || 0;
+                    let petPrice = this.propiedadActiva.precio_mascota || 0;
+
+                    // Suma Noches + Extras + Mascotas
                     let d = new Date(d1);
                     for (let i = 0; i < diffDays; i++) {
                         let dStr = getLocalDateString(d);
                         let diaBase = this.obtenerPrecioPorDia(dStr);
-                        subtotal += diaBase + (extraPaxCount * extraPrice);
+                        subtotal += diaBase + (extraPaxCount * extraPrice) + (numMascotas * petPrice);
                         d.setDate(d.getDate() + 1);
                     }
 
-                    if (this.formReserva.trae_mascota === 'si') {
-                        subtotal += (this.propiedadActiva.precio_mascota || 0);
-                    }
+                    // Sumar Aseo (Pago ÚNICO por estadía)
+                    let aseoUnico = this.propiedadActiva.tarifa_aseo || 0;
+                    subtotal += aseoUnico;
 
                     this.formReserva.monto_total = subtotal;
                 },
