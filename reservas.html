@@ -250,20 +250,29 @@
                                             x-text="diaObj.dia"></span>
 
                                         <div x-show="diaObj.resSalida"
-                                            class="absolute bottom-2 left-2 w-[45%] z-10 text-left cursor-pointer"
+                                            class="absolute bottom-1 left-1 w-[48%] z-10 text-left cursor-pointer p-1"
                                             @click.stop="editarReserva(diaObj.resSalida)">
-                                            <span class="font-black text-xs block leading-none opacity-80 truncate"
+                                            <span class="font-bold text-xs truncate block leading-tight"
+                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
+                                                x-text="diaObj.resSalida?.huesped_nombre.split(' ')[0]"></span>
+                                            <span
+                                                class="font-black text-[9px] uppercase block leading-none opacity-50 mt-1"
+                                                :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')">Check-out</span>
+                                            <span class="font-black text-[10px] block leading-none opacity-80 mt-0.5"
                                                 :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
                                                 x-text="formatearHora(diaObj.resSalida?.check_out)"></span>
                                         </div>
 
                                         <div x-show="diaObj.resLlegada"
-                                            class="absolute bottom-2 right-2 w-[45%] z-10 text-right cursor-pointer"
+                                            class="absolute bottom-1 right-1 w-[48%] z-10 text-right cursor-pointer p-1"
                                             @click.stop="editarReserva(diaObj.resLlegada)">
-                                            <span class="font-bold text-sm truncate block leading-none mb-1"
+                                            <span class="font-bold text-xs truncate block leading-tight"
                                                 :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
                                                 x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
-                                            <span class="font-black text-xs block leading-none opacity-80 truncate"
+                                            <span
+                                                class="font-black text-[9px] uppercase block leading-none opacity-50 mt-1"
+                                                :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')">Check-in</span>
+                                            <span class="font-black text-[10px] block leading-none opacity-80 mt-0.5"
                                                 :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
                                                 x-text="formatearHora(diaObj.resLlegada?.check_in)"></span>
                                         </div>
@@ -764,7 +773,6 @@
                 vistaAccionRango: 'opciones',
                 precioEspecialTemporal: '',
 
-                // ✨ NUEVO ESTADO: Config Tarifas ✨
                 modalConfigTarifas: false,
                 formTarifas: { precio_noche: 0, huespedes_base: 1, precio_huesped_extra: 0, precio_mascota: 0 },
 
@@ -819,7 +827,6 @@
                     alert("Datos sincronizados.");
                 },
 
-                // ✨ NUEVO: ABRIR MODAL CONFIGURACIÓN ✨
                 abrirModalConfigTarifas() {
                     this.formTarifas = {
                         precio_noche: this.propiedadActiva.precio_noche || 0,
@@ -830,7 +837,6 @@
                     this.modalConfigTarifas = true;
                 },
 
-                // ✨ NUEVO: GUARDAR CONFIGURACIÓN ✨
                 async guardarConfigTarifas() {
                     this.cargando = true;
                     try {
@@ -851,7 +857,8 @@
                             this.generarMesVisual();
                             this.modalConfigTarifas = false;
                         } else {
-                            alert("Asegúrate de haber agregado las 3 columnas en la Base de Datos como indicó Gemini.");
+                            // Alerta estándar, sin rastros de IA
+                            alert("Error al guardar la configuración. Inténtalo de nuevo.");
                         }
                     } catch (e) { alert("Error de conexión"); } finally { this.cargando = false; }
                 },
@@ -1026,7 +1033,6 @@
                     this.modalReserva = true;
                 },
 
-                // ✨ CEREBRO DEL FORMULARIO: CALCULA TODO AL VUELO ✨
                 recalcularTotal() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
 
@@ -1164,8 +1170,6 @@
                     if (tipo === 'text') return `text-${c}`;
                     if (tipo === 'border') return `border-${c}`;
                     if (tipo === 'badge') return `bg-${c}/10 text-${c} border-${c}/20`;
-
-                    // Banda limpia y transparente
                     if (tipo === 'band') return `bg-${c}/20`;
 
                     return '';
