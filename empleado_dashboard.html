@@ -137,7 +137,7 @@
                     </div>
                     <div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Daños Reportados</p>
-                        <p class="text-3xl font-extrabold text-navy">0</p>
+                        <p class="text-3xl font-extrabold text-navy" x-text="tareasConNovedad"></p>
                     </div>
                 </div>
             </div>
@@ -523,11 +523,13 @@
                 </svg>
                 Reportar Novedad
             </h3>
-            <form class="space-y-4" onsubmit="event.preventDefault(); alert('Reporte enviado.'); modalReporte = false;">
+
+            <form class="space-y-4" @submit.prevent="enviarReporte()">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Detalles del Daño
                         o Faltante</label>
-                    <textarea placeholder="Ej: Se rompió una copa de vino..." rows="3"
+                    <textarea x-model="nuevoReporte" placeholder="Ej: Se rompió una copa de vino en la sala..." rows="3"
+                        required
                         class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-danger text-sm text-navy resize-none"></textarea>
                 </div>
                 <button type="button"
@@ -538,7 +540,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Tomar Foto del Problema
+                    Tomar Foto (Próximamente)
                 </button>
                 <div class="pt-2 flex gap-3">
                     <button type="button" @click="modalReporte = false"
@@ -561,11 +563,15 @@
 
                 tareasPendientes: [],
                 tareasCompletadas: 0,
+                tareasConNovedad: 0,
 
                 aseoActivo: false,
                 tareaActiva: null,
                 pestañaActiva: 'checklist',
+
+                // Variables de Reporte
                 modalReporte: false,
+                nuevoReporte: '',
 
                 // Variables del Reloj Invisible
                 segundos: 0,
@@ -575,20 +581,17 @@
                 azucar: 0, te: 0, cafe: 0, papel: 0, jabon_barra: 0, shampoo: 0, toallas_grandes: 0, toallas_pequenas: 0,
 
                 async initApp() {
-                    // LEER AL USUARIO DESDE EL LOCALSTORAGE DE FORMA CORRECTA
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
                         this.empleadoId = usuario.id;
                         this.empleadoNombre = usuario.nombre;
 
-                        // Establecer iniciales
                         const partes = this.empleadoNombre.split(' ');
                         this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
 
                         await this.cargarTareasDesdeBD();
                     } else {
-                        // Si por algún motivo entra sin login, lo mandamos afuera
                         window.location.href = 'login.html';
                     }
                 },
@@ -600,9 +603,10 @@
                             const todasLasTareas = await res.json();
                             this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente');
                             this.tareasCompletadas = todasLasTareas.filter(t => t.estado === 'Completada').length;
+                            this.tareasConNovedad = todasLasTareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').length;
                         }
                     } catch (error) {
-                        console.error("Error al cargar las tareas del empleado", error);
+                        console.error(error);
                     } finally {
                         this.cargando = false;
                     }
@@ -612,6 +616,7 @@
                     this.aseoActivo = true;
                     this.tareaActiva = tarea;
                     this.pestañaActiva = 'checklist';
+                    this.nuevoReporte = '';
 
                     this.segundos = 0;
                     this.intervalo = setInterval(() => {
@@ -624,9 +629,31 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
+                // ✨ ENVÍA EL REPORTE A LA NUBE ✨
+                async enviarReporte() {
+                    if (!this.nuevoReporte.trim()) return;
+
+                    this.cargando = true;
+                    try {
+                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ novedad_reportada: this.nuevoReporte })
+                        });
+                        alert('🚨 Reporte enviado exitosamente al Ama de Llaves.');
+                        this.modalReporte = false;
+                        this.nuevoReporte = '';
+                        await this.cargarTareasDesdeBD(); // Recargar para actualizar el contador
+                    } catch (e) {
+                        console.error(e);
+                        alert('Error al enviar el reporte.');
+                    } finally {
+                        this.cargando = false;
+                    }
+                },
+
                 async finalizarAseo() {
                     clearInterval(this.intervalo);
-
                     this.cargando = true;
                     try {
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
@@ -658,15 +685,13 @@
             }
         }
 
-        // Lógica de Navbar 
+        // Navbar Scroll
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
             const largoPildora = 'max-w-[550px]';
-
             window.addEventListener('scroll', () => {
                 if (document.querySelector('[x-data]').__x.$data.aseoActivo) return;
-
                 if (window.scrollY > 50) {
                     logo.classList.replace('h-16', 'h-10');
                     navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
