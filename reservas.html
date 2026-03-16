@@ -262,9 +262,9 @@
                                             <span class="font-bold text-sm truncate block leading-none mb-0.5"
                                                 :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
                                                 x-text="diaObj.resSalida?.huesped_nombre.split(' ')[0]"></span>
-                                            <span class="font-black text-xs block leading-noneopacity-80"
+                                            <span class="font-black text-[11px] block leading-none opacity-80 truncate"
                                                 :class="obtenerColorCanal(diaObj.resSalida?.canal, 'text')"
-                                                x-text="'Out: ' + formatearHora(diaObj.resSalida?.check_out)"></span>
+                                                x-text="'Check-out: ' + formatearHora(diaObj.resSalida?.check_out)"></span>
                                         </div>
 
                                         <div x-show="diaObj.resLlegada"
@@ -273,9 +273,9 @@
                                             <span class="font-bold text-sm truncate block leading-none mb-0.5"
                                                 :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
                                                 x-text="diaObj.resLlegada?.huesped_nombre.split(' ')[0]"></span>
-                                            <span class="font-black text-xs block leading-none opacity-80"
+                                            <span class="font-black text-[11px] block leading-none opacity-80 truncate"
                                                 :class="obtenerColorCanal(diaObj.resLlegada?.canal, 'text')"
-                                                x-text="'In: ' + formatearHora(diaObj.resLlegada?.check_in)"></span>
+                                                x-text="'Check-in: ' + formatearHora(diaObj.resLlegada?.check_in)"></span>
                                         </div>
 
                                         <div x-show="diaObj.resLlena" class="absolute inset-0 z-20 cursor-pointer"
@@ -676,7 +676,6 @@
             });
         });
 
-        // Utilidad para extraer la fecha local de forma segura y evitar que los dias se corran por zona horaria
         function getLocalDateString(isoString) {
             const d = new Date(isoString);
             const y = d.getFullYear();
@@ -870,11 +869,9 @@
                             totalDinero += Number(r.monto_total);
                             totalPax += Number(r.cantidad_huespedes);
 
-                            // Matemática de hotel: Diferencia de días
                             let diffTime = Math.abs(dOut.getTime() - dIn.getTime());
                             let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                            // Asegurar la regla: mínimo 1 noche
                             if (diffDays < 1) diffDays = 1;
                             totalNoches += diffDays;
                         }
@@ -889,7 +886,6 @@
                     this.calcularStats();
                 },
 
-                // ✨ LOGICA DE CALENDARIO DIVIDIDO Y MINIMALISTA ✨
                 generarMesVisual() {
                     const year = this.fechaCalendario.getFullYear();
                     const month = this.fechaCalendario.getMonth();
@@ -1072,8 +1068,6 @@
                     if (tipo === 'text') return `text-${c}`;
                     if (tipo === 'border') return `border-${c}`;
                     if (tipo === 'badge') return `bg-${c}/10 text-${c} border-${c}/20`;
-
-                    // NUEVO: Color transparente para las bandas del calendario
                     if (tipo === 'band') return `bg-${c}/20`;
 
                     return '';
