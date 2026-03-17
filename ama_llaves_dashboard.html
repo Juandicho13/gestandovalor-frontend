@@ -218,7 +218,6 @@
                                         <div>
                                             <h4 class="text-sm font-bold text-navy" x-text="tarea.nombreAptoSeguro">
                                             </h4>
-                                            </h4>
                                             <p class="text-gray-500 text-xs font-medium">Asignado a: <strong
                                                     class="text-navy" x-text="tarea.nombreEmpleadoSeguro"></strong></p>
                                         </div>
@@ -404,8 +403,12 @@
 
                 async cargarTareas() {
                     try {
-                        const res = await this.fetchFresco('tareas-aseo');
-                        if (res.ok) this.tareas = await res.json();
+                        // 🐴 AQUÍ CONECTAMOS LA LECTURA AL CABALLO DE TROYA 🐴
+                        const urlFresco = 'https://gestandovalor-backend.onrender.com/reservas/troya/aseos?t=' + new Date().getTime();
+                        const res = await fetch(urlFresco);
+                        if (res.ok) {
+                            this.tareas = await res.json();
+                        }
                     } catch (e) { console.error(e); }
                 },
 
@@ -493,7 +496,8 @@
                     }
                     this.cargando = true;
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
+                        // 🐴 AQUÍ CONECTAMOS EL GUARDADO AL CABALLO DE TROYA 🐴
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
