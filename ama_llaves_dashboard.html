@@ -216,11 +216,10 @@
                                             <span class="font-black text-xs">🏠</span>
                                         </div>
                                         <div>
-                                            <h4 class="text-sm font-bold text-navy"
-                                                x-text="tarea.propiedad?.titulo || 'Apartamento'"></h4>
+                                            <h4 class="text-sm font-bold text-navy" x-text="tarea.nombreAptoSeguro">
+                                            </h4>
                                             <p class="text-gray-500 text-xs font-medium">Asignado a: <strong
-                                                    class="text-navy"
-                                                    x-text="tarea.empleado?.nombre || 'Desconocido'"></strong></p>
+                                                    class="text-navy" x-text="tarea.nombreEmpleadoSeguro"></strong></p>
                                         </div>
                                     </div>
                                     <span
@@ -259,21 +258,21 @@
                                         <div
                                             class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
                                             <span class="font-bold text-xs"
-                                                x-text="tarea.propiedad?.titulo?.substring(0,2) || '🏠'"></span>
+                                                x-text="(tarea.propiedad?.titulo || '🏠').substring(0,2)"></span>
                                         </div>
                                         <div>
                                             <h3 class="text-lg font-bold text-navy"
                                                 x-text="tarea.propiedad?.titulo || 'Apartamento'"></h3>
                                             <span
                                                 class="inline-block mt-1 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200 uppercase tracking-wider"
-                                                x-text="`Limpiado por: ${tarea.empleado?.nombre}`"></span>
+                                                x-text="`Limpiado por: ${tarea.empleado?.nombre || 'Desconocido'}`"></span>
                                         </div>
                                     </div>
                                     <span
                                         class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100 uppercase text-center leading-tight">
                                         Terminado<br>
                                         <span class="font-mono"
-                                            x-text="Math.floor(tarea.tiempo_segundos/60) + ' min'"></span>
+                                            x-text="Math.floor((tarea.tiempo_segundos||0)/60) + ' min'"></span>
                                     </span>
                                 </div>
                                 <button @click="abrirInspeccion(tarea)"
@@ -474,7 +473,6 @@
 
                 async cargarTareas() {
                     try {
-                        // ✨ EL RELOJ MÁGICO PARA EVITAR LA CACHÉ ✨
                         const urlFresco = 'https://gestandovalor-backend.onrender.com/tareas-aseo?t=' + new Date().getTime();
                         const res = await fetch(urlFresco);
                         if (res.ok) {
@@ -487,7 +485,6 @@
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
                 },
 
-                // ✨ DETECTORES BLINDADOS: Enlaza perfectamente la tarea con la reserva ✨
                 get checkoutsSinAsignar() {
                     return this.reservas.filter(res => {
                         const yaAsignado = this.tareas.some(t => {
@@ -539,8 +536,32 @@
                     });
                 },
 
+                // ✨ AQUÍ ESTÁ LA MAGIA PARA QUE NUNCA FALLE AL MOSTRAR EL NOMBRE Y APTO ✨
                 get tareasPendientes() {
-                    return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente');
+                    return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
+
+                        // Busca forzadamente la propiedad en la lista maestra si el backend no la manda
+                        let nombreApto = t.propiedad?.titulo;
+                        if (!nombreApto) {
+                            const idBuscado = String(t.propiedad_id || t.propiedadId);
+                            const propEncontrada = this.propiedades.find(p => String(p.id) === idBuscado);
+                            nombreApto = propEncontrada ? propEncontrada.titulo : 'Apto Desconocido';
+                        }
+
+                        // Busca forzadamente al empleado en la lista maestra si el backend no lo manda
+                        let nombreEmp = t.empleado?.nombre;
+                        if (!nombreEmp) {
+                            const idEmpBuscado = String(t.empleado_id || t.empleadoId);
+                            const empEncontrado = this.empleadosAseo.find(e => String(e.id) === idEmpBuscado);
+                            nombreEmp = empEncontrado ? empEncontrado.nombre : 'Desconocido';
+                        }
+
+                        return {
+                            ...t,
+                            nombreAptoSeguro: nombreApto,
+                            nombreEmpleadoSeguro: nombreEmp
+                        }
+                    });
                 },
 
                 get tareasCompletadas() {
