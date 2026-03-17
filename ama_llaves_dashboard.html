@@ -159,30 +159,38 @@
                                                 <h3 class="text-md font-bold text-navy"
                                                     x-text="`Huésped: ${reserva.huesped_nombre}`"></h3>
                                                 <p class="text-gray-500 text-xs font-medium">Sale el: <strong
-                                                        class="text-navy" x-text="reserva.fecha_salida"></strong> a las
-                                                    <strong class="text-navy" x-text="reserva.hora_salida"></strong>
+                                                        class="text-navy"
+                                                        x-text="reserva.fecha_salida_formato"></strong> a las
+                                                    <strong class="text-navy"
+                                                        x-text="reserva.hora_salida_formato"></strong>
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                                        <div class="flex flex-col sm:flex-row gap-2">
+                                        <div class="flex flex-col sm:flex-row gap-3 items-center">
                                             <select x-model="reserva.empleado_asignado"
-                                                class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
+                                                class="flex-1 w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
                                                 <option value="">Seleccionar personal...</option>
                                                 <template x-for="emp in empleadosAseo" :key="emp.id">
                                                     <option :value="emp.id" x-text="emp.nombre"></option>
                                                 </template>
                                             </select>
-                                            <select x-model="reserva.urgencia"
-                                                class="bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer shrink-0">
-                                                <option value="Normal">⚡ Normal</option>
-                                                <option value="Urgente">🔥 Urgente</option>
-                                                <option value="Flexible">☕ Flexible</option>
-                                            </select>
+
+                                            <span
+                                                class="text-[10px] font-extrabold px-3 py-2 rounded-lg uppercase tracking-wider shrink-0"
+                                                :class="{
+                                                      'bg-red-50 text-danger border border-red-100': reserva.urgencia_calculada === 'Urgente',
+                                                      'bg-yellow-50 text-warning border border-yellow-100': reserva.urgencia_calculada === 'Normal',
+                                                      'bg-gray-100 text-gray-500 border border-gray-200': reserva.urgencia_calculada === 'Flexible'
+                                                  }">
+                                                <span
+                                                    x-text="reserva.urgencia_calculada === 'Urgente' ? '🔥 Urgente' : (reserva.urgencia_calculada === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
+                                            </span>
+
                                             <button @click="asignarAseo(reserva)"
-                                                class="bg-navy hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg transition-colors text-xs shadow-sm shrink-0">
+                                                class="w-full sm:w-auto bg-navy hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg transition-colors text-xs shadow-sm shrink-0">
                                                 Agendar
                                             </button>
                                         </div>
@@ -197,7 +205,7 @@
                     </div>
 
                     <div>
-                        <h3 class="text-xl font-extrabold text-navy mb-4">Aseos Asignados (En progreso)</h3>
+                        <h3 class="text-xl font-extrabold text-navy mb-4">Aseos Asignados</h3>
                         <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
                             <template x-for="tarea in tareasPendientes" :key="tarea.id">
                                 <div
@@ -221,7 +229,7 @@
                                               'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
                                               'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
                                               'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || !tarea.urgencia
-                                          }" x-text="tarea.urgencia || 'Normal'">
+                                          }" x-text="tarea.urgencia || 'Flexible'">
                                     </span>
                                 </div>
                             </template>
@@ -477,21 +485,52 @@
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
                 },
 
-                // ✨ AHORA SÍ, SIN CANDADOS DE FECHA ✨
+                // ✨ AQUÍ ESTÁ EL CEREBRO MATEMÁTICO QUE CALCULA LA URGENCIA ✨
                 get checkoutsSinAsignar() {
                     return this.reservas.filter(res => {
-                        // Solo filtramos para que no salgan las que YA le asignaste a alguien
                         const yaAsignado = this.tareas.some(t => t.propiedad_id === res.propiedad_id && t.estado === 'Pendiente');
                         return !yaAsignado;
                     }).map(res => {
                         const prop = this.propiedades.find(p => p.id === res.propiedad_id);
+
+                        // Lógica de Urgencia Automática
+                        const checkoutDate = new Date(res.check_out);
+                        checkoutDate.setHours(0, 0, 0, 0);
+
+                        // Buscar si este apartamento tiene OTRA reserva que entre DESPUÉS o el mismo día del checkout
+                        const futurasReservas = this.reservas.filter(r => {
+                            if (r.id === res.id) return false;
+                            if (r.propiedad_id !== res.propiedad_id) return false;
+                            const checkInDate = new Date(r.check_in);
+                            checkInDate.setHours(0, 0, 0, 0);
+                            return checkInDate >= checkoutDate;
+                        });
+
+                        // Ordenar por fecha para ver cuál es la que sigue exactamente
+                        futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
+
+                        let autoUrgency = 'Flexible'; // Por defecto, no hay nadie esperando
+
+                        if (futurasReservas.length > 0) {
+                            const nextReserva = futurasReservas[0];
+                            const nextCheckIn = new Date(nextReserva.check_in);
+                            nextCheckIn.setHours(0, 0, 0, 0);
+
+                            // Si el Check-in de la que sigue es el MISMO día de la que sale: ¡Fuego!
+                            if (nextCheckIn.getTime() === checkoutDate.getTime()) {
+                                autoUrgency = 'Urgente';
+                            } else {
+                                autoUrgency = 'Normal'; // Entra al día siguiente o después
+                            }
+                        }
+
                         return {
                             ...res,
                             propiedad_nombre: prop ? prop.titulo : 'Apto Desconocido',
-                            fecha_salida: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
-                            hora_salida: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                            fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
+                            hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
                             empleado_asignado: '',
-                            urgencia: 'Normal'
+                            urgencia_calculada: autoUrgency // <-- La variable automática
                         };
                     });
                 },
@@ -515,10 +554,11 @@
                         const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
+                            // ✨ MANDA LA URGENCIA QUE CALCULÓ EL SISTEMA SOLITO ✨
                             body: JSON.stringify({
                                 propiedad_id: reserva.propiedad_id,
                                 empleado_id: reserva.empleado_asignado,
-                                urgencia: reserva.urgencia,
+                                urgencia: reserva.urgencia_calculada,
                                 estado: 'Pendiente'
                             })
                         });
