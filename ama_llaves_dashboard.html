@@ -228,7 +228,7 @@
                                         :class="{
                                               'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
                                               'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
-                                              'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || !tarea.urgencia
+                                              'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || (!tarea.urgencia)
                                           }" x-text="tarea.urgencia || 'Flexible'">
                                     </span>
                                 </div>
@@ -485,23 +485,27 @@
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
                 },
 
-                // ✨ EL CEREBRO DE URGENCIA AUTOMÁTICA Y FILTRO CORREGIDO ✨
+                // ✨ DETECTORES BLINDADOS: Enlaza perfectamente la tarea con la reserva ✨
                 get checkoutsSinAsignar() {
                     return this.reservas.filter(res => {
-                        // Filtramos si ya existe una tarea pendiente para este apartamento (usamos == para evitar error de texto/numero)
-                        const yaAsignado = this.tareas.some(t => t.propiedad_id == res.propiedad_id && t.estado === 'Pendiente');
+                        const yaAsignado = this.tareas.some(t => {
+                            const idAptoTarea = String(t.propiedad_id || t.propiedadId);
+                            const idAptoReserva = String(res.propiedad_id || res.propiedadId);
+                            const estadoEsPendiente = !t.estado || String(t.estado).toLowerCase() === 'pendiente';
+                            return idAptoTarea === idAptoReserva && estadoEsPendiente;
+                        });
                         return !yaAsignado;
                     }).map(res => {
-                        // Buscar el nombre del apartamento (usamos == por si acaso)
-                        const prop = this.propiedades.find(p => p.id == res.propiedad_id);
+                        const idBuscado = String(res.propiedad_id || res.propiedadId);
+                        const prop = this.propiedades.find(p => String(p.id) === idBuscado);
 
-                        // Lógica de Urgencia Automática
                         const checkoutDate = new Date(res.check_out);
                         checkoutDate.setHours(0, 0, 0, 0);
 
                         const futurasReservas = this.reservas.filter(r => {
                             if (r.id === res.id) return false;
-                            if (r.propiedad_id != res.propiedad_id) return false;
+                            const idR = String(r.propiedad_id || r.propiedadId);
+                            if (idR !== idBuscado) return false;
                             const checkInDate = new Date(r.check_in);
                             checkInDate.setHours(0, 0, 0, 0);
                             return checkInDate >= checkoutDate;
@@ -534,11 +538,11 @@
                 },
 
                 get tareasPendientes() {
-                    return this.tareas.filter(t => t.estado === 'Pendiente');
+                    return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente');
                 },
 
                 get tareasCompletadas() {
-                    return this.tareas.filter(t => t.estado === 'Completada');
+                    return this.tareas.filter(t => t.estado && String(t.estado).toLowerCase() === 'completada');
                 },
 
                 async asignarAseo(reserva) {
@@ -549,9 +553,9 @@
 
                     this.cargando = true;
                     try {
-                        // ✨ Convertimos a números para que la Base de Datos no se estrelle ✨
                         const empId = isNaN(reserva.empleado_asignado) ? reserva.empleado_asignado : Number(reserva.empleado_asignado);
-                        const propId = isNaN(reserva.propiedad_id) ? reserva.propiedad_id : Number(reserva.propiedad_id);
+                        const propVal = reserva.propiedad_id || reserva.propiedadId;
+                        const propId = isNaN(propVal) ? propVal : Number(propVal);
 
                         const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
                             method: 'POST',
@@ -566,10 +570,9 @@
 
                         if (res.ok) {
                             alert('✅ ¡Aseo asignado correctamente!');
-                            await this.cargarTareas(); // Esto lo mueve a la lista de abajo automáticamente
+                            await this.cargarTareas();
                         } else {
-                            const errorTxt = await res.text();
-                            alert('Error al guardar en el servidor: ' + errorTxt);
+                            alert('Error al guardar en el servidor.');
                         }
                     } catch (e) {
                         console.error(e);
