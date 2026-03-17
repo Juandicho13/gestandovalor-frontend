@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ GESTANDO VALOR - MODO DEBUG ⚡</title>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        .panel {
+            border: 1px solid #00ff00;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        button {
+            background: #00ff00;
+            color: #000;
+            padding: 10px 20px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background: #fff;
+        }
+
+        input,
+        select {
+            background: #333;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body x-data="debuggerApp()" x-init="cargarTodo()">
+
+    <h1>📡 LABORATORIO DE PRUEBAS - BASE DE DATOS CRUDA</h1>
+    <button @click="cargarTodo()">🔄 RECARGAR DATOS DEL SERVIDOR</button>
+
+    <div class="panel">
+        <h3>1. CREAR TAREA MANUALMENTE (Prueba de guardado)</h3>
+        <p>Escribe el ID de una propiedad y de un empleado de las listas de abajo, y dale guardar.</p>
+        <input type="text" x-model="nuevaTarea.propiedad_id" placeholder="ID de Propiedad">
+        <input type="text" x-model="nuevaTarea.empleado_id" placeholder="ID de Empleado">
+        <button @click="forzarGuardado()">💾 ENVIAR AL BACKEND</button>
+        <p style="color: yellow;" x-text="mensajeRespuesta"></p>
+    </div>
+
+    <div style="display: flex; gap: 20px;">
+        <div class="panel" style="flex: 1;">
+            <h3>📦 2. TAREAS DE ASEO ACTUALES</h3>
+            <pre x-text="JSON.stringify(tareas, null, 2)"></pre>
+        </div>
+
+        <div class="panel" style="flex: 1;">
+            <h3>📅 3. RESERVAS ACTUALES</h3>
+            <pre x-text="JSON.stringify(reservas, null, 2)"></pre>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px;">
+        <div class="panel" style="flex: 1;">
+            <h3>🏢 4. PROPIEDADES</h3>
+            <pre x-text="JSON.stringify(propiedades, null, 2)"></pre>
+        </div>
+
+        <div class="panel" style="flex: 1;">
+            <h3>👥 5. EMPLEADOS</h3>
+            <pre x-text="JSON.stringify(empleados, null, 2)"></pre>
+        </div>
+    </div>
+
+    <script>
+        function debuggerApp() {
+            return {
+                tareas: [], reservas: [], propiedades: [], empleados: [],
+                nuevaTarea: { propiedad_id: '', empleado_id: '' },
+                mensajeRespuesta: 'Esperando acción...',
+
+                async cargarTodo() {
+                    this.mensajeRespuesta = 'Cargando datos...';
+                    const t = new Date().getTime(); // Anti caché
+                    try {
+                        const [resTar, resRes, resProp, resEmp] = await Promise.all([
+                            fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos?t=' + t),
+                            fetch('https://gestandovalor-backend.onrender.com/reservas?t=' + t),
+                            fetch('https://gestandovalor-backend.onrender.com/propiedades?t=' + t),
+                            fetch('https://gestandovalor-backend.onrender.com/usuarios?t=' + t)
+                        ]);
+                        this.tareas = await resTar.json();
+                        this.reservas = await resRes.json();
+                        this.propiedades = await resProp.json();
+                        const todosUsuarios = await resEmp.json();
+                        this.empleados = todosUsuarios.filter(u => u.rol === 'ASEO');
+                        this.mensajeRespuesta = '✅ Datos cargados de la base de datos real.';
+                    } catch (e) {
+                        this.mensajeRespuesta = '❌ ERROR: No se pudo conectar al servidor.';
+                    }
+                },
+
+                async forzarGuardado() {
+                    if (!this.nuevaTarea.propiedad_id || !this.nuevaTarea.empleado_id) {
+                        this.mensajeRespuesta = '⚠️ Llena ambos campos de ID primero.';
+                        return;
+                    }
+                    this.mensajeRespuesta = '⏳ Enviando petición a Render...';
+
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                propiedad_id: this.nuevaTarea.propiedad_id,
+                                empleado_id: this.nuevaTarea.empleado_id,
+                                urgencia: 'Prueba',
+                                estado: 'Pendiente'
+                            })
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            this.mensajeRespuesta = '✅ GUARDADO EXITOSO! Revisa la caja de tareas abajo.';
+                            await this.cargarTodo(); // Recargamos para ver si aparece
+                        } else {
+                            const err = await res.text();
+                            this.mensajeRespuesta = '❌ ERROR DEL SERVIDOR: ' + err;
+                        }
+                    } catch (e) {
+                        this.mensajeRespuesta = '❌ ERROR DE RED.';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
