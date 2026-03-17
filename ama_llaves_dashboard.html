@@ -474,7 +474,9 @@
 
                 async cargarTareas() {
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo');
+                        // ✨ EL RELOJ MÁGICO PARA EVITAR LA CACHÉ ✨
+                        const urlFresco = 'https://gestandovalor-backend.onrender.com/tareas-aseo?t=' + new Date().getTime();
+                        const res = await fetch(urlFresco);
                         if (res.ok) {
                             this.tareas = await res.json();
                         }
