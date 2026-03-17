@@ -152,13 +152,13 @@
                                         <div class="flex items-start gap-4">
                                             <div
                                                 class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-navy flex-shrink-0 shadow-sm border border-gray-200">
-                                                <span class="font-black text-xs"
-                                                    x-text="reserva.propiedad_nombre.substring(0, 4)"></span>
+                                                <span class="font-black text-xl">🏠</span>
                                             </div>
                                             <div>
                                                 <h3 class="text-md font-bold text-navy"
-                                                    x-text="`Huésped: ${reserva.huesped_nombre}`"></h3>
-                                                <p class="text-gray-500 text-xs font-medium">Sale el: <strong
+                                                    x-text="(reserva.propiedad_nombre !== 'Apto Desconocido' ? reserva.propiedad_nombre : 'Apto') + ' (Huésped: ' + reserva.huesped_nombre + ')'">
+                                                </h3>
+                                                <p class="text-gray-500 text-xs font-medium mt-1">Sale el: <strong
                                                         class="text-navy"
                                                         x-text="reserva.fecha_salida_formato"></strong> a las
                                                     <strong class="text-navy"
@@ -485,42 +485,40 @@
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
                 },
 
-                // ✨ AQUÍ ESTÁ EL CEREBRO MATEMÁTICO QUE CALCULA LA URGENCIA ✨
+                // ✨ EL CEREBRO DE URGENCIA AUTOMÁTICA Y FILTRO CORREGIDO ✨
                 get checkoutsSinAsignar() {
                     return this.reservas.filter(res => {
-                        const yaAsignado = this.tareas.some(t => t.propiedad_id === res.propiedad_id && t.estado === 'Pendiente');
+                        // Filtramos si ya existe una tarea pendiente para este apartamento (usamos == para evitar error de texto/numero)
+                        const yaAsignado = this.tareas.some(t => t.propiedad_id == res.propiedad_id && t.estado === 'Pendiente');
                         return !yaAsignado;
                     }).map(res => {
-                        const prop = this.propiedades.find(p => p.id === res.propiedad_id);
+                        // Buscar el nombre del apartamento (usamos == por si acaso)
+                        const prop = this.propiedades.find(p => p.id == res.propiedad_id);
 
                         // Lógica de Urgencia Automática
                         const checkoutDate = new Date(res.check_out);
                         checkoutDate.setHours(0, 0, 0, 0);
 
-                        // Buscar si este apartamento tiene OTRA reserva que entre DESPUÉS o el mismo día del checkout
                         const futurasReservas = this.reservas.filter(r => {
                             if (r.id === res.id) return false;
-                            if (r.propiedad_id !== res.propiedad_id) return false;
+                            if (r.propiedad_id != res.propiedad_id) return false;
                             const checkInDate = new Date(r.check_in);
                             checkInDate.setHours(0, 0, 0, 0);
                             return checkInDate >= checkoutDate;
                         });
 
-                        // Ordenar por fecha para ver cuál es la que sigue exactamente
                         futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
 
-                        let autoUrgency = 'Flexible'; // Por defecto, no hay nadie esperando
-
+                        let autoUrgency = 'Flexible';
                         if (futurasReservas.length > 0) {
                             const nextReserva = futurasReservas[0];
                             const nextCheckIn = new Date(nextReserva.check_in);
                             nextCheckIn.setHours(0, 0, 0, 0);
 
-                            // Si el Check-in de la que sigue es el MISMO día de la que sale: ¡Fuego!
                             if (nextCheckIn.getTime() === checkoutDate.getTime()) {
                                 autoUrgency = 'Urgente';
                             } else {
-                                autoUrgency = 'Normal'; // Entra al día siguiente o después
+                                autoUrgency = 'Normal';
                             }
                         }
 
@@ -530,7 +528,7 @@
                             fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
                             hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
                             empleado_asignado: '',
-                            urgencia_calculada: autoUrgency // <-- La variable automática
+                            urgencia_calculada: autoUrgency
                         };
                     });
                 },
@@ -551,13 +549,16 @@
 
                     this.cargando = true;
                     try {
+                        // ✨ Convertimos a números para que la Base de Datos no se estrelle ✨
+                        const empId = isNaN(reserva.empleado_asignado) ? reserva.empleado_asignado : Number(reserva.empleado_asignado);
+                        const propId = isNaN(reserva.propiedad_id) ? reserva.propiedad_id : Number(reserva.propiedad_id);
+
                         const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            // ✨ MANDA LA URGENCIA QUE CALCULÓ EL SISTEMA SOLITO ✨
                             body: JSON.stringify({
-                                propiedad_id: reserva.propiedad_id,
-                                empleado_id: reserva.empleado_asignado,
+                                propiedad_id: propId,
+                                empleado_id: empId,
                                 urgencia: reserva.urgencia_calculada,
                                 estado: 'Pendiente'
                             })
@@ -565,9 +566,10 @@
 
                         if (res.ok) {
                             alert('✅ ¡Aseo asignado correctamente!');
-                            await this.cargarTareas();
+                            await this.cargarTareas(); // Esto lo mueve a la lista de abajo automáticamente
                         } else {
-                            alert('Error al guardar en el servidor.');
+                            const errorTxt = await res.text();
+                            alert('Error al guardar en el servidor: ' + errorTxt);
                         }
                     } catch (e) {
                         console.error(e);
