@@ -156,7 +156,7 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-md font-bold text-navy"
-                                                    x-text="(reserva.propiedad_nombre !== 'Apto Desconocido' ? reserva.propiedad_nombre : 'Apto') + ' (Huésped: ' + reserva.huesped_nombre + ')'">
+                                                    x-text="reserva.propiedad_nombre_seguro + ' (Huésped: ' + reserva.huesped_nombre + ')'">
                                                 </h3>
                                                 <p class="text-gray-500 text-xs font-medium mt-1">Sale el: <strong
                                                         class="text-navy"
@@ -258,14 +258,14 @@
                                         <div
                                             class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
                                             <span class="font-bold text-xs"
-                                                x-text="(tarea.propiedad?.titulo || '🏠').substring(0,2)"></span>
+                                                x-text="(tarea.nombreAptoSeguro || '🏠').substring(0,2)"></span>
                                         </div>
                                         <div>
-                                            <h3 class="text-lg font-bold text-navy"
-                                                x-text="tarea.propiedad?.titulo || 'Apartamento'"></h3>
+                                            <h3 class="text-lg font-bold text-navy" x-text="tarea.nombreAptoSeguro">
+                                            </h3>
                                             <span
                                                 class="inline-block mt-1 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200 uppercase tracking-wider"
-                                                x-text="`Limpiado por: ${tarea.empleado?.nombre || 'Desconocido'}`"></span>
+                                                x-text="`Limpiado por: ${tarea.nombreEmpleadoSeguro}`"></span>
                                         </div>
                                     </div>
                                     <span
@@ -310,25 +310,15 @@
                 <div>
                     <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
                         Empleado</span>
-                    <h3 class="text-2xl font-extrabold text-navy" x-text="tareaAInspeccionar?.propiedad?.titulo"></h3>
+                    <h3 class="text-2xl font-extrabold text-navy" x-text="tareaAInspeccionar?.nombreAptoSeguro"></h3>
                     <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy"
-                            x-text="tareaAInspeccionar?.empleado?.nombre"></strong></p>
+                            x-text="tareaAInspeccionar?.nombreEmpleadoSeguro"></strong></p>
                 </div>
                 <button @click="modalInspeccion = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg></button>
-            </div>
-
-            <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-8">
-                <p class="text-xs text-blue-800 font-bold flex items-center gap-2">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Verifica que el apartamento esté impecable antes de aprobar.
-                </p>
             </div>
 
             <div class="flex gap-4">
@@ -344,71 +334,7 @@
         </div>
     </div>
 
-    <div x-show="modalReportes" style="display: none;"
-        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
-        <div
-            class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] overflow-y-auto">
-
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-extrabold text-navy">Historial de Novedades</h3>
-                    <p class="text-xs text-gray-500 mt-1 font-bold">Daños reportados por el equipo de limpieza.</p>
-                </div>
-                <button @click="modalReportes = false"
-                    class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
-            </div>
-
-            <div class="space-y-4">
-                <template x-for="tarea in tareasConReporte" :key="tarea.id">
-                    <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
-                        <div
-                            class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-danger shadow-sm shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-bold text-navy" x-text="`Reporte en ${tarea.propiedad?.titulo}`">
-                            </h4>
-                            <p class="text-xs text-gray-500 mt-1" x-text="`Reportado por: ${tarea.empleado?.nombre}`">
-                            </p>
-                            <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100"
-                                x-text="`&quot;${tarea.novedad_reportada}&quot;`"></p>
-                        </div>
-                    </div>
-                </template>
-
-                <div x-show="tareasConReporte.length === 0" class="text-center py-4">
-                    <p class="text-gray-500 font-bold">No hay novedades reportadas recientemente. 🎉</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const navbar = document.getElementById('navbar');
-            const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[700px]';
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10');
-                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                } else {
-                    logo.classList.replace('h-10', 'h-16');
-                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                }
-            });
-        });
-
         function amaLlavesApp() {
             return {
                 cargando: true,
@@ -445,16 +371,22 @@
                     this.cargando = false;
                 },
 
+                // FETCH GENÉRICO ANTI-CACHÉ
+                async fetchFresco(endpoint) {
+                    const url = `https://gestandovalor-backend.onrender.com/${endpoint}?t=${new Date().getTime()}`;
+                    return await fetch(url, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } });
+                },
+
                 async cargarPropiedades() {
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        const res = await this.fetchFresco('propiedades');
                         if (res.ok) this.propiedades = await res.json();
                     } catch (e) { console.error(e); }
                 },
 
                 async cargarEmpleados() {
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/usuarios');
+                        const res = await this.fetchFresco('usuarios');
                         if (res.ok) {
                             const all = await res.json();
                             this.empleadosAseo = all.filter(u => u.rol === 'ASEO');
@@ -464,21 +396,27 @@
 
                 async cargarReservas() {
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas');
-                        if (res.ok) {
-                            this.reservas = await res.json();
-                        }
+                        const res = await this.fetchFresco('reservas');
+                        if (res.ok) this.reservas = await res.json();
                     } catch (e) { console.error(e); }
                 },
 
                 async cargarTareas() {
                     try {
-                        const urlFresco = 'https://gestandovalor-backend.onrender.com/tareas-aseo?t=' + new Date().getTime();
-                        const res = await fetch(urlFresco);
-                        if (res.ok) {
-                            this.tareas = await res.json();
-                        }
+                        const res = await this.fetchFresco('tareas-aseo');
+                        if (res.ok) this.tareas = await res.json();
                     } catch (e) { console.error(e); }
+                },
+
+                // LÓGICA MANUAL DE EMPAREJAMIENTO DE NOMBRES
+                obtenerNombreApto(id) {
+                    const prop = this.propiedades.find(p => String(p.id) === String(id));
+                    return prop ? prop.titulo : 'Apto Desconocido';
+                },
+
+                obtenerNombreEmpleado(id) {
+                    const emp = this.empleadosAseo.find(e => String(e.id) === String(id));
+                    return emp ? emp.nombre : 'Empleado Borrado';
                 },
 
                 get tareasConReporte() {
@@ -488,46 +426,37 @@
                 get checkoutsSinAsignar() {
                     return this.reservas.filter(res => {
                         const yaAsignado = this.tareas.some(t => {
-                            const idAptoTarea = String(t.propiedad_id || t.propiedadId);
-                            const idAptoReserva = String(res.propiedad_id || res.propiedadId);
+                            const idAptoTarea = String(t.propiedad_id);
+                            const idAptoReserva = String(res.propiedad_id);
                             const estadoEsPendiente = !t.estado || String(t.estado).toLowerCase() === 'pendiente';
                             return idAptoTarea === idAptoReserva && estadoEsPendiente;
                         });
                         return !yaAsignado;
                     }).map(res => {
-                        const idBuscado = String(res.propiedad_id || res.propiedadId);
-                        const prop = this.propiedades.find(p => String(p.id) === idBuscado);
+                        const propNombre = this.obtenerNombreApto(res.propiedad_id);
 
                         const checkoutDate = new Date(res.check_out);
                         checkoutDate.setHours(0, 0, 0, 0);
 
                         const futurasReservas = this.reservas.filter(r => {
                             if (r.id === res.id) return false;
-                            const idR = String(r.propiedad_id || r.propiedadId);
-                            if (idR !== idBuscado) return false;
+                            if (String(r.propiedad_id) !== String(res.propiedad_id)) return false;
                             const checkInDate = new Date(r.check_in);
                             checkInDate.setHours(0, 0, 0, 0);
                             return checkInDate >= checkoutDate;
                         });
-
                         futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
 
                         let autoUrgency = 'Flexible';
                         if (futurasReservas.length > 0) {
-                            const nextReserva = futurasReservas[0];
-                            const nextCheckIn = new Date(nextReserva.check_in);
+                            const nextCheckIn = new Date(futurasReservas[0].check_in);
                             nextCheckIn.setHours(0, 0, 0, 0);
-
-                            if (nextCheckIn.getTime() === checkoutDate.getTime()) {
-                                autoUrgency = 'Urgente';
-                            } else {
-                                autoUrgency = 'Normal';
-                            }
+                            autoUrgency = nextCheckIn.getTime() === checkoutDate.getTime() ? 'Urgente' : 'Normal';
                         }
 
                         return {
                             ...res,
-                            propiedad_nombre: prop ? prop.titulo : 'Apto Desconocido',
+                            propiedad_nombre_seguro: propNombre,
                             fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
                             hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
                             empleado_asignado: '',
@@ -538,24 +467,20 @@
 
                 get tareasPendientes() {
                     return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
-                        let nombreApto = t.propiedad?.titulo;
-                        if (!nombreApto) {
-                            const idBuscado = String(t.propiedad_id || t.propiedadId);
-                            const propEncontrada = this.propiedades.find(p => String(p.id) === idBuscado);
-                            nombreApto = propEncontrada ? propEncontrada.titulo : 'Apto Desconocido';
-                        }
-
-                        let nombreEmp = t.empleado?.nombre;
-                        if (!nombreEmp) {
-                            const idEmpBuscado = String(t.empleado_id || t.empleadoId);
-                            const empEncontrado = this.empleadosAseo.find(e => String(e.id) === idEmpBuscado);
-                            nombreEmp = empEncontrado ? empEncontrado.nombre : 'Desconocido';
-                        }
-
                         return {
                             ...t,
-                            nombreAptoSeguro: nombreApto,
-                            nombreEmpleadoSeguro: nombreEmp
+                            nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
+                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
+                        }
+                    });
+                },
+
+                get tareasCompletadas() {
+                    return this.tareas.filter(t => t.estado && String(t.estado).toLowerCase() === 'completada').map(t => {
+                        return {
+                            ...t,
+                            nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
+                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
                         }
                     });
                 },
@@ -565,22 +490,15 @@
                         alert("Por favor selecciona a un empleado.");
                         return;
                     }
-
                     this.cargando = true;
                     try {
-                        // ✨ AHORA ENVIAMOS LOS IDS COMO TEXTO PURO (STRING), NADA DE NÚMEROS ✨
-                        const empId = String(reserva.empleado_asignado);
-                        const propVal = reserva.propiedad_id || reserva.propiedadId;
-                        const propId = String(propVal);
-
                         const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                propiedad_id: propId,
-                                empleado_id: empId,
+                                propiedad_id: String(reserva.propiedad_id),
+                                empleado_id: String(reserva.empleado_asignado),
                                 urgencia: String(reserva.urgencia_calculada),
-                                estado: 'Pendiente'
                             })
                         });
 
@@ -589,18 +507,12 @@
                             await this.cargarTareas();
                         } else {
                             const errorMsg = await res.text();
-                            alert('Error al guardar en el servidor: ' + errorMsg);
+                            alert('❌ Hubo un error al guardar: ' + errorMsg);
                         }
                     } catch (e) {
-                        console.error(e);
                         alert('Error de conexión.');
                     }
                     this.cargando = false;
-                },
-
-                abrirInspeccion(tarea) {
-                    this.tareaAInspeccionar = tarea;
-                    this.modalInspeccion = true;
                 },
 
                 async aprobarInspeccion() {
