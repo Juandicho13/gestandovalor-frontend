@@ -536,11 +536,8 @@
                     });
                 },
 
-                // ✨ AQUÍ ESTÁ LA MAGIA PARA QUE NUNCA FALLE AL MOSTRAR EL NOMBRE Y APTO ✨
                 get tareasPendientes() {
                     return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
-
-                        // Busca forzadamente la propiedad en la lista maestra si el backend no la manda
                         let nombreApto = t.propiedad?.titulo;
                         if (!nombreApto) {
                             const idBuscado = String(t.propiedad_id || t.propiedadId);
@@ -548,7 +545,6 @@
                             nombreApto = propEncontrada ? propEncontrada.titulo : 'Apto Desconocido';
                         }
 
-                        // Busca forzadamente al empleado en la lista maestra si el backend no lo manda
                         let nombreEmp = t.empleado?.nombre;
                         if (!nombreEmp) {
                             const idEmpBuscado = String(t.empleado_id || t.empleadoId);
@@ -564,10 +560,6 @@
                     });
                 },
 
-                get tareasCompletadas() {
-                    return this.tareas.filter(t => t.estado && String(t.estado).toLowerCase() === 'completada');
-                },
-
                 async asignarAseo(reserva) {
                     if (!reserva.empleado_asignado) {
                         alert("Por favor selecciona a un empleado.");
@@ -576,9 +568,10 @@
 
                     this.cargando = true;
                     try {
-                        const empId = isNaN(reserva.empleado_asignado) ? reserva.empleado_asignado : Number(reserva.empleado_asignado);
+                        // ✨ AHORA ENVIAMOS LOS IDS COMO TEXTO PURO (STRING), NADA DE NÚMEROS ✨
+                        const empId = String(reserva.empleado_asignado);
                         const propVal = reserva.propiedad_id || reserva.propiedadId;
-                        const propId = isNaN(propVal) ? propVal : Number(propVal);
+                        const propId = String(propVal);
 
                         const res = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo', {
                             method: 'POST',
@@ -586,7 +579,7 @@
                             body: JSON.stringify({
                                 propiedad_id: propId,
                                 empleado_id: empId,
-                                urgencia: reserva.urgencia_calculada,
+                                urgencia: String(reserva.urgencia_calculada),
                                 estado: 'Pendiente'
                             })
                         });
@@ -595,7 +588,8 @@
                             alert('✅ ¡Aseo asignado correctamente!');
                             await this.cargarTareas();
                         } else {
-                            alert('Error al guardar en el servidor.');
+                            const errorMsg = await res.text();
+                            alert('Error al guardar en el servidor: ' + errorMsg);
                         }
                     } catch (e) {
                         console.error(e);
