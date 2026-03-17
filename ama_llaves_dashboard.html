@@ -477,9 +477,10 @@
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '');
                 },
 
-                // ✨ AQUÍ SE QUITÓ EL CANDADO DE TIEMPO ✨
+                // ✨ AHORA SÍ, SIN CANDADOS DE FECHA ✨
                 get checkoutsSinAsignar() {
                     return this.reservas.filter(res => {
+                        // Solo filtramos para que no salgan las que YA le asignaste a alguien
                         const yaAsignado = this.tareas.some(t => t.propiedad_id === res.propiedad_id && t.estado === 'Pendiente');
                         return !yaAsignado;
                     }).map(res => {
