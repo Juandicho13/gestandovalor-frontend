@@ -214,17 +214,31 @@
                                         <div
                                             class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white shadow-md border border-gray-200 shrink-0">
                                             <span class="font-black text-sm"
-                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' ? tarea.nombreAptoSeguro.substring(0,2) : '🏠')"></span>
+                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro.substring(0,2) : '🏠')"></span>
                                         </div>
                                         <div class="flex-1">
                                             <h4 class="text-lg font-extrabold text-navy"
                                                 x-text="tarea.nombreAptoSeguro"></h4>
 
-                                            <div class="mt-1 flex items-center gap-2">
-                                                <span class="text-gray-500 text-xs font-medium">Asignado a:</span>
+                                            <p
+                                                class="text-[11px] font-bold text-blue-600 mb-1.5 flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="tarea.proxima_reserva_texto"></span>
+                                            </p>
+
+                                            <div class="flex items-center gap-2">
+                                                <span
+                                                    class="text-gray-500 text-[11px] font-medium uppercase tracking-wider">Asignado
+                                                    a:</span>
                                                 <select x-model="tarea.empleado_id"
                                                     @change="cambiarEmpleado(tarea.id, tarea.empleado_id)"
-                                                    class="bg-gray-50 border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px]">
+                                                    class="bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px] shadow-sm">
                                                     <template x-for="emp in empleadosAseo" :key="emp.id">
                                                         <option :value="emp.id" x-text="emp.nombre"
                                                             :selected="emp.id == tarea.empleado_id"></option>
@@ -234,7 +248,7 @@
                                         </div>
                                     </div>
                                     <span
-                                        class="text-[10px] font-extrabold px-2 py-1 rounded-md uppercase tracking-wider shrink-0"
+                                        class="text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shrink-0 shadow-sm"
                                         :class="{
                                               'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
                                               'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
@@ -529,12 +543,35 @@
                     });
                 },
 
+                // ✨ LA MAGIA QUE CALCULA LA PRÓXIMA RESERVA ✨
                 get tareasPendientes() {
                     return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
+
+                        // Buscamos todas las reservas de ESTE apartamento
+                        const futurasReservas = this.reservas.filter(r => {
+                            if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
+                            // Filtramos solo las reservas de HOY en adelante
+                            const checkInDate = new Date(r.check_in);
+                            checkInDate.setHours(0, 0, 0, 0);
+                            const hoy = new Date();
+                            hoy.setHours(0, 0, 0, 0);
+                            return checkInDate >= hoy;
+                        });
+
+                        // Ordenamos para que la más próxima quede de primera
+                        futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
+
+                        let textoProximaReserva = 'Sin reservas próximas';
+                        if (futurasReservas.length > 0) {
+                            const nextDate = new Date(futurasReservas[0].check_in);
+                            textoProximaReserva = 'Entra huésped el ' + nextDate.toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
+                        }
+
                         return {
                             ...t,
                             nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
-                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
+                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id),
+                            proxima_reserva_texto: textoProximaReserva
                         }
                     });
                 },
@@ -567,7 +604,6 @@
                         });
 
                         if (res.ok) {
-                            alert('✅ ¡Aseo asignado correctamente!');
                             await this.cargarTareas();
                         } else {
                             const errorMsg = await res.text();
@@ -579,8 +615,6 @@
                     this.cargando = false;
                 },
 
-                // ✨ NUEVA FUNCIÓN PARA EDITAR EL EMPLEADO EN VIVO ✨
-                // ✨ FUNCIÓN CHISMOSA PARA VER EL ERROR REAL ✨
                 async cambiarEmpleado(tareaId, nuevoEmpleadoId) {
                     this.cargando = true;
                     try {
@@ -593,7 +627,6 @@
                         if (res.ok) {
                             await this.cargarTareas();
                         } else {
-                            // AQUI LE DECIMOS QUE NOS MUESTRE EL TEXTO EXACTO DEL ERROR
                             const errorMsg = await res.text();
                             alert('❌ ERROR DEL SERVIDOR: ' + errorMsg);
                         }
@@ -606,8 +639,6 @@
                 async aprobarInspeccion() {
                     this.cargando = true;
                     try {
-                        // Ojo, esta sí apuntaba a la ruta vieja de Prisma para el PATCH completo.
-                        // La dejamos por ahora, pero si falla la movemos al Caballo de Troya también.
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaAInspeccionar.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
