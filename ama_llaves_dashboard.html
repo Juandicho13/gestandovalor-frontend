@@ -580,6 +580,7 @@
                 },
 
                 // ✨ NUEVA FUNCIÓN PARA EDITAR EL EMPLEADO EN VIVO ✨
+                // ✨ FUNCIÓN CHISMOSA PARA VER EL ERROR REAL ✨
                 async cambiarEmpleado(tareaId, nuevoEmpleadoId) {
                     this.cargando = true;
                     try {
@@ -590,10 +591,11 @@
                         });
 
                         if (res.ok) {
-                            // Cambiamos el nombre en vivo sin tener que recargar toda la página molestamente
                             await this.cargarTareas();
                         } else {
-                            alert('❌ Hubo un error al actualizar el empleado.');
+                            // AQUI LE DECIMOS QUE NOS MUESTRE EL TEXTO EXACTO DEL ERROR
+                            const errorMsg = await res.text();
+                            alert('❌ ERROR DEL SERVIDOR: ' + errorMsg);
                         }
                     } catch (e) {
                         alert('Error de conexión al actualizar.');
