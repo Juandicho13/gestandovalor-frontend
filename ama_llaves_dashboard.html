@@ -506,23 +506,12 @@
                     }));
                 },
 
+                // ✨ LA MAGIA MATEMÁTICA CON ESCUDO ANTI-CLONES ✨
                 get checkoutsSinAsignar() {
-                    // ✨ Lógica para calcular 'hoy' strictly a medianoche ✨
                     const hoy = new Date();
                     hoy.setHours(0, 0, 0, 0);
 
-                    const aptosConAseoPendiente = this.tareas
-                        .filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente')
-                        .map(t => String(t.propiedad_id));
-
-                    // ✨ FILTRO DE FECHA: Solo muestra check-outs de HOY en adelante ✨
-                    let reservasFiltradas = this.reservas.filter(res => {
-                        const checkOutDate = new Date(res.check_out);
-                        // Compara strictly la fecha de salida contra hoy
-                        return checkOutDate >= hoy;
-                    });
-
-                    // Aplica lógica matemática para evitar duplicados si hay aseo pendiente
+                    // 1. Contar cuántas tareas de aseo hay por cada apartamento abajo
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
                         if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
@@ -531,15 +520,34 @@
                         }
                     });
 
-                    // Ordenamos de VIEJAS a NUEVAS para procesar cronológicamente
+                    // 2. Tomamos las reservas desde HOY hacia el futuro
+                    let reservasFiltradas = this.reservas.filter(res => {
+                        const checkoutDate = new Date(res.check_out);
+                        return checkoutDate >= hoy;
+                    });
                     reservasFiltradas.sort((a, b) => new Date(a.check_out) - new Date(b.check_out));
 
                     const reservasAMostrar = [];
+
+                    // 🛡️ ESCUDO ANTI-DUPLICADOS DE BASE DE DATOS 🛡️
+                    const checkoutsVistos = new Set();
+
+                    // 3. Revisamos reserva por reserva en orden cronológico
                     for (let res of reservasFiltradas) {
                         const idApto = String(res.propiedad_id);
+
+                        // Creamos una firma única (ID del Apto + Fecha de salida)
+                        const firmaUnica = idApto + '_' + res.check_out;
+
+                        // Si ya vimos esta salida exacta, es un clon de la base de datos, ¡LO IGNORAMOS!
+                        if (checkoutsVistos.has(firmaUnica)) continue;
+                        checkoutsVistos.add(firmaUnica);
+
+                        // Si este apartamento tiene "créditos" de limpieza (aseos ya asignados), descontamos 1
                         if (conteoAseosPendientes[idApto] > 0) {
                             conteoAseosPendientes[idApto]--;
                         } else {
+                            // Si NO hay créditos de limpieza, MOSTRAMOS LA RESERVA
                             const propNombre = this.obtenerNombreApto(res.propiedad_id);
                             const checkoutDate = new Date(res.check_out);
                             checkoutDate.setHours(0, 0, 0, 0);
@@ -563,7 +571,6 @@
                             reservasAMostrar.push({
                                 ...res,
                                 propiedad_nombre_seguro: propNombre,
-                                // ✨ Asigna la foto real aquí ✨
                                 fotoAptoSeguro: this.obtenerFotoApto(res.propiedad_id),
                                 fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
                                 hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
@@ -573,7 +580,6 @@
                         }
                     }
 
-                    // Re-ordenamos para mostrar las más urgentes (viejas) primero arriba
                     return reservasAMostrar;
                 },
 
