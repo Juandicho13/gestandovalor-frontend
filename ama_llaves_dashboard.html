@@ -495,26 +495,39 @@
                     }));
                 },
 
-                // ✨ LA MAGIA DEL FILTRO AGRUPADOR ✨
+                // ✨ LA MAGIA MATEMÁTICA: Oculta solo las reservas que ya tienen una tarea asignada ✨
                 get checkoutsSinAsignar() {
-                    // 1. Qué aptos YA tienen aseo pendiente abajo
-                    const aptosConAseoPendiente = this.tareas
-                        .filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente')
-                        .map(t => String(t.propiedad_id));
+                    const ayer = new Date();
+                    ayer.setDate(ayer.getDate() - 1);
+                    ayer.setHours(0, 0, 0, 0);
 
-                    const reservasAgrupadas = [];
-                    const aptosVistos = [];
+                    // Contar cuántas tareas de aseo hay por cada apartamento
+                    const conteoAseosPendientes = {};
+                    this.tareas.forEach(t => {
+                        if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
+                            const id = String(t.propiedad_id);
+                            conteoAseosPendientes[id] = (conteoAseosPendientes[id] || 0) + 1;
+                        }
+                    });
 
-                    // Ordenamos de la reserva más reciente a la más vieja
-                    const reservasOrdenadas = [...this.reservas].sort((a, b) => new Date(b.check_out) - new Date(a.check_out));
+                    // Tomamos todas las reservas desde ayer y las ordenamos por fecha de salida (las más viejas primero)
+                    let reservasFiltradas = this.reservas.filter(res => {
+                        const checkoutDate = new Date(res.check_out);
+                        return checkoutDate >= ayer;
+                    });
+                    reservasFiltradas.sort((a, b) => new Date(a.check_out) - new Date(b.check_out));
 
-                    for (let res of reservasOrdenadas) {
+                    const reservasAMostrar = [];
+
+                    // Por cada reserva, miramos si su apartamento tiene un aseo asignado
+                    for (let res of reservasFiltradas) {
                         const idApto = String(res.propiedad_id);
 
-                        // Si el apto NO está abajo en aseos, y NO lo hemos metido ya a la lista
-                        if (!aptosConAseoPendiente.includes(idApto) && !aptosVistos.includes(idApto)) {
-                            aptosVistos.push(idApto);
-
+                        // Si tiene aseos pendientes, "descontamos" uno y no mostramos esta reserva
+                        if (conteoAseosPendientes[idApto] > 0) {
+                            conteoAseosPendientes[idApto]--;
+                        } else {
+                            // Si ya no hay aseos asignados para descontar, MOSTRAMOS LA RESERVA
                             const propNombre = this.obtenerNombreApto(res.propiedad_id);
                             const checkoutDate = new Date(res.check_out);
                             checkoutDate.setHours(0, 0, 0, 0);
@@ -535,7 +548,7 @@
                                 autoUrgency = nextCheckIn.getTime() === checkoutDate.getTime() ? 'Urgente' : 'Normal';
                             }
 
-                            reservasAgrupadas.push({
+                            reservasAMostrar.push({
                                 ...res,
                                 propiedad_nombre_seguro: propNombre,
                                 fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
@@ -546,7 +559,7 @@
                         }
                     }
 
-                    return reservasAgrupadas;
+                    return reservasAMostrar;
                 },
 
                 get tareasPendientes() {
