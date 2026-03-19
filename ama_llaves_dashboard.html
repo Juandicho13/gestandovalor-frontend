@@ -151,8 +151,9 @@
                                     <div class="flex justify-between items-start">
                                         <div class="flex items-start gap-4">
                                             <div
-                                                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-navy flex-shrink-0 shadow-sm border border-gray-200">
-                                                <span class="font-black text-xl">🏠</span>
+                                                class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-sm border border-gray-200 bg-white">
+                                                <img :src="reserva.fotoAptoSeguro" alt="Apartamento"
+                                                    class="w-full h-full object-cover">
                                             </div>
                                             <div>
                                                 <h3 class="text-md font-bold text-navy"
@@ -212,9 +213,9 @@
                                     class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
                                     <div class="flex items-center gap-4 w-full">
                                         <div
-                                            class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white shadow-md border border-gray-200 shrink-0">
-                                            <span class="font-black text-sm"
-                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro.substring(0,2) : '🏠')"></span>
+                                            class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
+                                            <img :src="tarea.fotoAptoSeguro" alt="Apartamento"
+                                                class="w-full h-full object-cover">
                                         </div>
                                         <div class="flex-1">
                                             <h4 class="text-lg font-extrabold text-navy"
@@ -293,9 +294,9 @@
                                 <div class="flex justify-between items-start">
                                     <div class="flex items-start gap-4">
                                         <div
-                                            class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                                            <span class="font-bold text-xs"
-                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro.substring(0,2) : '🏠')"></span>
+                                            class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
+                                            <img :src="tarea.fotoAptoSeguro" alt="Apartamento"
+                                                class="w-full h-full object-cover">
                                         </div>
                                         <div>
                                             <h3 class="text-lg font-bold text-navy"
@@ -487,6 +488,16 @@
                     return emp ? emp.nombre : 'Empleado Borrado';
                 },
 
+                // ✨ Nueva función para obtener la foto real de portada (o placeholder si no hay) ✨
+                obtenerFotoApto(propId) {
+                    const prop = this.propiedades.find(p => String(p.id) === String(propId));
+                    if (prop && prop.fotos && prop.fotos.length > 0) {
+                        return prop.fotos[0]; // Retorna la primera foto
+                    }
+                    // Retorna una foto por defecto (puedes cambiar esta URL por tu placeholder GV.png)
+                    return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80';
+                },
+
                 get tareasConReporte() {
                     return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').map(t => ({
                         ...t,
@@ -495,13 +506,23 @@
                     }));
                 },
 
-                // ✨ LA MAGIA MATEMÁTICA REAL Y CORRECTA ✨
                 get checkoutsSinAsignar() {
-                    const ayer = new Date();
-                    ayer.setDate(ayer.getDate() - 1);
-                    ayer.setHours(0, 0, 0, 0);
+                    // ✨ Lógica para calcular 'hoy' strictly a medianoche ✨
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
 
-                    // 1. Contar cuántas tareas de aseo hay por cada apartamento abajo
+                    const aptosConAseoPendiente = this.tareas
+                        .filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente')
+                        .map(t => String(t.propiedad_id));
+
+                    // ✨ FILTRO DE FECHA: Solo muestra check-outs de HOY en adelante ✨
+                    let reservasFiltradas = this.reservas.filter(res => {
+                        const checkOutDate = new Date(res.check_out);
+                        // Compara strictly la fecha de salida contra hoy
+                        return checkOutDate >= hoy;
+                    });
+
+                    // Aplica lógica matemática para evitar duplicados si hay aseo pendiente
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
                         if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
@@ -510,24 +531,15 @@
                         }
                     });
 
-                    // 2. Tomamos las reservas desde ayer hacia el futuro, y ordenamos de VIEJAS a NUEVAS
-                    let reservasFiltradas = this.reservas.filter(res => {
-                        const checkoutDate = new Date(res.check_out);
-                        return checkoutDate >= ayer;
-                    });
+                    // Ordenamos de VIEJAS a NUEVAS para procesar cronológicamente
                     reservasFiltradas.sort((a, b) => new Date(a.check_out) - new Date(b.check_out));
 
                     const reservasAMostrar = [];
-
-                    // 3. Revisamos reserva por reserva en orden cronológico
                     for (let res of reservasFiltradas) {
                         const idApto = String(res.propiedad_id);
-
-                        // Si este apartamento tiene "créditos" de limpieza (aseos ya asignados), descontamos 1 y OCULTAMOS esta reserva
                         if (conteoAseosPendientes[idApto] > 0) {
                             conteoAseosPendientes[idApto]--;
                         } else {
-                            // Si NO hay créditos de limpieza, ¡AQUÍ ESTÁ! Mostramos la reserva
                             const propNombre = this.obtenerNombreApto(res.propiedad_id);
                             const checkoutDate = new Date(res.check_out);
                             checkoutDate.setHours(0, 0, 0, 0);
@@ -551,6 +563,8 @@
                             reservasAMostrar.push({
                                 ...res,
                                 propiedad_nombre_seguro: propNombre,
+                                // ✨ Asigna la foto real aquí ✨
+                                fotoAptoSeguro: this.obtenerFotoApto(res.propiedad_id),
                                 fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
                                 hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
                                 empleado_asignado: '',
@@ -559,6 +573,7 @@
                         }
                     }
 
+                    // Re-ordenamos para mostrar las más urgentes (viejas) primero arriba
                     return reservasAMostrar;
                 },
 
@@ -582,6 +597,8 @@
                         return {
                             ...t,
                             nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
+                            // ✨ Asigna la foto real aquí ✨
+                            fotoAptoSeguro: this.obtenerFotoApto(t.propiedad_id),
                             nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id),
                             proxima_reserva_texto: textoProximaReserva
                         }
@@ -593,6 +610,8 @@
                         return {
                             ...t,
                             nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
+                            // ✨ Asigna la foto real aquí ✨
+                            fotoAptoSeguro: this.obtenerFotoApto(t.propiedad_id),
                             nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
                         }
                     });
