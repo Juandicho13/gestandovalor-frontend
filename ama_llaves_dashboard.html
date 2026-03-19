@@ -156,7 +156,7 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-md font-bold text-navy"
-                                                    x-text="reserva.propiedad_nombre_seguro + ' (Huésped: ' + reserva.huesped_nombre + ')'">
+                                                    x-text="(reserva.propiedad_nombre_seguro !== 'Apto Desconocido' && reserva.propiedad_nombre_seguro !== 'Sin título' ? reserva.propiedad_nombre_seguro : 'Apto sin nombre') + ' (Huésped: ' + reserva.huesped_nombre + ')'">
                                                 </h3>
                                                 <p class="text-gray-500 text-xs font-medium mt-1">Sale el: <strong
                                                         class="text-navy"
@@ -218,7 +218,8 @@
                                         </div>
                                         <div class="flex-1">
                                             <h4 class="text-lg font-extrabold text-navy"
-                                                x-text="tarea.nombreAptoSeguro"></h4>
+                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
+                                            </h4>
 
                                             <p
                                                 class="text-[11px] font-bold text-blue-600 mb-1.5 flex items-center gap-1">
@@ -294,10 +295,11 @@
                                         <div
                                             class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md">
                                             <span class="font-bold text-xs"
-                                                x-text="(tarea.nombreAptoSeguro || '🏠').substring(0,2)"></span>
+                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro.substring(0,2) : '🏠')"></span>
                                         </div>
                                         <div>
-                                            <h3 class="text-lg font-bold text-navy" x-text="tarea.nombreAptoSeguro">
+                                            <h3 class="text-lg font-bold text-navy"
+                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
                                             </h3>
                                             <span
                                                 class="inline-block mt-1 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200 uppercase tracking-wider"
@@ -344,7 +346,9 @@
                 <div>
                     <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
                         Empleado</span>
-                    <h3 class="text-2xl font-extrabold text-navy" x-text="tareaAInspeccionar?.nombreAptoSeguro"></h3>
+                    <h3 class="text-2xl font-extrabold text-navy"
+                        x-text="(tareaAInspeccionar?.nombreAptoSeguro !== 'Apto Desconocido' && tareaAInspeccionar?.nombreAptoSeguro !== 'Sin título' ? tareaAInspeccionar?.nombreAptoSeguro : 'Apto sin nombre')">
+                    </h3>
                     <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy"
                             x-text="tareaAInspeccionar?.nombreEmpleadoSeguro"></strong></p>
                 </div>
@@ -383,7 +387,8 @@
                 <template x-for="tarea in tareasConReporte" :key="tarea.id">
                     <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
                         <div>
-                            <h4 class="text-sm font-bold text-navy" x-text="`Reporte en ${tarea.nombreAptoSeguro}`">
+                            <h4 class="text-sm font-bold text-navy"
+                                x-text="`Reporte en ${(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')}`">
                             </h4>
                             <p class="text-xs text-gray-500 mt-1"
                                 x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`"></p>
@@ -490,59 +495,58 @@
                     }));
                 },
 
-                // ✨ LÓGICA INFALIBLE: Muestra reservas futuras, y se ocultan si el apto tiene tarea pendiente ✨
+                // ✨ LA MAGIA DEL FILTRO AGRUPADOR ✨
                 get checkoutsSinAsignar() {
-                    const ayer = new Date();
-                    ayer.setDate(ayer.getDate() - 1);
-                    ayer.setHours(0, 0, 0, 0);
-
-                    // Agrupamos los apartamentos que YA tienen una tarea en la lista de abajo
+                    // 1. Qué aptos YA tienen aseo pendiente abajo
                     const aptosConAseoPendiente = this.tareas
                         .filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente')
                         .map(t => String(t.propiedad_id));
 
-                    return this.reservas.filter(res => {
-                        const checkoutDate = new Date(res.check_out);
+                    const reservasAgrupadas = [];
+                    const aptosVistos = [];
 
-                        // 1. Ocultar checkouts viejísimos (mostramos de ayer en adelante)
-                        if (checkoutDate < ayer) return false;
+                    // Ordenamos de la reserva más reciente a la más vieja
+                    const reservasOrdenadas = [...this.reservas].sort((a, b) => new Date(b.check_out) - new Date(a.check_out));
 
-                        // 2. Si este apartamento ya está en la lista de "Aseos Asignados", lo ocultamos de arriba
-                        const idAptoReserva = String(res.propiedad_id);
-                        if (aptosConAseoPendiente.includes(idAptoReserva)) return false;
+                    for (let res of reservasOrdenadas) {
+                        const idApto = String(res.propiedad_id);
 
-                        return true;
-                    }).map(res => {
-                        // (Lógica de urgencia igual)
-                        const propNombre = this.obtenerNombreApto(res.propiedad_id);
-                        const checkoutDate = new Date(res.check_out);
-                        checkoutDate.setHours(0, 0, 0, 0);
+                        // Si el apto NO está abajo en aseos, y NO lo hemos metido ya a la lista
+                        if (!aptosConAseoPendiente.includes(idApto) && !aptosVistos.includes(idApto)) {
+                            aptosVistos.push(idApto);
 
-                        const futurasReservas = this.reservas.filter(r => {
-                            if (r.id === res.id) return false;
-                            if (String(r.propiedad_id) !== String(res.propiedad_id)) return false;
-                            const checkInDate = new Date(r.check_in);
-                            checkInDate.setHours(0, 0, 0, 0);
-                            return checkInDate >= checkoutDate;
-                        });
-                        futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
+                            const propNombre = this.obtenerNombreApto(res.propiedad_id);
+                            const checkoutDate = new Date(res.check_out);
+                            checkoutDate.setHours(0, 0, 0, 0);
 
-                        let autoUrgency = 'Flexible';
-                        if (futurasReservas.length > 0) {
-                            const nextCheckIn = new Date(futurasReservas[0].check_in);
-                            nextCheckIn.setHours(0, 0, 0, 0);
-                            autoUrgency = nextCheckIn.getTime() === checkoutDate.getTime() ? 'Urgente' : 'Normal';
+                            const futurasReservas = this.reservas.filter(r => {
+                                if (r.id === res.id) return false;
+                                if (String(r.propiedad_id) !== idApto) return false;
+                                const checkInDate = new Date(r.check_in);
+                                checkInDate.setHours(0, 0, 0, 0);
+                                return checkInDate >= checkoutDate;
+                            });
+                            futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
+
+                            let autoUrgency = 'Flexible';
+                            if (futurasReservas.length > 0) {
+                                const nextCheckIn = new Date(futurasReservas[0].check_in);
+                                nextCheckIn.setHours(0, 0, 0, 0);
+                                autoUrgency = nextCheckIn.getTime() === checkoutDate.getTime() ? 'Urgente' : 'Normal';
+                            }
+
+                            reservasAgrupadas.push({
+                                ...res,
+                                propiedad_nombre_seguro: propNombre,
+                                fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
+                                hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                                empleado_asignado: '',
+                                urgencia_calculada: autoUrgency
+                            });
                         }
+                    }
 
-                        return {
-                            ...res,
-                            propiedad_nombre_seguro: propNombre,
-                            fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
-                            hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                            empleado_asignado: '',
-                            urgencia_calculada: autoUrgency
-                        };
-                    });
+                    return reservasAgrupadas;
                 },
 
                 get tareasPendientes() {
@@ -617,7 +621,6 @@
                     this.cargando = false;
                 },
 
-                // ✨ NUEVA FUNCIÓN: BORRAR EL ASEO ✨
                 async borrarAseo(tareaId) {
                     if (!confirm('¿Seguro que deseas eliminar esta asignación de aseo?')) return;
                     this.cargando = true;
