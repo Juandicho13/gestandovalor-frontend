@@ -495,13 +495,13 @@
                     }));
                 },
 
-                // ✨ LA MAGIA MATEMÁTICA: Oculta solo las reservas que ya tienen una tarea asignada ✨
+                // ✨ LA MAGIA MATEMÁTICA REAL Y CORRECTA ✨
                 get checkoutsSinAsignar() {
                     const ayer = new Date();
                     ayer.setDate(ayer.getDate() - 1);
                     ayer.setHours(0, 0, 0, 0);
 
-                    // Contar cuántas tareas de aseo hay por cada apartamento
+                    // 1. Contar cuántas tareas de aseo hay por cada apartamento abajo
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
                         if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
@@ -510,7 +510,7 @@
                         }
                     });
 
-                    // Tomamos todas las reservas desde ayer y las ordenamos por fecha de salida (las más viejas primero)
+                    // 2. Tomamos las reservas desde ayer hacia el futuro, y ordenamos de VIEJAS a NUEVAS
                     let reservasFiltradas = this.reservas.filter(res => {
                         const checkoutDate = new Date(res.check_out);
                         return checkoutDate >= ayer;
@@ -519,15 +519,15 @@
 
                     const reservasAMostrar = [];
 
-                    // Por cada reserva, miramos si su apartamento tiene un aseo asignado
+                    // 3. Revisamos reserva por reserva en orden cronológico
                     for (let res of reservasFiltradas) {
                         const idApto = String(res.propiedad_id);
 
-                        // Si tiene aseos pendientes, "descontamos" uno y no mostramos esta reserva
+                        // Si este apartamento tiene "créditos" de limpieza (aseos ya asignados), descontamos 1 y OCULTAMOS esta reserva
                         if (conteoAseosPendientes[idApto] > 0) {
                             conteoAseosPendientes[idApto]--;
                         } else {
-                            // Si ya no hay aseos asignados para descontar, MOSTRAMOS LA RESERVA
+                            // Si NO hay créditos de limpieza, ¡AQUÍ ESTÁ! Mostramos la reserva
                             const propNombre = this.obtenerNombreApto(res.propiedad_id);
                             const checkoutDate = new Date(res.check_out);
                             checkoutDate.setHours(0, 0, 0, 0);
