@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Ama de Llaves - GestandoValor</title>
+    <title>Panel de Empleado - GestandoValor</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -25,666 +25,657 @@
             }
         }
     </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="amaLlavesApp()" x-init="initApp()"
-    :class="(modalInspeccion || modalReportes) ? 'overflow-hidden' : ''">
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="appAseo()" x-init="initApp()">
+
+    <div
+        class="hidden bg-red-50 border-red-100 text-danger bg-yellow-50 border-yellow-100 text-warning bg-gray-100 border-gray-200 text-gray-600">
+    </div>
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
-        <p class="font-bold text-navy animate-pulse">Sincronizando operaciones...</p>
+        <p class="font-bold text-navy animate-pulse">Cargando tu ruta de hoy...</p>
     </div>
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
-        <a href="ama_llaves_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy"
+        x-show="!aseoActivo">
+        <a href="empleado_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
 
         <div
             class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="ama_llaves_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi
+            <a href="empleado_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi
                 Panel</a>
-            <a href="ama_llaves_inventario.html"
-                class="text-sm font-medium hover:text-gold transition-colors">Inventario por Apto</a>
-            <button @click="modalReportes = true"
-                class="text-sm font-medium hover:text-gold transition-colors">Historial Novedades</button>
-
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-
             <button @click="cerrarSesion()"
                 class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg> Salir
+                </svg>
+                Salir
             </button>
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white border border-gold font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform"
-                x-text="iniciales">AL</div>
+            <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                x-text="iniciales">
+            </div>
         </div>
     </nav>
 
-    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+    <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden"
+        x-show="!aseoActivo">
+        <div
+            class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none">
         </div>
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
-                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Supervisión y
-                        Calidad</span>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Gestión de
+                        Limpieza</span>
                     <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, <span
-                            x-text="nombreUsuario"></span> ✨</h1>
-                    <p class="text-gray-400 mt-2">Control de inspecciones, asignación de aseo y estado de suites.</p>
+                            x-text="empleadoNombre"></span> 👋</h1>
+                    <p class="text-gray-400 mt-2">Tienes <strong class="text-white"
+                            x-text="tareasPendientes.length + ' apartamentos'"></strong> asignados en tu ruta de hoy.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-12 relative z-20 min-h-screen">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <section class="py-12 relative z-20 min-h-screen" x-show="!aseoActivo">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4">
-                    <div
-                        class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-warning flex-shrink-0">
+                <div
+                    class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 flex items-center gap-6 transform transition hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-navy/5 rounded-2xl flex items-center justify-center text-navy">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                     </div>
                     <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Aseos Asignados</p>
-                        <p class="text-2xl font-extrabold text-navy" x-text="tareasPendientes.length"></p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Pendientes</p>
+                        <p class="text-3xl font-extrabold text-navy" x-text="tareasPendientes.length"></p>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4">
-                    <div
-                        class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 flex-shrink-0">
+                <div
+                    class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 flex items-center gap-6 transform transition hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-gold/10 rounded-2xl flex items-center justify-center text-gold">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
                     <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Por Inspeccionar</p>
-                        <p class="text-2xl font-extrabold text-navy" x-text="tareasCompletadas.length"></p>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Completados</p>
+                        <p class="text-3xl font-extrabold text-navy" x-text="tareasCompletadas"></p>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-[30px] shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:-translate-y-1 transition-transform"
-                    @click="modalReportes = true">
-                    <div
-                        class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-danger flex-shrink-0">
+                <div
+                    class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 flex items-center gap-6 transform transition hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-danger">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </div>
                     <div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Daños Reportados</p>
-                        <p class="text-2xl font-extrabold text-navy" x-text="tareasConReporte.length"></p>
+                        <p class="text-3xl font-extrabold text-navy" x-text="tareasConNovedad"></p>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <h2 class="text-2xl font-extrabold text-navy mb-6">Agenda asignada</h2>
 
-                <div class="space-y-8">
-
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-extrabold text-navy">Programar Limpiezas</h2>
-                            <span
-                                class="text-xs font-bold text-warning bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Próximos
-                                Check-outs</span>
-                        </div>
-
-                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
-                            <template x-for="reserva in checkoutsSinAsignar" :key="reserva.id">
-                                <div
-                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col gap-4">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex items-start gap-4">
-                                            <div
-                                                class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-sm border border-gray-200 bg-white">
-                                                <img :src="reserva.fotoAptoSeguro" alt="Apartamento"
-                                                    class="w-full h-full object-cover">
-                                            </div>
-                                            <div>
-                                                <h3 class="text-md font-bold text-navy"
-                                                    x-text="(reserva.propiedad_nombre_seguro !== 'Apto Desconocido' && reserva.propiedad_nombre_seguro !== 'Sin título' ? reserva.propiedad_nombre_seguro : 'Apto sin nombre') + ' (Huésped: ' + reserva.huesped_nombre + ')'">
-                                                </h3>
-                                                <p class="text-gray-500 text-xs font-medium mt-1">Sale el: <strong
-                                                        class="text-navy"
-                                                        x-text="reserva.fecha_salida_formato"></strong> a las
-                                                    <strong class="text-navy"
-                                                        x-text="reserva.hora_salida_formato"></strong>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                                        <div class="flex flex-col sm:flex-row gap-3 items-center">
-                                            <select x-model="reserva.empleado_asignado"
-                                                class="flex-1 w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer">
-                                                <option value="">Seleccionar personal...</option>
-                                                <template x-for="emp in empleadosAseo" :key="emp.id">
-                                                    <option :value="emp.id" x-text="emp.nombre"></option>
-                                                </template>
-                                            </select>
-
-                                            <span
-                                                class="text-[10px] font-extrabold px-3 py-2 rounded-lg uppercase tracking-wider shrink-0"
-                                                :class="{
-                                                      'bg-red-50 text-danger border border-red-100': reserva.urgencia_calculada === 'Urgente',
-                                                      'bg-yellow-50 text-warning border border-yellow-100': reserva.urgencia_calculada === 'Normal',
-                                                      'bg-gray-100 text-gray-500 border border-gray-200': reserva.urgencia_calculada === 'Flexible'
-                                                  }">
-                                                <span
-                                                    x-text="reserva.urgencia_calculada === 'Urgente' ? '🔥 Urgente' : (reserva.urgencia_calculada === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
-                                            </span>
-
-                                            <button @click="asignarAseo(reserva)"
-                                                class="w-full sm:w-auto bg-navy hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg transition-colors text-xs shadow-sm shrink-0">
-                                                Agendar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-
-                            <div x-show="checkoutsSinAsignar.length === 0" class="p-8 text-center">
-                                <p class="text-gray-400 font-bold">No hay check-outs próximos sin asignar. 🙌</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-extrabold text-navy mb-4">Aseos Asignados</h3>
-                        <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
-                            <template x-for="tarea in tareasPendientes" :key="tarea.id">
-                                <div
-                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
-                                    <div class="flex items-center gap-4 w-full">
-                                        <div
-                                            class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
-                                            <img :src="tarea.fotoAptoSeguro" alt="Apartamento"
-                                                class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="flex-1">
-                                            <h4 class="text-lg font-extrabold text-navy"
-                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
-                                            </h4>
-
-                                            <p
-                                                class="text-[11px] font-bold text-blue-600 mb-1.5 flex items-center gap-1">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                    </path>
-                                                </svg>
-                                                <span x-text="tarea.proxima_reserva_texto"></span>
-                                            </p>
-
-                                            <div class="flex items-center gap-2">
-                                                <span
-                                                    class="text-gray-500 text-[11px] font-medium uppercase tracking-wider">Asignado
-                                                    a:</span>
-                                                <select x-model="tarea.empleado_id"
-                                                    @change="cambiarEmpleado(tarea.id, tarea.empleado_id)"
-                                                    class="bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px] shadow-sm">
-                                                    <template x-for="emp in empleadosAseo" :key="emp.id">
-                                                        <option :value="emp.id" x-text="emp.nombre"
-                                                            :selected="emp.id == tarea.empleado_id"></option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex flex-col items-end gap-2 shrink-0">
-                                        <span
-                                            class="text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shadow-sm"
-                                            :class="{
-                                                  'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
-                                                  'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
-                                                  'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || (!tarea.urgencia)
-                                              }" x-text="tarea.urgencia || 'Flexible'">
-                                        </span>
-                                        <button @click="borrarAseo(tarea.id)" title="Eliminar asignación"
-                                            class="text-gray-300 hover:text-danger transition-colors bg-white hover:bg-red-50 p-1.5 rounded-md border border-transparent hover:border-red-100">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </template>
-
-                            <div x-show="tareasPendientes.length === 0" class="p-8 text-center">
-                                <p class="text-gray-400 font-bold">No has asignado aseos todavía. 📝</p>
-                            </div>
-                        </div>
-                    </div>
+                <div x-show="tareasPendientes.length === 0 && !cargando"
+                    class="bg-white rounded-[30px] shadow-sm border border-gray-100 p-10 text-center">
+                    <span class="text-4xl block mb-4">🎉</span>
+                    <h3 class="text-xl font-bold text-navy">¡Estás al día!</h3>
+                    <p class="text-gray-500 mt-2">No tienes apartamentos pendientes por limpiar.</p>
                 </div>
 
-                <div>
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-extrabold text-navy">Inspecciones Listas</h2>
-                        <span
-                            class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Esperando
-                            revisión</span>
-                    </div>
+                <template x-for="tarea in tareasPendientes" :key="tarea.id">
+                    <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden mb-6">
 
-                    <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-3 flex items-center justify-between border-b" :class="{
+                                'bg-red-50 border-red-100': tarea.urgencia === 'Urgente',
+                                'bg-yellow-50 border-yellow-100': tarea.urgencia === 'Normal',
+                                'bg-gray-100 border-gray-200': (!tarea.urgencia || tarea.urgencia === 'Flexible')
+                             }">
+                            <span class="font-extrabold text-xs uppercase tracking-widest flex items-center gap-2"
+                                :class="{
+                                    'text-danger': tarea.urgencia === 'Urgente',
+                                    'text-warning': tarea.urgencia === 'Normal',
+                                    'text-gray-600': (!tarea.urgencia || tarea.urgencia === 'Flexible')
+                                  }">
+                                <span
+                                    x-text="tarea.urgencia === 'Urgente' ? '🔥 Urgente' : (tarea.urgencia === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
+                            </span>
+                        </div>
 
-                        <template x-for="tarea in tareasCompletadas" :key="tarea.id">
-                            <div
-                                class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col gap-4">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-start gap-4">
-                                        <div
-                                            class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
-                                            <img :src="tarea.fotoAptoSeguro" alt="Apartamento"
-                                                class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <h3 class="text-lg font-bold text-navy"
-                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
-                                            </h3>
-                                            <span
-                                                class="inline-block mt-1 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200 uppercase tracking-wider"
-                                                x-text="`Limpiado por: ${tarea.nombreEmpleadoSeguro}`"></span>
-                                        </div>
-                                    </div>
+                        <div
+                            class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-bold text-navy flex items-center gap-3"
+                                        x-text="tarea.propiedad?.titulo || 'Apartamento'"></h3>
                                     <span
-                                        class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100 uppercase text-center leading-tight">
-                                        Terminado<br>
-                                        <span class="font-mono"
-                                            x-text="Math.floor((tarea.tiempo_segundos||0)/60) + ' min'"></span>
-                                    </span>
+                                        class="bg-gray-100 text-gray-600 text-xs font-mono px-2 py-1 rounded-md border border-gray-200"
+                                        x-text="'🔑 ' + (tarea.propiedad?.cerradura_codigo || 'Consultar admin')"></span>
                                 </div>
-                                <button @click="abrirInspeccion(tarea)"
-                                    class="w-full mt-2 bg-gray-50 hover:bg-gray-100 text-navy border border-gray-200 font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2">
-                                    <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    Revisar Reporte y Aprobar
-                                </button>
+                                <p class="text-gray-500 text-sm"
+                                    x-text="tarea.propiedad?.direccion || 'Dirección no especificada'"></p>
                             </div>
-                        </template>
-
-                        <div x-show="tareasCompletadas.length === 0" class="p-8 text-center">
-                            <p class="text-gray-400 font-bold">No hay apartamentos esperando inspección. ✨</p>
+                            <button @click="iniciarAseo(tarea)"
+                                class="w-full md:w-auto bg-navy hover:bg-blue-900 text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2 flex-shrink-0">
+                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Iniciar Aseo
+                            </button>
                         </div>
-
                     </div>
-                </div>
+                </template>
 
             </div>
         </div>
     </section>
 
-    <div x-show="modalInspeccion" style="display: none;"
-        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalInspeccion = false"></div>
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
+    <section x-show="aseoActivo" style="display: none;" class="min-h-screen bg-white relative z-50 pt-24 pb-32">
+
+        <div class="fixed top-0 left-0 w-full bg-navy text-white shadow-2xl z-50">
+            <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
-                        Empleado</span>
-                    <h3 class="text-2xl font-extrabold text-navy"
-                        x-text="(tareaAInspeccionar?.nombreAptoSeguro !== 'Apto Desconocido' && tareaAInspeccionar?.nombreAptoSeguro !== 'Sin título' ? tareaAInspeccionar?.nombreAptoSeguro : 'Apto sin nombre')">
-                    </h3>
-                    <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy"
-                            x-text="tareaAInspeccionar?.nombreEmpleadoSeguro"></strong></p>
+                    <p class="text-[10px] text-gold uppercase tracking-widest font-bold">Limpiando ahora</p>
+                    <h2 class="text-lg font-extrabold truncate" x-text="tareaActiva?.propiedad?.titulo"></h2>
                 </div>
-                <button @click="modalInspeccion = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
-            </div>
-            <div class="flex gap-4">
-                <button @click="modalInspeccion = false"
-                    class="w-1/3 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-xl hover:bg-red-50 transition-colors">Cerrar</button>
-                <button @click="aprobarInspeccion()"
-                    class="w-2/3 bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg transition-transform active:scale-95">Aprobar
-                    Inspección</button>
+                <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
+                    <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm font-bold tracking-wider">En proceso</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div x-show="modalReportes" style="display: none;"
-        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-extrabold text-navy">Historial de Novedades</h3>
-                    <p class="text-xs text-gray-500 mt-1 font-bold">Daños reportados por el equipo de limpieza.</p>
-                </div>
-                <button @click="modalReportes = false" class="bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
+        <div class="max-w-3xl mx-auto px-6 mt-8">
+
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-8 sticky top-[88px] z-40">
+                <button @click="pestañaActiva = 'checklist'"
+                    class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
+                    :class="pestañaActiva === 'checklist' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
+                    1. Checklist Tareas
+                </button>
+                <button @click="pestañaActiva = 'consumibles'"
+                    class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
+                    :class="pestañaActiva === 'consumibles' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
+                    2. Consumibles
+                </button>
             </div>
-            <div class="space-y-4">
-                <template x-for="tarea in tareasConReporte" :key="tarea.id">
-                    <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-navy"
-                                x-text="`Reporte en ${(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')}`">
-                            </h4>
-                            <p class="text-xs text-gray-500 mt-1"
-                                x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`"></p>
-                            <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100"
-                                x-text="`&quot;${tarea.novedad_reportada}&quot;`"></p>
+
+            <div x-show="pestañaActiva === 'checklist'" x-transition.opacity class="pb-10">
+
+                <div class="mb-8">
+                    <h3
+                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🛏️ Habitaciones
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Cambio de sábanas y fundas limpias</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Revisión interior de armarios/gavetas</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Barrer y trapear pisos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3
+                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🚿 Baños (Desinfección)
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Lavar y desinfectar inodoro y ducha</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Limpiar espejos sin dejar marcas</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Colocar toallas limpias (Cuerpo y
+                                manos)</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Vaciar papelera de baño</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3
+                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🍳 Cocina
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Lavar, secar y guardar toda la loza</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Desengrasar estufa y mesones</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Revisar nevera (Tirar sobras, limpiar
+                                interior)</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura principal</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3
+                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        🛋️ Zonas Comunes (Sala/Comedor)
+                    </h3>
+                    <div class="space-y-3 pl-2">
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Acomodar cojines y decoración</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Limpiar polvo en TV, mesas y repisas</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
+                            <input type="checkbox"
+                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
+                            <span class="text-sm font-bold text-gray-700">Barrer y trapear a fondo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button @click="modalReporte = true"
+                    class="mt-8 w-full bg-red-50 text-danger border border-red-200 font-bold py-4 rounded-xl hover:bg-red-100 transition flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Reportar Daño o Problema
+                </button>
+            </div>
+
+            <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
+
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Insumos y
+                    Consumibles</h3>
+                <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento.</p>
+
+                <div class="space-y-4 mb-10">
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🍬</span>
+                            <span class="font-bold text-navy">Sobres de Azúcar</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(azucar > 0) azucar--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="azucar"></span>
+                            <button @click="azucar++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
                         </div>
                     </div>
-                </template>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🍵</span>
+                            <span class="font-bold text-navy">Sobres de Té</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(te > 0) te--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="te"></span>
+                            <button @click="te++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">☕</span>
+                            <span class="font-bold text-navy">Café</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(cafe > 0) cafe--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="cafe"></span>
+                            <button @click="cafe++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧻</span>
+                            <span class="font-bold text-navy">Papel Higiénico</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(papel > 0) papel--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="papel"></span>
+                            <button @click="papel++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧼</span>
+                            <span class="font-bold text-navy">Barra de Jabón</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(jabon_barra > 0) jabon_barra--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="jabon_barra"></span>
+                            <button @click="jabon_barra++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧴</span>
+                            <span class="font-bold text-navy">Shampoo</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(shampoo > 0) shampoo--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="shampoo"></span>
+                            <button @click="shampoo++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Reporte de
+                    Toallas</h3>
+                <p class="text-xs text-gray-500 mb-4">Lencería dejada en la propiedad.</p>
+
+                <div class="space-y-4">
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🛁</span>
+                            <span class="font-bold text-navy">Toallas Grandes</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(toallas_grandes > 0) toallas_grandes--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="toallas_grandes"></span>
+                            <button @click="toallas_grandes++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🧺</span>
+                            <span class="font-bold text-navy">Toallas Pequeñas</span>
+                        </div>
+                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                            <button @click="if(toallas_pequenas > 0) toallas_pequenas--"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="toallas_pequenas"></span>
+                            <button @click="toallas_pequenas++"
+                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+        </div>
+
+        <div
+            class="fixed bottom-0 left-0 w-full p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50">
+            <button @click="finalizarAseo()"
+                class="w-full max-w-3xl mx-auto block bg-success hover:bg-green-600 text-white font-extrabold text-lg py-5 rounded-2xl shadow-lg shadow-green-200 transition-transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Finalizar Limpieza (Enviar Reporte)
+            </button>
+        </div>
+    </section>
+
+    <div x-show="modalReporte" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-end justify-center sm:items-center px-4 pb-4 sm:pb-0">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReporte = false"></div>
+        <div
+            class="bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl w-full max-w-md relative z-10 overflow-hidden transform transition-all p-6 sm:p-8">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <h3 class="text-xl font-extrabold text-danger flex items-center gap-2 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Reportar Novedad
+            </h3>
+
+            <form class="space-y-4" @submit.prevent="enviarReporte()">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Detalles del Daño
+                        o Faltante</label>
+                    <textarea x-model="nuevoReporte" placeholder="Ej: Se rompió una copa de vino en la sala..." rows="3"
+                        required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-danger text-sm text-navy resize-none"></textarea>
+                </div>
+                <button type="button"
+                    class="w-full bg-gray-50 border-2 border-dashed border-gray-300 text-gray-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 mb-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Tomar Foto (Próximamente)
+                </button>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" @click="modalReporte = false"
+                        class="w-1/3 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="w-2/3 bg-danger text-white font-extrabold py-4 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200">Enviar
+                        Alerta</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        function amaLlavesApp() {
+        function appAseo() {
             return {
                 cargando: true,
-                nombreUsuario: 'Equipo',
-                iniciales: 'AL',
+                empleadoId: null,
+                empleadoNombre: 'Equipo',
+                iniciales: 'EA',
 
-                propiedades: [],
-                empleadosAseo: [],
-                reservas: [],
-                tareas: [],
+                tareasPendientes: [],
+                tareasCompletadas: 0,
+                tareasConNovedad: 0,
 
-                modalInspeccion: false,
-                tareaAInspeccionar: null,
-                modalReportes: false,
+                aseoActivo: false,
+                tareaActiva: null,
+                pestañaActiva: 'checklist',
+
+                // Variables de Reporte
+                modalReporte: false,
+                nuevoReporte: '',
+
+                // Variables del Reloj Invisible
+                segundos: 0,
+                intervalo: null,
+
+                // Consumibles
+                azucar: 0, te: 0, cafe: 0, papel: 0, jabon_barra: 0, shampoo: 0, toallas_grandes: 0, toallas_pequenas: 0,
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
-                        this.nombreUsuario = usuario.nombre.split(' ')[0];
-                        this.iniciales = this.nombreUsuario.substring(0, 2).toUpperCase();
+                        this.empleadoId = usuario.id;
+                        this.empleadoNombre = usuario.nombre;
+
+                        const partes = this.empleadoNombre.split(' ');
+                        this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
+
+                        await this.cargarTareasDesdeBD();
                     } else {
                         window.location.href = 'login.html';
-                        return;
                     }
-
-                    await Promise.all([
-                        this.cargarPropiedades(),
-                        this.cargarEmpleados(),
-                        this.cargarReservas(),
-                        this.cargarTareas()
-                    ]);
-
-                    this.cargando = false;
                 },
 
-                async fetchFresco(endpoint) {
-                    const url = `https://gestandovalor-backend.onrender.com/${endpoint}?t=${new Date().getTime()}`;
-                    return await fetch(url, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } });
-                },
-
-                async cargarPropiedades() {
+                async cargarTareasDesdeBD() {
                     try {
-                        const res = await this.fetchFresco('propiedades');
-                        if (res.ok) this.propiedades = await res.json();
-                    } catch (e) { console.error(e); }
-                },
-
-                async cargarEmpleados() {
-                    try {
-                        const res = await this.fetchFresco('usuarios');
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/empleado/${this.empleadoId}`);
                         if (res.ok) {
-                            const all = await res.json();
-                            this.empleadosAseo = all.filter(u => u.rol === 'ASEO');
+                            const todasLasTareas = await res.json();
+                            this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente');
+                            this.tareasCompletadas = todasLasTareas.filter(t => t.estado === 'Completada').length;
+                            this.tareasConNovedad = todasLasTareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').length;
                         }
-                    } catch (e) { console.error(e); }
-                },
-
-                async cargarReservas() {
-                    try {
-                        const res = await this.fetchFresco('reservas');
-                        if (res.ok) this.reservas = await res.json();
-                    } catch (e) { console.error(e); }
-                },
-
-                async cargarTareas() {
-                    try {
-                        const urlFresco = 'https://gestandovalor-backend.onrender.com/reservas/troya/aseos?t=' + new Date().getTime();
-                        const res = await fetch(urlFresco);
-                        if (res.ok) {
-                            this.tareas = await res.json();
-                        }
-                    } catch (e) { console.error(e); }
-                },
-
-                obtenerNombreApto(id) {
-                    const prop = this.propiedades.find(p => String(p.id) === String(id));
-                    return prop ? prop.titulo : 'Apto Desconocido';
-                },
-
-                obtenerNombreEmpleado(id) {
-                    const emp = this.empleadosAseo.find(e => String(e.id) === String(id));
-                    return emp ? emp.nombre : 'Empleado Borrado';
-                },
-
-                // ✨ Nueva función para obtener la foto real de portada (o placeholder si no hay) ✨
-                obtenerFotoApto(propId) {
-                    const prop = this.propiedades.find(p => String(p.id) === String(propId));
-                    if (prop && prop.fotos && prop.fotos.length > 0) {
-                        return prop.fotos[0]; // Retorna la primera foto
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        this.cargando = false;
                     }
-                    // Retorna una foto por defecto (puedes cambiar esta URL por tu placeholder GV.png)
-                    return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80';
                 },
 
-                get tareasConReporte() {
-                    return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').map(t => ({
-                        ...t,
-                        nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
-                        nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
-                    }));
+                iniciarAseo(tarea) {
+                    this.aseoActivo = true;
+                    this.tareaActiva = tarea;
+                    this.pestañaActiva = 'checklist';
+                    this.nuevoReporte = '';
+
+                    this.segundos = 0;
+                    this.intervalo = setInterval(() => {
+                        this.segundos++;
+                    }, 1000);
+
+                    this.azucar = 0; this.te = 0; this.cafe = 0; this.papel = 0;
+                    this.jabon_barra = 0; this.shampoo = 0; this.toallas_grandes = 0; this.toallas_pequenas = 0;
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
-                // ✨ LA MAGIA MATEMÁTICA CON ESCUDO ANTI-CLONES ✨
-                get checkoutsSinAsignar() {
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
+                // ✨ ENVÍA EL REPORTE A LA NUBE ✨
+                async enviarReporte() {
+                    if (!this.nuevoReporte.trim()) return;
 
-                    // 1. Contar cuántas tareas de aseo hay por cada apartamento abajo
-                    const conteoAseosPendientes = {};
-                    this.tareas.forEach(t => {
-                        if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
-                            const id = String(t.propiedad_id);
-                            conteoAseosPendientes[id] = (conteoAseosPendientes[id] || 0) + 1;
-                        }
-                    });
-
-                    // 2. Tomamos las reservas desde HOY hacia el futuro
-                    let reservasFiltradas = this.reservas.filter(res => {
-                        const checkoutDate = new Date(res.check_out);
-                        return checkoutDate >= hoy;
-                    });
-                    reservasFiltradas.sort((a, b) => new Date(a.check_out) - new Date(b.check_out));
-
-                    const reservasAMostrar = [];
-
-                    // 🛡️ ESCUDO ANTI-DUPLICADOS DE BASE DE DATOS 🛡️
-                    const checkoutsVistos = new Set();
-
-                    // 3. Revisamos reserva por reserva en orden cronológico
-                    for (let res of reservasFiltradas) {
-                        const idApto = String(res.propiedad_id);
-
-                        // Creamos una firma única (ID del Apto + Fecha de salida)
-                        const firmaUnica = idApto + '_' + res.check_out;
-
-                        // Si ya vimos esta salida exacta, es un clon de la base de datos, ¡LO IGNORAMOS!
-                        if (checkoutsVistos.has(firmaUnica)) continue;
-                        checkoutsVistos.add(firmaUnica);
-
-                        // Si este apartamento tiene "créditos" de limpieza (aseos ya asignados), descontamos 1
-                        if (conteoAseosPendientes[idApto] > 0) {
-                            conteoAseosPendientes[idApto]--;
-                        } else {
-                            // Si NO hay créditos de limpieza, MOSTRAMOS LA RESERVA
-                            const propNombre = this.obtenerNombreApto(res.propiedad_id);
-                            const checkoutDate = new Date(res.check_out);
-                            checkoutDate.setHours(0, 0, 0, 0);
-
-                            const futurasReservas = this.reservas.filter(r => {
-                                if (r.id === res.id) return false;
-                                if (String(r.propiedad_id) !== idApto) return false;
-                                const checkInDate = new Date(r.check_in);
-                                checkInDate.setHours(0, 0, 0, 0);
-                                return checkInDate >= checkoutDate;
-                            });
-                            futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
-
-                            let autoUrgency = 'Flexible';
-                            if (futurasReservas.length > 0) {
-                                const nextCheckIn = new Date(futurasReservas[0].check_in);
-                                nextCheckIn.setHours(0, 0, 0, 0);
-                                autoUrgency = nextCheckIn.getTime() === checkoutDate.getTime() ? 'Urgente' : 'Normal';
-                            }
-
-                            reservasAMostrar.push({
-                                ...res,
-                                propiedad_nombre_seguro: propNombre,
-                                fotoAptoSeguro: this.obtenerFotoApto(res.propiedad_id),
-                                fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
-                                hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                                empleado_asignado: '',
-                                urgencia_calculada: autoUrgency
-                            });
-                        }
-                    }
-
-                    return reservasAMostrar;
-                },
-
-                get tareasPendientes() {
-                    return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
-                        const futurasReservas = this.reservas.filter(r => {
-                            if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
-                            const checkInDate = new Date(r.check_in);
-                            checkInDate.setHours(0, 0, 0, 0);
-                            const hoy = new Date();
-                            hoy.setHours(0, 0, 0, 0);
-                            return checkInDate >= hoy;
-                        });
-                        futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
-                        let textoProximaReserva = 'Sin reservas próximas';
-                        if (futurasReservas.length > 0) {
-                            const nextDate = new Date(futurasReservas[0].check_in);
-                            textoProximaReserva = 'Entra huésped el ' + nextDate.toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
-                        }
-
-                        return {
-                            ...t,
-                            nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
-                            // ✨ Asigna la foto real aquí ✨
-                            fotoAptoSeguro: this.obtenerFotoApto(t.propiedad_id),
-                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id),
-                            proxima_reserva_texto: textoProximaReserva
-                        }
-                    });
-                },
-
-                get tareasCompletadas() {
-                    return this.tareas.filter(t => t.estado && String(t.estado).toLowerCase() === 'completada').map(t => {
-                        return {
-                            ...t,
-                            nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
-                            // ✨ Asigna la foto real aquí ✨
-                            fotoAptoSeguro: this.obtenerFotoApto(t.propiedad_id),
-                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
-                        }
-                    });
-                },
-
-                async asignarAseo(reserva) {
-                    if (!reserva.empleado_asignado) {
-                        alert("Por favor selecciona a un empleado.");
-                        return;
-                    }
                     this.cargando = true;
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
-                            method: 'POST',
+                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ novedad_reportada: this.nuevoReporte })
+                        });
+                        alert('🚨 Reporte enviado exitosamente al Ama de Llaves.');
+                        this.modalReporte = false;
+                        this.nuevoReporte = '';
+                        await this.cargarTareasDesdeBD(); // Recargar para actualizar el contador
+                    } catch (e) {
+                        console.error(e);
+                        alert('Error al enviar el reporte.');
+                    } finally {
+                        this.cargando = false;
+                    }
+                },
+
+                async finalizarAseo() {
+                    clearInterval(this.intervalo);
+                    this.cargando = true;
+                    try {
+                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                propiedad_id: String(reserva.propiedad_id),
-                                empleado_id: String(reserva.empleado_asignado),
-                                urgencia: String(reserva.urgencia_calculada),
+                                estado: 'Completada',
+                                tiempo_segundos: this.segundos,
+                                completed_at: new Date().toISOString()
                             })
                         });
+                        await this.cargarTareasDesdeBD();
+                    } catch (e) {
+                        console.error(e);
+                    } finally {
+                        this.cargando = false;
+                    }
 
-                        if (res.ok) await this.cargarTareas();
-                        else alert('❌ Hubo un error al guardar.');
-                    } catch (e) { alert('Error de conexión.'); }
-                    this.cargando = false;
-                },
-
-                async cambiarEmpleado(tareaId, nuevoEmpleadoId) {
-                    this.cargando = true;
-                    try {
-                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/troya/aseos/${tareaId}`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ empleado_id: nuevoEmpleadoId })
-                        });
-                        if (res.ok) await this.cargarTareas();
-                    } catch (e) { }
-                    this.cargando = false;
-                },
-
-                async borrarAseo(tareaId) {
-                    if (!confirm('¿Seguro que deseas eliminar esta asignación de aseo?')) return;
-                    this.cargando = true;
-                    try {
-                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/troya/aseos/${tareaId}`, {
-                            method: 'DELETE'
-                        });
-                        if (res.ok) await this.cargarTareas();
-                        else alert('Error al borrar la tarea');
-                    } catch (e) { alert('Error de conexión'); }
-                    this.cargando = false;
-                },
-
-                async aprobarInspeccion() {
-                    this.cargando = true;
-                    try {
-                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaAInspeccionar.id}`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ estado: 'Inspeccionada' })
-                        });
-                        alert('✅ Inspección Aprobada.');
-                        this.modalInspeccion = false;
-                        await this.cargarTareas();
-                    } catch (e) { }
-                    this.cargando = false;
+                    alert(`¡Aseo finalizado exitosamente!\nReporte e inventario enviados al Ama de Llaves.`);
+                    this.aseoActivo = false;
+                    this.tareaActiva = null;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
                 cerrarSesion() {
@@ -693,6 +684,25 @@
                 }
             }
         }
+
+        // Navbar Scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo-combined');
+            const largoPildora = 'max-w-[550px]';
+            window.addEventListener('scroll', () => {
+                if (document.querySelector('[x-data]').__x.$data.aseoActivo) return;
+                if (window.scrollY > 50) {
+                    logo.classList.replace('h-16', 'h-10');
+                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                } else {
+                    logo.classList.replace('h-10', 'h-16');
+                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                }
+            });
+        });
     </script>
 </body>
 

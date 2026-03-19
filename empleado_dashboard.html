@@ -34,6 +34,13 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* Quitar flechas de los inputs numéricos */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -228,7 +235,7 @@
                 <button @click="pestañaActiva = 'consumibles'"
                     class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
                     :class="pestañaActiva === 'consumibles' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
-                    2. Consumibles
+                    2. Inventario Físico
                 </button>
             </div>
 
@@ -283,8 +290,7 @@
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
                             <input type="checkbox"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Colocar toallas limpias (Cuerpo y
-                                manos)</span>
+                            <span class="text-sm font-bold text-gray-700">Colocar toallas limpias</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
@@ -317,14 +323,13 @@
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
                             <input type="checkbox"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Revisar nevera (Tirar sobras, limpiar
-                                interior)</span>
+                            <span class="text-sm font-bold text-gray-700">Revisar nevera</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
                             <input type="checkbox"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura principal</span>
+                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura</span>
                         </label>
                     </div>
                 </div>
@@ -368,130 +373,62 @@
 
             <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
 
-                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Insumos y
-                    Consumibles</h3>
-                <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento.</p>
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Consumibles
+                    de la Propiedad</h3>
+                <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento para
+                    el próximo huésped.</p>
 
                 <div class="space-y-4 mb-10">
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🍬</span>
-                            <span class="font-bold text-navy">Sobres de Azúcar</span>
+                    <template x-for="(cantidad, nombre) in inventarioLocal.Consumible" :key="nombre">
+                        <div
+                            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
+                                <span class="font-bold text-navy"
+                                    x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                            </div>
+                            <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                                <button
+                                    @click="if(inventarioLocal.Consumible[nombre] > 0) inventarioLocal.Consumible[nombre]--"
+                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                                <input type="number" x-model.number="inventarioLocal.Consumible[nombre]"
+                                    class="font-mono font-bold text-lg w-10 text-center bg-transparent outline-none text-navy">
+                                <button @click="inventarioLocal.Consumible[nombre]++"
+                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(azucar > 0) azucar--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="azucar"></span>
-                            <button @click="azucar++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🍵</span>
-                            <span class="font-bold text-navy">Sobres de Té</span>
-                        </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(te > 0) te--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="te"></span>
-                            <button @click="te++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">☕</span>
-                            <span class="font-bold text-navy">Café</span>
-                        </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(cafe > 0) cafe--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="cafe"></span>
-                            <button @click="cafe++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🧻</span>
-                            <span class="font-bold text-navy">Papel Higiénico</span>
-                        </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(papel > 0) papel--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="papel"></span>
-                            <button @click="papel++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🧼</span>
-                            <span class="font-bold text-navy">Barra de Jabón</span>
-                        </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(jabon_barra > 0) jabon_barra--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="jabon_barra"></span>
-                            <button @click="jabon_barra++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🧴</span>
-                            <span class="font-bold text-navy">Shampoo</span>
-                        </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(shampoo > 0) shampoo--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="shampoo"></span>
-                            <button @click="shampoo++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
+                    </template>
+                    <p x-show="Object.keys(inventarioLocal.Consumible || {}).length === 0"
+                        class="text-center text-gray-400 font-bold py-4">No hay consumibles registrados en este
+                        apartamento.</p>
                 </div>
 
-                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Reporte de
-                    Toallas</h3>
-                <p class="text-xs text-gray-500 mb-4">Lencería dejada en la propiedad.</p>
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Dotación Fija
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">Verifica que estos elementos estén completos.</p>
 
                 <div class="space-y-4">
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🛁</span>
-                            <span class="font-bold text-navy">Toallas Grandes</span>
+                    <template x-for="(cantidad, nombre) in inventarioLocal.Fijo" :key="nombre">
+                        <div
+                            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
+                                <span class="font-bold text-navy"
+                                    x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                            </div>
+                            <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                                <button @click="if(inventarioLocal.Fijo[nombre] > 0) inventarioLocal.Fijo[nombre]--"
+                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
+                                <input type="number" x-model.number="inventarioLocal.Fijo[nombre]"
+                                    class="font-mono font-bold text-lg w-10 text-center bg-transparent outline-none text-navy">
+                                <button @click="inventarioLocal.Fijo[nombre]++"
+                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(toallas_grandes > 0) toallas_grandes--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="toallas_grandes"></span>
-                            <button @click="toallas_grandes++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🧺</span>
-                            <span class="font-bold text-navy">Toallas Pequeñas</span>
-                        </div>
-                        <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                            <button @click="if(toallas_pequenas > 0) toallas_pequenas--"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                            <span class="font-mono font-bold text-lg w-4 text-center" x-text="toallas_pequenas"></span>
-                            <button @click="toallas_pequenas++"
-                                class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
+                    </template>
+                    <p x-show="Object.keys(inventarioLocal.Fijo || {}).length === 0"
+                        class="text-center text-gray-400 font-bold py-4">No hay dotación fija registrada en este
+                        apartamento.</p>
                 </div>
 
             </div>
@@ -569,16 +506,14 @@
                 tareaActiva: null,
                 pestañaActiva: 'checklist',
 
-                // Variables de Reporte
                 modalReporte: false,
                 nuevoReporte: '',
 
-                // Variables del Reloj Invisible
                 segundos: 0,
                 intervalo: null,
 
-                // Consumibles
-                azucar: 0, te: 0, cafe: 0, papel: 0, jabon_barra: 0, shampoo: 0, toallas_grandes: 0, toallas_pequenas: 0,
+                // ✨ JSON DINÁMICO PARA EL EMPLEADO ✨
+                inventarioLocal: { Fijo: {}, Consumible: {} },
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
@@ -623,13 +558,21 @@
                         this.segundos++;
                     }, 1000);
 
-                    this.azucar = 0; this.te = 0; this.cafe = 0; this.papel = 0;
-                    this.jabon_barra = 0; this.shampoo = 0; this.toallas_grandes = 0; this.toallas_pequenas = 0;
+                    // ✨ EXTRAER EL INVENTARIO REAL DE LA BASE DE DATOS ✨
+                    let inv = tarea.propiedad?.inventario;
+                    if (typeof inv === 'string') {
+                        try { inv = JSON.parse(inv); } catch (e) { inv = null; }
+                    }
+                    if (inv && Object.keys(inv).length > 0 && (inv.Fijo || inv.Consumible)) {
+                        // Clonamos el objeto para que pueda modificarlo sin romper nada
+                        this.inventarioLocal = JSON.parse(JSON.stringify(inv));
+                    } else {
+                        this.inventarioLocal = { Fijo: {}, Consumible: {} };
+                    }
 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
-                // ✨ ENVÍA EL REPORTE A LA NUBE ✨
                 async enviarReporte() {
                     if (!this.nuevoReporte.trim()) return;
 
@@ -643,7 +586,7 @@
                         alert('🚨 Reporte enviado exitosamente al Ama de Llaves.');
                         this.modalReporte = false;
                         this.nuevoReporte = '';
-                        await this.cargarTareasDesdeBD(); // Recargar para actualizar el contador
+                        await this.cargarTareasDesdeBD();
                     } catch (e) {
                         console.error(e);
                         alert('Error al enviar el reporte.');
@@ -652,10 +595,19 @@
                     }
                 },
 
+                // ✨ EL BOTÓN FINAL: ENVÍA EL ESTADO Y EL INVENTARIO AL TIEMPO ✨
                 async finalizarAseo() {
                     clearInterval(this.intervalo);
                     this.cargando = true;
                     try {
+                        // 1. Actualizar el Inventario en la Propiedad
+                        await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.tareaActiva.propiedad_id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ inventario: this.inventarioLocal })
+                        });
+
+                        // 2. Marcar la tarea de aseo como Completada
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
@@ -665,14 +617,16 @@
                                 completed_at: new Date().toISOString()
                             })
                         });
+
                         await this.cargarTareasDesdeBD();
+                        alert(`¡Aseo finalizado exitosamente!\nReporte e inventario enviados al Ama de Llaves.`);
                     } catch (e) {
                         console.error(e);
+                        alert("Hubo un error de conexión al finalizar.");
                     } finally {
                         this.cargando = false;
                     }
 
-                    alert(`¡Aseo finalizado exitosamente!\nReporte e inventario enviados al Ama de Llaves.`);
                     this.aseoActivo = false;
                     this.tareaActiva = null;
                     window.scrollTo({ top: 0, behavior: 'smooth' });
