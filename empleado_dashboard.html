@@ -35,7 +35,6 @@
             scrollbar-width: none;
         }
 
-        /* Quitar flechas de los inputs numéricos */
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -512,13 +511,20 @@
                 segundos: 0,
                 intervalo: null,
 
-                // ✨ JSON DINÁMICO PARA EL EMPLEADO ✨
                 inventarioLocal: { Fijo: {}, Consumible: {} },
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
+
+                        // ✨ SEGURIDAD: Solo el personal de aseo (o un admin) puede ver esto ✨
+                        if (usuario.rol !== 'ASEO' && usuario.rol !== 'ADMIN') {
+                            alert('⛔ Acceso denegado. Solo el personal de Aseo puede acceder a esta ruta.');
+                            window.location.href = 'login.html';
+                            return;
+                        }
+
                         this.empleadoId = usuario.id;
                         this.empleadoNombre = usuario.nombre;
 
@@ -558,13 +564,11 @@
                         this.segundos++;
                     }, 1000);
 
-                    // ✨ EXTRAER EL INVENTARIO REAL DE LA BASE DE DATOS ✨
                     let inv = tarea.propiedad?.inventario;
                     if (typeof inv === 'string') {
                         try { inv = JSON.parse(inv); } catch (e) { inv = null; }
                     }
                     if (inv && Object.keys(inv).length > 0 && (inv.Fijo || inv.Consumible)) {
-                        // Clonamos el objeto para que pueda modificarlo sin romper nada
                         this.inventarioLocal = JSON.parse(JSON.stringify(inv));
                     } else {
                         this.inventarioLocal = { Fijo: {}, Consumible: {} };
@@ -595,19 +599,16 @@
                     }
                 },
 
-                // ✨ EL BOTÓN FINAL: ENVÍA EL ESTADO Y EL INVENTARIO AL TIEMPO ✨
                 async finalizarAseo() {
                     clearInterval(this.intervalo);
                     this.cargando = true;
                     try {
-                        // 1. Actualizar el Inventario en la Propiedad
                         await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.tareaActiva.propiedad_id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ inventario: this.inventarioLocal })
                         });
 
-                        // 2. Marcar la tarea de aseo como Completada
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
