@@ -209,7 +209,7 @@
                         <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
                             <template x-for="tarea in tareasPendientes" :key="tarea.id">
                                 <div
-                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4">
+                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
                                     <div class="flex items-center gap-4 w-full">
                                         <div
                                             class="w-12 h-12 bg-navy rounded-full flex items-center justify-center text-white shadow-md border border-gray-200 shrink-0">
@@ -247,14 +247,25 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <span
-                                        class="text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shrink-0 shadow-sm"
-                                        :class="{
-                                              'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
-                                              'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
-                                              'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || (!tarea.urgencia)
-                                          }" x-text="tarea.urgencia || 'Flexible'">
-                                    </span>
+
+                                    <div class="flex flex-col items-end gap-2 shrink-0">
+                                        <span
+                                            class="text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shadow-sm"
+                                            :class="{
+                                                  'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
+                                                  'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
+                                                  'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || (!tarea.urgencia)
+                                              }" x-text="tarea.urgencia || 'Flexible'">
+                                        </span>
+                                        <button @click="borrarAseo(tarea.id)" title="Eliminar asignación"
+                                            class="text-gray-300 hover:text-danger transition-colors bg-white hover:bg-red-50 p-1.5 rounded-md border border-transparent hover:border-red-100">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </template>
 
@@ -328,9 +339,7 @@
     <div x-show="modalInspeccion" style="display: none;"
         class="fixed inset-0 z-[100] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalInspeccion = false"></div>
-        <div
-            class="bg-white rounded-[40px] shadow-2xl w-full max-w-xl relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] overflow-y-auto">
-
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
                 <div>
                     <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
@@ -345,16 +354,12 @@
                             d="M6 18L18 6M6 6l12 12" />
                     </svg></button>
             </div>
-
             <div class="flex gap-4">
                 <button @click="modalInspeccion = false"
-                    class="w-1/3 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-xl hover:bg-red-50 transition-colors">
-                    Cerrar
-                </button>
+                    class="w-1/3 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-xl hover:bg-red-50 transition-colors">Cerrar</button>
                 <button @click="aprobarInspeccion()"
-                    class="w-2/3 bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
-                    Aprobar Inspección
-                </button>
+                    class="w-2/3 bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg transition-transform active:scale-95">Aprobar
+                    Inspección</button>
             </div>
         </div>
     </div>
@@ -362,47 +367,31 @@
     <div x-show="modalReportes" style="display: none;"
         class="fixed inset-0 z-[100] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
-        <div
-            class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] overflow-y-auto">
-
+        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <h3 class="text-2xl font-extrabold text-navy">Historial de Novedades</h3>
                     <p class="text-xs text-gray-500 mt-1 font-bold">Daños reportados por el equipo de limpieza.</p>
                 </div>
-                <button @click="modalReportes = false"
-                    class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
+                <button @click="modalReportes = false" class="bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg></button>
             </div>
-
             <div class="space-y-4">
                 <template x-for="tarea in tareasConReporte" :key="tarea.id">
                     <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
-                        <div
-                            class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-danger shadow-sm shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
                         <div>
                             <h4 class="text-sm font-bold text-navy" x-text="`Reporte en ${tarea.nombreAptoSeguro}`">
                             </h4>
                             <p class="text-xs text-gray-500 mt-1"
-                                x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`">
-                            </p>
+                                x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`"></p>
                             <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100"
                                 x-text="`&quot;${tarea.novedad_reportada}&quot;`"></p>
                         </div>
                     </div>
                 </template>
-
-                <div x-show="tareasConReporte.length === 0" class="text-center py-4">
-                    <p class="text-gray-500 font-bold">No hay novedades reportadas recientemente. 🎉</p>
-                </div>
             </div>
         </div>
     </div>
@@ -501,18 +490,31 @@
                     }));
                 },
 
+                // ✨ LÓGICA INFALIBLE: Muestra reservas futuras, y se ocultan si el apto tiene tarea pendiente ✨
                 get checkoutsSinAsignar() {
-                    return this.reservas.filter(res => {
-                        const yaAsignado = this.tareas.some(t => {
-                            const idAptoTarea = String(t.propiedad_id);
-                            const idAptoReserva = String(res.propiedad_id);
-                            const estadoEsPendiente = !t.estado || String(t.estado).toLowerCase() === 'pendiente';
-                            return idAptoTarea === idAptoReserva && estadoEsPendiente;
-                        });
-                        return !yaAsignado;
-                    }).map(res => {
-                        const propNombre = this.obtenerNombreApto(res.propiedad_id);
+                    const ayer = new Date();
+                    ayer.setDate(ayer.getDate() - 1);
+                    ayer.setHours(0, 0, 0, 0);
 
+                    // Agrupamos los apartamentos que YA tienen una tarea en la lista de abajo
+                    const aptosConAseoPendiente = this.tareas
+                        .filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente')
+                        .map(t => String(t.propiedad_id));
+
+                    return this.reservas.filter(res => {
+                        const checkoutDate = new Date(res.check_out);
+
+                        // 1. Ocultar checkouts viejísimos (mostramos de ayer en adelante)
+                        if (checkoutDate < ayer) return false;
+
+                        // 2. Si este apartamento ya está en la lista de "Aseos Asignados", lo ocultamos de arriba
+                        const idAptoReserva = String(res.propiedad_id);
+                        if (aptosConAseoPendiente.includes(idAptoReserva)) return false;
+
+                        return true;
+                    }).map(res => {
+                        // (Lógica de urgencia igual)
+                        const propNombre = this.obtenerNombreApto(res.propiedad_id);
                         const checkoutDate = new Date(res.check_out);
                         checkoutDate.setHours(0, 0, 0, 0);
 
@@ -543,24 +545,17 @@
                     });
                 },
 
-                // ✨ LA MAGIA QUE CALCULA LA PRÓXIMA RESERVA ✨
                 get tareasPendientes() {
                     return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
-
-                        // Buscamos todas las reservas de ESTE apartamento
                         const futurasReservas = this.reservas.filter(r => {
                             if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
-                            // Filtramos solo las reservas de HOY en adelante
                             const checkInDate = new Date(r.check_in);
                             checkInDate.setHours(0, 0, 0, 0);
                             const hoy = new Date();
                             hoy.setHours(0, 0, 0, 0);
                             return checkInDate >= hoy;
                         });
-
-                        // Ordenamos para que la más próxima quede de primera
                         futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
-
                         let textoProximaReserva = 'Sin reservas próximas';
                         if (futurasReservas.length > 0) {
                             const nextDate = new Date(futurasReservas[0].check_in);
@@ -603,15 +598,9 @@
                             })
                         });
 
-                        if (res.ok) {
-                            await this.cargarTareas();
-                        } else {
-                            const errorMsg = await res.text();
-                            alert('❌ Hubo un error al guardar: ' + errorMsg);
-                        }
-                    } catch (e) {
-                        alert('Error de conexión.');
-                    }
+                        if (res.ok) await this.cargarTareas();
+                        else alert('❌ Hubo un error al guardar.');
+                    } catch (e) { alert('Error de conexión.'); }
                     this.cargando = false;
                 },
 
@@ -623,16 +612,22 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ empleado_id: nuevoEmpleadoId })
                         });
+                        if (res.ok) await this.cargarTareas();
+                    } catch (e) { }
+                    this.cargando = false;
+                },
 
-                        if (res.ok) {
-                            await this.cargarTareas();
-                        } else {
-                            const errorMsg = await res.text();
-                            alert('❌ ERROR DEL SERVIDOR: ' + errorMsg);
-                        }
-                    } catch (e) {
-                        alert('Error de conexión al actualizar.');
-                    }
+                // ✨ NUEVA FUNCIÓN: BORRAR EL ASEO ✨
+                async borrarAseo(tareaId) {
+                    if (!confirm('¿Seguro que deseas eliminar esta asignación de aseo?')) return;
+                    this.cargando = true;
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/troya/aseos/${tareaId}`, {
+                            method: 'DELETE'
+                        });
+                        if (res.ok) await this.cargarTareas();
+                        else alert('Error al borrar la tarea');
+                    } catch (e) { alert('Error de conexión'); }
                     this.cargando = false;
                 },
 
@@ -647,7 +642,7 @@
                         alert('✅ Inspección Aprobada.');
                         this.modalInspeccion = false;
                         await this.cargarTareas();
-                    } catch (e) { console.error(e); }
+                    } catch (e) { }
                     this.cargando = false;
                 },
 
