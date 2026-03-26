@@ -184,16 +184,24 @@
 
                         <div
                             class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <div class="flex flex-wrap items-center gap-3 mb-2">
-                                    <h3 class="text-xl font-bold text-navy flex items-center gap-3"
-                                        x-text="tarea.propiedad?.titulo || 'Apartamento'"></h3>
-                                    <span
-                                        class="bg-gray-100 text-gray-600 text-xs font-mono px-2 py-1 rounded-md border border-gray-200"
-                                        x-text="'🔑 ' + (tarea.propiedad?.cerradura_codigo || 'Consultar admin')"></span>
+
+                            <div class="flex items-center gap-5">
+                                <div
+                                    class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-200">
+                                    <img :src="obtenerFotoApto(tarea.propiedad_segura)" alt="Apto"
+                                        class="w-full h-full object-cover">
                                 </div>
-                                <p class="text-gray-500 text-sm"
-                                    x-text="tarea.propiedad?.direccion || 'Dirección no especificada'"></p>
+                                <div>
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-navy"
+                                            x-text="tarea.propiedad_segura?.titulo || 'Apartamento sin título'"></h3>
+                                        <span
+                                            class="bg-gray-100 text-gray-600 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-200"
+                                            x-text="'🔑 ' + (tarea.propiedad_segura?.cerradura_codigo || 'Consultar admin')"></span>
+                                    </div>
+                                    <p class="text-gray-500 text-xs font-medium"
+                                        x-text="tarea.propiedad_segura?.direccion || 'Dirección no especificada'"></p>
+                                </div>
                             </div>
 
                             <button
@@ -231,11 +239,19 @@
 
         <div class="max-w-3xl mx-auto px-6 relative z-20">
 
-            <div class="mb-6 pt-4">
-                <span class="text-gold font-bold uppercase tracking-widest text-[10px]">Limpieza en progreso</span>
-                <h2 class="text-3xl font-extrabold text-navy" x-text="tareaActiva?.propiedad?.titulo"></h2>
-                <p class="text-gray-500 text-sm mt-1">Marca las tareas a medida que las vayas completando. Sin prisas,
-                    lo importante es la calidad.</p>
+            <div
+                class="mb-6 pt-4 flex flex-col md:flex-row items-start md:items-center gap-6 bg-gray-50 p-6 rounded-[30px] border border-gray-100">
+                <div class="w-24 h-24 rounded-2xl overflow-hidden shadow-md border border-gray-200 shrink-0 bg-white">
+                    <img :src="obtenerFotoApto(tareaActiva?.propiedad_segura)" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <span class="text-gold font-bold uppercase tracking-widest text-[10px]">Limpieza en progreso</span>
+                    <h2 class="text-3xl font-extrabold text-navy"
+                        x-text="tareaActiva?.propiedad_segura?.titulo || 'Apartamento sin título'"></h2>
+                    <p class="text-gray-500 text-sm mt-1" x-text="tareaActiva?.propiedad_segura?.direccion"></p>
+                    <p class="text-gray-400 text-xs mt-1">Marca las tareas a medida que vayas completando. La calidad es
+                        lo más importante.</p>
+                </div>
             </div>
 
             <div
@@ -253,7 +269,6 @@
             </div>
 
             <div x-show="pestañaActiva === 'checklist'" x-transition.opacity class="pb-10">
-
                 <div class="mb-8">
                     <h3
                         class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
@@ -385,7 +400,6 @@
             </div>
 
             <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
-
                 <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Consumibles
                     de la Propiedad</h3>
                 <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento para
@@ -443,7 +457,6 @@
                         class="text-center text-gray-400 font-bold py-4">No hay dotación fija registrada en este
                         apartamento.</p>
                 </div>
-
             </div>
 
         </div>
@@ -513,6 +526,7 @@
                 empleadoNombre: 'Equipo',
                 iniciales: 'EA',
 
+                propiedades: [],
                 tareasPendientes: [],
                 tareasCompletadas: 0,
                 tareasConNovedad: 0,
@@ -544,28 +558,44 @@
                         const usuario = JSON.parse(usuarioGuardado);
 
                         if (usuario.rol !== 'ASEO' && usuario.rol !== 'ADMIN') {
-                            alert('⛔ Acceso denegado. Solo el personal de Aseo puede acceder a esta ruta.');
+                            alert('⛔ Acceso denegado.');
                             window.location.href = 'login.html';
                             return;
                         }
 
                         this.empleadoId = usuario.id;
                         this.empleadoNombre = usuario.nombre;
-
                         const partes = this.empleadoNombre.split(' ');
                         this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
 
+                        await this.cargarPropiedades();
                         await this.cargarTareasDesdeBD();
                     } else {
                         window.location.href = 'login.html';
                     }
                 },
 
+                async cargarPropiedades() {
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        if (res.ok) {
+                            this.propiedades = await res.json();
+                        }
+                    } catch (e) { console.error("Error propiedades:", e); }
+                },
+
                 async cargarTareasDesdeBD() {
                     try {
                         const res = await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/empleado/${this.empleadoId}`);
                         if (res.ok) {
-                            const todasLasTareas = await res.json();
+                            let todasLasTareas = await res.json();
+
+                            // Mapeamos la propiedad completa
+                            todasLasTareas = todasLasTareas.map(t => {
+                                const prop = this.propiedades.find(p => String(p.id) === String(t.propiedad_id));
+                                return { ...t, propiedad_segura: prop || {} };
+                            });
+
                             this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente');
                             this.tareasCompletadas = todasLasTareas.filter(t => t.estado === 'Completada').length;
                             this.tareasConNovedad = todasLasTareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').length;
@@ -574,23 +604,26 @@
                     finally { this.cargando = false; }
                 },
 
+                obtenerFotoApto(prop) {
+                    if (prop && prop.fotos && prop.fotos.length > 0) return prop.fotos[0];
+                    return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80';
+                },
+
                 iniciarAseo(tarea) {
                     this.aseoActivo = true;
                     this.tareaActiva = tarea;
                     this.pestañaActiva = 'checklist';
                     this.nuevoReporte = '';
 
-                    // Resetear Checklist
                     for (let key in this.checklist) { this.checklist[key] = false; }
 
-                    // Resetear Tiempos
                     this.segundos = 0;
                     this.pausasRegistradas = [];
                     this.horaInicioPausa = null;
 
                     this.iniciarReloj();
 
-                    let inv = tarea.propiedad?.inventario;
+                    let inv = tarea.propiedad_segura?.inventario;
                     if (typeof inv === 'string') {
                         try { inv = JSON.parse(inv); } catch (e) { inv = null; }
                     }
@@ -603,11 +636,8 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
-                // ✨ CONTROL DE RELOJ Y PAUSAS ✨
                 iniciarReloj() {
-                    this.intervalo = setInterval(() => {
-                        this.segundos++;
-                    }, 1000);
+                    this.intervalo = setInterval(() => { this.segundos++; }, 1000);
                 },
 
                 pausarAseo() {
@@ -637,9 +667,7 @@
                     const horas = Math.floor(totalSegundos / 3600);
                     const minutos = Math.floor((totalSegundos % 3600) / 60);
                     const segundos = totalSegundos % 60;
-                    if (horas > 0) {
-                        return `${horas}h ${minutos}m`;
-                    }
+                    if (horas > 0) return `${horas}h ${minutos}m`;
                     return `${minutos}m ${segundos}s`;
                 },
 
@@ -664,7 +692,6 @@
                     clearInterval(this.intervalo);
                     this.cargando = true;
 
-                    // ✨ EMPAQUETAR EL REPORTE FINAL ✨
                     const reporteFinal = {
                         tiempo_limpieza_segundos: this.segundos,
                         historial_pausas: this.pausasRegistradas,
