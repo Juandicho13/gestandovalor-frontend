@@ -259,7 +259,7 @@
                 <button @click="pestañaActiva = 'consumibles'"
                     class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
                     :class="pestañaActiva === 'consumibles' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
-                    2. Inventario Físico
+                    2. Insumos Físicos
                 </button>
             </div>
 
@@ -339,62 +339,67 @@
 
             <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
 
-                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Consumibles
-                    de la Propiedad</h3>
-                <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento para
-                    el próximo huésped.</p>
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Reporte de
+                    Insumos</h3>
+                <p class="text-xs text-gray-500 mb-6">Anota **únicamente** la cantidad de consumibles que agregaste
+                    nuevos para reponer.</p>
 
                 <div class="space-y-4 mb-10">
                     <template x-for="(cantidad, nombre) in inventarioLocal.Consumible" :key="nombre">
                         <div
-                            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:border-gold transition-colors">
                             <div class="flex items-center gap-3">
                                 <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
                                 <span class="font-bold text-navy"
                                     x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
                             </div>
-                            <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                                <button
-                                    @click="if(inventarioLocal.Consumible[nombre] > 0) inventarioLocal.Consumible[nombre]--"
-                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                                <input type="number" x-model.number="inventarioLocal.Consumible[nombre]"
-                                    class="font-mono font-bold text-lg w-10 text-center bg-transparent outline-none text-navy">
-                                <button @click="inventarioLocal.Consumible[nombre]++"
-                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+
+                            <div
+                                class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200 shadow-inner">
+                                <button @click="if(consumosReportados[nombre] > 0) consumosReportados[nombre]--"
+                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100 transition-colors">-</button>
+
+                                <div class="flex flex-col items-center justify-center w-12">
+                                    <span
+                                        class="text-[9px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Puse</span>
+                                    <input type="number" x-model.number="consumosReportados[nombre]" readonly
+                                        class="font-mono font-extrabold text-xl w-full text-center bg-transparent outline-none text-gold leading-none">
+                                </div>
+
+                                <button @click="if(consumosReportados[nombre] < cantidad) consumosReportados[nombre]++"
+                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100 transition-colors">+</button>
                             </div>
                         </div>
                     </template>
                     <p x-show="Object.keys(inventarioLocal.Consumible || {}).length === 0"
-                        class="text-center text-gray-400 font-bold py-4">No hay consumibles registrados en este
+                        class="text-center text-gray-400 font-bold py-4">No hay consumibles asignados a este
                         apartamento.</p>
                 </div>
 
-                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Dotación Fija
-                </h3>
-                <p class="text-xs text-gray-500 mb-4">Verifica que estos elementos estén completos.</p>
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Verificación
+                    de Dotación</h3>
+                <p class="text-xs text-gray-500 mb-4">Verifica visualmente que esta dotación esté completa. Si falta
+                    algo, repórtalo en el botón de Daños.</p>
 
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <template x-for="(cantidad, nombre) in inventarioLocal.Fijo" :key="nombre">
                         <div
-                            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                            class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl">
                             <div class="flex items-center gap-3">
-                                <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
-                                <span class="font-bold text-navy"
+                                <span class="text-xl" x-text="nombre.split(' ')[0]"></span>
+                                <span class="font-bold text-gray-600 text-sm"
                                     x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
                             </div>
-                            <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-1 border border-gray-200">
-                                <button @click="if(inventarioLocal.Fijo[nombre] > 0) inventarioLocal.Fijo[nombre]--"
-                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">-</button>
-                                <input type="number" x-model.number="inventarioLocal.Fijo[nombre]"
-                                    class="font-mono font-bold text-lg w-10 text-center bg-transparent outline-none text-navy">
-                                <button @click="inventarioLocal.Fijo[nombre]++"
-                                    class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-navy font-bold hover:bg-gray-100">+</button>
+
+                            <div
+                                class="px-4 py-1.5 bg-white rounded-lg border border-gray-200 shadow-sm flex items-center gap-2">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">Deben haber:</span>
+                                <span class="font-mono font-extrabold text-navy" x-text="cantidad"></span>
                             </div>
                         </div>
                     </template>
                     <p x-show="Object.keys(inventarioLocal.Fijo || {}).length === 0"
-                        class="text-center text-gray-400 font-bold py-4">No hay dotación fija registrada en este
-                        apartamento.</p>
+                        class="text-center text-gray-400 font-bold py-4">No hay dotación fija registrada.</p>
                 </div>
 
             </div>
@@ -443,8 +448,8 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Detalles del Daño
                         o Faltante</label>
-                    <textarea x-model="nuevoReporte" placeholder="Ej: Se rompió una copa de vino en la sala..." rows="3"
-                        required
+                    <textarea x-model="nuevoReporte" placeholder="Ej: Faltan 2 toallas grandes y se rompió una copa..."
+                        rows="3" required
                         class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-danger text-sm text-navy resize-none"></textarea>
                 </div>
                 <div class="pt-2 flex gap-3">
@@ -484,8 +489,9 @@
                 horaInicioPausa: null,
 
                 inventarioLocal: { Fijo: {}, Consumible: {} },
+                // ✨ NUEVO: Variable para contar de cero los consumos
+                consumosReportados: {},
 
-                // ✨ CHECKLIST EXACTO DEL PDF DEL CLIENTE (83 TAREAS ÚNICAS AGRUPADAS) ✨
                 categoriasChecklist: [
                     {
                         icono: '🚪', titulo: 'Entrada y General',
@@ -627,7 +633,6 @@
                     }
                 },
 
-                // Lógica de porcentaje para la barra
                 get totalTareas() {
                     return this.categoriasChecklist.reduce((sum, cat) => sum + cat.items.length, 0);
                 },
@@ -688,6 +693,7 @@
                     this.nuevoReporte = '';
 
                     this.resetearChecklist();
+                    this.consumosReportados = {};
 
                     this.segundos = 0;
                     this.pausasRegistradas = [];
@@ -701,6 +707,14 @@
                     }
                     if (inv && Object.keys(inv).length > 0 && (inv.Fijo || inv.Consumible)) {
                         this.inventarioLocal = JSON.parse(JSON.stringify(inv));
+
+                        // Inicializamos los consumos en cero
+                        if (this.inventarioLocal.Consumible) {
+                            for (let key in this.inventarioLocal.Consumible) {
+                                this.consumosReportados[key] = 0;
+                            }
+                        }
+
                     } else {
                         this.inventarioLocal = { Fijo: {}, Consumible: {} };
                     }
@@ -769,10 +783,23 @@
                     clearInterval(this.intervalo);
                     this.cargando = true;
 
+                    // ✨ CALCULAR RESTA DEL INVENTARIO ✨
+                    // Restamos lo que reportó del total del inventario.
+                    if (this.inventarioLocal && this.inventarioLocal.Consumible) {
+                        for (let key in this.consumosReportados) {
+                            if (this.inventarioLocal.Consumible[key] !== undefined) {
+                                this.inventarioLocal.Consumible[key] -= this.consumosReportados[key];
+                                // Aseguramos que no quede negativo por si acaso
+                                if (this.inventarioLocal.Consumible[key] < 0) this.inventarioLocal.Consumible[key] = 0;
+                            }
+                        }
+                    }
+
                     const reporteFinal = {
                         tiempo_limpieza_segundos: this.segundos,
                         historial_pausas: this.pausasRegistradas,
-                        checklist_marcado: this.checklistMarcadas
+                        checklist_marcado: this.checklistMarcadas,
+                        consumos_utilizados: this.consumosReportados // Mandamos lo que usó para que lo vea el Ama de Llaves
                     };
 
                     try {
@@ -794,7 +821,7 @@
                         });
 
                         await this.cargarTareasDesdeBD();
-                        alert(`¡Aseo finalizado exitosamente!\nTiempo neto de limpieza: ${this.formatearTiempo(this.segundos)}.\n\nReporte enviado al Ama de Llaves.`);
+                        alert(`¡Aseo finalizado exitosamente!\nTiempo neto de limpieza: ${this.formatearTiempo(this.segundos)}.\n\nInventario descontado y reporte enviado.`);
                     } catch (e) {
                         console.error(e);
                         alert("Hubo un error de conexión al finalizar.");
