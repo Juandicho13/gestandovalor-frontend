@@ -207,54 +207,33 @@
                 <div class="lg:col-span-2">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-extrabold text-navy">Logística de Hoy</h2>
-                        <a href="reservas.html"
-                            class="text-sm font-bold text-gold hover:text-navy transition-colors">Ver calendario
-                            completo</a>
                     </div>
 
                     <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
-                        <div
-                            class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-success flex-shrink-0">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-success">Check-In •
-                                        15:00</span>
-                                    <h3 class="text-lg font-bold text-navy leading-tight">Suite Ejecutiva Chía</h3>
-                                    <p class="text-gray-500 text-sm">Huésped: Mariana G. • 2 Noches</p>
-                                </div>
-                            </div>
-                            <span
-                                class="px-4 py-2 bg-green-50 text-success text-xs font-bold rounded-full border border-green-200">Aseo
-                                Completado</span>
-                        </div>
 
-                        <div
-                            class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-danger flex-shrink-0">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
+                        <template x-for="log in logisticaHoy" :key="log.id">
+                            <div
+                                class="p-6 md:p-8 border-b border-gray-100 hover:bg-gray-50 transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                                        :class="log.colorBg + ' ' + log.colorText" x-html="log.icono"></div>
+                                    <div>
+                                        <span class="text-xs font-bold uppercase tracking-wider" :class="log.colorText"
+                                            x-text="log.tipo + ' • ' + log.hora"></span>
+                                        <h3 class="text-lg font-bold text-navy leading-tight" x-text="log.propiedad">
+                                        </h3>
+                                        <p class="text-gray-500 text-sm"
+                                            x-text="'Huésped: ' + log.huesped + ' • ' + log.detalle"></p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-danger">Check-Out •
-                                        11:00</span>
-                                    <h3 class="text-lg font-bold text-navy leading-tight">Penthouse Bogotá</h3>
-                                    <p class="text-gray-500 text-sm">Huésped: Carlos R.</p>
-                                </div>
+                                <span class="px-4 py-2 text-xs font-bold rounded-full border" :class="log.badgeBg"
+                                    x-text="log.estadoBadge"></span>
                             </div>
-                            <span
-                                class="px-4 py-2 bg-yellow-50 text-yellow-700 text-xs font-bold rounded-full border border-yellow-200">Aseo
-                                Pendiente</span>
+                        </template>
+
+                        <div x-show="logisticaHoy.length === 0" class="p-10 text-center">
+                            <span class="text-4xl block mb-2">🌴</span>
+                            <p class="text-gray-500 font-bold">No hay check-ins ni check-outs programados para hoy.</p>
                         </div>
                     </div>
                 </div>
@@ -262,39 +241,32 @@
                 <div>
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-extrabold text-navy">Estado del Equipo</h2>
-                        <a href="operacion.html"
-                            class="text-sm font-bold text-gold hover:text-navy transition-colors">Ver operaciones</a>
                     </div>
 
                     <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8">
                         <div class="space-y-6">
 
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-bold text-sm shadow-sm flex-shrink-0">
-                                    E</div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-navy">Equipo de Aseo</h4>
-                                    <p class="text-xs text-gray-500 mb-1">Enrutamiento activo</p>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                        <span class="text-xs font-bold text-blue-500">Limpiando</span>
+                            <template x-for="(miembro, index) in estadoDelEquipo" :key="miembro.id">
+                                <div class="flex items-start gap-4"
+                                    :class="{'pt-6 border-t border-gray-100': index > 0}">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0"
+                                        :class="miembro.iconBg" x-text="miembro.iniciales"></div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-navy"
+                                            x-text="miembro.nombre + ' (' + miembro.rolTxt + ')'"></h4>
+                                        <p class="text-xs text-gray-500 mb-1" x-text="miembro.detalle"></p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full" :class="miembro.dotColor"></span>
+                                            <span class="text-xs font-bold" :class="miembro.statusColor"
+                                                x-text="miembro.estado"></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </template>
 
-                            <div class="flex items-start gap-4 pt-6 border-t border-gray-100">
-                                <div
-                                    class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
-                                    AL</div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-navy">Ama de Llaves</h4>
-                                    <p class="text-xs text-gray-500 mb-1">Supervisión</p>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-success"></span>
-                                        <span class="text-xs font-bold text-success">Disponible</span>
-                                    </div>
-                                </div>
+                            <div x-show="estadoDelEquipo.length === 0" class="text-center">
+                                <p class="text-gray-400 font-bold text-sm">No hay personal de Aseo o Ama de Llaves
+                                    registrado.</p>
                             </div>
 
                         </div>
@@ -436,6 +408,8 @@
             return {
                 propiedades: [],
                 reservas: [],
+                tareas: [],
+                usuarios: [],
                 solicitudesPendientes: 0,
                 ingresosDelMes: 0,
                 ocupacionDelMes: 0,
@@ -444,34 +418,131 @@
                     const usuario = JSON.parse(localStorage.getItem('gv_usuario_actual') || '{}');
                     if (usuario.rol !== 'ADMIN') return;
 
+                    // Cargamos tooooodo para que los datos sean reales
                     await Promise.all([
                         this.cargarPropiedades(),
-                        this.cargarReservas()
+                        this.cargarReservas(),
+                        this.cargarTareas(),
+                        this.cargarUsuarios()
                     ]);
 
                     this.calcularMetricas();
+                    this.actualizarContadorSolicitudes();
                 },
 
                 async cargarPropiedades() {
                     try {
                         const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
-                        if (response.ok) {
-                            this.propiedades = await response.json();
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
+                        if (response.ok) this.propiedades = await response.json();
+                    } catch (error) { console.error('Error:', error); }
                 },
 
                 async cargarReservas() {
                     try {
                         const response = await fetch('https://gestandovalor-backend.onrender.com/reservas');
-                        if (response.ok) {
-                            this.reservas = await response.json();
+                        if (response.ok) this.reservas = await response.json();
+                    } catch (error) { console.error('Error:', error); }
+                },
+
+                async cargarTareas() {
+                    try {
+                        const response = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos');
+                        if (response.ok) this.tareas = await response.json();
+                    } catch (error) { console.error('Error:', error); }
+                },
+
+                async cargarUsuarios() {
+                    try {
+                        const response = await fetch('https://gestandovalor-backend.onrender.com/usuarios');
+                        if (response.ok) this.usuarios = await response.json();
+                    } catch (error) { console.error('Error:', error); }
+                },
+
+                get logisticaHoy() {
+                    const hoyStr = new Date().toISOString().split('T')[0]; // Ej: "2026-03-26"
+                    let logs = [];
+
+                    this.reservas.forEach(res => {
+                        const checkInStr = res.check_in.split('T')[0];
+                        const checkOutStr = res.check_out.split('T')[0];
+                        const prop = this.propiedades.find(p => String(p.id) === String(res.propiedad_id));
+                        const propNombre = prop ? prop.titulo : 'Propiedad Desconocida';
+
+                        // Si hay Check-In hoy
+                        if (checkInStr === hoyStr) {
+                            const noches = Math.ceil((new Date(res.check_out) - new Date(res.check_in)) / (1000 * 60 * 60 * 24));
+                            logs.push({
+                                id: 'in_' + res.id,
+                                tipo: 'CHECK-IN',
+                                hora: '15:00',
+                                propiedad: propNombre,
+                                huesped: res.huesped_nombre,
+                                detalle: `${noches} Noche(s)`,
+                                icono: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>`,
+                                colorBg: 'bg-green-100',
+                                colorText: 'text-success',
+                                estadoBadge: 'Entrando hoy',
+                                badgeBg: 'bg-green-50 text-success border-green-200'
+                            });
                         }
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
+
+                        // Si hay Check-Out hoy
+                        if (checkOutStr === hoyStr) {
+                            const tareaAsignada = this.tareas.find(t => String(t.propiedad_id) === String(res.propiedad_id) && (!t.estado || t.estado === 'Pendiente'));
+
+                            logs.push({
+                                id: 'out_' + res.id,
+                                tipo: 'CHECK-OUT',
+                                hora: '11:00',
+                                propiedad: propNombre,
+                                huesped: res.huesped_nombre,
+                                detalle: 'Salida',
+                                icono: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>`,
+                                colorBg: 'bg-red-100',
+                                colorText: 'text-danger',
+                                estadoBadge: tareaAsignada ? 'Aseo Pendiente' : 'Aseo Completado',
+                                badgeBg: tareaAsignada ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-gray-50 text-gray-500 border-gray-200'
+                            });
+                        }
+                    });
+
+                    return logs;
+                },
+
+                get estadoDelEquipo() {
+                    let equipo = [];
+                    // Filtramos solo a los que limpian o supervisan
+                    const staff = this.usuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
+
+                    staff.forEach(u => {
+                        let estado = 'Disponible';
+                        let statusColor = 'text-success';
+                        let dotColor = 'bg-success';
+                        let detalle = u.rol === 'AMA_LLAVES' ? 'Supervisión' : 'A la espera de rutas';
+                        let iconBg = u.rol === 'AMA_LLAVES' ? 'bg-navy text-white' : 'bg-gold text-navy';
+
+                        if (u.rol === 'ASEO') {
+                            // Revisamos si el empleado tiene tareas pendientes HOY
+                            const tareaActiva = this.tareas.find(t => String(t.empleado_id) === String(u.id) && t.estado === 'Pendiente');
+                            if (tareaActiva) {
+                                estado = 'Limpiando';
+                                statusColor = 'text-blue-500';
+                                dotColor = 'bg-blue-500 animate-pulse';
+                                const prop = this.propiedades.find(p => String(p.id) === String(tareaActiva.propiedad_id));
+                                if (prop) detalle = `Asignado a: ${prop.titulo}`;
+                            }
+                        }
+
+                        equipo.push({
+                            id: u.id,
+                            nombre: u.nombre,
+                            rolTxt: u.rol === 'AMA_LLAVES' ? 'Ama de Llaves' : 'Equipo de Aseo',
+                            iniciales: u.nombre.substring(0, 2).toUpperCase(),
+                            estado, detalle, statusColor, dotColor, iconBg
+                        });
+                    });
+
+                    return equipo;
                 },
 
                 calcularMetricas() {
@@ -479,9 +550,7 @@
                     const mesActual = hoy.getMonth();
                     const anioActual = hoy.getFullYear();
 
-                    // Total de días del mes actual para sacar el 100%
                     const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
-
                     let ingresos = 0;
                     let nochesOcupadas = 0;
 
@@ -489,16 +558,13 @@
                         const checkIn = new Date(res.check_in);
                         const checkOut = new Date(res.check_out);
 
-                        // Si la reserva existe en este mes
                         if ((checkIn.getMonth() === mesActual && checkIn.getFullYear() === anioActual) ||
                             (checkOut.getMonth() === mesActual && checkOut.getFullYear() === anioActual)) {
 
-                            // Para simplificar, la plata entra en el mes del check-in
                             if (checkIn.getMonth() === mesActual) {
                                 ingresos += Number(res.monto_total || 0);
                             }
 
-                            // Calcular cuántas de esas noches caen exactamente en este mes
                             let fechaInicio = checkIn < new Date(anioActual, mesActual, 1) ? new Date(anioActual, mesActual, 1) : checkIn;
                             let fechaFin = checkOut > new Date(anioActual, mesActual + 1, 0) ? new Date(anioActual, mesActual + 1, 0) : checkOut;
 
@@ -516,6 +582,16 @@
                     } else {
                         this.ocupacionDelMes = 0;
                     }
+                },
+
+                async actualizarContadorSolicitudes() {
+                    try {
+                        const respuesta = await fetch('https://gestandovalor-backend.onrender.com/prospectos');
+                        if (respuesta.ok) {
+                            const prospectos = await respuesta.json();
+                            this.solicitudesPendientes = prospectos.length;
+                        }
+                    } catch (error) { console.error('Error:', error); }
                 },
 
                 formatearDinero(valor) {
@@ -542,25 +618,16 @@
             });
         });
 
-        // ... (El resto de la función editorBlog() se mantiene intacta) ...
+        // ... (Editor de Blog intacto) ...
         function editorBlog() {
             return {
                 cargando: false,
                 comprimiendo: false,
-                form: {
-                    titulo: '',
-                    categoria: 'Inversión',
-                    tiempo_lectura: 5,
-                    foto_url: '',
-                    contenido: ''
-                },
-
+                form: { titulo: '', categoria: 'Inversión', tiempo_lectura: 5, foto_url: '', contenido: '' },
                 procesarFotoBlog(event) {
                     const archivo = event.target.files[0];
                     if (!archivo) return;
-
                     this.comprimiendo = true;
-
                     const lector = new FileReader();
                     lector.onload = (e) => {
                         const img = new Image();
@@ -569,25 +636,15 @@
                             const MAX_HEIGHT = 1200;
                             let width = img.width;
                             let height = img.height;
-
                             if (width > height) {
-                                if (width > MAX_WIDTH) {
-                                    height = Math.round((height *= MAX_WIDTH / width));
-                                    width = MAX_WIDTH;
-                                }
+                                if (width > MAX_WIDTH) { height = Math.round((height *= MAX_WIDTH / width)); width = MAX_WIDTH; }
                             } else {
-                                if (height > MAX_HEIGHT) {
-                                    width = Math.round((width *= MAX_HEIGHT / height));
-                                    height = MAX_HEIGHT;
-                                }
+                                if (height > MAX_HEIGHT) { width = Math.round((width *= MAX_HEIGHT / height)); height = MAX_HEIGHT; }
                             }
-
                             const canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
+                            canvas.width = width; canvas.height = height;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-
                             this.form.foto_url = canvas.toDataURL('image/jpeg', 0.7);
                             this.comprimiendo = false;
                         };
@@ -595,39 +652,21 @@
                     };
                     lector.readAsDataURL(archivo);
                 },
-
                 async publicarArticulo() {
-                    if (!this.form.titulo || !this.form.contenido) {
-                        alert('El título y el contenido son obligatorios para publicar.');
-                        return;
-                    }
+                    if (!this.form.titulo || !this.form.contenido) { alert('El título y el contenido son obligatorios.'); return; }
                     this.cargando = true;
                     try {
                         const response = await fetch('https://gestandovalor-backend.onrender.com/blog', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                ...this.form,
-                                estado: 'Publicado',
-                                tiempo_lectura: Number(this.form.tiempo_lectura)
-                            })
+                            body: JSON.stringify({ ...this.form, estado: 'Publicado', tiempo_lectura: Number(this.form.tiempo_lectura) })
                         });
-
                         if (response.ok) {
-                            alert('🎉 ¡Artículo publicado con éxito! Ya está visible en tu página web.');
+                            alert('🎉 ¡Artículo publicado con éxito!');
                             this.form = { titulo: '', categoria: 'Inversión', tiempo_lectura: 5, foto_url: '', contenido: '' };
                             document.querySelector('body').__x.$data.modalBlog = false;
-                        } else {
-                            if (response.status === 413) {
-                                alert('Error: La imagen sigue siendo muy grande. Intenta con una distinta.');
-                            } else {
-                                alert('Hubo un error al guardar el artículo en la base de datos.');
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Error:', e);
-                        alert('No se pudo conectar con el servidor en Render. Revisa la consola.');
-                    }
+                        } else { alert('Error al guardar el artículo.'); }
+                    } catch (e) { alert('Error de conexión.'); }
                     this.cargando = false;
                 }
             }
