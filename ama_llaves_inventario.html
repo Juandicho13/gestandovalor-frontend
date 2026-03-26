@@ -159,10 +159,12 @@
                                 <template x-for="(cantidad, nombre) in inventarioLocal.Fijo" :key="nombre">
                                     <div
                                         class="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-2xl group hover:border-gold transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
-                                            <span class="font-bold text-navy"
-                                                x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                                        <div class="flex flex-col gap-1">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
+                                                <span class="font-bold text-navy"
+                                                    x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                                            </div>
                                         </div>
                                         <div class="flex items-center gap-4">
                                             <div
@@ -212,11 +214,23 @@
                                 <template x-for="(cantidad, nombre) in inventarioLocal.Consumible" :key="nombre">
                                     <div
                                         class="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-2xl group hover:border-gold transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
-                                            <span class="font-bold text-navy"
-                                                x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+
+                                        <div class="flex flex-col gap-1.5">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-2xl" x-text="nombre.split(' ')[0]"></span>
+                                                <span class="font-bold text-navy"
+                                                    x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                                            </div>
+                                            <label class="flex items-center gap-2">
+                                                <span
+                                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Máx.
+                                                    x Aseo:</span>
+                                                <input type="number" min="0"
+                                                    x-model.number="inventarioLocal.Limites[nombre]"
+                                                    class="w-12 h-6 bg-white border border-gray-200 rounded text-center text-xs font-bold text-navy outline-none focus:border-gold shadow-inner">
+                                            </label>
                                         </div>
+
                                         <div class="flex items-center gap-4">
                                             <div
                                                 class="flex items-center gap-2 bg-white rounded-xl p-1 border border-gray-200 shadow-sm">
@@ -327,14 +341,14 @@
                 nuevoItemNombre: '',
                 nuevoItemCantidad: 0,
 
-                inventarioLocal: { Fijo: {}, Consumible: {} },
+                // ✨ INCLUIMOS LIMITES EN EL OBJETO LOCAL ✨
+                inventarioLocal: { Fijo: {}, Consumible: {}, Limites: {} },
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
 
-                        // ✨ SEGURIDAD: Solo ADMIN y AMA_LLAVES ✨
                         if (usuario.rol !== 'ADMIN' && usuario.rol !== 'AMA_LLAVES') {
                             alert('⛔ Acceso denegado.');
                             window.location.href = 'login.html';
@@ -380,8 +394,10 @@
 
                     if (inv && Object.keys(inv).length > 0 && (inv.Fijo || inv.Consumible)) {
                         this.inventarioLocal = JSON.parse(JSON.stringify(inv));
+                        if (!this.inventarioLocal.Limites) {
+                            this.inventarioLocal.Limites = {};
+                        }
                     } else {
-                        // Plantilla Base
                         this.inventarioLocal = {
                             Fijo: {
                                 "🍴 Tenedores": 6, "🔪 Cuchillos": 6, "🍽️ Platos Grandes": 6,
@@ -390,6 +406,10 @@
                             Consumible: {
                                 "🧻 Rollos de Papel": 8, "🧼 Kits de Baño": 12,
                                 "☕ Cápsulas Café": 15, "🍬 Sobres de Azúcar": 20
+                            },
+                            Limites: {
+                                "🧻 Rollos de Papel": 2, "🧼 Kits de Baño": 2,
+                                "☕ Cápsulas Café": 4, "🍬 Sobres de Azúcar": 4
                             }
                         };
                     }
@@ -405,7 +425,7 @@
                         });
 
                         if (res.ok) {
-                            alert('✅ Inventario guardado exitosamente en la nube.');
+                            alert('✅ Inventario y límites guardados exitosamente.');
                             const index = this.propiedades.findIndex(p => p.id === this.propiedadActiva.id);
                             if (index > -1) this.propiedades[index].inventario = JSON.parse(JSON.stringify(this.inventarioLocal));
                         } else {
@@ -426,6 +446,11 @@
 
                     this.inventarioLocal[this.categoriaNuevoItem][key] = Number(this.nuevoItemCantidad);
 
+                    if (this.categoriaNuevoItem === 'Consumible') {
+                        if (!this.inventarioLocal.Limites) this.inventarioLocal.Limites = {};
+                        this.inventarioLocal.Limites[key] = 1; // Límite por defecto
+                    }
+
                     this.modalNuevoItem = false;
                     this.nuevoItemEmoji = '';
                     this.nuevoItemNombre = '';
@@ -435,6 +460,9 @@
                 eliminarItem(categoria, key) {
                     if (confirm(`¿Estás seguro que deseas eliminar "${key}" del inventario de este apartamento?`)) {
                         delete this.inventarioLocal[categoria][key];
+                        if (categoria === 'Consumible' && this.inventarioLocal.Limites) {
+                            delete this.inventarioLocal.Limites[key];
+                        }
                     }
                 },
 
