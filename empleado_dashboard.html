@@ -7,6 +7,7 @@
     <title>Panel de Empleado - GestandoValor</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
@@ -44,10 +45,6 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="appAseo()" x-init="initApp()">
-
-    <div
-        class="hidden bg-red-50 border-red-100 text-danger bg-yellow-50 border-yellow-100 text-warning bg-gray-100 border-gray-200 text-gray-600">
-    </div>
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
@@ -187,7 +184,7 @@
 
                             <div class="flex items-center gap-5">
                                 <div
-                                    class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-200">
+                                    class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
                                     <img :src="obtenerFotoApto(tarea.propiedad_segura)" alt="Apto"
                                         class="w-full h-full object-cover">
                                 </div>
@@ -244,13 +241,11 @@
                 <div class="w-24 h-24 rounded-2xl overflow-hidden shadow-md border border-gray-200 shrink-0 bg-white">
                     <img :src="obtenerFotoApto(tareaActiva?.propiedad_segura)" class="w-full h-full object-cover">
                 </div>
-                <div>
+                <div class="flex-1">
                     <span class="text-gold font-bold uppercase tracking-widest text-[10px]">Limpieza en progreso</span>
                     <h2 class="text-3xl font-extrabold text-navy"
                         x-text="tareaActiva?.propiedad_segura?.titulo || 'Apartamento sin título'"></h2>
                     <p class="text-gray-500 text-sm mt-1" x-text="tareaActiva?.propiedad_segura?.direccion"></p>
-                    <p class="text-gray-400 text-xs mt-1">Marca las tareas a medida que vayas completando. La calidad es
-                        lo más importante.</p>
                 </div>
             </div>
 
@@ -259,7 +254,7 @@
                 <button @click="pestañaActiva = 'checklist'"
                     class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
                     :class="pestañaActiva === 'checklist' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
-                    1. Checklist Tareas
+                    1. Estándares de Calidad
                 </button>
                 <button @click="pestañaActiva = 'consumibles'"
                     class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
@@ -269,128 +264,71 @@
             </div>
 
             <div x-show="pestañaActiva === 'checklist'" x-transition.opacity class="pb-10">
-                <div class="mb-8">
-                    <h3
-                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        🛏️ Habitaciones
-                    </h3>
-                    <div class="space-y-3 pl-2">
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.hab_sabanas"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Cambio de sábanas y fundas limpias</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.hab_armarios"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Revisión interior de armarios/gavetas</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.hab_pisos"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Barrer y trapear pisos</span>
-                        </label>
-                    </div>
-                </div>
 
-                <div class="mb-8">
-                    <h3
-                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        🚿 Baños (Desinfección)
-                    </h3>
-                    <div class="space-y-3 pl-2">
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.bano_inodoro"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Lavar y desinfectar inodoro y ducha</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.bano_espejos"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Limpiar espejos sin dejar marcas</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.bano_toallas"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Colocar toallas limpias</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.bano_papelera"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Vaciar papelera de baño</span>
-                        </label>
+                <div class="mb-6 bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden relative">
+                    <div class="p-6 bg-gray-50 flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-extrabold text-navy">Progreso de Tareas</h3>
+                            <span class="text-sm font-bold text-gold" x-text="porcentajeChecklist + '%'"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-gold h-2.5 rounded-full transition-all duration-500"
+                                :style="`width: ${porcentajeChecklist}%`"></div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-8">
-                    <h3
-                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        🍳 Cocina
-                    </h3>
-                    <div class="space-y-3 pl-2">
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.cocina_loza"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Lavar, secar y guardar toda la loza</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.cocina_estufa"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Desengrasar estufa y mesones</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.cocina_nevera"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Revisar nevera</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.cocina_basura"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura principal</span>
-                        </label>
-                    </div>
-                </div>
+                    <div class="p-4 space-y-4">
+                        <template x-for="(cat, index) in categoriasChecklist" :key="index">
+                            <div class="border border-gray-100 rounded-2xl overflow-hidden shadow-sm"
+                                x-data="{ abierta: index === 0 }">
+                                <button @click="abierta = !abierta"
+                                    class="w-full p-5 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl" x-text="cat.icono"></span>
+                                        <span class="font-extrabold text-navy" x-text="cat.titulo"></span>
 
-                <div class="mb-4">
-                    <h3
-                        class="text-sm font-extrabold text-navy uppercase tracking-widest mb-4 flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        🛋️ Zonas Comunes (Sala/Comedor)
-                    </h3>
-                    <div class="space-y-3 pl-2">
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.sala_cojines"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Acomodar cojines y decoración</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.sala_polvo"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Limpiar polvo en TV, mesas y repisas</span>
-                        </label>
-                        <label
-                            class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox" x-model="checklist.sala_pisos"
-                                class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Barrer y trapear a fondo</span>
-                        </label>
+                                        <svg x-show="cat.items.every(i => checklistMarcadas[i.id])"
+                                            class="w-5 h-5 text-success ml-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400 transform transition-transform duration-300"
+                                        :class="abierta ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                <div x-show="abierta" x-collapse class="bg-white p-4 space-y-3">
+                                    <template x-for="item in cat.items" :key="item.id">
+                                        <label
+                                            class="flex items-start gap-4 p-3 rounded-xl border transition-colors cursor-pointer group"
+                                            :class="checklistMarcadas[item.id] ? 'bg-green-50/30 border-green-200' : 'bg-white border-gray-100 hover:border-gold'">
+                                            <div class="mt-0.5 relative flex items-center justify-center shrink-0">
+                                                <input type="checkbox" x-model="checklistMarcadas[item.id]"
+                                                    class="w-6 h-6 border-2 border-gray-300 rounded-md appearance-none checked:bg-gold checked:border-gold transition-colors cursor-pointer peer">
+                                                <svg class="w-4 h-4 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="3" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span class="text-sm font-bold transition-all"
+                                                :class="checklistMarcadas[item.id] ? 'text-gray-400 line-through' : 'text-gray-700'"
+                                                x-text="item.texto"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
 
                 <button @click="modalReporte = true"
-                    class="mt-8 w-full bg-red-50 text-danger border border-red-200 font-bold py-4 rounded-xl hover:bg-red-100 transition flex justify-center items-center gap-2">
+                    class="w-full bg-red-50 text-danger border border-red-200 font-bold py-4 rounded-xl hover:bg-red-100 transition flex justify-center items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -400,6 +338,7 @@
             </div>
 
             <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
+
                 <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Consumibles
                     de la Propiedad</h3>
                 <p class="text-xs text-gray-500 mb-6">Anota la cantidad exacta que dejaste lista en el apartamento para
@@ -457,6 +396,7 @@
                         class="text-center text-gray-400 font-bold py-4">No hay dotación fija registrada en este
                         apartamento.</p>
                 </div>
+
             </div>
 
         </div>
@@ -545,12 +485,123 @@
 
                 inventarioLocal: { Fijo: {}, Consumible: {} },
 
-                checklist: {
-                    hab_sabanas: false, hab_armarios: false, hab_pisos: false,
-                    bano_inodoro: false, bano_espejos: false, bano_toallas: false, bano_papelera: false,
-                    cocina_loza: false, cocina_estufa: false, cocina_nevera: false, cocina_basura: false,
-                    sala_cojines: false, sala_polvo: false, sala_pisos: false
-                },
+                // ✨ CHECKLIST EXACTO DEL PDF DEL CLIENTE (83 TAREAS ÚNICAS AGRUPADAS) ✨
+                categoriasChecklist: [
+                    {
+                        icono: '🚪', titulo: 'Entrada y General',
+                        items: [
+                            { id: 'gen_1', texto: 'Puerta principal sin polvo' },
+                            { id: 'gen_2', texto: 'Chapa desinfectada' },
+                            { id: 'gen_3', texto: 'Cerradura funcional' },
+                            { id: 'gen_4', texto: 'Muebles sin polvo' },
+                            { id: 'gen_5', texto: 'Puertas sin manchas y manijas desinfectadas, sin polvo' },
+                            { id: 'gen_6', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' },
+                            { id: 'gen_7', texto: 'Desinfección de tomacorrientes e interruptores, sin polvo' },
+                            { id: 'gen_8', texto: 'Paredes sin manchas' },
+                            { id: 'gen_9', texto: 'Pisos barridos y trapeados con desinfectante sin manchas' },
+                            { id: 'gen_10', texto: 'Ambiente con fragancia fresca' },
+                            { id: 'gen_11', texto: 'Verificar funcionamiento de luces' },
+                            { id: 'gen_12', texto: 'Checklist inventario muebles y enseres' },
+                            { id: 'gen_13', texto: 'Checklist consumibles' }
+                        ]
+                    },
+                    {
+                        icono: '🍳', titulo: 'Cocina',
+                        items: [
+                            { id: 'coc_1', texto: 'Salpicadero desinfectado, sin grasa en esquinas ni juntas' },
+                            { id: 'coc_2', texto: 'Mesones desinfectados, sin grasa en esquinas ni juntas' },
+                            { id: 'coc_3', texto: 'Gabinetes y cajones interior limpios, sin grasa, sin residuos' },
+                            { id: 'coc_4', texto: 'Extractor sin grasa, sin residuos, vidrio sin manchas ni grasa' },
+                            { id: 'coc_5', texto: 'Muebles sin polvo en la parte superior' },
+                            { id: 'coc_6', texto: 'Quemadores limpios, sin grasa acumulada' },
+                            { id: 'coc_7', texto: 'Horno sin residuos, grasa, vidrios sin manchas' },
+                            { id: 'coc_8', texto: 'Nevera interior sin productos, desinfectada, estantes sin manchas, cauchos limpios' },
+                            { id: 'coc_9', texto: 'Ollas y utensilios sin residuos, secos, sin grasa' },
+                            { id: 'coc_10', texto: 'Caneca lavada, desinfectada, bolsa nueva' },
+                            { id: 'coc_11', texto: 'Esquinas y bordes del piso sin migas' },
+                            { id: 'coc_12', texto: 'Electrodomésticos funcionando, desinfectados y secos' },
+                            { id: 'coc_13', texto: 'Cubiertos sin manchas, secos' },
+                            { id: 'coc_14', texto: 'Recarga aromáticas, cafés, azúcar' },
+                            { id: 'coc_15', texto: 'Esponja de jabón sin residuos, en buen estado. Jabón recargado' }
+                        ]
+                    },
+                    {
+                        icono: '🧺', titulo: 'Zona de Ropa',
+                        items: [
+                            { id: 'rop_1', texto: 'Lavadora interior limpio y desinfectado, cajón detergente sin residuos' },
+                            { id: 'rop_2', texto: 'Filtro de lavadora sin basura y limpio' },
+                            { id: 'rop_3', texto: 'Trapero limpio y con buen olor' },
+                            { id: 'rop_4', texto: 'Escoba sin pelos ni suciedad' },
+                            { id: 'rop_5', texto: 'Recogedor limpio y sin residuos' },
+                            { id: 'rop_6', texto: 'Piso y desagüe limpio, sin residuos' },
+                            { id: 'rop_7', texto: 'Esquinas y bordes del piso sin pelos ni residuos' },
+                            { id: 'rop_8', texto: 'Tendedero sin polvo' }
+                        ]
+                    },
+                    {
+                        icono: '🚿', titulo: 'Baño',
+                        items: [
+                            { id: 'ban_1', texto: 'Inodoro interior y exterior y base desinfectados, sin manchas' },
+                            { id: 'ban_2', texto: 'Ducha sin moho en juntas, paredes y piso sin grasa y seco' },
+                            { id: 'ban_3', texto: 'Vidrios sin manchas, secos' },
+                            { id: 'ban_4', texto: 'Lavamanos sin residuos, grifería sin manchas, seco' },
+                            { id: 'ban_5', texto: 'Toallas sin manchas, sin olores' },
+                            { id: 'ban_6', texto: 'Espejo sin marcas ni salpicaduras' },
+                            { id: 'ban_7', texto: 'Paredes sin manchas, sin humedad' },
+                            { id: 'ban_8', texto: 'Cero cabellos en piso y superficies' },
+                            { id: 'ban_9', texto: 'Esquinas de piso sin pelos ni residuos' },
+                            { id: 'ban_10', texto: 'Caneca lavada desinfectada, seca, bolsa nueva' },
+                            { id: 'ban_11', texto: 'Papel higiénico, jabones y shampoo nuevos' }
+                        ]
+                    },
+                    {
+                        icono: '🛋️', titulo: 'Sala y Comedor',
+                        items: [
+                            { id: 'sal_1', texto: 'Comedor desinfectado, sin manchas' },
+                            { id: 'sal_2', texto: 'Sillas sin mancha ni polvo' },
+                            { id: 'sal_3', texto: 'Cuadros y espejos alineados y limpios' },
+                            { id: 'sal_4', texto: 'Tapetes aspirados y sin manchas, secos, sin olores' },
+                            { id: 'sal_5', texto: 'Individuales desinfectados, sin manchas' },
+                            { id: 'sal_6', texto: 'Esquinas de piso sin pelos ni residuos' },
+                            { id: 'sal_7', texto: 'Pisos sin polvo ni residuos debajo de muebles' },
+                            { id: 'sal_8', texto: 'Sofá cama aspirado profundo, sin manchas, residuos o pelos (abierto)' },
+                            { id: 'sal_9', texto: 'Cojines sin manchas, sin pelos' },
+                            { id: 'sal_10', texto: 'Mesa de centro desinfectada, sin manchas' },
+                            { id: 'sal_11', texto: 'TV frontal y posterior sin polvo detrás, en conexiones y soporte' },
+                            { id: 'sal_12', texto: 'Cables TV organizados y ocultos' },
+                            { id: 'sal_13', texto: 'Confirmación de funcionamiento de TV' },
+                            { id: 'sal_14', texto: 'Control desinfectado, sin residuos en botones' },
+                            { id: 'sal_15', texto: 'Paredes sin manchas ni marcas' },
+                            { id: 'sal_16', texto: 'Plantas con agua, hojas y matera limpias' },
+                            { id: 'sal_17', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }
+                        ]
+                    },
+                    {
+                        icono: '🛏️', titulo: 'Alcoba y Zona de Trabajo',
+                        items: [
+                            { id: 'alc_1', texto: 'Cama, sábanas tensadas, sin pelos, ni manchas' },
+                            { id: 'alc_2', texto: 'Cobijas sin manchas, sin olores' },
+                            { id: 'alc_3', texto: 'Almohadas sin manchas, buen olor' },
+                            { id: 'alc_4', texto: 'Juegos adicionales guardados, sin manchas, residuos, con buen olor' },
+                            { id: 'alc_5', texto: 'Juegos de cama doblados perfectamente, organizados' },
+                            { id: 'alc_6', texto: 'Tapetes aspirados y sin manchas' },
+                            { id: 'alc_7', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' },
+                            { id: 'alc_8', texto: 'Mesas de noche desinfectadas, sin manchas, sin residuos' },
+                            { id: 'alc_9', texto: 'Debajo de la cama sin polvo, sin residuos' },
+                            { id: 'alc_10', texto: 'Closet y cajones interior limpio, sin residuos, sin polvo' },
+                            { id: 'alc_11', texto: 'Lámparas recargadas, funcionando' },
+                            { id: 'alc_12', texto: 'Esquinas de piso sin pelos ni residuos' },
+                            { id: 'alc_13', texto: 'Escritorio con superficie limpia y desinfectada' },
+                            { id: 'alc_14', texto: 'Silla sin polvo ni manchas' },
+                            { id: 'alc_15', texto: 'Cables organizados' },
+                            { id: 'alc_16', texto: 'Pisos sin polvo ni residuos debajo de muebles' },
+                            { id: 'alc_17', texto: 'Conexiones eléctricas en funcionamiento' },
+                            { id: 'alc_18', texto: 'WiFi funcionando' },
+                            { id: 'alc_19', texto: 'Verificar funcionamiento de electrodomésticos' }
+                        ]
+                    }
+                ],
+                checklistMarcadas: {},
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
@@ -568,11 +619,33 @@
                         const partes = this.empleadoNombre.split(' ');
                         this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
 
+                        this.resetearChecklist();
                         await this.cargarPropiedades();
                         await this.cargarTareasDesdeBD();
                     } else {
                         window.location.href = 'login.html';
                     }
+                },
+
+                // Lógica de porcentaje para la barra
+                get totalTareas() {
+                    return this.categoriasChecklist.reduce((sum, cat) => sum + cat.items.length, 0);
+                },
+                get tareasCompletadasCheck() {
+                    return Object.values(this.checklistMarcadas).filter(Boolean).length;
+                },
+                get porcentajeChecklist() {
+                    if (this.totalTareas === 0) return 0;
+                    return Math.round((this.tareasCompletadasCheck / this.totalTareas) * 100);
+                },
+
+                resetearChecklist() {
+                    this.checklistMarcadas = {};
+                    this.categoriasChecklist.forEach(cat => {
+                        cat.items.forEach(item => {
+                            this.checklistMarcadas[item.id] = false;
+                        });
+                    });
                 },
 
                 async cargarPropiedades() {
@@ -590,7 +663,6 @@
                         if (res.ok) {
                             let todasLasTareas = await res.json();
 
-                            // Mapeamos la propiedad completa
                             todasLasTareas = todasLasTareas.map(t => {
                                 const prop = this.propiedades.find(p => String(p.id) === String(t.propiedad_id));
                                 return { ...t, propiedad_segura: prop || {} };
@@ -615,7 +687,7 @@
                     this.pestañaActiva = 'checklist';
                     this.nuevoReporte = '';
 
-                    for (let key in this.checklist) { this.checklist[key] = false; }
+                    this.resetearChecklist();
 
                     this.segundos = 0;
                     this.pausasRegistradas = [];
@@ -689,13 +761,18 @@
                 },
 
                 async finalizarAseo() {
+                    if (this.tareasCompletadasCheck < this.totalTareas) {
+                        const confirmar = confirm(`Faltan tareas por marcar en el Checklist (${this.tareasCompletadasCheck}/${this.totalTareas}).\n\n¿Estás SEGURO que limpiaste todo y quieres finalizar?`);
+                        if (!confirmar) return;
+                    }
+
                     clearInterval(this.intervalo);
                     this.cargando = true;
 
                     const reporteFinal = {
                         tiempo_limpieza_segundos: this.segundos,
                         historial_pausas: this.pausasRegistradas,
-                        checklist_marcado: this.checklist
+                        checklist_marcado: this.checklistMarcadas
                     };
 
                     try {
