@@ -53,7 +53,14 @@
     </style>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="appGestandoValor()" x-init="init()">
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="appGestandoValor()" x-init="init()"
+    :class="modalNuevoItem ? 'overflow-hidden' : ''">
+
+    <div x-show="cargandoAccion" style="display: none;"
+        class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
+        <p class="font-bold text-navy animate-pulse">Sincronizando inventario...</p>
+    </div>
 
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
@@ -70,7 +77,7 @@
             <a href="propiedades.html"
                 class="text-sm font-medium text-white border-b-2 border-gold pb-1">Propiedades</a>
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            <a href="login.html"
+            <a href="login.html" @click="localStorage.removeItem('gv_usuario_actual')"
                 class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -441,96 +448,169 @@
 
                     <div class="lg:col-span-2">
                         <div
-                            class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden h-full flex flex-col">
+                            class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden h-full flex flex-col relative">
+
                             <div
                                 class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                                 <div>
                                     <h2 class="text-2xl font-extrabold text-navy">Inventario en Vivo</h2>
-                                    <p class="text-sm text-gray-500 mt-1">Conectado a tu base de datos real.</p>
+                                    <p class="text-sm text-gray-500 mt-1">Modifica el stock en tiempo real.</p>
                                 </div>
-                                <span
-                                    class="px-3 py-1 text-xs font-bold rounded-full border shadow-sm flex items-center gap-1"
-                                    :class="tieneInventario(propiedadActiva) ? 'bg-green-100 text-success border-green-200' : 'bg-red-100 text-danger border-red-200'">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" x-show="tieneInventario(propiedadActiva)" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" x-show="!tieneInventario(propiedadActiva)"
-                                            style="display: none;" />
-                                    </svg>
+                                <div class="flex items-center gap-3">
+                                    <button x-show="tieneInventarioActivo" @click="guardarInventario()"
+                                        class="bg-gold hover:bg-yellow-500 text-navy px-5 py-2.5 rounded-xl font-extrabold transition-transform active:scale-95 shadow-md flex items-center gap-2 text-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Guardar
+                                    </button>
                                     <span
-                                        x-text="tieneInventario(propiedadActiva) ? 'Sincronizado' : 'Sin Inventario'"></span>
-                                </span>
+                                        class="px-3 py-2 text-xs font-bold rounded-full border shadow-sm flex items-center gap-1"
+                                        :class="tieneInventarioActivo ? 'bg-green-100 text-success border-green-200' : 'bg-red-100 text-danger border-red-200'">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" x-show="tieneInventarioActivo" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" x-show="!tieneInventarioActivo"
+                                                style="display: none;" />
+                                        </svg>
+                                        <span x-text="tieneInventarioActivo ? 'Sincronizado' : 'Sin Inventario'"></span>
+                                    </span>
+                                </div>
                             </div>
 
-                            <div x-show="!tieneInventario(propiedadActiva)"
-                                class="p-12 text-center flex-1 flex flex-col items-center justify-center">
-                                <p class="text-gray-500 mb-4 font-medium">Esta propiedad aún no tiene un registro de
-                                    inventario inicial.</p>
-                                <button
-                                    class="bg-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-900 transition-colors"
-                                    @click="window.location.href='ama_llaves_inventario.html'">
-                                    Ir a configurarlo (Ama de Llaves)
+                            <div x-show="!tieneInventarioActivo"
+                                class="p-12 text-center flex flex-col items-center justify-center flex-1">
+                                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-500 mb-6 font-medium max-w-md mx-auto">Esta propiedad aún no tiene
+                                    un registro de inventario. Puedes crearlo desde cero ahora mismo.</p>
+                                <button @click="inicializarInventarioBase()"
+                                    class="bg-navy text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-900 transition-transform active:scale-95 shadow-lg shadow-navy/20 mx-auto block">
+                                    Crear Plantilla Base
                                 </button>
                             </div>
 
-                            <div x-show="tieneInventario(propiedadActiva)" style="display: none;"
-                                class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 flex-1 overflow-y-auto custom-scrollbar">
+                            <div x-show="tieneInventarioActivo" style="display: none;"
+                                class="p-6 md:p-8 flex-1 overflow-y-auto custom-scrollbar bg-white">
+                                <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
 
-                                <div>
-                                    <h3
-                                        class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
-                                        Consumibles</h3>
-                                    <div class="space-y-5 mt-4">
-                                        <template x-for="(cantidad, nombre) in obtenerConsumibles(propiedadActiva)"
-                                            :key="nombre">
-                                            <div>
-                                                <div class="flex justify-between text-xs font-bold text-gray-600 mb-2">
-                                                    <span class="flex items-center gap-1">
-                                                        <span x-text="nombre.split(' ')[0]"></span>
-                                                        <span x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
-                                                    </span>
-                                                    <span :class="cantidad < 3 ? 'text-danger' : 'text-success'"
-                                                        x-text="`${cantidad} unid.`"></span>
-                                                </div>
-                                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                    <div :class="cantidad < 3 ? 'bg-danger' : 'bg-success'"
-                                                        class="h-2.5 rounded-full transition-all duration-500"
-                                                        :style="`width: ${Math.min((cantidad || 0) * 10, 100)}%`">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-6">
+                                            <h3
+                                                class="text-lg font-extrabold text-navy border-b-4 border-gold inline-block pb-1">
+                                                Dotación Fija</h3>
+                                            <button @click="modalNuevoItem = true; categoriaNuevoItem = 'Fijo'"
+                                                class="text-xs font-bold text-gold hover:text-navy transition-colors flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M12 4v16m8-8H4" />
+                                                </svg> Agregar
+                                            </button>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <template x-for="(cantidad, nombre) in inventarioLocal.Fijo" :key="nombre">
+                                                <div
+                                                    class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl group hover:border-gold transition-colors">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="text-xl" x-text="nombre.split(' ')[0]"></span>
+                                                        <span class="font-bold text-navy text-sm"
+                                                            x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                                                    </div>
+                                                    <div class="flex items-center gap-3">
+                                                        <div
+                                                            class="flex items-center gap-1 bg-white rounded-lg p-1 border border-gray-200 shadow-sm">
+                                                            <button
+                                                                @click="if(inventarioLocal.Fijo[nombre] > 0) inventarioLocal.Fijo[nombre]--"
+                                                                class="w-6 h-6 flex items-center justify-center rounded text-gray-500 font-bold hover:bg-gray-100">-</button>
+                                                            <input type="number"
+                                                                x-model.number="inventarioLocal.Fijo[nombre]"
+                                                                class="font-mono font-bold text-sm w-8 text-center bg-transparent outline-none text-navy">
+                                                            <button @click="inventarioLocal.Fijo[nombre]++"
+                                                                class="w-6 h-6 flex items-center justify-center rounded text-gray-500 font-bold hover:bg-gray-100">+</button>
+                                                        </div>
+                                                        <button @click="eliminarItem('Fijo', nombre)"
+                                                            class="text-gray-300 hover:text-danger transition-colors p-1"
+                                                            title="Eliminar ítem">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <p x-show="cantidad < 3"
-                                                    class="text-[10px] text-danger mt-1 italic font-medium">¡Stock bajo!
-                                                    Reponer pronto.</p>
-                                            </div>
-                                        </template>
-                                        <p x-show="Object.keys(obtenerConsumibles(propiedadActiva)).length === 0"
-                                            class="text-xs text-gray-400 font-medium">No hay consumibles registrados.
-                                        </p>
+                                            </template>
+                                            <p x-show="Object.keys(inventarioLocal.Fijo || {}).length === 0"
+                                                class="text-gray-400 text-xs font-bold text-center py-2">No hay dotación
+                                                registrada.</p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div>
-                                    <h3
-                                        class="font-extrabold text-navy text-sm uppercase tracking-wider mb-4 border-b-2 border-gold inline-block pb-1">
-                                        Dotación Fija</h3>
-                                    <ul class="space-y-3 mt-4">
-                                        <template x-for="(cantidad, nombre) in obtenerFijos(propiedadActiva)"
-                                            :key="nombre">
-                                            <li
-                                                class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                <span class="text-sm font-bold text-navy flex items-center gap-2">
-                                                    <span x-text="nombre.split(' ')[0]"></span>
-                                                    <span x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
-                                                </span>
-                                                <span
-                                                    class="font-extrabold text-navy px-3 py-1 bg-white rounded-lg border border-gray-200 shadow-sm"
-                                                    x-text="cantidad"></span>
-                                            </li>
-                                        </template>
-                                        <li x-show="Object.keys(obtenerFijos(propiedadActiva)).length === 0"
-                                            class="text-xs text-gray-400 font-medium">No hay dotación registrada.</li>
-                                    </ul>
+                                    <div>
+                                        <div class="flex justify-between items-center mb-6">
+                                            <h3
+                                                class="text-lg font-extrabold text-navy border-b-4 border-gold inline-block pb-1">
+                                                Consumibles</h3>
+                                            <button @click="modalNuevoItem = true; categoriaNuevoItem = 'Consumible'"
+                                                class="text-xs font-bold text-gold hover:text-navy transition-colors flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M12 4v16m8-8H4" />
+                                                </svg> Agregar
+                                            </button>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <template x-for="(cantidad, nombre) in inventarioLocal.Consumible"
+                                                :key="nombre">
+                                                <div
+                                                    class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl group hover:border-gold transition-colors">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="text-xl" x-text="nombre.split(' ')[0]"></span>
+                                                        <span class="font-bold text-navy text-sm"
+                                                            x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                                                    </div>
+                                                    <div class="flex items-center gap-3">
+                                                        <div
+                                                            class="flex items-center gap-1 bg-white rounded-lg p-1 border border-gray-200 shadow-sm">
+                                                            <button
+                                                                @click="if(inventarioLocal.Consumible[nombre] > 0) inventarioLocal.Consumible[nombre]--"
+                                                                class="w-6 h-6 flex items-center justify-center rounded text-gray-500 font-bold hover:bg-gray-100">-</button>
+                                                            <input type="number"
+                                                                x-model.number="inventarioLocal.Consumible[nombre]"
+                                                                class="font-mono font-bold text-sm w-8 text-center bg-transparent outline-none text-navy"
+                                                                :class="cantidad < 3 ? 'text-danger' : ''">
+                                                            <button @click="inventarioLocal.Consumible[nombre]++"
+                                                                class="w-6 h-6 flex items-center justify-center rounded text-gray-500 font-bold hover:bg-gray-100">+</button>
+                                                        </div>
+                                                        <button @click="eliminarItem('Consumible', nombre)"
+                                                            class="text-gray-300 hover:text-danger transition-colors p-1"
+                                                            title="Eliminar ítem">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <p x-show="Object.keys(inventarioLocal.Consumible || {}).length === 0"
+                                                class="text-gray-400 text-xs font-bold text-center py-2">No hay
+                                                consumibles registrados.</p>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -765,6 +845,58 @@
         </div>
     </div>
 
+    <div x-show="modalNuevoItem" style="display: none;"
+        class="fixed inset-0 z-[150] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalNuevoItem = false"></div>
+        <div
+            class="bg-white rounded-[40px] shadow-2xl w-full max-w-md relative z-10 overflow-hidden transform transition-all p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-extrabold text-navy">Añadir Insumo</h3>
+                <button @click="modalNuevoItem = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <form class="space-y-4" @submit.prevent="agregarItem()">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Categoría</label>
+                    <select x-model="categoriaNuevoItem"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy cursor-pointer font-bold">
+                        <option value="Fijo">Dotación Fija (Cocina, Mobiliario)</option>
+                        <option value="Consumible">Consumibles (Baño, Limpieza)</option>
+                    </select>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-1/3">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Emoji</label>
+                        <input type="text" x-model="nuevoItemEmoji" placeholder="Ej: 🍷" required
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-center text-xl">
+                    </div>
+                    <div class="w-2/3">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre del
+                            Ítem</label>
+                        <input type="text" x-model="nuevoItemNombre" placeholder="Ej: Copas de Vino" required
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Cantidad
+                        Inicial</label>
+                    <input type="number" x-model.number="nuevoItemCantidad" min="0" required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm text-navy font-mono font-bold">
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" @click="modalNuevoItem = false"
+                        class="w-1/3 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="w-2/3 bg-gold text-navy font-extrabold py-4 rounded-xl hover:bg-yellow-500 transition-colors shadow-lg shadow-gold/20">Añadir
+                        a la lista</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function appGestandoValor() {
             return {
@@ -772,9 +904,18 @@
                 propiedadActiva: null,
                 propiedades: [],
                 cargandoPropiedades: true,
+                cargandoAccion: false,
+
+                // Inventario Variables
+                inventarioLocal: { Fijo: {}, Consumible: {} },
+                modalNuevoItem: false,
+                categoriaNuevoItem: 'Fijo',
+                nuevoItemEmoji: '',
+                nuevoItemNombre: '',
+                nuevoItemCantidad: 0,
+
                 modalNueva: false,
                 modoEdicion: false,
-
                 paso: 1,
                 cargando: false,
                 titulos: ['Describe tu espacio', 'Haz que destaque', 'Terminar publicación'],
@@ -797,38 +938,78 @@
                 init() {
                     const usuario = JSON.parse(localStorage.getItem('gv_usuario_actual') || '{}');
                     if (usuario.rol !== 'ADMIN') {
-                        alert('⛔ Acceso denegado. Área exclusiva de Administración.');
+                        alert('⛔ Acceso denegado.');
                         window.location.href = 'login.html';
                         return;
                     }
-
                     this.form = this.getFormVacio();
                     this.cargarPropiedades();
                     this.activarNavbarDinamica();
                 },
 
-                // ✨ FUNCIONES DE INVENTARIO ✨
-                tieneInventario(prop) {
-                    if (!prop || !prop.inventario) return false;
-                    let inv = prop.inventario;
-                    if (typeof inv === 'string') {
-                        try { inv = JSON.parse(inv); } catch (e) { return false; }
+                // ✨ LÓGICA INVENTARIO ✨
+                get tieneInventarioActivo() {
+                    if (!this.inventarioLocal) return false;
+                    const fijos = Object.keys(this.inventarioLocal.Fijo || {}).length;
+                    const cons = Object.keys(this.inventarioLocal.Consumible || {}).length;
+                    return (fijos + cons) > 0;
+                },
+
+                inicializarInventarioBase() {
+                    this.inventarioLocal = {
+                        Fijo: {
+                            "🍴 Tenedores": 6, "🔪 Cuchillos": 6, "🍽️ Platos Grandes": 6,
+                            "🥃 Vasos de Vidrio": 4, "🛁 Toallas Grandes": 4
+                        },
+                        Consumible: {
+                            "🧻 Rollos de Papel": 8, "🧼 Kits de Baño": 12,
+                            "☕ Cápsulas Café": 15, "🍬 Sobres de Azúcar": 20
+                        }
+                    };
+                    this.guardarInventario();
+                },
+
+                agregarItem() {
+                    if (!this.nuevoItemEmoji || !this.nuevoItemNombre) return;
+                    const key = `${this.nuevoItemEmoji} ${this.nuevoItemNombre}`;
+                    if (!this.inventarioLocal[this.categoriaNuevoItem]) {
+                        this.inventarioLocal[this.categoriaNuevoItem] = {};
                     }
-                    return Object.keys(inv).length > 0 && (inv.Fijo || inv.Consumible);
+                    this.inventarioLocal[this.categoriaNuevoItem][key] = Number(this.nuevoItemCantidad);
+                    this.modalNuevoItem = false;
+                    this.nuevoItemEmoji = '';
+                    this.nuevoItemNombre = '';
+                    this.nuevoItemCantidad = 0;
                 },
 
-                obtenerConsumibles(prop) {
-                    if (!this.tieneInventario(prop)) return {};
-                    let inv = typeof prop.inventario === 'string' ? JSON.parse(prop.inventario) : prop.inventario;
-                    return inv.Consumible || {};
+                eliminarItem(categoria, key) {
+                    if (confirm(`¿Quitar "${key}" del inventario?`)) {
+                        delete this.inventarioLocal[categoria][key];
+                    }
                 },
 
-                obtenerFijos(prop) {
-                    if (!this.tieneInventario(prop)) return {};
-                    let inv = typeof prop.inventario === 'string' ? JSON.parse(prop.inventario) : prop.inventario;
-                    return inv.Fijo || {};
+                async guardarInventario() {
+                    if (!this.propiedadActiva) return;
+                    this.cargandoAccion = true;
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ inventario: this.inventarioLocal })
+                        });
+                        if (res.ok) {
+                            alert('✅ Inventario actualizado en vivo.');
+                            const index = this.propiedades.findIndex(p => p.id === this.propiedadActiva.id);
+                            if (index > -1) {
+                                this.propiedades[index].inventario = JSON.parse(JSON.stringify(this.inventarioLocal));
+                            }
+                            this.propiedadActiva.inventario = JSON.parse(JSON.stringify(this.inventarioLocal));
+                        } else {
+                            alert('❌ Error al guardar.');
+                        }
+                    } catch (e) { alert('Error de conexión.'); }
+                    this.cargandoAccion = false;
                 },
-                // ✨ FIN FUNCIONES DE INVENTARIO ✨
 
                 formatearDinero(valor) {
                     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor);
@@ -950,6 +1131,18 @@
                 async abrirDetalle(propiedad) {
                     this.propiedadActiva = propiedad;
                     this.vista = 'detalle';
+
+                    // Cargar inventario a local
+                    let inv = propiedad.inventario;
+                    if (typeof inv === 'string') {
+                        try { inv = JSON.parse(inv); } catch (e) { inv = null; }
+                    }
+                    if (inv && Object.keys(inv).length > 0 && (inv.Fijo || inv.Consumible)) {
+                        this.inventarioLocal = JSON.parse(JSON.stringify(inv));
+                    } else {
+                        this.inventarioLocal = { Fijo: {}, Consumible: {} };
+                    }
+
                     this.evaluarLiquidacionActual();
 
                     try {
