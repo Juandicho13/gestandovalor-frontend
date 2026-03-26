@@ -159,7 +159,8 @@
                 </div>
 
                 <template x-for="tarea in tareasPendientes" :key="tarea.id">
-                    <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden mb-6">
+                    <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden mb-6"
+                        :class="tareaActiva && tareaActiva.id === tarea.id ? 'ring-4 ring-warning/50' : ''">
 
                         <div class="px-6 py-3 flex items-center justify-between border-b" :class="{
                                 'bg-red-50 border-red-100': tarea.urgencia === 'Urgente',
@@ -174,6 +175,10 @@
                                   }">
                                 <span
                                     x-text="tarea.urgencia === 'Urgente' ? '🔥 Urgente' : (tarea.urgencia === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
+                            </span>
+                            <span x-show="tareaActiva && tareaActiva.id === tarea.id"
+                                class="text-[10px] bg-warning text-white px-2 py-1 rounded-md font-bold uppercase tracking-wider animate-pulse">
+                                Limpieza en Pausa
                             </span>
                         </div>
 
@@ -190,16 +195,30 @@
                                 <p class="text-gray-500 text-sm"
                                     x-text="tarea.propiedad?.direccion || 'Dirección no especificada'"></p>
                             </div>
-                            <button @click="iniciarAseo(tarea)"
-                                class="w-full md:w-auto bg-navy hover:bg-blue-900 text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2 flex-shrink-0">
-                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <button
+                                @click="tareaActiva && tareaActiva.id === tarea.id ? reanudarAseo() : iniciarAseo(tarea)"
+                                class="w-full md:w-auto text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform flex justify-center items-center gap-2 flex-shrink-0"
+                                :class="(tareaActiva && tareaActiva.id !== tarea.id) ? 'bg-gray-300 opacity-50 cursor-not-allowed shadow-none' : (tareaActiva && tareaActiva.id === tarea.id ? 'bg-warning hover:bg-orange-500 active:scale-95' : 'bg-navy hover:bg-blue-900 active:scale-95')"
+                                :disabled="tareaActiva && tareaActiva.id !== tarea.id">
+
+                                <svg x-show="tareaActiva && tareaActiva.id === tarea.id" class="w-5 h-5 text-white"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                </svg>
+                                <svg x-show="!(tareaActiva && tareaActiva.id === tarea.id)" class="w-5 h-5 text-gold"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Iniciar Aseo
+
+                                <span
+                                    x-text="tareaActiva && tareaActiva.id === tarea.id ? 'Reanudar Aseo' : 'Iniciar Aseo'"></span>
                             </button>
+
                         </div>
                     </div>
                 </template>
@@ -208,24 +227,19 @@
         </div>
     </section>
 
-    <section x-show="aseoActivo" style="display: none;" class="min-h-screen bg-white relative z-50 pt-24 pb-32">
+    <section x-show="aseoActivo" style="display: none;" class="min-h-screen bg-white relative z-50 pt-8 pb-32">
 
-        <div class="fixed top-0 left-0 w-full bg-navy text-white shadow-2xl z-50">
-            <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
-                <div>
-                    <p class="text-[10px] text-gold uppercase tracking-widest font-bold">Limpiando ahora</p>
-                    <h2 class="text-lg font-extrabold truncate" x-text="tareaActiva?.propiedad?.titulo"></h2>
-                </div>
-                <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
-                    <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                    <span class="text-sm font-bold tracking-wider">En proceso</span>
-                </div>
+        <div class="max-w-3xl mx-auto px-6 relative z-20">
+
+            <div class="mb-6 pt-4">
+                <span class="text-gold font-bold uppercase tracking-widest text-[10px]">Limpieza en progreso</span>
+                <h2 class="text-3xl font-extrabold text-navy" x-text="tareaActiva?.propiedad?.titulo"></h2>
+                <p class="text-gray-500 text-sm mt-1">Marca las tareas a medida que las vayas completando. Sin prisas,
+                    lo importante es la calidad.</p>
             </div>
-        </div>
 
-        <div class="max-w-3xl mx-auto px-6 mt-8">
-
-            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-8 sticky top-[88px] z-40">
+            <div
+                class="flex bg-gray-100 p-1.5 rounded-2xl mb-8 sticky top-4 z-40 transition-all duration-500 shadow-sm border border-gray-200">
                 <button @click="pestañaActiva = 'checklist'"
                     class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
                     :class="pestañaActiva === 'checklist' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
@@ -248,19 +262,19 @@
                     <div class="space-y-3 pl-2">
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.hab_sabanas"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Cambio de sábanas y fundas limpias</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.hab_armarios"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Revisión interior de armarios/gavetas</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.hab_pisos"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Barrer y trapear pisos</span>
                         </label>
@@ -275,25 +289,25 @@
                     <div class="space-y-3 pl-2">
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.bano_inodoro"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Lavar y desinfectar inodoro y ducha</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.bano_espejos"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Limpiar espejos sin dejar marcas</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.bano_toallas"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Colocar toallas limpias</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.bano_papelera"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Vaciar papelera de baño</span>
                         </label>
@@ -308,27 +322,27 @@
                     <div class="space-y-3 pl-2">
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.cocina_loza"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Lavar, secar y guardar toda la loza</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.cocina_estufa"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Desengrasar estufa y mesones</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.cocina_nevera"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Revisar nevera</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.cocina_basura"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
-                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura</span>
+                            <span class="text-sm font-bold text-gray-700">Cambiar bolsa de basura principal</span>
                         </label>
                     </div>
                 </div>
@@ -341,19 +355,19 @@
                     <div class="space-y-3 pl-2">
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.sala_cojines"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Acomodar cojines y decoración</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.sala_polvo"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Limpiar polvo en TV, mesas y repisas</span>
                         </label>
                         <label
                             class="flex items-center gap-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-gold transition-colors">
-                            <input type="checkbox"
+                            <input type="checkbox" x-model="checklist.sala_pisos"
                                 class="w-6 h-6 text-gold border-gray-300 rounded focus:ring-gold accent-gold">
                             <span class="text-sm font-bold text-gray-700">Barrer y trapear a fondo</span>
                         </label>
@@ -435,14 +449,26 @@
         </div>
 
         <div
-            class="fixed bottom-0 left-0 w-full p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50">
+            class="fixed bottom-0 left-0 w-full p-4 md:p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50 flex gap-3 md:gap-4">
+
+            <button @click="pausarAseo()"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-navy border border-gray-200 font-extrabold text-sm md:text-lg py-4 md:py-5 rounded-2xl transition-transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span class="hidden sm:inline">Pausar y Volver</span>
+                <span class="sm:hidden">Pausar</span>
+            </button>
+
             <button @click="finalizarAseo()"
-                class="w-full max-w-3xl mx-auto block bg-success hover:bg-green-600 text-white font-extrabold text-lg py-5 rounded-2xl shadow-lg shadow-green-200 transition-transform active:scale-95 flex items-center justify-center gap-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="flex-1 bg-success hover:bg-green-600 text-white font-extrabold text-sm md:text-lg py-4 md:py-5 rounded-2xl shadow-lg shadow-green-200 transition-transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                Finalizar Limpieza (Enviar Reporte)
+                Finalizar Limpieza
             </button>
+
         </div>
     </section>
 
@@ -468,16 +494,6 @@
                         required
                         class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-danger text-sm text-navy resize-none"></textarea>
                 </div>
-                <button type="button"
-                    class="w-full bg-gray-50 border-2 border-dashed border-gray-300 text-gray-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 mb-4">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Tomar Foto (Próximamente)
-                </button>
                 <div class="pt-2 flex gap-3">
                     <button type="button" @click="modalReporte = false"
                         class="w-1/3 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
@@ -510,15 +526,23 @@
 
                 segundos: 0,
                 intervalo: null,
+                pausasRegistradas: [],
+                horaInicioPausa: null,
 
                 inventarioLocal: { Fijo: {}, Consumible: {} },
+
+                checklist: {
+                    hab_sabanas: false, hab_armarios: false, hab_pisos: false,
+                    bano_inodoro: false, bano_espejos: false, bano_toallas: false, bano_papelera: false,
+                    cocina_loza: false, cocina_estufa: false, cocina_nevera: false, cocina_basura: false,
+                    sala_cojines: false, sala_polvo: false, sala_pisos: false
+                },
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
 
-                        // ✨ SEGURIDAD: Solo el personal de aseo (o un admin) puede ver esto ✨
                         if (usuario.rol !== 'ASEO' && usuario.rol !== 'ADMIN') {
                             alert('⛔ Acceso denegado. Solo el personal de Aseo puede acceder a esta ruta.');
                             window.location.href = 'login.html';
@@ -546,11 +570,8 @@
                             this.tareasCompletadas = todasLasTareas.filter(t => t.estado === 'Completada').length;
                             this.tareasConNovedad = todasLasTareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').length;
                         }
-                    } catch (error) {
-                        console.error(error);
-                    } finally {
-                        this.cargando = false;
-                    }
+                    } catch (error) { console.error(error); }
+                    finally { this.cargando = false; }
                 },
 
                 iniciarAseo(tarea) {
@@ -559,10 +580,15 @@
                     this.pestañaActiva = 'checklist';
                     this.nuevoReporte = '';
 
+                    // Resetear Checklist
+                    for (let key in this.checklist) { this.checklist[key] = false; }
+
+                    // Resetear Tiempos
                     this.segundos = 0;
-                    this.intervalo = setInterval(() => {
-                        this.segundos++;
-                    }, 1000);
+                    this.pausasRegistradas = [];
+                    this.horaInicioPausa = null;
+
+                    this.iniciarReloj();
 
                     let inv = tarea.propiedad?.inventario;
                     if (typeof inv === 'string') {
@@ -577,9 +603,48 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
+                // ✨ CONTROL DE RELOJ Y PAUSAS ✨
+                iniciarReloj() {
+                    this.intervalo = setInterval(() => {
+                        this.segundos++;
+                    }, 1000);
+                },
+
+                pausarAseo() {
+                    this.aseoActivo = false;
+                    clearInterval(this.intervalo);
+                    this.horaInicioPausa = new Date();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                reanudarAseo() {
+                    this.aseoActivo = true;
+                    if (this.horaInicioPausa) {
+                        const horaFin = new Date();
+                        const duracionSegundos = Math.round((horaFin - this.horaInicioPausa) / 1000);
+
+                        this.pausasRegistradas.push({
+                            inicio: this.horaInicioPausa.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+                            fin: horaFin.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+                            duracion_segundos: duracionSegundos
+                        });
+                        this.horaInicioPausa = null;
+                    }
+                    this.iniciarReloj();
+                },
+
+                formatearTiempo(totalSegundos) {
+                    const horas = Math.floor(totalSegundos / 3600);
+                    const minutos = Math.floor((totalSegundos % 3600) / 60);
+                    const segundos = totalSegundos % 60;
+                    if (horas > 0) {
+                        return `${horas}h ${minutos}m`;
+                    }
+                    return `${minutos}m ${segundos}s`;
+                },
+
                 async enviarReporte() {
                     if (!this.nuevoReporte.trim()) return;
-
                     this.cargando = true;
                     try {
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
@@ -591,17 +656,21 @@
                         this.modalReporte = false;
                         this.nuevoReporte = '';
                         await this.cargarTareasDesdeBD();
-                    } catch (e) {
-                        console.error(e);
-                        alert('Error al enviar el reporte.');
-                    } finally {
-                        this.cargando = false;
-                    }
+                    } catch (e) { alert('Error al enviar el reporte.'); }
+                    finally { this.cargando = false; }
                 },
 
                 async finalizarAseo() {
                     clearInterval(this.intervalo);
                     this.cargando = true;
+
+                    // ✨ EMPAQUETAR EL REPORTE FINAL ✨
+                    const reporteFinal = {
+                        tiempo_limpieza_segundos: this.segundos,
+                        historial_pausas: this.pausasRegistradas,
+                        checklist_marcado: this.checklist
+                    };
+
                     try {
                         await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.tareaActiva.propiedad_id}`, {
                             method: 'PATCH',
@@ -615,12 +684,13 @@
                             body: JSON.stringify({
                                 estado: 'Completada',
                                 tiempo_segundos: this.segundos,
-                                completed_at: new Date().toISOString()
+                                completed_at: new Date().toISOString(),
+                                reporte_empleado: reporteFinal
                             })
                         });
 
                         await this.cargarTareasDesdeBD();
-                        alert(`¡Aseo finalizado exitosamente!\nReporte e inventario enviados al Ama de Llaves.`);
+                        alert(`¡Aseo finalizado exitosamente!\nTiempo neto de limpieza: ${this.formatearTiempo(this.segundos)}.\n\nReporte enviado al Ama de Llaves.`);
                     } catch (e) {
                         console.error(e);
                         alert("Hubo un error de conexión al finalizar.");
@@ -639,25 +709,6 @@
                 }
             }
         }
-
-        // Navbar Scroll
-        document.addEventListener('DOMContentLoaded', () => {
-            const navbar = document.getElementById('navbar');
-            const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[550px]';
-            window.addEventListener('scroll', () => {
-                if (document.querySelector('[x-data]').__x.$data.aseoActivo) return;
-                if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10');
-                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                } else {
-                    logo.classList.replace('h-10', 'h-16');
-                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                }
-            });
-        });
     </script>
 </body>
 
