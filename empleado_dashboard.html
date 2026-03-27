@@ -259,7 +259,7 @@
                 <button @click="pestañaActiva = 'consumibles'"
                     class="flex-1 py-3 text-sm font-extrabold rounded-xl transition-all shadow-sm"
                     :class="pestañaActiva === 'consumibles' ? 'bg-white text-navy' : 'text-gray-500 hover:text-navy'">
-                    2. Insumos Físicos
+                    2. Inventario Físico
                 </button>
             </div>
 
@@ -524,7 +524,7 @@
                             { id: 'coc_5', texto: 'Muebles sin polvo en la parte superior' },
                             { id: 'coc_6', texto: 'Quemadores limpios, sin grasa acumulada' },
                             { id: 'coc_7', texto: 'Horno sin residuos, grasa, vidrios sin manchas' },
-                            { id: 'coc_8', texto: 'Nevera interior sin productos, desinfectada, estantes sin manchas, cauchos limpios' },
+                            { id: 'coc_8', texto: 'Nevera interior sin productos, desinfectada, estantes de vidrio sin manchas cauchos des' },
                             { id: 'coc_9', texto: 'Ollas y utensilios sin residuos, secos, sin grasa' },
                             { id: 'coc_10', texto: 'Caneca lavada, desinfectada, bolsa nueva' },
                             { id: 'coc_11', texto: 'Esquinas y bordes del piso sin migas' },
@@ -628,10 +628,11 @@
                         const partes = this.empleadoNombre.split(' ');
                         this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
 
+                        this.resetearChecklist();
                         await this.cargarPropiedades();
                         await this.cargarTareasDesdeBD();
 
-                        // ✨ MAGIA DE AUTOGUARDADO (Recuperar progreso si recarga la página) ✨
+                        // ✨ MAGIA DE AUTOGUARDADO ✨
                         const estadoGuardado = localStorage.getItem('gv_aseo_en_progreso');
                         if (estadoGuardado) {
                             const estado = JSON.parse(estadoGuardado);
@@ -648,7 +649,6 @@
                                 this.consumosReportados = estado.consumosReportados || {};
                                 this.inventarioLocal = estado.inventarioLocal || { Fijo: {}, Consumible: {} };
 
-                                // Si estaba limpiando activamente cuando recargó (ej. se apagó el celular), sumamos los segundos que estuvo por fuera
                                 if (this.aseoActivo && !this.pausaActiva) {
                                     const tiempoFuera = Math.floor((Date.now() - (estado.ultimoTick || Date.now())) / 1000);
                                     if (tiempoFuera > 0 && tiempoFuera < 86400) this.segundos += tiempoFuera;
@@ -667,7 +667,6 @@
                     }
                 },
 
-                // ✨ FUNCIÓN PARA GUARDAR EN LA MEMORIA DEL CELULAR ✨
                 guardarProgresoLocal() {
                     if (!this.aseoActivo && !this.pausaActiva) {
                         localStorage.removeItem('gv_aseo_en_progreso');
@@ -782,7 +781,6 @@
                     if (this.intervalo) clearInterval(this.intervalo);
                     this.intervalo = setInterval(() => {
                         this.segundos++;
-                        // Autoguardado cada segundo
                         this.guardarProgresoLocal();
                     }, 1000);
                 },
@@ -882,9 +880,8 @@
                         });
 
                         await this.cargarTareasDesdeBD();
-                        // Borramos el progreso de la memoria al terminar exitosamente
                         localStorage.removeItem('gv_aseo_en_progreso');
-                        alert(`¡Aseo finalizado exitosamente!\nTiempo neto de limpieza: ${this.formatearTiempo(this.segundos)}.\n\nInventario descontado y reporte enviado.`);
+                        alert(`✅ ¡Aseo finalizado exitosamente!\n\nTu reporte e inventario han sido enviados al Ama de Llaves. ¡Gran trabajo!`);
                     } catch (e) {
                         console.error(e);
                         alert("Hubo un error de conexión al finalizar.");
