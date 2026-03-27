@@ -103,7 +103,6 @@
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-
         <div
             class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
@@ -114,7 +113,6 @@
                 class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar
                 Sesión</a>
         </div>
-
         <div class="flex items-center gap-4 flex-shrink-0">
             <button
                 class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
@@ -377,7 +375,7 @@
                         @click="abrirModalPago()">
                         Reservar
                     </button>
-                    <p class="text-center text-xs text-gray-400 mt-4">Confirmación directa por WhatsApp</p>
+                    <p class="text-center text-xs text-gray-400 mt-4">Confirmación rápida y segura</p>
 
                     <div x-show="noches > 0" x-transition class="mt-6">
                         <div class="space-y-4 text-gray-300 text-sm font-medium border-b border-white/10 pb-6 mb-6">
@@ -458,8 +456,7 @@
                     </svg>
                 </div>
                 <h2 class="text-2xl font-extrabold text-navy">Confirma tu Reserva</h2>
-                <p class="text-sm text-gray-500 mt-2">Transfiere el valor total para asegurar tus fechas. ¡Es rápido y
-                    seguro!</p>
+                <p class="text-sm text-gray-500 mt-2">Asegura tus fechas realizando el pago.</p>
             </div>
 
             <div class="p-8 bg-gray-50/50">
@@ -476,45 +473,25 @@
                 <div class="space-y-3">
                     <label
                         class="flex items-center justify-between p-4 bg-white border-2 rounded-2xl cursor-pointer transition-all"
-                        :class="metodoSeleccionado === 'Nequi' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
+                        :class="metodoSeleccionado === 'Transferencia' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
                         <div class="flex items-center gap-4">
-                            <input type="radio" name="metodoPago" value="Nequi" x-model="metodoSeleccionado"
+                            <input type="radio" name="metodoPago" value="Transferencia" x-model="metodoSeleccionado"
                                 class="hidden">
                             <div
-                                class="w-10 h-10 rounded-xl bg-[#39215A] text-white font-black flex items-center justify-center text-xs">
-                                NQ</div>
+                                class="w-10 h-10 rounded-xl bg-green-50 text-success font-black flex items-center justify-center border border-green-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                                </svg>
+                            </div>
                             <div>
-                                <p class="font-bold text-navy text-sm">Nequi</p>
-                                <p class="text-xs text-gray-500 mt-0.5 select-all">300 123 4567</p>
+                                <p class="font-bold text-navy text-sm">Transferencia Directa</p>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Bancolombia, Nequi o Bre-B</p>
                             </div>
                         </div>
                         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
-                            :class="metodoSeleccionado === 'Nequi' ? 'border-gold bg-gold' : 'border-gray-300'">
-                            <svg x-show="metodoSeleccionado === 'Nequi'" class="w-3 h-3 text-white" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                    </label>
-
-                    <label
-                        class="flex items-center justify-between p-4 bg-white border-2 rounded-2xl cursor-pointer transition-all"
-                        :class="metodoSeleccionado === 'Bancolombia' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="metodoPago" value="Bancolombia" x-model="metodoSeleccionado"
-                                class="hidden">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-[#FDDA24] text-navy font-black flex items-center justify-center text-xs">
-                                BC</div>
-                            <div>
-                                <p class="font-bold text-navy text-sm">Bancolombia (Ahorros)</p>
-                                <p class="text-xs text-gray-500 mt-0.5 select-all">123-456789-00</p>
-                            </div>
-                        </div>
-                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
-                            :class="metodoSeleccionado === 'Bancolombia' ? 'border-gold bg-gold' : 'border-gray-300'">
-                            <svg x-show="metodoSeleccionado === 'Bancolombia'" class="w-3 h-3 text-white" fill="none"
+                            :class="metodoSeleccionado === 'Transferencia' ? 'border-gold bg-gold' : 'border-gray-300'">
+                            <svg x-show="metodoSeleccionado === 'Transferencia'" class="w-3 h-3 text-white" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                     d="M5 13l4 4L19 7" />
@@ -533,7 +510,8 @@
                                 MP</div>
                             <div>
                                 <p class="font-bold text-navy text-sm">Mercado Pago</p>
-                                <p class="text-[11px] text-gray-500 mt-0.5">Tarjetas de Crédito / Internacional</p>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Tarjetas de Crédito / PSE / Internacional
+                                </p>
                             </div>
                         </div>
                         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
@@ -549,16 +527,25 @@
             </div>
 
             <div class="p-6 bg-white border-t border-gray-100">
-                <button @click="irAWhatsApp()"
+                <button @click="procesarReserva()"
                     class="w-full font-extrabold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2"
-                    :class="metodoSeleccionado !== '' ? 'bg-success hover:bg-green-600 text-white transform hover:-translate-y-1 active:scale-95' : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
-                    :disabled="metodoSeleccionado === ''">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    :class="metodoSeleccionado !== '' ? (metodoSeleccionado === 'Transferencia' ? 'bg-success hover:bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white') : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
+                    :disabled="metodoSeleccionado === '' || cargandoPago">
+
+                    <svg x-show="metodoSeleccionado === 'Transferencia'" class="w-5 h-5" fill="currentColor"
+                        viewBox="0 0 24 24">
                         <path
                             d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.327.101.144.447.712.947 1.156.643.57 1.205.748 1.349.835.143.087.229.072.316-.029l.36-.433c.114-.144.23-.115.36-.065l1.287.607c.144.072.245.108.281.166.035.058.035.332-.109.737z" />
                     </svg>
-                    <span
-                        x-text="metodoSeleccionado === 'Mercado Pago' ? 'Solicitar Link por WhatsApp' : (metodoSeleccionado === '' ? 'Selecciona un método' : 'Enviar Comprobante por WhatsApp')"></span>
+                    <svg x-show="metodoSeleccionado === 'Mercado Pago' && !cargandoPago" class="w-5 h-5" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+
+                    <span x-show="cargandoPago">Conectando pasarela...</span>
+                    <span x-show="!cargandoPago"
+                        x-text="metodoSeleccionado === 'Transferencia' ? 'Contactar a Edwin por WhatsApp' : (metodoSeleccionado === 'Mercado Pago' ? 'Pagar de forma segura en línea' : 'Selecciona un método')"></span>
                 </button>
             </div>
         </div>
@@ -642,6 +629,7 @@
         function suiteApp() {
             return {
                 cargando: true,
+                cargandoPago: false,
                 propiedad: { fotos: [], comodidades: [], precio_noche: 0, descripcion: '' },
 
                 openModalText: false,
@@ -827,27 +815,28 @@
                     this.modalPago = true;
                 },
 
-                irAWhatsApp() {
+                async procesarReserva() {
                     const totalStr = this.formatearDinero(this.calcularTotal());
                     const totalHuespedes = this.adults + this.children + this.infants;
 
-                    let texto = `¡Hola GestandoValor! 👋 Quiero confirmar mi reserva:\n\n`;
-                    texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
-                    texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
-                    texto += `👥 *Huéspedes:* ${totalHuespedes} persona(s)\n`;
-                    if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets} (Aplica tarifa extra)\n`;
-                    texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
-                    texto += `Mi código de reserva es: *#${this.codigoReserva}*\n\n`;
+                    if (this.metodoSeleccionado === 'Transferencia') {
+                        let texto = `¡Hola Edwin! 👋 Quiero confirmar mi reserva por Transferencia:\n\n`;
+                        texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
+                        texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
+                        texto += `👥 *Huéspedes:* ${totalHuespedes} persona(s)\n`;
+                        if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets} (Aplica tarifa extra)\n`;
+                        texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
+                        texto += `Mi código de reserva es: *#${this.codigoReserva}*\n\n`;
+                        texto += `Quedo atento/a para enviar el comprobante de Nequi, Bancolombia o Bre-B y recibir las instrucciones de acceso. 🔑`;
 
-                    if (this.metodoSeleccionado === 'Mercado Pago') {
-                        texto += `Deseo realizar el pago con *Tarjeta / Internacional (Mercado Pago)*. Por favor envíame el link de pago seguro. 💳`;
-                    } else {
-                        texto += `Aquí adjunto mi comprobante de transferencia por *${this.metodoSeleccionado}*. Quedo atento/a para recibir las instrucciones de acceso. 🔑`;
+                        this.modalPago = false;
+                        const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
+                        window.open(urlWA, '_blank');
+
+                    } else if (this.metodoSeleccionado === 'Mercado Pago') {
+                        // TODO: Aquí conectaremos tu backend con Mercado Pago.
+                        alert("¡Frontend preparado! Para que esto redirija a la pantalla de pago real de Mercado Pago, necesitamos crear la ruta en tu Backend (NestJS). ¿Me pasas tu Access Token de Mercado Pago?");
                     }
-
-                    this.modalPago = false;
-                    const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
-                    window.open(urlWA, '_blank');
                 }
             }
         }
