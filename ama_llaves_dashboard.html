@@ -25,6 +25,21 @@
             }
         }
     </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="amaLlavesApp()" x-init="initApp()"
@@ -311,11 +326,11 @@
                                         class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100 uppercase text-center leading-tight">
                                         Terminado<br>
                                         <span class="font-mono"
-                                            x-text="Math.floor((tarea.tiempo_segundos||0)/60) + ' min'"></span>
+                                            x-text="formatearTiempoCorto(tarea.tiempo_segundos)"></span>
                                     </span>
                                 </div>
                                 <button @click="abrirInspeccion(tarea)"
-                                    class="w-full mt-2 bg-gray-50 hover:bg-gray-100 text-navy border border-gray-200 font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2">
+                                    class="w-full mt-2 bg-navy hover:bg-blue-900 text-white shadow-md font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2">
                                     <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -323,7 +338,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
-                                    Revisar Reporte y Aprobar
+                                    Ver Reporte Detallado
                                 </button>
                             </div>
                         </template>
@@ -340,31 +355,153 @@
     </section>
 
     <div x-show="modalInspeccion" style="display: none;"
-        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalInspeccion = false"></div>
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
-                <div>
-                    <span class="text-xs font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
-                        Empleado</span>
-                    <h3 class="text-2xl font-extrabold text-navy"
-                        x-text="(tareaAInspeccionar?.nombreAptoSeguro !== 'Apto Desconocido' && tareaAInspeccionar?.nombreAptoSeguro !== 'Sin título' ? tareaAInspeccionar?.nombreAptoSeguro : 'Apto sin nombre')">
-                    </h3>
-                    <p class="text-xs text-gray-500 mt-1">Limpiado por: <strong class="text-navy"
-                            x-text="tareaAInspeccionar?.nombreEmpleadoSeguro"></strong></p>
+        <div
+            class="bg-white rounded-[40px] shadow-2xl w-full max-w-4xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
+
+            <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-start bg-white shrink-0">
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden shadow-sm border border-gray-200 shrink-0">
+                        <img :src="tareaAInspeccionar?.fotoAptoSeguro" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
+                            Inspección</span>
+                        <h3 class="text-2xl font-extrabold text-navy"
+                            x-text="tareaAInspeccionar?.nombreAptoSeguro || 'Apto'"></h3>
+                        <p class="text-xs text-gray-500 mt-1">Realizado por: <strong class="text-navy"
+                                x-text="tareaAInspeccionar?.nombreEmpleadoSeguro"></strong></p>
+                    </div>
                 </div>
-                <button @click="modalInspeccion = false" class="text-gray-400 hover:text-navy"><svg class="w-6 h-6"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button @click="modalInspeccion = false"
+                    class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full transition-colors"><svg
+                        class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg></button>
             </div>
-            <div class="flex gap-4">
-                <button @click="modalInspeccion = false"
-                    class="w-1/3 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-xl hover:bg-red-50 transition-colors">Cerrar</button>
+
+            <div class="overflow-y-auto custom-scrollbar bg-gray-50/50 p-6 md:p-8 flex-1 space-y-8">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <h4
+                            class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Tiempo Neto
+                        </h4>
+                        <div class="text-4xl font-black text-navy mb-4 font-mono"
+                            x-text="formatearTiempoLargo(reporteActivo?.tiempo_limpieza_segundos || 0)"></div>
+
+                        <div x-show="reporteActivo?.historial_pausas && reporteActivo.historial_pausas.length > 0">
+                            <p class="text-[10px] font-bold text-warning uppercase mb-2">Pausas Registradas:</p>
+                            <ul class="space-y-2">
+                                <template x-for="pausa in reporteActivo?.historial_pausas">
+                                    <li
+                                        class="text-xs text-gray-600 bg-orange-50/50 px-3 py-2 rounded-lg border border-orange-100 flex justify-between">
+                                        <span x-text="`${pausa.inicio} - ${pausa.fin}`"></span>
+                                        <span class="font-bold text-warning"
+                                            x-text="formatearTiempoCorto(pausa.duracion_segundos) + ' pausa'"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div x-show="!reporteActivo?.historial_pausas || reporteActivo.historial_pausas.length === 0"
+                            class="text-xs text-gray-400 font-medium italic">
+                            No se registraron pausas.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <h4
+                            class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            Insumos Reportados
+                        </h4>
+
+                        <div class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2"
+                            x-show="hayConsumos(reporteActivo?.consumos_utilizados)">
+                            <template x-for="(cantidad, nombre) in reporteActivo?.consumos_utilizados" :key="nombre">
+                                <div x-show="cantidad > 0"
+                                    class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
+                                    <div class="flex items-center gap-2 text-sm text-navy font-bold">
+                                        <span x-text="nombre.split(' ')[0]"></span>
+                                        <span x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
+                                    </div>
+                                    <span class="text-xs font-black text-navy bg-gold/20 px-2 py-1 rounded-md"
+                                        x-text="`+${cantidad}`"></span>
+                                </div>
+                            </template>
+                        </div>
+                        <div x-show="!hayConsumos(reporteActivo?.consumos_utilizados)"
+                            class="text-xs text-gray-400 font-medium italic mt-2">
+                            El empleado no reportó haber repuesto ningún insumo.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                        <h4
+                            class="text-xs font-extrabold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Estándares de Calidad
+                        </h4>
+
+                        <span class="px-3 py-1 text-xs font-black rounded-full"
+                            :class="resumenChecklist.faltantes.length === 0 ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'">
+                            <span x-text="`${resumenChecklist.marcadas}/${resumenChecklist.total} Completadas`"></span>
+                        </span>
+                    </div>
+
+                    <div x-show="resumenChecklist.faltantes.length > 0"
+                        class="bg-red-50/50 border border-red-100 rounded-2xl p-4 mb-6">
+                        <p class="text-xs font-bold text-danger uppercase tracking-wider mb-3">⚠️ Tareas NO marcadas por
+                            el empleado:</p>
+                        <ul class="list-disc pl-5 text-sm text-red-800 space-y-1 font-medium">
+                            <template x-for="faltante in resumenChecklist.faltantes">
+                                <li x-text="faltante"></li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <div x-show="resumenChecklist.faltantes.length === 0"
+                        class="bg-green-50/50 border border-green-100 rounded-2xl p-6 text-center">
+                        <span class="text-3xl block mb-2">🏆</span>
+                        <p class="text-sm font-bold text-success">El empleado marcó el 100% de las tareas como
+                            completadas.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-6 bg-white border-t border-gray-200 flex gap-4 shrink-0">
+                <button @click="rechazarInspeccion()"
+                    class="flex-1 bg-white border-2 border-red-100 text-danger font-extrabold py-4 rounded-2xl hover:bg-red-50 transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Rechazar y Devolver
+                </button>
                 <button @click="aprobarInspeccion()"
-                    class="w-2/3 bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg transition-transform active:scale-95">Aprobar
-                    Inspección</button>
+                    class="flex-[2] bg-success hover:bg-green-600 text-white font-extrabold py-4 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Aprobar Inspección
+                </button>
             </div>
         </div>
     </div>
@@ -414,22 +551,63 @@
                 reservas: [],
                 tareas: [],
 
+                // Inspeccion Variables
                 modalInspeccion: false,
                 tareaAInspeccionar: null,
+                reporteActivo: null,
+                resumenChecklist: { total: 0, marcadas: 0, faltantes: [] },
+
                 modalReportes: false,
+
+                // ✨ COPIA DEL CEREBRO DE TAREAS PARA TRADUCIR EL CHECKLIST ✨
+                categoriasChecklist: [
+                    {
+                        titulo: 'Entrada y General',
+                        items: [
+                            { id: 'gen_1', texto: 'Puerta principal sin polvo' }, { id: 'gen_2', texto: 'Chapa desinfectada' }, { id: 'gen_3', texto: 'Cerradura funcional' }, { id: 'gen_4', texto: 'Muebles sin polvo' }, { id: 'gen_5', texto: 'Puertas sin manchas y manijas desinfectadas, sin polvo' }, { id: 'gen_6', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }, { id: 'gen_7', texto: 'Desinfección de tomacorrientes e interruptores, sin polvo' }, { id: 'gen_8', texto: 'Paredes sin manchas' }, { id: 'gen_9', texto: 'Pisos barridos y trapeados con desinfectante sin manchas' }, { id: 'gen_10', texto: 'Ambiente con fragancia fresca' }, { id: 'gen_11', texto: 'Verificar funcionamiento de luces' }, { id: 'gen_12', texto: 'Checklist inventario muebles y enseres' }, { id: 'gen_13', texto: 'Checklist consumibles' }
+                        ]
+                    },
+                    {
+                        titulo: 'Cocina',
+                        items: [
+                            { id: 'coc_1', texto: 'Salpicadero desinfectado, sin grasa en esquinas ni juntas' }, { id: 'coc_2', texto: 'Mesones desinfectados, sin grasa en esquinas ni juntas' }, { id: 'coc_3', texto: 'Gabinetes y cajones interior limpios, sin grasa, sin residuos' }, { id: 'coc_4', texto: 'Extractor sin grasa, sin residuos, vidrio sin manchas ni grasa' }, { id: 'coc_5', texto: 'Muebles sin polvo en la parte superior' }, { id: 'coc_6', texto: 'Quemadores limpios, sin grasa acumulada' }, { id: 'coc_7', texto: 'Horno sin residuos, grasa, vidrios sin manchas' }, { id: 'coc_8', texto: 'Nevera interior sin productos, desinfectada, estantes de vidrio sin manchas cauchos des' }, { id: 'coc_9', texto: 'Ollas y utensilios sin residuos, secos, sin grasa' }, { id: 'coc_10', texto: 'Caneca lavada, desinfectada, bolsa nueva' }, { id: 'coc_11', texto: 'Esquinas y bordes del piso sin migas' }, { id: 'coc_12', texto: 'Electrodomésticos funcionando, desinfectados y secos' }, { id: 'coc_13', texto: 'Cubiertos sin manchas, secos' }, { id: 'coc_14', texto: 'Recarga aromáticas, cafés, azúcar' }, { id: 'coc_15', texto: 'Esponja de jabón sin residuos, en buen estado. Jabón recargado' }
+                        ]
+                    },
+                    {
+                        titulo: 'Zona de Ropa',
+                        items: [
+                            { id: 'rop_1', texto: 'Lavadora interior limpio y desinfectado, cajón detergente sin residuos' }, { id: 'rop_2', texto: 'Filtro de lavadora sin basura y limpio' }, { id: 'rop_3', texto: 'Trapero limpio y con buen olor' }, { id: 'rop_4', texto: 'Escoba sin pelos ni suciedad' }, { id: 'rop_5', texto: 'Recogedor limpio y sin residuos' }, { id: 'rop_6', texto: 'Piso y desagüe limpio, sin residuos' }, { id: 'rop_7', texto: 'Esquinas y bordes del piso sin pelos ni residuos' }, { id: 'rop_8', texto: 'Tendedero sin polvo' }
+                        ]
+                    },
+                    {
+                        titulo: 'Baño',
+                        items: [
+                            { id: 'ban_1', texto: 'Inodoro interior y exterior y base desinfectados, sin manchas' }, { id: 'ban_2', texto: 'Ducha sin moho en juntas, paredes y piso sin grasa y seco' }, { id: 'ban_3', texto: 'Vidrios sin manchas, secos' }, { id: 'ban_4', texto: 'Lavamanos sin residuos, grifería sin manchas, seco' }, { id: 'ban_5', texto: 'Toallas sin manchas, sin olores' }, { id: 'ban_6', texto: 'Espejo sin marcas ni salpicaduras' }, { id: 'ban_7', texto: 'Paredes sin manchas, sin humedad' }, { id: 'ban_8', texto: 'Cero cabellos en piso y superficies' }, { id: 'ban_9', texto: 'Esquinas de piso sin pelos ni residuos' }, { id: 'ban_10', texto: 'Caneca lavada desinfectada, seca, bolsa nueva' }, { id: 'ban_11', texto: 'Papel higiénico, jabones y shampoo nuevos' }
+                        ]
+                    },
+                    {
+                        titulo: 'Sala y Comedor',
+                        items: [
+                            { id: 'sal_1', texto: 'Comedor desinfectado, sin manchas' }, { id: 'sal_2', texto: 'Sillas sin mancha ni polvo' }, { id: 'sal_3', texto: 'Cuadros y espejos alineados y limpios' }, { id: 'sal_4', texto: 'Tapetes aspirados y sin manchas, secos, sin olores' }, { id: 'sal_5', texto: 'Individuales desinfectados, sin manchas' }, { id: 'sal_6', texto: 'Esquinas de piso sin pelos ni residuos' }, { id: 'sal_7', texto: 'Pisos sin polvo ni residuos debajo de muebles' }, { id: 'sal_8', texto: 'Sofá cama aspirado profundo, sin manchas, residuos o pelos (abierto)' }, { id: 'sal_9', texto: 'Cojines sin manchas, sin pelos' }, { id: 'sal_10', texto: 'Mesa de centro desinfectada, sin manchas' }, { id: 'sal_11', texto: 'TV frontal y posterior sin polvo detrás, en conexiones y soporte' }, { id: 'sal_12', texto: 'Cables TV organizados y ocultos' }, { id: 'sal_13', texto: 'Confirmación de funcionamiento de TV' }, { id: 'sal_14', texto: 'Control desinfectado, sin residuos en botones' }, { id: 'sal_15', texto: 'Paredes sin manchas ni marcas' }, { id: 'sal_16', texto: 'Plantas con agua, hojas y matera limpias' }, { id: 'sal_17', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }
+                        ]
+                    },
+                    {
+                        titulo: 'Alcoba y Zona de Trabajo',
+                        items: [
+                            { id: 'alc_1', texto: 'Cama, sábanas tensadas, sin pelos, ni manchas' }, { id: 'alc_2', texto: 'Cobijas sin manchas, sin olores' }, { id: 'alc_3', texto: 'Almohadas sin manchas, buen olor' }, { id: 'alc_4', texto: 'Juegos adicionales guardados, sin manchas, residuos, con buen olor' }, { id: 'alc_5', texto: 'Juegos de cama doblados perfectamente, organizados' }, { id: 'alc_6', texto: 'Tapetes aspirados y sin manchas' }, { id: 'alc_7', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }, { id: 'alc_8', texto: 'Mesas de noche desinfectadas, sin manchas, sin residuos' }, { id: 'alc_9', texto: 'Debajo de la cama sin polvo, sin residuos' }, { id: 'alc_10', texto: 'Closet y cajones interior limpio, sin residuos, sin polvo' }, { id: 'alc_11', texto: 'Lámparas recargadas, funcionando' }, { id: 'alc_12', texto: 'Esquinas de piso sin pelos ni residuos' }, { id: 'alc_13', texto: 'Escritorio con superficie limpia y desinfectada' }, { id: 'alc_14', texto: 'Silla sin polvo ni manchas' }, { id: 'alc_15', texto: 'Cables organizados' }, { id: 'alc_16', texto: 'Pisos sin polvo ni residuos debajo de muebles' }, { id: 'alc_17', texto: 'Conexiones eléctricas en funcionamiento' }, { id: 'alc_18', texto: 'WiFi funcionando' }, { id: 'alc_19', texto: 'Verificar funcionamiento de electrodomésticos' }
+                        ]
+                    }
+                ],
 
                 async initApp() {
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
-
-                        // ✨ GUARDIA DE SEGURIDAD (Solo Ama de Llaves o Admin) ✨
                         if (usuario.rol !== 'AMA_LLAVES' && usuario.rol !== 'ADMIN') {
-                            alert('⛔ Acceso denegado. Esta pantalla es exclusiva para el equipo de Ama de Llaves.');
+                            alert('⛔ Acceso denegado. Pantalla exclusiva para Ama de Llaves.');
                             window.location.href = 'login.html';
                             return;
                         }
-
                         this.nombreUsuario = usuario.nombre.split(' ')[0];
                         this.iniciales = this.nombreUsuario.substring(0, 2).toUpperCase();
                     } else {
@@ -456,7 +634,7 @@
                     try {
                         const res = await this.fetchFresco('propiedades');
                         if (res.ok) this.propiedades = await res.json();
-                    } catch (e) { console.error(e); }
+                    } catch (e) { }
                 },
 
                 async cargarEmpleados() {
@@ -466,24 +644,22 @@
                             const all = await res.json();
                             this.empleadosAseo = all.filter(u => u.rol === 'ASEO');
                         }
-                    } catch (e) { console.error(e); }
+                    } catch (e) { }
                 },
 
                 async cargarReservas() {
                     try {
                         const res = await this.fetchFresco('reservas');
                         if (res.ok) this.reservas = await res.json();
-                    } catch (e) { console.error(e); }
+                    } catch (e) { }
                 },
 
                 async cargarTareas() {
                     try {
                         const urlFresco = 'https://gestandovalor-backend.onrender.com/reservas/troya/aseos?t=' + new Date().getTime();
                         const res = await fetch(urlFresco);
-                        if (res.ok) {
-                            this.tareas = await res.json();
-                        }
-                    } catch (e) { console.error(e); }
+                        if (res.ok) this.tareas = await res.json();
+                    } catch (e) { }
                 },
 
                 obtenerNombreApto(id) {
@@ -498,10 +674,27 @@
 
                 obtenerFotoApto(propId) {
                     const prop = this.propiedades.find(p => String(p.id) === String(propId));
-                    if (prop && prop.fotos && prop.fotos.length > 0) {
-                        return prop.fotos[0];
-                    }
+                    if (prop && prop.fotos && prop.fotos.length > 0) return prop.fotos[0];
                     return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80';
+                },
+
+                formatearTiempoLargo(totalSegundos) {
+                    const horas = Math.floor(totalSegundos / 3600);
+                    const minutos = Math.floor((totalSegundos % 3600) / 60);
+                    if (horas > 0) return `${horas}h ${minutos}m`;
+                    return `${minutos} min`;
+                },
+
+                formatearTiempoCorto(totalSegundos) {
+                    return Math.floor((totalSegundos || 0) / 60) + ' min';
+                },
+
+                hayConsumos(consumosObj) {
+                    if (!consumosObj) return false;
+                    for (let key in consumosObj) {
+                        if (consumosObj[key] > 0) return true;
+                    }
+                    return false;
                 },
 
                 get tareasConReporte() {
@@ -574,7 +767,6 @@
                             });
                         }
                     }
-
                     return reservasAMostrar;
                 },
 
@@ -594,7 +786,6 @@
                             const nextDate = new Date(futurasReservas[0].check_in);
                             textoProximaReserva = 'Entra huésped el ' + nextDate.toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
                         }
-
                         return {
                             ...t,
                             nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
@@ -617,25 +808,16 @@
                 },
 
                 async asignarAseo(reserva) {
-                    if (!reserva.empleado_asignado) {
-                        alert("Por favor selecciona a un empleado.");
-                        return;
-                    }
+                    if (!reserva.empleado_asignado) { alert("Por favor selecciona a un empleado."); return; }
                     this.cargando = true;
                     try {
                         const res = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                propiedad_id: String(reserva.propiedad_id),
-                                empleado_id: String(reserva.empleado_asignado),
-                                urgencia: String(reserva.urgencia_calculada),
-                            })
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ propiedad_id: String(reserva.propiedad_id), empleado_id: String(reserva.empleado_asignado), urgencia: String(reserva.urgencia_calculada) })
                         });
-
                         if (res.ok) await this.cargarTareas();
                         else alert('❌ Hubo un error al guardar.');
-                    } catch (e) { alert('Error de conexión.'); }
+                    } catch (e) { }
                     this.cargando = false;
                 },
 
@@ -643,8 +825,7 @@
                     this.cargando = true;
                     try {
                         const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/troya/aseos/${tareaId}`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
+                            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ empleado_id: nuevoEmpleadoId })
                         });
                         if (res.ok) await this.cargarTareas();
@@ -656,13 +837,40 @@
                     if (!confirm('¿Seguro que deseas eliminar esta asignación de aseo?')) return;
                     this.cargando = true;
                     try {
-                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/troya/aseos/${tareaId}`, {
-                            method: 'DELETE'
-                        });
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/troya/aseos/${tareaId}`, { method: 'DELETE' });
                         if (res.ok) await this.cargarTareas();
-                        else alert('Error al borrar la tarea');
-                    } catch (e) { alert('Error de conexión'); }
+                    } catch (e) { }
                     this.cargando = false;
+                },
+
+                // ✨ ABRIR MODAL DE REVISIÓN Y DESEMPAQUETAR EL REPORTE ✨
+                abrirInspeccion(tarea) {
+                    this.tareaAInspeccionar = tarea;
+
+                    let reporte = tarea.reporte_empleado;
+                    if (typeof reporte === 'string') {
+                        try { reporte = JSON.parse(reporte); } catch (e) { reporte = {}; }
+                    }
+                    this.reporteActivo = reporte || {};
+
+                    // Evaluar el Checklist
+                    const total = this.categoriasChecklist.reduce((acc, cat) => acc + cat.items.length, 0);
+                    let marcadas = 0;
+                    let faltantes = [];
+                    const checks = this.reporteActivo.checklist_marcado || {};
+
+                    this.categoriasChecklist.forEach(cat => {
+                        cat.items.forEach(item => {
+                            if (checks[item.id]) {
+                                marcadas++;
+                            } else {
+                                faltantes.push(`${cat.titulo}: ${item.texto}`);
+                            }
+                        });
+                    });
+
+                    this.resumenChecklist = { total, marcadas, faltantes };
+                    this.modalInspeccion = true;
                 },
 
                 async aprobarInspeccion() {
@@ -673,7 +881,25 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ estado: 'Inspeccionada' })
                         });
-                        alert('✅ Inspección Aprobada.');
+                        alert('✅ Inspección Aprobada. La suite está lista para el próximo huésped.');
+                        this.modalInspeccion = false;
+                        await this.cargarTareas();
+                    } catch (e) { }
+                    this.cargando = false;
+                },
+
+                async rechazarInspeccion() {
+                    const confirmar = confirm("¿Estás seguro de devolver este aseo? Volverá a la lista de pendientes del empleado.");
+                    if (!confirmar) return;
+
+                    this.cargando = true;
+                    try {
+                        await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaAInspeccionar.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ estado: 'Pendiente' }) // Lo devolvemos al empleado
+                        });
+                        alert('⚠️ Aseo devuelto. El empleado deberá retomar la tarea.');
                         this.modalInspeccion = false;
                         await this.cargarTareas();
                     } catch (e) { }
