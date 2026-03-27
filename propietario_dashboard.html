@@ -141,18 +141,9 @@
                                 </div>
 
                                 <div
-                                    class="grid grid-cols-2 gap-4 mt-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                    <div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Tarifa Noche Base</p>
-                                        <p class="font-bold text-navy" x-text="formatearDinero(prop.precio_noche || 0)">
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Ingresos (Mes Actual)
-                                        </p>
-                                        <p class="font-bold text-success"
-                                            x-text="formatearDinero(prop.ingresosMes || 0)"></p>
-                                    </div>
+                                    class="mt-3 bg-gray-50 p-3 rounded-xl border border-gray-100 flex items-center justify-between">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Tarifa Noche Base</p>
+                                    <p class="font-bold text-navy" x-text="formatearDinero(prop.precio_noche || 0)"></p>
                                 </div>
 
                                 <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
@@ -284,7 +275,6 @@
                             const anioActual = hoy.getFullYear();
                             const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
 
-                            // Ajustar hoyStr a la zona horaria local de Colombia para evitar desfases
                             const offsetCol = -5;
                             const fechaCol = new Date(hoy.getTime() + offsetCol * 3600 * 1000);
                             const hoyStr = fechaCol.toISOString().split('T')[0];
@@ -305,17 +295,13 @@
                                     const checkInStr = checkIn.toISOString().split('T')[0];
                                     const checkOutStr = checkOut.toISOString().split('T')[0];
 
-                                    // ¿Ocupado hoy? (El check_out no cuenta como noche ocupada para el huésped que sale ese mismo día)
                                     if (hoyStr >= checkInStr && hoyStr < checkOutStr) {
                                         ocupadoHoy = true;
                                     }
 
-                                    // Cálculos del mes actual
                                     if ((checkIn.getMonth() === mesActual && checkIn.getFullYear() === anioActual) ||
                                         (checkOut.getMonth() === mesActual && checkOut.getFullYear() === anioActual)) {
 
-                                        // Sumamos ingresos si la reserva entró este mes (Basado en el monto_total de la reserva)
-                                        // * 0.8 es el cálculo de utilidad neta para el propietario que tenías en tu código original
                                         if (checkIn.getMonth() === mesActual) {
                                             ingresosProp += (Number(res.monto_total || 0) * 0.8);
                                         }
@@ -342,7 +328,6 @@
 
                             if (this.misPropiedades.length > 0) { this.filtroPropiedadId = this.misPropiedades[0].id; }
 
-                            // Carga de Liquidaciones (PDFs)
                             let liquidacionesCargadas = [];
                             for (const prop of this.misPropiedades) {
                                 try {
