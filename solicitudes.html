@@ -290,7 +290,10 @@
         });
 
         // ✨ NUEVA FUNCIÓN PARA BORRAR ✨
+        // ✨ FUNCIÓN DE BORRADO CON RAYOS X PARA DEBUG ✨
         async function borrarSolicitud(id) {
+            console.log("Intentando eliminar la solicitud con ID:", id); // Verificamos que el ID no esté roto
+
             if (!confirm('¿Estás seguro de eliminar este prospecto? Esta acción no se puede deshacer.')) return;
 
             try {
@@ -302,10 +305,13 @@
                     alert('✅ Solicitud eliminada correctamente.');
                     cargarSolicitudes(); // Recarga la tabla
                 } else {
-                    alert('❌ Hubo un problema al intentar eliminar la solicitud.');
+                    // Si falla, leemos el chisme completo del servidor
+                    const errorText = await response.text();
+                    console.error("❌ Rechazado por el servidor. Código:", response.status, "Detalle:", errorText);
+                    alert(`❌ El servidor rechazó la orden (Error ${response.status}). \n\nPresiona F12, ve a "Consola" y mándame foto de lo que sale en rojo.`);
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error crítico de red:', error);
                 alert('No pudimos conectar con el servidor.');
             }
         }
