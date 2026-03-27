@@ -23,14 +23,17 @@
                     colors: {
                         navy: '#0B132B',
                         gold: '#D4AF37',
-                        lightGray: '#F9FAFB'
+                        lightGray: '#F9FAFB',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        airbnb: '#FF5A5F',
+                        booking: '#003580'
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Calendario Premium */
         .flatpickr-calendar {
             border-radius: 24px !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
@@ -67,7 +70,6 @@
             margin: 0;
         }
 
-        /* Scrollbar modal Apple */
         .modal-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -88,7 +90,7 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-white" x-data="suiteApp()" x-init="initApp()"
-    :class="openModalText ? 'overflow-hidden' : ''">
+    :class="(openModalText || modalPago) ? 'overflow-hidden' : ''">
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mb-4"></div>
@@ -114,7 +116,7 @@
         </div>
 
         <div class="flex items-center gap-4 flex-shrink-0">
-            <button @click="openContact = true"
+            <button
                 class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
         </div>
     </nav>
@@ -127,17 +129,19 @@
                 <p class="underline" x-text="`${propiedad.ciudad}, ${propiedad.departamento}, Colombia`"></p>
                 <div class="flex gap-4">
                     <button
-                        class="flex items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-xl transition-colors text-navy font-bold"><svg
-                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-xl transition-colors text-navy font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg> Compartir</button>
+                        </svg> Compartir
+                    </button>
                     <button
-                        class="flex items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-xl transition-colors text-navy font-bold"><svg
-                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-xl transition-colors text-navy font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg> Guardar</button>
+                        </svg> Guardar
+                    </button>
                 </div>
             </div>
         </section>
@@ -315,28 +319,15 @@
                                 <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
                                         <div class="font-bold text-navy text-base">Adultos</div>
-                                        <div class="text-sm text-gray-400 font-medium">Edad 13+</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="adults > 1 ? adults-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
-                                            :disabled="adults <= 1">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28"></path>
-                                            </svg>
-                                        </button>
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors"
+                                            :disabled="adults <= 1">-</button>
                                         <span x-text="adults"
                                             class="text-navy w-4 text-center text-base font-extrabold">1</span>
                                         <button @click.stop="adults++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28m-14-14v28"></path>
-                                            </svg>
-                                        </button>
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
                                     </div>
                                 </div>
 
@@ -347,86 +338,33 @@
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="children > 0 ? children-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
-                                            :disabled="children <= 0">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28"></path>
-                                            </svg>
-                                        </button>
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors"
+                                            :disabled="children <= 0">-</button>
                                         <span x-text="children"
                                             class="text-navy w-4 text-center text-base font-extrabold">0</span>
                                         <button @click.stop="children++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28m-14-14v28"></path>
-                                            </svg>
-                                        </button>
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                                    <div>
-                                        <div class="font-bold text-navy text-base">Bebés</div>
-                                        <div class="text-sm text-gray-400 font-medium">Menos de 2 años</div>
-                                    </div>
-                                    <div class="flex gap-3 items-center">
-                                        <button @click.stop="infants > 0 ? infants-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
-                                            :disabled="infants <= 0">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28"></path>
-                                            </svg>
-                                        </button>
-                                        <span x-text="infants"
-                                            class="text-navy w-4 text-center text-base font-extrabold">0</span>
-                                        <button @click.stop="infants++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28m-14-14v28"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-between items-center py-4">
+                                <div class="flex justify-between items-center py-4 border-b border-gray-100">
                                     <div>
                                         <div class="font-bold text-navy text-base">Mascotas</div>
-                                        <a href="#"
-                                            class="text-sm text-gray-500 underline font-medium hover:text-navy">¿Traes
-                                            un animal?</a>
+                                        <div class="text-[10px] text-warning font-bold uppercase mt-0.5">Aplica Tarifa
+                                            Extra</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="pets > 0 ? pets-- : null"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 disabled:opacity-30 disabled:border-gray-200 disabled:cursor-not-allowed transition-colors"
-                                            :disabled="pets <= 0">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28"></path>
-                                            </svg>
-                                        </button>
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors"
+                                            :disabled="pets <= 0">-</button>
                                         <span x-text="pets"
                                             class="text-navy w-4 text-center text-base font-extrabold">0</span>
                                         <button @click.stop="pets++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 hover:text-gray-800 transition-colors">
-                                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
-                                                aria-hidden="true" role="presentation" focusable="false"
-                                                style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 4; overflow: visible;">
-                                                <path d="m2 16h28m-14-14v28"></path>
-                                            </svg>
-                                        </button>
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-end pt-2">
+                                <div class="flex justify-end pt-3">
                                     <button @click.stop="openWidgetGuests = false"
                                         class="font-bold text-navy underline text-sm hover:text-gold transition-colors focus:outline-none">Cerrar</button>
                                 </div>
@@ -435,11 +373,11 @@
                     </div>
 
                     <button
-                        class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-4 rounded-full transition-transform hover:-translate-y-1 shadow-lg text-lg mb-4"
-                        @click="reservar()">
+                        class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-4 rounded-full transition-transform hover:-translate-y-1 shadow-[0_0_15px_rgba(212,175,55,0.3)] text-lg mb-4"
+                        @click="abrirModalPago()">
                         Reservar
                     </button>
-                    <p class="text-center text-xs text-gray-400 mt-4">No se te cobrará nada todavía</p>
+                    <p class="text-center text-xs text-gray-400 mt-4">Confirmación directa por WhatsApp</p>
 
                     <div x-show="noches > 0" x-transition class="mt-6">
                         <div class="space-y-4 text-gray-300 text-sm font-medium border-b border-white/10 pb-6 mb-6">
@@ -453,12 +391,15 @@
                                 <span class="underline">Tarifa de limpieza</span>
                                 <span class="text-white" x-text="formatearDinero(tarifaLimpieza)"></span>
                             </div>
+                            <div class="flex justify-between text-warning" x-show="pets > 0">
+                                <span class="underline" x-text="`Tarifa por Mascota (${pets})`"></span>
+                                <span class="font-bold" x-text="formatearDinero(tarifaMascota * pets)"></span>
+                            </div>
                         </div>
 
                         <div class="flex justify-between items-center font-extrabold text-white text-xl">
                             <span>Total <span class="text-sm font-medium text-gray-300">(COP)</span></span>
-                            <span class="text-gold"
-                                x-text="formatearDinero((propiedad.precio_noche * noches) + tarifaLimpieza)"></span>
+                            <span class="text-gold" x-text="formatearDinero(calcularTotal())"></span>
                         </div>
                     </div>
 
@@ -491,7 +432,134 @@
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 md:p-8 modal-scroll text-lg text-gray-700 leading-relaxed space-y-6"
-                x-html="formatearDescripcionCompleta(propiedad.descripcion)">
+                x-html="formatearDescripcionCompleta(propiedad.descripcion)"></div>
+        </div>
+    </div>
+
+    <div x-show="modalPago" style="display: none;" class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-navy/90 backdrop-blur-md" @click="modalPago = false" x-transition.opacity></div>
+
+        <div class="relative w-full max-w-lg bg-white rounded-[40px] shadow-2xl flex flex-col overflow-hidden transform transition-all"
+            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-10 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100">
+
+            <div class="p-8 text-center border-b border-gray-100 relative">
+                <button @click="modalPago = false"
+                    class="absolute top-6 right-6 text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full transition-colors"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+                <div
+                    class="w-16 h-16 bg-green-50 text-success rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-extrabold text-navy">Confirma tu Reserva</h2>
+                <p class="text-sm text-gray-500 mt-2">Transfiere el valor total para asegurar tus fechas. ¡Es rápido y
+                    seguro!</p>
+            </div>
+
+            <div class="p-8 bg-gray-50/50">
+                <div class="bg-navy rounded-2xl p-5 text-center shadow-lg shadow-navy/20 mb-6">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total a Pagar</p>
+                    <p class="text-3xl font-black text-gold" x-text="formatearDinero(calcularTotal())"></p>
+                    <p class="text-xs text-gray-300 mt-2">Código de Solicitud: <strong class="text-white"
+                            x-text="'#' + codigoReserva"></strong></p>
+                </div>
+
+                <p class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4">Selecciona tu método de
+                    pago:</p>
+
+                <div class="space-y-3">
+                    <label
+                        class="flex items-center justify-between p-4 bg-white border-2 rounded-2xl cursor-pointer transition-all"
+                        :class="metodoSeleccionado === 'Nequi' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
+                        <div class="flex items-center gap-4">
+                            <input type="radio" name="metodoPago" value="Nequi" x-model="metodoSeleccionado"
+                                class="hidden">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-[#39215A] text-white font-black flex items-center justify-center text-xs">
+                                NQ</div>
+                            <div>
+                                <p class="font-bold text-navy text-sm">Nequi</p>
+                                <p class="text-xs text-gray-500 mt-0.5 select-all">300 123 4567</p>
+                            </div>
+                        </div>
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                            :class="metodoSeleccionado === 'Nequi' ? 'border-gold bg-gold' : 'border-gray-300'">
+                            <svg x-show="metodoSeleccionado === 'Nequi'" class="w-3 h-3 text-white" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </label>
+
+                    <label
+                        class="flex items-center justify-between p-4 bg-white border-2 rounded-2xl cursor-pointer transition-all"
+                        :class="metodoSeleccionado === 'Bancolombia' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
+                        <div class="flex items-center gap-4">
+                            <input type="radio" name="metodoPago" value="Bancolombia" x-model="metodoSeleccionado"
+                                class="hidden">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-[#FDDA24] text-navy font-black flex items-center justify-center text-xs">
+                                BC</div>
+                            <div>
+                                <p class="font-bold text-navy text-sm">Bancolombia (Ahorros)</p>
+                                <p class="text-xs text-gray-500 mt-0.5 select-all">123-456789-00</p>
+                            </div>
+                        </div>
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                            :class="metodoSeleccionado === 'Bancolombia' ? 'border-gold bg-gold' : 'border-gray-300'">
+                            <svg x-show="metodoSeleccionado === 'Bancolombia'" class="w-3 h-3 text-white" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </label>
+
+                    <label
+                        class="flex items-center justify-between p-4 bg-white border-2 rounded-2xl cursor-pointer transition-all"
+                        :class="metodoSeleccionado === 'Mercado Pago' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
+                        <div class="flex items-center gap-4">
+                            <input type="radio" name="metodoPago" value="Mercado Pago" x-model="metodoSeleccionado"
+                                class="hidden">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-[#009EE3] text-white font-black flex items-center justify-center text-xs tracking-tighter">
+                                MP</div>
+                            <div>
+                                <p class="font-bold text-navy text-sm">Mercado Pago</p>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Tarjetas de Crédito / Internacional</p>
+                            </div>
+                        </div>
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                            :class="metodoSeleccionado === 'Mercado Pago' ? 'border-gold bg-gold' : 'border-gray-300'">
+                            <svg x-show="metodoSeleccionado === 'Mercado Pago'" class="w-3 h-3 text-white" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="p-6 bg-white border-t border-gray-100">
+                <button @click="irAWhatsApp()"
+                    class="w-full font-extrabold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2"
+                    :class="metodoSeleccionado !== '' ? 'bg-success hover:bg-green-600 text-white transform hover:-translate-y-1 active:scale-95' : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
+                    :disabled="metodoSeleccionado === ''">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.327.101.144.447.712.947 1.156.643.57 1.205.748 1.349.835.143.087.229.072.316-.029l.36-.433c.114-.144.23-.115.36-.065l1.287.607c.144.072.245.108.281.166.035.058.035.332-.109.737z" />
+                    </svg>
+                    <span
+                        x-text="metodoSeleccionado === 'Mercado Pago' ? 'Solicitar Link por WhatsApp' : (metodoSeleccionado === '' ? 'Selecciona un método' : 'Enviar Comprobante por WhatsApp')"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -577,30 +645,23 @@
                 propiedad: { fotos: [], comodidades: [], precio_noche: 0, descripcion: '' },
 
                 openModalText: false,
-                adults: 1,
-                children: 0,
-                infants: 0,
-                pets: 0,
+                adults: 1, children: 0, infants: 0, pets: 0,
                 openWidgetGuests: false,
-                checkinRaw: '',
-                checkoutRaw: '',
-                checkinLabel: '',
-                checkoutLabel: '',
+                checkinRaw: '', checkoutRaw: '',
+                checkinLabel: '', checkoutLabel: '',
                 noches: 0,
                 tarifaLimpieza: 55000,
+                tarifaMascota: 30000,
                 mapa: null,
 
+                modalPago: false,
+                metodoSeleccionado: '',
+                codigoReserva: '',
+                telefonoAdmin: '3001234567', // <-- ¡PON TU NÚMERO DE WHATSAPP AQUÍ!
+
                 insigniasPropiedad: [
-                    {
-                        titulo: 'Ubicación fantástica',
-                        descripcion: 'El 100% de los huéspedes recientes calificó la ubicación con 5 estrellas.',
-                        iconoSVG: '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />'
-                    },
-                    {
-                        titulo: 'Proceso de llegada autónomo',
-                        descripcion: 'Accede fácilmente mediante nuestro sistema de entrada inteligente.',
-                        iconoSVG: '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />'
-                    }
+                    { titulo: 'Ubicación fantástica', descripcion: 'El 100% de los huéspedes recientes calificó la ubicación con 5 estrellas.', iconoSVG: '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />' },
+                    { titulo: 'Proceso de llegada autónomo', descripcion: 'Accede fácilmente mediante nuestro sistema de entrada inteligente.', iconoSVG: '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />' }
                 ],
 
                 iconosSVG: {
@@ -653,12 +714,8 @@
                 obtenerResumen() {
                     if (!this.propiedad.descripcion) return 'Aún no hay descripción.';
                     let txt = this.propiedad.descripcion;
-                    if (txt.includes('\n')) {
-                        txt = txt.split('\n')[0];
-                    }
-                    if (txt.length > 250) {
-                        txt = txt.substring(0, 250) + '...';
-                    }
+                    if (txt.includes('\n')) txt = txt.split('\n')[0];
+                    if (txt.length > 250) txt = txt.substring(0, 250) + '...';
                     return txt;
                 },
 
@@ -752,12 +809,45 @@
                     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor || 0);
                 },
 
-                reservar() {
-                    if (this.noches === 0) {
-                        alert("Por favor, selecciona las fechas de tu viaje.");
+                calcularTotal() {
+                    let total = (this.propiedad.precio_noche * this.noches) + this.tarifaLimpieza;
+                    if (this.pets > 0) {
+                        total += (this.tarifaMascota * this.pets);
+                    }
+                    return total;
+                },
+
+                abrirModalPago() {
+                    if (this.noches === 0 || !this.checkinLabel) {
+                        alert("Por favor, selecciona las fechas de tu viaje en el calendario.");
                         return;
                     }
-                    alert(`¡Reserva en proceso!\nDestino: ${this.propiedad.titulo}\nNoches: ${this.noches}\nTotal: ${this.formatearDinero((this.propiedad.precio_noche * this.noches) + this.tarifaLimpieza)}`);
+                    this.codigoReserva = 'WEB-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+                    this.metodoSeleccionado = '';
+                    this.modalPago = true;
+                },
+
+                irAWhatsApp() {
+                    const totalStr = this.formatearDinero(this.calcularTotal());
+                    const totalHuespedes = this.adults + this.children + this.infants;
+
+                    let texto = `¡Hola GestandoValor! 👋 Quiero confirmar mi reserva:\n\n`;
+                    texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
+                    texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
+                    texto += `👥 *Huéspedes:* ${totalHuespedes} persona(s)\n`;
+                    if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets} (Aplica tarifa extra)\n`;
+                    texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
+                    texto += `Mi código de reserva es: *#${this.codigoReserva}*\n\n`;
+
+                    if (this.metodoSeleccionado === 'Mercado Pago') {
+                        texto += `Deseo realizar el pago con *Tarjeta / Internacional (Mercado Pago)*. Por favor envíame el link de pago seguro. 💳`;
+                    } else {
+                        texto += `Aquí adjunto mi comprobante de transferencia por *${this.metodoSeleccionado}*. Quedo atento/a para recibir las instrucciones de acceso. 🔑`;
+                    }
+
+                    this.modalPago = false;
+                    const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
+                    window.open(urlWA, '_blank');
                 }
             }
         }
