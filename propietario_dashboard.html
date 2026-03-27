@@ -61,7 +61,7 @@
     <div x-show="cargando" class="flex justify-center items-center py-40 min-h-screen bg-navy z-50 fixed inset-0">
         <div class="text-center">
             <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-gold mx-auto mb-4"></div>
-            <p class="text-gold font-bold animate-pulse">Cargando portafolio...</p>
+            <p class="text-gold font-bold animate-pulse">Cargando datos reales de tu portafolio...</p>
         </div>
     </div>
 
@@ -77,7 +77,7 @@
                             Inversionistas</span>
                         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, <span
                                 x-text="usuarioInfo ? usuarioInfo.nombre : 'Inversionista'"></span> 📈</h1>
-                        <p class="text-gray-400 mt-2">Este es el rendimiento de tus propiedades administradas por
+                        <p class="text-gray-400 mt-2">Este es el rendimiento real de tus propiedades administradas por
                             GestandoValor.</p>
                     </div>
                 </div>
@@ -93,9 +93,9 @@
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 relative z-10"
                             x-text="`Tus Ingresos Netos (${mesActivo.split(' ')[0]})`"></p>
                         <h3 class="text-4xl font-black text-navy relative z-10"
-                            x-text="formatearDinero(totalIngresosSimulados)"></h3>
+                            x-text="formatearDinero(totalIngresosNetos)"></h3>
                         <p class="text-xs text-success font-bold mt-2 flex items-center gap-1 relative z-10">
-                            Calculado según tus activos
+                            Calculado según reservas reales
                         </p>
                     </div>
 
@@ -108,7 +108,7 @@
                             <div class="bg-gold h-2 rounded-full transition-all duration-1000"
                                 :style="`width: ${ocupacionPromedio}%`"></div>
                         </div>
-                        <p class="text-xs text-gray-500 font-bold mt-2">Dato referencial del mes</p>
+                        <p class="text-xs text-gray-500 font-bold mt-2">Dato real del mes actual</p>
                     </div>
                 </div>
 
@@ -135,9 +135,9 @@
                                         <p class="text-xs text-gray-500 font-bold uppercase"
                                             x-text="`${prop.ciudad}, ${prop.departamento}`"></p>
                                     </div>
-                                    <span class="text-[10px] font-extrabold px-2 py-1 rounded border"
-                                        :class="prop.ocupacionSimulada > 75 ? 'bg-green-50 text-success border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'"
-                                        x-text="prop.ocupacionSimulada > 75 ? 'Ocupado Hoy' : 'Libre Hoy'"></span>
+                                    <span class="text-[10px] font-extrabold px-2 py-1 rounded border shadow-sm"
+                                        :class="prop.ocupadoHoy ? 'bg-green-50 text-success border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'"
+                                        x-text="prop.ocupadoHoy ? 'Ocupado Hoy' : 'Libre Hoy'"></span>
                                 </div>
 
                                 <div
@@ -148,10 +148,10 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Tu Utilidad Estimada
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Ingresos (Mes Actual)
                                         </p>
                                         <p class="font-bold text-success"
-                                            x-text="formatearDinero((prop.precio_noche || 0) * 20 * 0.8)"></p>
+                                            x-text="formatearDinero(prop.ingresosMes || 0)"></p>
                                     </div>
                                 </div>
 
@@ -220,9 +220,8 @@
                         class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gold transition-colors">
                         <div>
                             <p class="font-bold text-navy" x-text="liq.mes_anio"></p>
-                            <p class="text-[10px] font-extrabold uppercase tracking-widest mt-1"
-                                :class="index === 2 ? 'text-warning' : 'text-success'"
-                                x-text="index === 2 ? 'Pronto a expirar' : 'Soporte Listo'"></p>
+                            <p class="text-[10px] font-extrabold uppercase tracking-widest mt-1 text-success">Soporte
+                                Listo</p>
                         </div>
                         <button @click="descargarPDF(liq.archivo_pdf, liq.nombre_archivo)"
                             class="bg-white border border-gray-200 hover:border-gold hover:text-gold text-navy font-bold py-2 px-4 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-xs flex-shrink-0">
@@ -240,9 +239,15 @@
     <script>
         function portalPropietario() {
             return {
-                cargando: true, mesActivo: '', modalLiquidaciones: false,
-                usuarioInfo: null, misPropiedades: [], misLiquidaciones: [],
-                totalIngresosSimulados: 0, ocupacionPromedio: 0, filtroPropiedadId: null,
+                cargando: true,
+                mesActivo: '',
+                modalLiquidaciones: false,
+                usuarioInfo: null,
+                misPropiedades: [],
+                misLiquidaciones: [],
+                totalIngresosNetos: 0,
+                ocupacionPromedio: 0,
+                filtroPropiedadId: null,
 
                 async init() {
                     this.obtenerMesActual();
@@ -264,29 +269,81 @@
 
                 async cargarDatosDesdeBackend() {
                     try {
-                        const resProp = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
-                        if (resProp.ok) {
+                        const [resProp, resRes] = await Promise.all([
+                            fetch('https://gestandovalor-backend.onrender.com/propiedades'),
+                            fetch('https://gestandovalor-backend.onrender.com/reservas')
+                        ]);
+
+                        if (resProp.ok && resRes.ok) {
                             const todasLasPropiedades = await resProp.json();
-                            this.misPropiedades = todasLasPropiedades.filter(p => p.propietario_id === this.usuarioInfo.id);
+                            this.misPropiedades = todasLasPropiedades.filter(p => String(p.propietario_id) === String(this.usuarioInfo.id));
+                            const todasLasReservas = await resRes.json();
+
+                            const hoy = new Date();
+                            const mesActual = hoy.getMonth();
+                            const anioActual = hoy.getFullYear();
+                            const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
+
+                            // Ajustar hoyStr a la zona horaria local de Colombia para evitar desfases
+                            const offsetCol = -5;
+                            const fechaCol = new Date(hoy.getTime() + offsetCol * 3600 * 1000);
+                            const hoyStr = fechaCol.toISOString().split('T')[0];
+
+                            let ingresosTotales = 0;
+                            let nochesTotalesOcupadas = 0;
+
+                            this.misPropiedades = this.misPropiedades.map(prop => {
+                                const reservasProp = todasLasReservas.filter(r => String(r.propiedad_id) === String(prop.id) && r.estado_reserva !== 'Cancelada');
+
+                                let ingresosProp = 0;
+                                let nochesOcupadasProp = 0;
+                                let ocupadoHoy = false;
+
+                                reservasProp.forEach(res => {
+                                    const checkIn = new Date(res.check_in);
+                                    const checkOut = new Date(res.check_out);
+                                    const checkInStr = checkIn.toISOString().split('T')[0];
+                                    const checkOutStr = checkOut.toISOString().split('T')[0];
+
+                                    // ¿Ocupado hoy? (El check_out no cuenta como noche ocupada para el huésped que sale ese mismo día)
+                                    if (hoyStr >= checkInStr && hoyStr < checkOutStr) {
+                                        ocupadoHoy = true;
+                                    }
+
+                                    // Cálculos del mes actual
+                                    if ((checkIn.getMonth() === mesActual && checkIn.getFullYear() === anioActual) ||
+                                        (checkOut.getMonth() === mesActual && checkOut.getFullYear() === anioActual)) {
+
+                                        // Sumamos ingresos si la reserva entró este mes (Basado en el monto_total de la reserva)
+                                        // * 0.8 es el cálculo de utilidad neta para el propietario que tenías en tu código original
+                                        if (checkIn.getMonth() === mesActual) {
+                                            ingresosProp += (Number(res.monto_total || 0) * 0.8);
+                                        }
+
+                                        let fechaInicio = checkIn < new Date(anioActual, mesActual, 1) ? new Date(anioActual, mesActual, 1) : checkIn;
+                                        let fechaFin = checkOut > new Date(anioActual, mesActual + 1, 0) ? new Date(anioActual, mesActual + 1, 0) : checkOut;
+
+                                        let noches = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24));
+                                        if (noches > 0) nochesOcupadasProp += noches;
+                                    }
+                                });
+
+                                ingresosTotales += ingresosProp;
+                                nochesTotalesOcupadas += nochesOcupadasProp;
+
+                                return { ...prop, ocupadoHoy, ingresosMes: ingresosProp, nochesOcupadasMes: nochesOcupadasProp };
+                            });
+
+                            this.totalIngresosNetos = ingresosTotales;
+
+                            const totalNochesPosibles = this.misPropiedades.length * diasEnMes;
+                            this.ocupacionPromedio = totalNochesPosibles > 0 ? Math.round((nochesTotalesOcupadas / totalNochesPosibles) * 100) : 0;
+                            if (this.ocupacionPromedio > 100) this.ocupacionPromedio = 100;
 
                             if (this.misPropiedades.length > 0) { this.filtroPropiedadId = this.misPropiedades[0].id; }
 
-                            if (this.misPropiedades.length > 0) {
-                                let sumaOcupacion = 0;
-                                this.misPropiedades.forEach(p => {
-                                    const ocupacion = Math.floor(Math.random() * (95 - 70 + 1)) + 70;
-                                    p.ocupacionSimulada = ocupacion;
-                                    sumaOcupacion += ocupacion;
-                                });
-                                this.ocupacionPromedio = Math.round(sumaOcupacion / this.misPropiedades.length);
-                            }
-
-                            this.totalIngresosSimulados = this.misPropiedades.reduce((total, prop) => {
-                                return total + ((prop.precio_noche || 0) * 20 * 0.8);
-                            }, 0);
-
+                            // Carga de Liquidaciones (PDFs)
                             let liquidacionesCargadas = [];
-
                             for (const prop of this.misPropiedades) {
                                 try {
                                     const resLiq = await fetch(`https://gestandovalor-backend.onrender.com/liquidaciones/propiedad/${prop.id}`);
@@ -302,7 +359,6 @@
                                     console.log('Error trayendo liquidación de', prop.id);
                                 }
                             }
-
                             this.misLiquidaciones = liquidacionesCargadas.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                         }
                     } catch (error) {
