@@ -630,7 +630,7 @@
             return {
                 cargando: true,
                 cargandoPago: false,
-                propiedad: { fotos: [], comodidades: [], precio_noche: 0, descripcion: '' },
+                propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '' },
 
                 openModalText: false,
                 adults: 1, children: 0, infants: 0, pets: 0,
@@ -645,7 +645,7 @@
                 modalPago: false,
                 metodoSeleccionado: '',
                 codigoReserva: '',
-                telefonoAdmin: '3185388292', // <-- ¡NÚMERO CONFIGURADO!
+                telefonoAdmin: '3185388292', // <-- Tu WhatsApp configurado
 
                 insigniasPropiedad: [
                     { titulo: 'Ubicación fantástica', descripcion: 'El 100% de los huéspedes recientes calificó la ubicación con 5 estrellas.', iconoSVG: '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />' },
@@ -816,10 +816,14 @@
                 },
 
                 async procesarReserva() {
-                    const totalStr = this.formatearDinero(this.calcularTotal());
+                    const totalPagar = this.calcularTotal();
+                    const totalStr = this.formatearDinero(totalPagar);
                     const totalHuespedes = this.adults + this.children + this.infants;
 
                     if (this.metodoSeleccionado === 'Transferencia') {
+                        // ✨ AQUÍ CREAMOS EL LINK MÁGICO PARA EDWIN ✨
+                        const linkMagico = `https://gestandovalor.com/reservas.html?accion=nueva_magica&prop_id=${this.propiedad.id}&in=${this.checkinRaw}&out=${this.checkoutRaw}&pax=${totalHuespedes}&total=${totalPagar}&codigo=${this.codigoReserva}`;
+
                         let texto = `¡Hola Edwin! 👋 Quiero confirmar mi reserva por Transferencia:\n\n`;
                         texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
                         texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
@@ -827,7 +831,9 @@
                         if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets} (Aplica tarifa extra)\n`;
                         texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
                         texto += `Mi código de reserva es: *#${this.codigoReserva}*\n\n`;
-                        texto += `Quedo atento/a para enviar el comprobante de Nequi, Bancolombia o Bre-B y recibir las instrucciones de acceso. 🔑`;
+                        texto += `Quedo atento/a para enviar el comprobante de Nequi, Bancolombia o Bre-B y recibir las instrucciones de acceso. 🔑\n\n`;
+                        texto += `---------------------\n`;
+                        texto += `⚙️ *[PARA EDWIN] Link para crear la reserva automático:* \n${linkMagico}`;
 
                         this.modalPago = false;
                         const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
@@ -835,7 +841,7 @@
 
                     } else if (this.metodoSeleccionado === 'Mercado Pago') {
                         // TODO: Aquí conectaremos tu backend con Mercado Pago.
-                        alert("¡Frontend preparado! Para que esto redirija a la pantalla de pago real de Mercado Pago, necesitamos crear la ruta en tu Backend (NestJS). ¿Me pasas tu Access Token de Mercado Pago?");
+                        alert("¡Siguiente paso! Pásame tu Access Token de Mercado Pago para conectarlo al Backend y automatizar esto.");
                     }
                 }
             }
