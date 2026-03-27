@@ -358,16 +358,17 @@
         class="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalInspeccion = false"></div>
         <div
-            class="bg-white rounded-[40px] shadow-2xl w-full max-w-4xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
+            class="bg-white rounded-[40px] shadow-2xl w-full max-w-6xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
 
             <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-start bg-white shrink-0">
                 <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden shadow-sm border border-gray-200 shrink-0">
+                    <div
+                        class="w-16 h-16 rounded-xl overflow-hidden shadow-sm border border-gray-200 shrink-0 bg-white">
                         <img :src="tareaAInspeccionar?.fotoAptoSeguro" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <span class="text-[10px] font-bold text-gold uppercase tracking-widest mb-1 block">Reporte de
-                            Inspección</span>
+                        <span class="text-[10px] font-bold text-gold uppercase tracking-widest mb-1 block">Estación de
+                            Auditoría</span>
                         <h3 class="text-2xl font-extrabold text-navy"
                             x-text="tareaAInspeccionar?.nombreAptoSeguro || 'Apto'"></h3>
                         <p class="text-xs text-gray-500 mt-1">Realizado por: <strong class="text-navy"
@@ -418,72 +419,118 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                        <h4
-                            class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                            Insumos Reportados
-                        </h4>
+                        <div class="flex justify-between items-center mb-4">
+                            <h4
+                                class="text-xs font-extrabold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                                Auditoría de Insumos
+                            </h4>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mb-3 leading-tight">Si el empleado se equivocó, corrige aquí
+                            el número de insumos que realmente sacó. El inventario se reajustará solo al aprobar.</p>
 
-                        <div class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2"
-                            x-show="hayConsumos(reporteActivo?.consumos_utilizados)">
-                            <template x-for="(cantidad, nombre) in reporteActivo?.consumos_utilizados" :key="nombre">
-                                <div x-show="cantidad > 0"
-                                    class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
+                        <div class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                            <template x-for="(cantidad, nombre) in consumosAuditados" :key="nombre">
+                                <div
+                                    class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 hover:border-gold transition-colors">
                                     <div class="flex items-center gap-2 text-sm text-navy font-bold">
                                         <span x-text="nombre.split(' ')[0]"></span>
                                         <span x-text="nombre.substring(nombre.indexOf(' ') + 1)"></span>
                                     </div>
-                                    <span class="text-xs font-black text-navy bg-gold/20 px-2 py-1 rounded-md"
-                                        x-text="`+${cantidad}`"></span>
+                                    <div
+                                        class="flex items-center gap-3 bg-white rounded-lg p-1 border border-gray-200 shadow-sm">
+                                        <button @click="if(consumosAuditados[nombre] > 0) consumosAuditados[nombre]--"
+                                            class="w-6 h-6 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded text-navy font-bold">-</button>
+                                        <input type="number" x-model.number="consumosAuditados[nombre]"
+                                            class="w-8 text-center text-sm font-extrabold text-navy outline-none bg-transparent">
+                                        <button @click="consumosAuditados[nombre]++"
+                                            class="w-6 h-6 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded text-navy font-bold">+</button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
-                        <div x-show="!hayConsumos(reporteActivo?.consumos_utilizados)"
-                            class="text-xs text-gray-400 font-medium italic mt-2">
-                            El empleado no reportó haber repuesto ningún insumo.
-                        </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <div class="bg-red-50/30 border border-red-100 rounded-3xl p-6 h-[500px] flex flex-col">
                         <h4
-                            class="text-xs font-extrabold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            class="text-xs font-extrabold text-danger uppercase tracking-widest mb-4 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            Estándares de Calidad
+                            Tareas NO marcadas por empleado
                         </h4>
 
-                        <span class="px-3 py-1 text-xs font-black rounded-full"
-                            :class="resumenChecklist.faltantes.length === 0 ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'">
-                            <span x-text="`${resumenChecklist.marcadas}/${resumenChecklist.total} Completadas`"></span>
-                        </span>
+                        <div x-show="resumenChecklist.faltantes.length > 0"
+                            class="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                            <ul class="list-disc pl-5 text-sm text-red-800 space-y-2 font-medium">
+                                <template x-for="faltante in resumenChecklist.faltantes">
+                                    <li x-text="faltante" class="leading-tight"></li>
+                                </template>
+                            </ul>
+                        </div>
+
+                        <div x-show="resumenChecklist.faltantes.length === 0"
+                            class="flex-1 flex flex-col items-center justify-center text-center">
+                            <span class="text-5xl block mb-4">🏆</span>
+                            <p class="text-sm font-bold text-success">El empleado marcó el 100% de las tareas.</p>
+                        </div>
                     </div>
 
-                    <div x-show="resumenChecklist.faltantes.length > 0"
-                        class="bg-red-50/50 border border-red-100 rounded-2xl p-4 mb-6">
-                        <p class="text-xs font-bold text-danger uppercase tracking-wider mb-3">⚠️ Tareas NO marcadas por
-                            el empleado:</p>
-                        <ul class="list-disc pl-5 text-sm text-red-800 space-y-1 font-medium">
-                            <template x-for="faltante in resumenChecklist.faltantes">
-                                <li x-text="faltante"></li>
+                    <div class="bg-white border border-gray-200 rounded-3xl p-6 h-[500px] flex flex-col shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4
+                                class="text-xs font-extrabold text-navy uppercase tracking-widest flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Tu Auditoría
+                            </h4>
+                            <span class="text-[10px] text-gray-400 font-bold">Califica cada zona</span>
+                        </div>
+
+                        <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                            <template x-for="cat in categoriasChecklist" :key="cat.titulo">
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <h5 class="font-bold text-navy mb-3 text-sm" x-text="cat.icono + ' ' + cat.titulo">
+                                    </h5>
+                                    <div class="space-y-2">
+                                        <template x-for="item in cat.items" :key="item.id">
+                                            <div
+                                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-2.5 rounded-lg border border-gray-100 gap-2">
+                                                <span class="text-xs text-gray-600 font-medium sm:w-1/2 leading-tight"
+                                                    x-text="item.texto"></span>
+                                                <div
+                                                    class="flex gap-1 shrink-0 bg-gray-50 p-1 rounded-md border border-gray-200">
+                                                    <button @click="auditoriaChecklist[item.id] = 'bien'"
+                                                        :class="auditoriaChecklist[item.id] === 'bien' ? 'bg-success text-white shadow-sm' : 'bg-transparent text-gray-400 hover:bg-gray-200'"
+                                                        class="px-2.5 py-1.5 rounded text-[10px] font-bold transition-all">✓
+                                                        Bien</button>
+                                                    <button @click="auditoriaChecklist[item.id] = 'mal'"
+                                                        :class="auditoriaChecklist[item.id] === 'mal' ? 'bg-warning text-white shadow-sm' : 'bg-transparent text-gray-400 hover:bg-gray-200'"
+                                                        class="px-2.5 py-1.5 rounded text-[10px] font-bold transition-all">⚠️
+                                                        Mal</button>
+                                                    <button @click="auditoriaChecklist[item.id] = 'no_hecho'"
+                                                        :class="auditoriaChecklist[item.id] === 'no_hecho' ? 'bg-danger text-white shadow-sm' : 'bg-transparent text-gray-400 hover:bg-gray-200'"
+                                                        class="px-2.5 py-1.5 rounded text-[10px] font-bold transition-all">✗
+                                                        No</button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
                             </template>
-                        </ul>
+                        </div>
                     </div>
 
-                    <div x-show="resumenChecklist.faltantes.length === 0"
-                        class="bg-green-50/50 border border-green-100 rounded-2xl p-6 text-center">
-                        <span class="text-3xl block mb-2">🏆</span>
-                        <p class="text-sm font-bold text-success">El empleado marcó el 100% de las tareas como
-                            completadas.</p>
-                    </div>
                 </div>
-
             </div>
 
             <div class="p-6 bg-white border-t border-gray-200 flex gap-4 shrink-0">
@@ -557,42 +604,46 @@
                 reporteActivo: null,
                 resumenChecklist: { total: 0, marcadas: 0, faltantes: [] },
 
+                // ✨ NUEVAS VARIABLES DE AUDITORÍA ✨
+                consumosAuditados: {},
+                auditoriaChecklist: {},
+
                 modalReportes: false,
 
-                // ✨ COPIA DEL CEREBRO DE TAREAS PARA TRADUCIR EL CHECKLIST ✨
+                // Copia del Checklist de 89 tareas
                 categoriasChecklist: [
                     {
-                        titulo: 'Entrada y General',
+                        titulo: 'Entrada y General', icono: '🚪',
                         items: [
                             { id: 'gen_1', texto: 'Puerta principal sin polvo' }, { id: 'gen_2', texto: 'Chapa desinfectada' }, { id: 'gen_3', texto: 'Cerradura funcional' }, { id: 'gen_4', texto: 'Muebles sin polvo' }, { id: 'gen_5', texto: 'Puertas sin manchas y manijas desinfectadas, sin polvo' }, { id: 'gen_6', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }, { id: 'gen_7', texto: 'Desinfección de tomacorrientes e interruptores, sin polvo' }, { id: 'gen_8', texto: 'Paredes sin manchas' }, { id: 'gen_9', texto: 'Pisos barridos y trapeados con desinfectante sin manchas' }, { id: 'gen_10', texto: 'Ambiente con fragancia fresca' }, { id: 'gen_11', texto: 'Verificar funcionamiento de luces' }, { id: 'gen_12', texto: 'Checklist inventario muebles y enseres' }, { id: 'gen_13', texto: 'Checklist consumibles' }
                         ]
                     },
                     {
-                        titulo: 'Cocina',
+                        titulo: 'Cocina', icono: '🍳',
                         items: [
                             { id: 'coc_1', texto: 'Salpicadero desinfectado, sin grasa en esquinas ni juntas' }, { id: 'coc_2', texto: 'Mesones desinfectados, sin grasa en esquinas ni juntas' }, { id: 'coc_3', texto: 'Gabinetes y cajones interior limpios, sin grasa, sin residuos' }, { id: 'coc_4', texto: 'Extractor sin grasa, sin residuos, vidrio sin manchas ni grasa' }, { id: 'coc_5', texto: 'Muebles sin polvo en la parte superior' }, { id: 'coc_6', texto: 'Quemadores limpios, sin grasa acumulada' }, { id: 'coc_7', texto: 'Horno sin residuos, grasa, vidrios sin manchas' }, { id: 'coc_8', texto: 'Nevera interior sin productos, desinfectada, estantes de vidrio sin manchas cauchos des' }, { id: 'coc_9', texto: 'Ollas y utensilios sin residuos, secos, sin grasa' }, { id: 'coc_10', texto: 'Caneca lavada, desinfectada, bolsa nueva' }, { id: 'coc_11', texto: 'Esquinas y bordes del piso sin migas' }, { id: 'coc_12', texto: 'Electrodomésticos funcionando, desinfectados y secos' }, { id: 'coc_13', texto: 'Cubiertos sin manchas, secos' }, { id: 'coc_14', texto: 'Recarga aromáticas, cafés, azúcar' }, { id: 'coc_15', texto: 'Esponja de jabón sin residuos, en buen estado. Jabón recargado' }
                         ]
                     },
                     {
-                        titulo: 'Zona de Ropa',
+                        titulo: 'Zona de Ropa', icono: '🧺',
                         items: [
                             { id: 'rop_1', texto: 'Lavadora interior limpio y desinfectado, cajón detergente sin residuos' }, { id: 'rop_2', texto: 'Filtro de lavadora sin basura y limpio' }, { id: 'rop_3', texto: 'Trapero limpio y con buen olor' }, { id: 'rop_4', texto: 'Escoba sin pelos ni suciedad' }, { id: 'rop_5', texto: 'Recogedor limpio y sin residuos' }, { id: 'rop_6', texto: 'Piso y desagüe limpio, sin residuos' }, { id: 'rop_7', texto: 'Esquinas y bordes del piso sin pelos ni residuos' }, { id: 'rop_8', texto: 'Tendedero sin polvo' }
                         ]
                     },
                     {
-                        titulo: 'Baño',
+                        titulo: 'Baño', icono: '🚿',
                         items: [
                             { id: 'ban_1', texto: 'Inodoro interior y exterior y base desinfectados, sin manchas' }, { id: 'ban_2', texto: 'Ducha sin moho en juntas, paredes y piso sin grasa y seco' }, { id: 'ban_3', texto: 'Vidrios sin manchas, secos' }, { id: 'ban_4', texto: 'Lavamanos sin residuos, grifería sin manchas, seco' }, { id: 'ban_5', texto: 'Toallas sin manchas, sin olores' }, { id: 'ban_6', texto: 'Espejo sin marcas ni salpicaduras' }, { id: 'ban_7', texto: 'Paredes sin manchas, sin humedad' }, { id: 'ban_8', texto: 'Cero cabellos en piso y superficies' }, { id: 'ban_9', texto: 'Esquinas de piso sin pelos ni residuos' }, { id: 'ban_10', texto: 'Caneca lavada desinfectada, seca, bolsa nueva' }, { id: 'ban_11', texto: 'Papel higiénico, jabones y shampoo nuevos' }
                         ]
                     },
                     {
-                        titulo: 'Sala y Comedor',
+                        titulo: 'Sala y Comedor', icono: '🛋️',
                         items: [
                             { id: 'sal_1', texto: 'Comedor desinfectado, sin manchas' }, { id: 'sal_2', texto: 'Sillas sin mancha ni polvo' }, { id: 'sal_3', texto: 'Cuadros y espejos alineados y limpios' }, { id: 'sal_4', texto: 'Tapetes aspirados y sin manchas, secos, sin olores' }, { id: 'sal_5', texto: 'Individuales desinfectados, sin manchas' }, { id: 'sal_6', texto: 'Esquinas de piso sin pelos ni residuos' }, { id: 'sal_7', texto: 'Pisos sin polvo ni residuos debajo de muebles' }, { id: 'sal_8', texto: 'Sofá cama aspirado profundo, sin manchas, residuos o pelos (abierto)' }, { id: 'sal_9', texto: 'Cojines sin manchas, sin pelos' }, { id: 'sal_10', texto: 'Mesa de centro desinfectada, sin manchas' }, { id: 'sal_11', texto: 'TV frontal y posterior sin polvo detrás, en conexiones y soporte' }, { id: 'sal_12', texto: 'Cables TV organizados y ocultos' }, { id: 'sal_13', texto: 'Confirmación de funcionamiento de TV' }, { id: 'sal_14', texto: 'Control desinfectado, sin residuos en botones' }, { id: 'sal_15', texto: 'Paredes sin manchas ni marcas' }, { id: 'sal_16', texto: 'Plantas con agua, hojas y matera limpias' }, { id: 'sal_17', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }
                         ]
                     },
                     {
-                        titulo: 'Alcoba y Zona de Trabajo',
+                        titulo: 'Alcoba y Zona de Trabajo', icono: '🛏️',
                         items: [
                             { id: 'alc_1', texto: 'Cama, sábanas tensadas, sin pelos, ni manchas' }, { id: 'alc_2', texto: 'Cobijas sin manchas, sin olores' }, { id: 'alc_3', texto: 'Almohadas sin manchas, buen olor' }, { id: 'alc_4', texto: 'Juegos adicionales guardados, sin manchas, residuos, con buen olor' }, { id: 'alc_5', texto: 'Juegos de cama doblados perfectamente, organizados' }, { id: 'alc_6', texto: 'Tapetes aspirados y sin manchas' }, { id: 'alc_7', texto: 'Ventanas con vidrios impecables y rieles limpios interior y exterior' }, { id: 'alc_8', texto: 'Mesas de noche desinfectadas, sin manchas, sin residuos' }, { id: 'alc_9', texto: 'Debajo de la cama sin polvo, sin residuos' }, { id: 'alc_10', texto: 'Closet y cajones interior limpio, sin residuos, sin polvo' }, { id: 'alc_11', texto: 'Lámparas recargadas, funcionando' }, { id: 'alc_12', texto: 'Esquinas de piso sin pelos ni residuos' }, { id: 'alc_13', texto: 'Escritorio con superficie limpia y desinfectada' }, { id: 'alc_14', texto: 'Silla sin polvo ni manchas' }, { id: 'alc_15', texto: 'Cables organizados' }, { id: 'alc_16', texto: 'Pisos sin polvo ni residuos debajo de muebles' }, { id: 'alc_17', texto: 'Conexiones eléctricas en funcionamiento' }, { id: 'alc_18', texto: 'WiFi funcionando' }, { id: 'alc_19', texto: 'Verificar funcionamiento de electrodomésticos' }
                         ]
@@ -853,18 +904,41 @@
                     }
                     this.reporteActivo = reporte || {};
 
-                    // Evaluar el Checklist
+                    // 1. Preparar Consumos Auditados (Editables)
+                    this.consumosAuditados = {};
+                    const prop = this.propiedades.find(p => String(p.id) === String(tarea.propiedad_id));
+                    let invActual = prop ? prop.inventario : null;
+                    if (typeof invActual === 'string') invActual = JSON.parse(invActual);
+
+                    // Cargamos todo el inventario de consumibles en 0, luego le sumamos lo que dijo el empleado
+                    if (invActual && invActual.Consumible) {
+                        Object.keys(invActual.Consumible).forEach(k => {
+                            this.consumosAuditados[k] = this.reporteActivo.consumos_utilizados?.[k] || 0;
+                        });
+                    }
+                    if (this.reporteActivo.consumos_utilizados) {
+                        Object.keys(this.reporteActivo.consumos_utilizados).forEach(k => {
+                            if (this.consumosAuditados[k] === undefined) this.consumosAuditados[k] = this.reporteActivo.consumos_utilizados[k];
+                        });
+                    }
+
+                    // 2. Evaluar Faltantes del Checklist para Lado Izquierdo
                     const total = this.categoriasChecklist.reduce((acc, cat) => acc + cat.items.length, 0);
                     let marcadas = 0;
                     let faltantes = [];
                     const checks = this.reporteActivo.checklist_marcado || {};
 
+                    // 3. Preparar Auditoria Checklist para Lado Derecho
+                    this.auditoriaChecklist = {};
+
                     this.categoriasChecklist.forEach(cat => {
                         cat.items.forEach(item => {
                             if (checks[item.id]) {
                                 marcadas++;
+                                this.auditoriaChecklist[item.id] = 'bien'; // Por defecto lo ponemos 'bien' si el empleado lo marcó
                             } else {
                                 faltantes.push(`${cat.titulo}: ${item.texto}`);
+                                this.auditoriaChecklist[item.id] = 'no_hecho'; // Por defecto 'no hecho' si no lo marcó
                             }
                         });
                     });
@@ -875,11 +949,50 @@
 
                 async aprobarInspeccion() {
                     this.cargando = true;
+
+                    // 1. Calcular y aplicar la corrección de Inventario
+                    const prop = this.propiedades.find(p => String(p.id) === String(this.tareaAInspeccionar.propiedad_id));
+                    let invActual = prop ? prop.inventario : null;
+                    if (typeof invActual === 'string') invActual = JSON.parse(invActual);
+
+                    if (invActual && invActual.Consumible) {
+                        for (let key in this.consumosAuditados) {
+                            const auditado = this.consumosAuditados[key];
+                            const reportado = this.reporteActivo.consumos_utilizados?.[key] || 0;
+                            const delta = auditado - reportado; // Si reportó 2 y yo digo que fueron 3, delta es +1
+
+                            // Ajustamos el inventario real restándole ese extra que gastó
+                            if (delta !== 0 && invActual.Consumible[key] !== undefined) {
+                                invActual.Consumible[key] -= delta;
+                                if (invActual.Consumible[key] < 0) invActual.Consumible[key] = 0;
+                            }
+                        }
+
+                        await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.tareaAInspeccionar.propiedad_id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ inventario: invActual })
+                        });
+                    }
+
+                    // 2. Guardar la corrección dentro del reporte_empleado
+                    const reporteActualizado = {
+                        ...this.reporteActivo,
+                        auditoria_ama_llaves: {
+                            consumos_corregidos: this.consumosAuditados,
+                            checklist_auditado: this.auditoriaChecklist,
+                            fecha_auditoria: new Date().toISOString()
+                        }
+                    };
+
                     try {
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaAInspeccionar.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ estado: 'Inspeccionada' })
+                            body: JSON.stringify({
+                                estado: 'Inspeccionada',
+                                reporte_empleado: reporteActualizado
+                            })
                         });
                         alert('✅ Inspección Aprobada. La suite está lista para el próximo huésped.');
                         this.modalInspeccion = false;
@@ -889,15 +1002,38 @@
                 },
 
                 async rechazarInspeccion() {
-                    const confirmar = confirm("¿Estás seguro de devolver este aseo? Volverá a la lista de pendientes del empleado.");
+                    const confirmar = confirm("¿Estás seguro de devolver este aseo? Volverá a la lista de pendientes del empleado y se devolverá al inventario lo que él había descontado.");
                     if (!confirmar) return;
 
                     this.cargando = true;
                     try {
+                        // 1. Devolver el inventario descontado por el empleado
+                        const prop = this.propiedades.find(p => String(p.id) === String(this.tareaAInspeccionar.propiedad_id));
+                        let invActual = prop ? prop.inventario : null;
+                        if (typeof invActual === 'string') invActual = JSON.parse(invActual);
+
+                        if (invActual && invActual.Consumible && this.reporteActivo.consumos_utilizados) {
+                            for (let key in this.reporteActivo.consumos_utilizados) {
+                                if (invActual.Consumible[key] !== undefined) {
+                                    invActual.Consumible[key] += this.reporteActivo.consumos_utilizados[key]; // Se lo sumamos de vuelta
+                                }
+                            }
+                            await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.tareaAInspeccionar.propiedad_id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ inventario: invActual })
+                            });
+                        }
+
+                        // 2. Cambiar estado a Pendiente y borrar el reporte para que arranque limpio
                         await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaAInspeccionar.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ estado: 'Pendiente' }) // Lo devolvemos al empleado
+                            body: JSON.stringify({
+                                estado: 'Pendiente',
+                                reporte_empleado: null,
+                                tiempo_segundos: 0
+                            })
                         });
                         alert('⚠️ Aseo devuelto. El empleado deberá retomar la tarea.');
                         this.modalInspeccion = false;
