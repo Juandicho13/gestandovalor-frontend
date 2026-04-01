@@ -1121,14 +1121,13 @@
                 async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
 
-                    // ✨ CANDADO 3 (Definitivo): Si por alguna razón los días son iguales, bloquea el guardado
+                    // ✨ CANDADO 3: Bloqueo de fechas iguales
                     if (this.formReserva.check_in === this.formReserva.check_out) {
-                        alert("⚠️ ERROR: La reserva debe ser de mínimo 1 noche. El Check-in y Check-out no pueden ser el mismo día.");
-                        return; // No lo deja guardar
+                        alert("⚠️ ERROR: La reserva debe ser de mínimo 1 noche.");
+                        return;
                     }
 
-                    this.cargando = true;
-
+                    // 1. Preparamos los datos
                     const dateInString = this.formReserva.check_in + "T" + this.formReserva.hora_llegada + ":00";
                     const dateOutString = this.formReserva.check_out + "T" + this.formReserva.hora_salida + ":00";
 
@@ -1150,6 +1149,24 @@
                         method = 'PATCH';
                     }
 
+                    // 🚀 2. MAGIA OPTIMISTA: Pintamos en pantalla ANTES de enviar al servidor
+                    let tempId = this.formReserva.id ? this.formReserva.id : 'temp_' + Date.now();
+                    let reservaVisual = { ...payload, id: tempId };
+
+                    let backupReservas = [...this.reservas]; // Guardamos una copia por si el server falla
+
+                    if (!this.formReserva.id) {
+                        this.reservas.push(reservaVisual);
+                    } else {
+                        let idx = this.reservas.findIndex(r => r.id === this.formReserva.id);
+                        if (idx > -1) this.reservas[idx] = reservaVisual;
+                    }
+
+                    this.generarMesVisual();
+                    this.calcularStats();
+                    this.modalReserva = false; // Cerramos el modal AL INSTANTE
+
+                    // ☁️ 3. ENVIAMOS AL SERVIDOR EN SEGUNDO PLANO
                     try {
                         const res = await fetch(url, {
                             method: method, headers: { 'Content-Type': 'application/json' },
@@ -1158,19 +1175,28 @@
 
                         if (res.ok) {
                             const resGuardada = await res.json();
-                            if (!this.formReserva.id) this.reservas.push(resGuardada);
-                            else {
-                                let idx = this.reservas.findIndex(r => r.id === this.formReserva.id);
-                                if (idx > -1) this.reservas[idx] = resGuardada;
+                            // Actualizamos nuestra reserva temporal silenciosamente
+                            let idx = this.reservas.findIndex(r => r.id === tempId);
+                            if (idx > -1) {
+                                this.reservas[idx] = resGuardada;
+                                this.generarMesVisual();
+                                this.calcularStats();
                             }
+                        } else {
+                            // 🛑 FALLÓ EL SERVIDOR: Revertimos los cambios visuales
+                            this.reservas = backupReservas;
                             this.generarMesVisual();
                             this.calcularStats();
-                            this.modalReserva = false;
-                        } else {
                             const errorData = await res.json();
-                            alert(`Error:\n${errorData.message || 'Las fechas ya están ocupadas.'}`);
+                            alert(`⚠️ Error del Servidor:\n${errorData.message || 'Las fechas ya están ocupadas.'}`);
                         }
-                    } catch (e) { alert("Error de conexión al servidor."); } finally { this.cargando = false; }
+                    } catch (e) {
+                        // 🛑 FALLÓ EL INTERNET: Revertimos los cambios visuales
+                        this.reservas = backupReservas;
+                        this.generarMesVisual();
+                        this.calcularStats();
+                        alert("⚠️ Error de conexión. La reserva no se pudo guardar.");
+                    }
                 },
 
                 async borrarReservaDirecto(id) {
