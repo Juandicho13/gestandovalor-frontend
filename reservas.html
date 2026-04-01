@@ -893,13 +893,23 @@
                 },
 
                 abrirReservaDesdeRango() {
+                    let fIn = this.rangoSeleccionado[0];
+                    let fOut = this.rangoSeleccionado[1];
+
+                    // ✨ CANDADO 1: Si seleccionaron el mismo día en la cuadrícula, sumar 1 día al check-out
+                    if (fIn === fOut) {
+                        let dateObj = new Date(fIn + "T12:00:00");
+                        dateObj.setDate(dateObj.getDate() + 1);
+                        fOut = dateObj.toISOString().split('T')[0];
+                    }
+
                     this.formReserva = {
-                        id: null, huesped_nombre: '', check_in: this.rangoSeleccionado[0], check_out: this.rangoSeleccionado[1],
+                        id: null, huesped_nombre: '', check_in: fIn, check_out: fOut,
                         hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
                     };
                     this.cerrarAccionRango();
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
-                    this.recalcularTotal(); // ✨ AQUI LA MAGIA PARA QUE SALGA EL PRECIO DESDE EL INICIO
+                    this.recalcularTotal();
                     this.modalReserva = true;
                 },
 
@@ -1091,12 +1101,12 @@
                             locale: "es",
                             onChange: function (selectedDates, dateStr, instance) {
                                 if (selectedDates.length === 2) {
-                                    // ✨ LA MAGIA: Si eligen el mismo día, le sumamos 1 noche automáticamente
+                                    // ✨ CANDADO 2: Si eligen el mismo día en el modal, se corrige automático
                                     if (selectedDates[0].getTime() === selectedDates[1].getTime()) {
                                         let nextDay = new Date(selectedDates[0]);
                                         nextDay.setDate(nextDay.getDate() + 1);
-                                        instance.setDate([selectedDates[0], nextDay], false);
-                                        selectedDates = [selectedDates[0], nextDay];
+                                        instance.setDate([selectedDates[0], nextDay], true);
+                                        return;
                                     }
 
                                     that.formReserva.check_in = instance.formatDate(selectedDates[0], "Y-m-d");
@@ -1110,6 +1120,13 @@
 
                 async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
+
+                    // ✨ CANDADO 3 (Definitivo): Si por alguna razón los días son iguales, bloquea el guardado
+                    if (this.formReserva.check_in === this.formReserva.check_out) {
+                        alert("⚠️ ERROR: La reserva debe ser de mínimo 1 noche. El Check-in y Check-out no pueden ser el mismo día.");
+                        return; // No lo deja guardar
+                    }
+
                     this.cargando = true;
 
                     const dateInString = this.formReserva.check_in + "T" + this.formReserva.hora_llegada + ":00";
