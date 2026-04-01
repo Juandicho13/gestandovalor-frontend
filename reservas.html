@@ -903,6 +903,13 @@
                         fOut = dateObj.toISOString().split('T')[0];
                     }
 
+                    // ✨ CANDADO ANTICHOQUES PARA LA CUADRÍCULA
+                    if (this.haySuperposicion(fIn, fOut)) {
+                        alert("⚠️ El rango que seleccionaste choca con una reserva existente en el calendario.");
+                        this.cerrarAccionRango();
+                        return;
+                    }
+
                     this.formReserva = {
                         id: null, huesped_nombre: '', check_in: fIn, check_out: fOut,
                         hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
@@ -917,6 +924,26 @@
                     this.modalAccionRango = false;
                     this.rangoSeleccionado = [];
                     this.generarMesVisual();
+                },
+
+                // ✨ NUEVO: Función para detectar choques de reservas
+                haySuperposicion(checkInStr, checkOutStr, excludeReservaId = null) {
+                    if (!checkInStr || !checkOutStr) return false;
+
+                    const inTime = new Date(checkInStr + "T12:00:00").getTime();
+                    const outTime = new Date(checkOutStr + "T12:00:00").getTime();
+
+                    return this.reservas.some(res => {
+                        if (excludeReservaId && res.id === excludeReservaId) return false;
+
+                        const resInTime = new Date(getLocalDateString(res.check_in) + "T12:00:00").getTime();
+                        const resOutTime = new Date(getLocalDateString(res.check_out) + "T12:00:00").getTime();
+
+                        // Hay cruce si el nuevo Check-in es ANTES del Check-out existente
+                        // Y el nuevo Check-out es DESPUÉS del Check-in existente.
+                        // (Permite que alguien salga el mismo día que otro entra)
+                        return (inTime < resOutTime) && (outTime > resInTime);
+                    });
                 },
 
                 async guardarTarifaRapida() {
@@ -1109,8 +1136,21 @@
                                         return;
                                     }
 
-                                    that.formReserva.check_in = instance.formatDate(selectedDates[0], "Y-m-d");
-                                    that.formReserva.check_out = instance.formatDate(selectedDates[1], "Y-m-d");
+                                    let chkIn = instance.formatDate(selectedDates[0], "Y-m-d");
+                                    let chkOut = instance.formatDate(selectedDates[1], "Y-m-d");
+
+                                    // ✨ CANDADO ANTICHOQUES: Verifica que no pise otra reserva
+                                    if (that.haySuperposicion(chkIn, chkOut, that.formReserva.id)) {
+                                        alert("⚠️ Las fechas seleccionadas chocan con una reserva existente. Por favor elige otras fechas.");
+                                        instance.clear();
+                                        that.formReserva.check_in = '';
+                                        that.formReserva.check_out = '';
+                                        that.formReserva.monto_total = '';
+                                        return;
+                                    }
+
+                                    that.formReserva.check_in = chkIn;
+                                    that.formReserva.check_out = chkOut;
                                     that.recalcularTotal();
                                 }
                             }
@@ -1124,6 +1164,12 @@
                     // ✨ CANDADO 3: Bloqueo de fechas iguales
                     if (this.formReserva.check_in === this.formReserva.check_out) {
                         alert("⚠️ ERROR: La reserva debe ser de mínimo 1 noche.");
+                        return;
+                    }
+
+                    // ✨ CANDADO 4 (Definitivo): Última revisión de choques antes de enviar
+                    if (this.haySuperposicion(this.formReserva.check_in, this.formReserva.check_out, this.formReserva.id)) {
+                        alert("⚠️ ERROR: Las fechas se cruzan con una reserva que ya está en el calendario.");
                         return;
                     }
 
