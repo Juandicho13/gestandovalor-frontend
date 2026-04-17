@@ -84,7 +84,8 @@
         class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/10 border-airbnb/20 bg-airbnb/20 bg-booking text-booking border-booking bg-booking/10 border-booking/20 bg-booking/20 bg-directo text-directo border-directo bg-directo/10 border-directo/20 bg-directo/20">
     </div>
 
-    <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
+    <div x-show="cargando"
+        class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
         <p class="font-bold text-navy animate-pulse">Sincronizando sistema...</p>
     </div>
@@ -993,22 +994,46 @@
                     });
                 },
 
+                // ✨ OPTIMISTIC UI PARA TARIFAS 🚀
                 async guardarTarifaRapida() {
                     if (this.rangoSeleccionado.length !== 2) return;
-                    this.cargando = true;
+
                     const payload = {
                         propiedad_id: this.propiedadActiva.id,
                         fecha_inicio: new Date(this.rangoSeleccionado[0] + "T12:00:00").toISOString(),
                         fecha_fin: new Date(this.rangoSeleccionado[1] + "T12:00:00").toISOString(),
                         precio: Number(this.precioEspecialTemporal)
                     };
+
+                    // ✨ MAGIA OPTIMISTA: Reflejamos el cambio en pantalla antes del servidor
+                    let tarifaTemporal = { ...payload, id: 'temp_' + Date.now() };
+                    this.tarifasEspeciales.push(tarifaTemporal);
+
+                    this.cerrarAccionRango(); // Cierra el modal y limpia la selección visualmente de inmediato
+
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/tarifas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/tarifas', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                        });
+
                         if (res.ok) {
-                            this.tarifasEspeciales.push(await res.json());
-                            this.cerrarAccionRango();
+                            const resGuardada = await res.json();
+                            // Reemplazamos la temporal por el ID real silenciosamente
+                            let idx = this.tarifasEspeciales.findIndex(t => t.id === tarifaTemporal.id);
+                            if (idx > -1) this.tarifasEspeciales[idx] = resGuardada;
+                        } else {
+                            // 🛑 FALLO DEL SERVIDOR
+                            this.tarifasEspeciales = this.tarifasEspeciales.filter(t => t.id !== tarifaTemporal.id);
+                            this.generarMesVisual();
+                            const err = await res.json();
+                            alert(`⚠️ Error del Servidor:\n${err.message || 'No se pudo guardar la tarifa.'}`);
                         }
-                    } catch (e) { alert("Error al guardar tarifa."); } finally { this.cargando = false; }
+                    } catch (e) {
+                        // 🛑 FALLO DE INTERNET
+                        this.tarifasEspeciales = this.tarifasEspeciales.filter(t => t.id !== tarifaTemporal.id);
+                        this.generarMesVisual();
+                        alert("⚠️ Error de conexión al intentar guardar la tarifa.");
+                    }
                 },
 
                 estaEnRango(fecha) {
@@ -1254,11 +1279,11 @@
                         method = 'PATCH';
                     }
 
-                    // 🚀 2. MAGIA OPTIMISTA: Pintamos en pantalla ANTES de enviar al servidor
+                    // 🚀 MAGIA OPTIMISTA PARA RESERVAS
                     let tempId = this.formReserva.id ? this.formReserva.id : 'temp_' + Date.now();
                     let reservaVisual = { ...payload, id: tempId };
 
-                    let backupReservas = [...this.reservas]; // Guardamos una copia por si el server falla
+                    let backupReservas = [...this.reservas];
 
                     if (!this.formReserva.id) {
                         this.reservas.push(reservaVisual);
@@ -1269,9 +1294,8 @@
 
                     this.generarMesVisual();
                     this.calcularStats();
-                    this.modalReserva = false; // Cerramos el modal AL INSTANTE
+                    this.modalReserva = false;
 
-                    // ☁️ 3. ENVIAMOS AL SERVIDOR EN SEGUNDO PLANO
                     try {
                         const res = await fetch(url, {
                             method: method, headers: { 'Content-Type': 'application/json' },
@@ -1280,7 +1304,6 @@
 
                         if (res.ok) {
                             const resGuardada = await res.json();
-                            // Actualizamos nuestra reserva temporal silenciosamente
                             let idx = this.reservas.findIndex(r => r.id === tempId);
                             if (idx > -1) {
                                 this.reservas[idx] = resGuardada;
@@ -1288,7 +1311,6 @@
                                 this.calcularStats();
                             }
                         } else {
-                            // 🛑 FALLÓ EL SERVIDOR: Revertimos los cambios visuales
                             this.reservas = backupReservas;
                             this.generarMesVisual();
                             this.calcularStats();
@@ -1296,7 +1318,6 @@
                             alert(`⚠️ Error del Servidor:\n${errorData.message || 'Las fechas ya están ocupadas.'}`);
                         }
                     } catch (e) {
-                        // 🛑 FALLÓ EL INTERNET: Revertimos los cambios visuales
                         this.reservas = backupReservas;
                         this.generarMesVisual();
                         this.calcularStats();
@@ -1306,15 +1327,27 @@
 
                 async borrarReservaDirecto(id) {
                     if (!confirm("¿Borrar reserva permanentemente?")) return;
-                    this.cargando = true;
+
+                    // Magia optimista para el borrado
+                    let backupReservas = [...this.reservas];
+                    this.reservas = this.reservas.filter(r => r.id !== id);
+                    this.generarMesVisual();
+                    this.calcularStats();
+
                     try {
                         const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/${id}`, { method: 'DELETE' });
-                        if (res.ok) {
-                            this.reservas = this.reservas.filter(r => r.id !== id);
+                        if (!res.ok) {
+                            this.reservas = backupReservas;
                             this.generarMesVisual();
                             this.calcularStats();
-                        } else alert("Error al borrar en el servidor.");
-                    } catch (e) { alert("Error de conexión."); } finally { this.cargando = false; }
+                            alert("Error al borrar en el servidor.");
+                        }
+                    } catch (e) {
+                        this.reservas = backupReservas;
+                        this.generarMesVisual();
+                        this.calcularStats();
+                        alert("Error de conexión al intentar borrar.");
+                    }
                 },
 
                 formatearPrecioCalendario(valor) { return valor ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor) : ''; },
