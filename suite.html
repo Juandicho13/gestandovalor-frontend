@@ -268,50 +268,50 @@
             </div>
 
             <div class="w-full lg:w-[35%] xl:w-[30%] relative z-40">
-                <div class="sticky top-32 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-6 lg:p-8">
+                <div class="sticky top-28 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-5 lg:p-6">
 
-                    <div class="flex justify-between items-end mb-8">
+                    <div class="flex justify-between items-end mb-5">
                         <div>
-                            <span class="text-2xl lg:text-3xl font-extrabold text-white"
+                            <span class="text-2xl font-extrabold text-white"
                                 x-text="formatearDinero(calcularPromedioNoche())"></span>
-                            <span class="text-gray-300 font-medium block"
+                            <span class="text-gray-300 font-medium text-sm block"
                                 x-text="noches > 0 ? '/ noche (promedio)' : '/ noche base'"></span>
                         </div>
                     </div>
 
                     <div
-                        class="border border-white/20 rounded-2xl mb-6 focus-within:border-gold transition-colors relative">
+                        class="border border-white/20 rounded-xl mb-4 focus-within:border-gold transition-colors relative">
 
-                        <div class="flex border-b border-white/20 relative cursor-pointer hover:bg-white/5 transition-colors rounded-t-2xl"
+                        <div class="flex border-b border-white/20 relative cursor-pointer hover:bg-white/5 transition-colors rounded-t-xl"
                             id="date-trigger">
-                            <div class="w-1/2 p-3 sm:p-4 border-r border-white/20 relative pointer-events-none">
+                            <div class="w-1/2 p-3 border-r border-white/20 relative pointer-events-none">
                                 <label
                                     class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Llegada</label>
                                 <input type="text" x-model="checkinLabel" placeholder="Agregar fecha"
-                                    class="w-full text-sm font-bold text-white outline-none bg-transparent mt-1 placeholder-white/50"
+                                    class="w-full text-sm font-bold text-white outline-none bg-transparent mt-0.5 placeholder-white/50"
                                     readonly>
                             </div>
-                            <div class="w-1/2 p-3 sm:p-4 relative pointer-events-none">
+                            <div class="w-1/2 p-3 relative pointer-events-none">
                                 <label
                                     class="block text-[10px] font-bold uppercase tracking-widest text-white/70">Salida</label>
                                 <input type="text" x-model="checkoutLabel" placeholder="Agregar fecha"
-                                    class="w-full text-sm font-bold text-white outline-none bg-transparent mt-1 placeholder-white/50"
+                                    class="w-full text-sm font-bold text-white outline-none bg-transparent mt-0.5 placeholder-white/50"
                                     readonly>
                             </div>
                             <input id="suite-calendar" type="text" class="absolute inset-0 opacity-0 cursor-pointer">
                         </div>
 
-                        <div class="p-3 sm:p-4 cursor-pointer relative hover:bg-white/5 transition-colors rounded-b-2xl"
+                        <div class="p-3 cursor-pointer relative hover:bg-white/5 transition-colors rounded-b-xl"
                             @click="openWidgetGuests = !openWidgetGuests">
                             <label
                                 class="block text-[10px] font-bold uppercase tracking-widest text-white/70 pointer-events-none">Acompañantes</label>
                             <div
-                                class="text-sm font-bold text-white flex justify-between items-center mt-1 pointer-events-none">
+                                class="text-sm font-bold text-white flex justify-between items-center mt-0.5 pointer-events-none">
                                 <div class="truncate pr-2">
                                     <span
                                         x-text="`${adults + children} huésped${(adults + children) !== 1 ? 'es' : ''}${infants > 0 ? ', ' + infants + ' bb' : ''}${pets > 0 ? ', ' + pets + ' masc' : ''}`"></span>
                                 </div>
-                                <svg class="w-5 h-5 text-gold transform transition-transform flex-shrink-0"
+                                <svg class="w-4 h-4 text-gold transform transition-transform flex-shrink-0"
                                     :class="openWidgetGuests ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -326,7 +326,7 @@
                                 <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
                                         <div class="font-bold text-navy text-base">Adultos</div>
-                                        <div class="text-sm text-gray-400 font-medium">13+ años</div>
+                                        <div class="text-xs text-gray-400 font-medium">13+ años</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="adults > 1 ? adults-- : null"
@@ -344,7 +344,7 @@
                                 <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
                                         <div class="font-bold text-navy text-base">Niños</div>
-                                        <div class="text-sm text-gray-400 font-medium">Edades 2 – 12</div>
+                                        <div class="text-xs text-gray-400 font-medium">Edades 2 – 12</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="children > 0 ? children-- : null"
@@ -406,14 +406,14 @@
                     </div>
 
                     <button
-                        class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-4 rounded-full transition-transform hover:-translate-y-1 shadow-[0_0_15px_rgba(212,175,55,0.3)] text-lg mb-4"
+                        class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3.5 rounded-full transition-transform hover:-translate-y-0.5 shadow-lg text-base mb-2"
                         @click="abrirModalPago()">
                         Reservar
                     </button>
-                    <p class="text-center text-xs text-gray-400 mt-4">Confirmación directa por WhatsApp</p>
+                    <p class="text-center text-[10px] text-gray-400 mt-2">Confirmación directa por WhatsApp</p>
 
-                    <div x-show="noches > 0" x-transition class="mt-6">
-                        <div class="space-y-4 text-gray-300 text-sm font-medium border-b border-white/10 pb-6 mb-6">
+                    <div x-show="noches > 0" x-transition class="mt-4">
+                        <div class="space-y-2.5 text-gray-300 text-xs font-medium border-b border-white/10 pb-4 mb-4">
 
                             <div class="flex justify-between">
                                 <span class="underline"
@@ -443,8 +443,8 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-between items-center font-extrabold text-white text-xl">
-                            <span>Total <span class="text-sm font-medium text-gray-300">(COP)</span></span>
+                        <div class="flex justify-between items-center font-extrabold text-white text-lg">
+                            <span>Total <span class="text-xs font-medium text-gray-300">(COP)</span></span>
                             <span class="text-gold" x-text="formatearDinero(calcularTotal())"></span>
                         </div>
                     </div>
@@ -840,7 +840,6 @@
                     return total;
                 },
 
-                // ✨ CÁLCULO DE PROMEDIO
                 calcularPromedioNoche() {
                     if (this.noches === 0) return this.propiedad.precio_noche;
                     return this.calcularSubtotalNoches() / this.noches;
