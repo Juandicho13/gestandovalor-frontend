@@ -273,8 +273,9 @@
                     <div class="flex justify-between items-end mb-8">
                         <div>
                             <span class="text-2xl lg:text-3xl font-extrabold text-white"
-                                x-text="formatearDinero(propiedad.precio_noche)"></span>
-                            <span class="text-gray-300 font-medium block">/ noche base</span>
+                                x-text="formatearDinero(calcularPromedioNoche())"></span>
+                            <span class="text-gray-300 font-medium block"
+                                x-text="noches > 0 ? '/ noche (promedio)' : '/ noche base'"></span>
                         </div>
                     </div>
 
@@ -612,17 +613,16 @@
                 cargando: true,
                 cargandoPago: false,
                 propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
-                reservasFechas: [], // Aquí guardaremos las fechas ocupadas para bloquear el calendario
+                reservasFechas: [],
 
                 openModalText: false,
 
-                // ✨ NUEVOS DATOS DESGLOSADOS
                 adults: 1,
                 children: 0,
                 infants: 0,
                 pets: 0,
 
-                nombreHuesped: '', // Para guardar en la BD directamente
+                nombreHuesped: '',
 
                 openWidgetGuests: false,
                 checkinRaw: '', checkoutRaw: '',
@@ -632,7 +632,7 @@
 
                 modalPago: false,
                 metodoSeleccionado: '',
-                telefonoAdmin: '3185388292', // <-- Tu WhatsApp configurado
+                telefonoAdmin: '3185388292',
 
                 insigniasPropiedad: [
                     { titulo: 'Ubicación fantástica', descripcion: 'El 100% de huéspedes recientes calificó la ubicación con 5 estrellas.', iconoSVG: '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />' },
@@ -658,13 +658,11 @@
 
                     if (!id) { window.location.href = 'alojamientos.html'; return; }
 
-                    // ✨ LECTURA DEL DESGLOSE DESDE LA URL
                     if (params.get('ad')) this.adults = parseInt(params.get('ad'));
                     if (params.get('ni')) this.children = parseInt(params.get('ni'));
                     if (params.get('bb')) this.infants = parseInt(params.get('bb'));
                     if (params.get('ma')) this.pets = parseInt(params.get('ma'));
 
-                    // Fallback por si usan el link viejo con 'pax'
                     if (params.get('pax') && !params.get('ad')) {
                         let parsedPax = parseInt(params.get('pax'));
                         this.adults = parsedPax > 0 ? parsedPax : 1;
@@ -679,14 +677,12 @@
                             this.propiedad = await res.json();
                             this.propiedad.precio_noche = Number(this.propiedad.precio_noche) || 0;
 
-                            // ✨ DESCARGAMOS TARIFAS ESPECIALES
                             try {
                                 const tRes = await fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${id}`);
                                 if (tRes.ok) this.propiedad.tarifas_especiales = await tRes.json();
                                 else this.propiedad.tarifas_especiales = [];
                             } catch (e) { this.propiedad.tarifas_especiales = []; }
 
-                            // Traemos las reservas de esta propiedad para bloquear el calendario del cliente
                             const resRes = await fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${id}`);
                             if (resRes.ok) this.reservasFechas = await resRes.json();
 
@@ -756,6 +752,8 @@
                     if (defaultIn && defaultOut) {
                         const d1 = new Date(defaultIn + "T12:00:00");
                         const d2 = new Date(defaultOut + "T12:00:00");
+                        this.checkinRaw = defaultIn;
+                        this.checkoutRaw = defaultOut;
                         this.checkinLabel = d1.toLocaleDateString('es', { day: 'numeric', month: 'short' });
                         this.checkoutLabel = d2.toLocaleDateString('es', { day: 'numeric', month: 'short' });
                         this.calcularNoches(d1, d2);
@@ -820,7 +818,6 @@
                     });
                 },
 
-                // ✨ CÁLCULO DÍA POR DÍA INYECTADO (AQUÍ ESTÁ LA MAGIA)
                 obtenerPrecioPorDia(fechaStr) {
                     if (!fechaStr) return this.propiedad.precio_noche;
                     const f = new Date(fechaStr + "T12:00:00").getTime();
@@ -843,7 +840,12 @@
                     return total;
                 },
 
-                // ✨ NUEVO CÁLCULO DE TOTAL BASADO EN EL DÍA A DÍA
+                // ✨ CÁLCULO DE PROMEDIO
+                calcularPromedioNoche() {
+                    if (this.noches === 0) return this.propiedad.precio_noche;
+                    return this.calcularSubtotalNoches() / this.noches;
+                },
+
                 calcularTotal() {
                     let totalBase = this.calcularSubtotalNoches();
                     let totalAseo = this.propiedad.tarifa_aseo || 0;
@@ -882,7 +884,6 @@
                     const totalPagar = this.calcularTotal();
                     const totalStr = this.formatearDinero(totalPagar);
 
-                    // ✨ 1. CREAMOS LA RESERVA AUTOMÁTICA EN LA BASE DE DATOS
                     try {
                         const payload = {
                             propiedad_id: this.propiedad.id,
@@ -890,12 +891,11 @@
                             check_in: new Date(this.checkinRaw + "T15:00:00").toISOString(),
                             check_out: new Date(this.checkoutRaw + "T11:00:00").toISOString(),
 
-                            // Desglose enviado a la base de datos
                             adultos: this.adults,
                             ninos: this.children,
                             bebes: this.infants,
                             mascotas: this.pets,
-                            cantidad_huespedes: this.adults + this.children, // Pagadores
+                            cantidad_huespedes: this.adults + this.children,
 
                             monto_total: totalPagar,
                             canal: 'Directa',
@@ -910,7 +910,6 @@
 
                         if (!res.ok) throw new Error("Las fechas fueron ocupadas recientemente.");
 
-                        // ✨ 2. REDIRECCIÓN AL WHATSAPP O MERCADO PAGO
                         if (this.metodoSeleccionado === 'Transferencia') {
                             let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
                             texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
@@ -927,7 +926,6 @@
                             const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
                             window.open(urlWA, '_blank');
 
-                            // Recargar la página para limpiar el calendario después del éxito
                             setTimeout(() => window.location.reload(), 2000);
                         }
 
