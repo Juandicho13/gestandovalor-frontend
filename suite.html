@@ -98,7 +98,7 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-white" x-data="suiteApp()" x-init="initApp()"
-    :class="(openModalText || modalPago) ? 'overflow-hidden' : ''">
+    :class="(openModalText || modalPago || mobileMenuOpen) ? 'overflow-hidden' : ''">
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mb-4"></div>
@@ -106,27 +106,78 @@
     </div>
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
-        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-visible border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
+
         <div
-            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300 z-[60]">
             <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
             <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
             <a href="alojamientos.html"
                 class="text-sm font-medium hover:text-gold transition-colors text-white border-b-2 border-gold pb-1">Alojamientos</a>
-            <a href="login.html"
-                class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar
-                Sesión</a>
         </div>
-        <div class="flex items-center gap-4 flex-shrink-0">
+
+        <div class="flex items-center gap-4 flex-shrink-0 z-[60]">
             <button
-                class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
+                class="hidden md:block bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
+
+            <div class="relative shrink-0 hidden md:block" @click.away="menuPerfil = false">
+                <button @click="menuPerfil = !menuPerfil"
+                    class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold focus:outline-none hover:scale-105 transition-transform">
+                    RI
+                </button>
+
+                <div x-show="menuPerfil" x-transition.opacity style="display: none;"
+                    class="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-2xl py-2 border border-gray-100 text-left overflow-hidden">
+                    <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                        <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-0.5">Conectado como</p>
+                        <p class="text-sm font-extrabold text-navy truncate">Ricardo</p>
+                    </div>
+                    <a href="login.html"
+                        class="flex items-center gap-2 px-5 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors w-full text-left">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Salir
+                    </a>
+                </div>
+            </div>
+            <button @click="mobileMenuOpen = !mobileMenuOpen"
+                class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10 ml-2">
+                <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                    :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+                <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                    :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+                <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                    :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+            </button>
         </div>
     </nav>
 
+    <div x-show="mobileMenuOpen" style="display: none;" x-transition.opacity
+        class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+        <div class="flex flex-col items-center gap-8 w-full mt-10">
+            <div
+                class="w-16 h-16 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold text-2xl shadow-lg border-2 border-gold mb-2">
+                RI</div>
+            <a href="index.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white">Inicio</a>
+            <a href="alojamientos.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
+
+            <a href="login.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-bold text-red-500 hover:text-red-400 mt-4 flex items-center gap-2 bg-red-500/10 px-8 py-3 rounded-full border border-red-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Salir
+            </a>
+        </div>
+    </div>
     <main class="pt-36 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando" style="display: none;">
 
         <section class="mb-8">
@@ -612,6 +663,8 @@
             return {
                 cargando: true,
                 cargandoPago: false,
+                mobileMenuOpen: false, // ✨ AÑADIDO ESTADO MENÚ MÓVIL
+                menuPerfil: false,     // ✨ AÑADIDO ESTADO BOLITA DE PERFIL
                 propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
                 reservasFechas: [],
 
