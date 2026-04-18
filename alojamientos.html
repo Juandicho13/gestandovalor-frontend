@@ -179,19 +179,23 @@
                     <div x-show="openGuests" @click.away="openGuests = false"
                         class="absolute top-[120%] right-0 w-[350px] md:w-[400px] bg-white rounded-[32px] shadow-2xl p-8 z-50 border border-gray-100 cursor-default text-left"
                         style="display: none;">
+
                         <div class="flex items-center justify-between py-4 border-b border-gray-100">
                             <div>
                                 <p class="font-bold text-navy">Adultos</p>
                                 <p class="text-xs text-gray-400">Edad 13+</p>
                             </div>
                             <div class="flex items-center gap-4">
-                                <button @click.stop="adults > 0 ? adults-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">-</button>
+                                <button @click.stop="adults > 1 ? adults-- : null"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy transition-colors"
+                                    :class="adults <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold'"
+                                    :disabled="adults <= 1">-</button>
                                 <span x-text="adults" class="w-6 text-center font-extrabold text-navy"></span>
                                 <button @click.stop="adults++"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">+</button>
                             </div>
                         </div>
+
                         <div class="flex items-center justify-between py-4 border-b border-gray-100">
                             <div>
                                 <p class="font-bold text-navy">Niños</p>
@@ -199,12 +203,15 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <button @click.stop="children > 0 ? children-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">-</button>
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy transition-colors"
+                                    :class="children <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold'"
+                                    :disabled="children <= 0">-</button>
                                 <span x-text="children" class="w-6 text-center font-extrabold text-navy"></span>
-                                <button @click.stop="children++"
+                                <button @click.stop="children++; if(adults === 0) adults = 1;"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">+</button>
                             </div>
                         </div>
+
                         <div class="flex items-center justify-between py-4 border-b border-gray-100 relative">
                             <div class="absolute left-[-32px] top-0 bottom-0 w-1 bg-green-400" x-show="infants > 0">
                             </div>
@@ -214,12 +221,15 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <button @click.stop="infants > 0 ? infants-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">-</button>
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy transition-colors"
+                                    :class="infants <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold'"
+                                    :disabled="infants <= 0">-</button>
                                 <span x-text="infants" class="w-6 text-center font-extrabold text-navy"></span>
-                                <button @click.stop="infants++"
+                                <button @click.stop="infants++; if(adults === 0) adults = 1;"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">+</button>
                             </div>
                         </div>
+
                         <div class="flex items-center justify-between py-4 relative">
                             <div class="absolute left-[-32px] top-0 bottom-0 w-1 bg-yellow-500" x-show="pets > 0"></div>
                             <div>
@@ -228,9 +238,11 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <button @click.stop="pets > 0 ? pets-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">-</button>
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy transition-colors"
+                                    :class="pets <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold'"
+                                    :disabled="pets <= 0">-</button>
                                 <span x-text="pets" class="w-6 text-center font-extrabold text-navy"></span>
-                                <button @click.stop="pets++"
+                                <button @click.stop="pets++; if(adults === 0) adults = 1;"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">+</button>
                             </div>
                         </div>
@@ -258,7 +270,7 @@
                 location: '',
                 checkin: '',
                 checkout: '',
-                adults: 1, // ✨ 1 adulto por defecto
+                adults: 1, // ✨ Mínimo siempre 1
                 children: 0,
                 infants: 0,
                 pets: 0,
@@ -300,13 +312,12 @@
                     }
                 },
 
-                // ✨ NUEVO FILTRO INTELIGENTE DE DESTINOS
                 async cargarDestinosDinamicos() {
                     try {
                         const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
                         if (res.ok) {
                             const data = await res.json();
-                            const lugaresMap = new Map(); // Usamos un Map para evitar duplicados por tildes o mayúsculas
+                            const lugaresMap = new Map();
 
                             data.forEach(p => {
                                 if (p.ciudad) {
@@ -314,7 +325,6 @@
                                     let depto = p.departamento ? p.departamento.trim() : '';
                                     let locStr = depto ? `${ciudad}, ${depto}` : ciudad;
 
-                                    // Llave limpia: minúsculas y sin tildes (ej: "chia, cundinamarca")
                                     let keyNormalizada = locStr
                                         .toLowerCase()
                                         .normalize("NFD")
@@ -323,7 +333,6 @@
                                     if (!lugaresMap.has(keyNormalizada)) {
                                         lugaresMap.set(keyNormalizada, locStr);
                                     } else {
-                                        // Si el nuevo string tiene tilde y el viejo no, lo reemplazamos para mejor ortografía
                                         let tieneTildeNuevo = /[\u0300-\u036f]/.test(locStr.normalize("NFD"));
                                         let tieneTildeViejo = /[\u0300-\u036f]/.test(lugaresMap.get(keyNormalizada).normalize("NFD"));
 
@@ -334,7 +343,6 @@
                                 }
                             });
 
-                            // Guardamos solo los nombres bonitos y ordenamos alfabéticamente
                             this.lugaresDisponibles = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
                         }
                     } catch (e) {
@@ -360,7 +368,6 @@
                     });
                 },
 
-                // Enviar el desglose exacto a la página de resultados
                 ejecutarBusqueda() {
                     let url = 'resultados.html?';
 
