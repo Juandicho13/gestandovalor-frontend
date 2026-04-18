@@ -172,7 +172,7 @@
                         <template x-if="adults + children + infants + pets === 0"><span>¿Cuántos?</span></template>
                         <template x-if="adults + children + infants + pets > 0">
                             <span
-                                x-text="`${adults + children} huéspedes${infants > 0 ? ', ' + infants + ' bebés' : ''}${pets > 0 ? ', ' + pets + ' mas.' : ''}`"></span>
+                                x-text="`${adults + children} huésped${(adults + children) !== 1 ? 'es' : ''}${infants > 0 ? ', ' + infants + ' bb' : ''}${pets > 0 ? ', ' + pets + ' masc' : ''}`"></span>
                         </template>
                     </div>
 
@@ -205,10 +205,12 @@
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">+</button>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between py-4 border-b border-gray-100">
+                        <div class="flex items-center justify-between py-4 border-b border-gray-100 relative">
+                            <div class="absolute left-[-32px] top-0 bottom-0 w-1 bg-green-400" x-show="infants > 0">
+                            </div>
                             <div>
                                 <p class="font-bold text-navy">Bebés</p>
-                                <p class="text-xs text-gray-400">Menos de 2 años</p>
+                                <p class="text-[10px] text-green-500 font-bold uppercase">No pagan extra</p>
                             </div>
                             <div class="flex items-center gap-4">
                                 <button @click.stop="infants > 0 ? infants-- : null"
@@ -218,10 +220,11 @@
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-navy hover:border-gold transition-colors">+</button>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between py-4">
+                        <div class="flex items-center justify-between py-4 relative">
+                            <div class="absolute left-[-32px] top-0 bottom-0 w-1 bg-yellow-500" x-show="pets > 0"></div>
                             <div>
                                 <p class="font-bold text-navy">Mascotas</p>
-                                <p class="text-xs text-gray-400 underline">¿Traes un animal?</p>
+                                <p class="text-[10px] text-yellow-600 font-bold uppercase">Aplica tarifa extra</p>
                             </div>
                             <div class="flex items-center gap-4">
                                 <button @click.stop="pets > 0 ? pets-- : null"
@@ -255,7 +258,7 @@
                 location: '',
                 checkin: '',
                 checkout: '',
-                adults: 0,
+                adults: 1, // ✨ 1 adulto por defecto
                 children: 0,
                 infants: 0,
                 pets: 0,
@@ -297,20 +300,42 @@
                     }
                 },
 
+                // ✨ NUEVO FILTRO INTELIGENTE DE DESTINOS
                 async cargarDestinosDinamicos() {
                     try {
                         const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
                         if (res.ok) {
                             const data = await res.json();
-                            const lugaresSet = new Set();
+                            const lugaresMap = new Map(); // Usamos un Map para evitar duplicados por tildes o mayúsculas
+
                             data.forEach(p => {
                                 if (p.ciudad) {
-                                    // Formato: Chía, Cundinamarca
-                                    const locStr = p.departamento ? `${p.ciudad}, ${p.departamento}` : p.ciudad;
-                                    lugaresSet.add(locStr);
+                                    let ciudad = p.ciudad.trim();
+                                    let depto = p.departamento ? p.departamento.trim() : '';
+                                    let locStr = depto ? `${ciudad}, ${depto}` : ciudad;
+
+                                    // Llave limpia: minúsculas y sin tildes (ej: "chia, cundinamarca")
+                                    let keyNormalizada = locStr
+                                        .toLowerCase()
+                                        .normalize("NFD")
+                                        .replace(/[\u0300-\u036f]/g, "");
+
+                                    if (!lugaresMap.has(keyNormalizada)) {
+                                        lugaresMap.set(keyNormalizada, locStr);
+                                    } else {
+                                        // Si el nuevo string tiene tilde y el viejo no, lo reemplazamos para mejor ortografía
+                                        let tieneTildeNuevo = /[\u0300-\u036f]/.test(locStr.normalize("NFD"));
+                                        let tieneTildeViejo = /[\u0300-\u036f]/.test(lugaresMap.get(keyNormalizada).normalize("NFD"));
+
+                                        if (tieneTildeNuevo && !tieneTildeViejo) {
+                                            lugaresMap.set(keyNormalizada, locStr);
+                                        }
+                                    }
                                 }
                             });
-                            this.lugaresDisponibles = Array.from(lugaresSet).sort();
+
+                            // Guardamos solo los nombres bonitos y ordenamos alfabéticamente
+                            this.lugaresDisponibles = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
                         }
                     } catch (e) {
                         console.error("Error al cargar ubicaciones", e);
@@ -335,13 +360,20 @@
                     });
                 },
 
+                // Enviar el desglose exacto a la página de resultados
                 ejecutarBusqueda() {
-                    let totalHuespedes = this.adults + this.children;
                     let url = 'resultados.html?';
 
                     if (this.location) url += `loc=${encodeURIComponent(this.location)}&`;
                     if (this.checkin && this.checkout) url += `in=${this.checkin}&out=${this.checkout}&`;
-                    if (totalHuespedes > 0) url += `pax=${totalHuespedes}`;
+
+                    if (this.adults > 0) url += `ad=${this.adults}&`;
+                    if (this.children > 0) url += `ni=${this.children}&`;
+                    if (this.infants > 0) url += `bb=${this.infants}&`;
+                    if (this.pets > 0) url += `ma=${this.pets}&`;
+
+                    if (url.endsWith('&')) url = url.slice(0, -1);
+                    if (url.endsWith('?')) url = url.slice(0, -1);
 
                     window.location.href = url;
                 }
