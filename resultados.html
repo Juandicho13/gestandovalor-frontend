@@ -445,9 +445,13 @@
                         if (ocupantesReales > 0 && prop.capacidad_huespedes < ocupantesReales) return false;
 
                         if (this.filtros.loc && this.filtros.loc !== 'Destino') {
-                            const termino = this.filtros.loc.split(',')[0].toLowerCase().trim();
-                            const ciudad = (prop.ciudad || '').toLowerCase();
-                            const depto = (prop.departamento || '').toLowerCase();
+                            // ✨ MAGIA: Normalizamos quitando tildes tanto al filtro como a la BD para que "Chía" == "Chia"
+                            const removeTildes = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+                            const termino = removeTildes(this.filtros.loc.split(',')[0].trim());
+                            const ciudad = removeTildes(prop.ciudad || '');
+                            const depto = removeTildes(prop.departamento || '');
+
                             if (!ciudad.includes(termino) && !depto.includes(termino)) return false;
                         }
 
