@@ -63,7 +63,7 @@
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mb-4"></div>
-        <p class="font-bold text-navy animate-pulse">Buscando los mejores alojamientos...</p>
+        <p class="font-bold text-navy animate-pulse">Calculando las mejores tarifas para ti...</p>
     </div>
 
     <nav id="navbar"
@@ -268,6 +268,13 @@
     </main>
 
     <script>
+        function getLocalDateString(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function resultadosApp() {
             return {
                 cargando: true,
@@ -298,7 +305,6 @@
                 async initApp() {
                     this.activarNavbarDinamica();
                     this.leerFiltrosURL();
-
                     await this.cargarDesdeBD();
                     this.extraerUbicacionesUnicas();
                     this.initCalendario();
@@ -360,7 +366,20 @@
                     try {
                         const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
                         if (response.ok) {
-                            this.todasPropiedades = await response.json();
+                            let data = await response.json();
+
+                            // ✨ MAGIA: Descargamos las tarifas de cada propiedad en segundo plano
+                            this.todasPropiedades = await Promise.all(data.map(async (prop) => {
+                                try {
+                                    const tRes = await fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${prop.id}`);
+                                    if (tRes.ok) prop.tarifas_especiales = await tRes.json();
+                                    else prop.tarifas_especiales = [];
+                                } catch (e) {
+                                    prop.tarifas_especiales = [];
+                                }
+                                return prop;
+                            }));
+
                             this.aplicarFiltros();
                         }
                     } catch (error) {
@@ -445,9 +464,7 @@
                         if (ocupantesReales > 0 && prop.capacidad_huespedes < ocupantesReales) return false;
 
                         if (this.filtros.loc && this.filtros.loc !== 'Destino') {
-                            // ✨ MAGIA: Normalizamos quitando tildes tanto al filtro como a la BD para que "Chía" == "Chia"
                             const removeTildes = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
                             const termino = removeTildes(this.filtros.loc.split(',')[0].trim());
                             const ciudad = removeTildes(prop.ciudad || '');
                             const depto = removeTildes(prop.departamento || '');
@@ -467,11 +484,32 @@
                     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 },
 
+                // ✨ CÁLCULO DÍA POR DÍA INYECTADO
+                obtenerPrecioPorDia(prop, fechaStr) {
+                    if (!fechaStr) return prop.precio_noche;
+                    const f = new Date(fechaStr + "T12:00:00").getTime();
+                    let tarifaEspecial = (prop.tarifas_especiales || []).find(t => {
+                        const tIn = new Date(t.fecha_inicio).getTime();
+                        const tOut = new Date(t.fecha_fin).getTime();
+                        return f >= tIn && f <= tOut;
+                    });
+                    return tarifaEspecial ? tarifaEspecial.precio : (prop.precio_noche || 0);
+                },
+
                 calcularTotalPropiedad(prop) {
                     const noches = this.calcularNoches();
                     if (noches === 0) return prop.precio_noche;
 
-                    let totalBase = (prop.precio_noche * noches);
+                    let totalBase = 0;
+                    let d = new Date(this.filtros.in + "T12:00:00");
+
+                    // Sumamos el valor exacto para cada noche de la estadía
+                    for (let i = 0; i < noches; i++) {
+                        let dStr = getLocalDateString(d);
+                        totalBase += this.obtenerPrecioPorDia(prop, dStr);
+                        d.setDate(d.getDate() + 1);
+                    }
+
                     let totalAseo = prop.tarifa_aseo || 0;
 
                     let extraCost = 0;
@@ -493,7 +531,7 @@
                     if (noches > 0) {
                         return `total por ${noches} noche${noches > 1 ? 's' : ''}`;
                     }
-                    return 'COP noche';
+                    return 'COP noche base';
                 },
 
                 textoHuespedesBarra() {
