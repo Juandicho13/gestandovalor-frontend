@@ -240,10 +240,10 @@
                     <div class="flex justify-between items-start">
                         <div class="pr-2">
                             <h3 class="font-extrabold text-navy text-lg leading-tight line-clamp-1"
-                                x-text="`${prop.ciudad}, ${prop.departamento}`"></h3>
-                            <p class="text-gray-500 text-sm mt-1" x-text="`${prop.camas} camas · ${prop.banos} baños`">
-                            </p>
-                            <p class="text-gray-500 text-sm truncate" x-text="prop.titulo"></p>
+                                x-text="prop.titulo || 'Suite GestandoValor'"></h3>
+                            <p class="text-gray-500 text-sm mt-1 truncate"
+                                x-text="`${prop.ciudad}, ${prop.departamento}`"></p>
+                            <p class="text-gray-500 text-sm" x-text="`${prop.camas} camas · ${prop.banos} baños`"></p>
 
                             <div class="mt-2 flex items-baseline gap-1">
                                 <span class="font-extrabold text-navy text-lg"
@@ -253,7 +253,6 @@
                             <div class="text-xs text-gray-400 mt-0.5" x-show="calcularNoches() > 0">
                                 <span x-text="`${formatearDinero(prop.precio_noche)} base / noche`"></span>
                             </div>
-
                         </div>
                         <div class="flex items-center gap-1 text-sm font-bold text-navy shrink-0">
                             <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
@@ -393,7 +392,6 @@
                     this.lugaresDisponibles = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
                 },
 
-                // Aplicar desde el botón del dropdown
                 aplicarHuespedes() {
                     this.filtros.ad = this.tempAdults;
                     this.filtros.ni = this.tempChildren;
@@ -404,10 +402,8 @@
                     this.aplicarFiltrosYURL();
                 },
 
-                // ✨ Aplicar desde cualquier lado (como la lupa)
                 aplicarFiltrosYURL(forzarSyncHuespedes = false) {
                     if (forzarSyncHuespedes) {
-                        // Si le dan a la lupa, atrapamos lo que sea que hayan tocado en los botones +/-
                         this.filtros.ad = this.tempAdults;
                         this.filtros.ni = this.tempChildren;
                         this.filtros.bb = this.tempInfants;
@@ -459,7 +455,6 @@
                     });
                 },
 
-                // ✨ CÁLCULO DE NOCHES PARA LA TARJETA
                 calcularNoches() {
                     if (!this.filtros.in || !this.filtros.out) return 0;
                     const d1 = new Date(this.filtros.in + "T12:00:00");
@@ -468,10 +463,9 @@
                     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 },
 
-                // ✨ CÁLCULO TOTAL MATEMÁTICO IDÉNTICO A LA SUITE
                 calcularTotalPropiedad(prop) {
                     const noches = this.calcularNoches();
-                    if (noches === 0) return prop.precio_noche; // Muestra el base si no hay fechas
+                    if (noches === 0) return prop.precio_noche;
 
                     let totalBase = (prop.precio_noche * noches);
                     let totalAseo = prop.tarifa_aseo || 0;
