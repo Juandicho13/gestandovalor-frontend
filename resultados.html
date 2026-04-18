@@ -274,7 +274,6 @@
                 openLocation: false,
                 openGuests: false,
 
-                // ✨ Contadores temporales (Inicializados con mínimo 1 adulto)
                 tempAdults: 1,
                 tempChildren: 0,
                 tempInfants: 0,
@@ -282,7 +281,6 @@
 
                 fp: null,
 
-                // ✨ Filtros completos
                 filtros: {
                     loc: '',
                     in: '',
@@ -308,19 +306,16 @@
                     this.filtros.in = params.get('in') || '';
                     this.filtros.out = params.get('out') || '';
 
-                    // Lectura inteligente de los nuevos parámetros
                     this.filtros.ad = parseInt(params.get('ad')) || 1;
                     this.filtros.ni = parseInt(params.get('ni')) || 0;
                     this.filtros.bb = parseInt(params.get('bb')) || 0;
                     this.filtros.ma = parseInt(params.get('ma')) || 0;
 
-                    // Fallback para URLs viejas (pax)
                     if (params.get('pax') && !params.get('ad')) {
                         let paxViejo = parseInt(params.get('pax'));
                         this.filtros.ad = paxViejo > 0 ? paxViejo : 1;
                     }
 
-                    // Sincronizar temporales
                     this.tempAdults = this.filtros.ad;
                     this.tempChildren = this.filtros.ni;
                     this.tempInfants = this.filtros.bb;
@@ -393,7 +388,6 @@
                     this.lugaresDisponibles = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
                 },
 
-                // ✨ Aplicar los huéspedes a los filtros finales
                 aplicarHuespedes() {
                     this.filtros.ad = this.tempAdults;
                     this.filtros.ni = this.tempChildren;
@@ -411,8 +405,7 @@
                     if (this.filtros.in) url.searchParams.set('in', this.filtros.in); else url.searchParams.delete('in');
                     if (this.filtros.out) url.searchParams.set('out', this.filtros.out); else url.searchParams.delete('out');
 
-                    // ✨ Reescribimos la URL con los datos específicos
-                    url.searchParams.delete('pax'); // Limpiamos la basura vieja si existe
+                    url.searchParams.delete('pax');
                     if (this.filtros.ad > 0) url.searchParams.set('ad', this.filtros.ad); else url.searchParams.delete('ad');
                     if (this.filtros.ni > 0) url.searchParams.set('ni', this.filtros.ni); else url.searchParams.delete('ni');
                     if (this.filtros.bb > 0) url.searchParams.set('bb', this.filtros.bb); else url.searchParams.delete('bb');
@@ -434,13 +427,13 @@
 
                 aplicarFiltros() {
                     this.propiedadesFiltradas = this.todasPropiedades.filter(prop => {
-                        // ✨ FILTRO ESTRICTO: Solo sumar adultos y niños (Los que pagan/cuentan para capacidad)
-                        let huespedesPagadores = this.filtros.ad + this.filtros.ni;
+                        // ✨ REGLA APLICADA: Solo Adultos y Niños cuentan para la capacidad máxima de la suite.
+                        let ocupantesReales = this.filtros.ad + this.filtros.ni;
 
-                        if (huespedesPagadores > 0 && prop.capacidad_huespedes < huespedesPagadores) return false;
+                        if (ocupantesReales > 0 && prop.capacidad_huespedes < ocupantesReales) return false;
 
                         if (this.filtros.loc && this.filtros.loc !== 'Destino') {
-                            const termino = this.filtros.loc.split(',')[0].toLowerCase().trim(); // Busca solo "Chía"
+                            const termino = this.filtros.loc.split(',')[0].toLowerCase().trim();
                             const ciudad = (prop.ciudad || '').toLowerCase();
                             const depto = (prop.departamento || '').toLowerCase();
                             if (!ciudad.includes(termino) && !depto.includes(termino)) return false;
@@ -450,7 +443,6 @@
                     });
                 },
 
-                // ✨ LÓGICA VISUAL DE LA BARRA
                 textoHuespedesBarra() {
                     let totalPagadores = this.filtros.ad + this.filtros.ni;
                     if (totalPagadores + this.filtros.bb + this.filtros.ma === 0) return '¿Cuántos?';
