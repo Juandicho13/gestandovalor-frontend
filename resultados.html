@@ -105,25 +105,29 @@
 
                 <div class="relative cursor-pointer px-2 md:px-4 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group"
                     @click.stop="openGuests = !openGuests; openLocation = false">
-                    <div class="text-[10px] md:text-sm font-bold whitespace-nowrap"
-                        x-text="filtros.pax > 0 ? `${filtros.pax} huéspedes` : '¿Cuántos?'"></div>
+                    <div class="text-[10px] md:text-sm font-bold whitespace-nowrap" x-text="textoHuespedesBarra()">
+                    </div>
 
                     <div x-show="openGuests" @click.away="openGuests = false" x-transition.opacity
                         class="absolute top-[180%] right-0 md:left-0 w-[300px] md:w-[350px] bg-white rounded-[32px] shadow-2xl p-6 z-50 border border-gray-100 text-left text-navy cursor-default"
                         style="display: none;">
+
                         <div class="flex justify-between items-center pb-4 border-b border-gray-100">
                             <div>
                                 <div class="font-bold">Adultos</div>
                                 <div class="text-xs text-gray-500">Edad 13+</div>
                             </div>
                             <div class="flex gap-3 items-center">
-                                <button @click.stop="tempAdults > 0 ? tempAdults-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                <button @click.stop="tempAdults > 1 ? tempAdults-- : null"
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center transition-colors"
+                                    :class="tempAdults <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold hover:text-gold'"
+                                    :disabled="tempAdults <= 1">-</button>
                                 <span x-text="tempAdults" class="font-extrabold w-4 text-center"></span>
                                 <button @click.stop="tempAdults++"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
                             </div>
                         </div>
+
                         <div class="flex justify-between items-center py-4 border-b border-gray-100">
                             <div>
                                 <div class="font-bold">Niños</div>
@@ -131,38 +135,51 @@
                             </div>
                             <div class="flex gap-3 items-center">
                                 <button @click.stop="tempChildren > 0 ? tempChildren-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center transition-colors"
+                                    :class="tempChildren <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold hover:text-gold'"
+                                    :disabled="tempChildren <= 0">-</button>
                                 <span x-text="tempChildren" class="font-extrabold w-4 text-center"></span>
-                                <button @click.stop="tempChildren++"
+                                <button @click.stop="tempChildren++; if(tempAdults === 0) tempAdults = 1;"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center py-4 border-b border-gray-100">
+
+                        <div class="flex justify-between items-center py-4 border-b border-gray-100 relative">
+                            <div class="absolute left-[-24px] top-0 bottom-0 w-1 bg-green-400" x-show="tempInfants > 0">
+                            </div>
                             <div>
                                 <div class="font-bold">Bebés</div>
-                                <div class="text-xs text-gray-500">Menos de 2 años</div>
+                                <div class="text-[10px] text-green-500 font-bold uppercase">No pagan extra</div>
                             </div>
                             <div class="flex gap-3 items-center">
                                 <button @click.stop="tempInfants > 0 ? tempInfants-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center transition-colors"
+                                    :class="tempInfants <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold hover:text-gold'"
+                                    :disabled="tempInfants <= 0">-</button>
                                 <span x-text="tempInfants" class="font-extrabold w-4 text-center"></span>
-                                <button @click.stop="tempInfants++"
+                                <button @click.stop="tempInfants++; if(tempAdults === 0) tempAdults = 1;"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center py-4 border-b border-gray-100">
+
+                        <div class="flex justify-between items-center py-4 relative border-b border-gray-100">
+                            <div class="absolute left-[-24px] top-0 bottom-0 w-1 bg-yellow-500" x-show="tempPets > 0">
+                            </div>
                             <div>
                                 <div class="font-bold">Mascotas</div>
-                                <div class="text-xs text-gray-500 underline">¿Traes un animal?</div>
+                                <div class="text-[10px] text-yellow-600 font-bold uppercase">Aplica tarifa extra</div>
                             </div>
                             <div class="flex gap-3 items-center">
                                 <button @click.stop="tempPets > 0 ? tempPets-- : null"
-                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">-</button>
+                                    class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center transition-colors"
+                                    :class="tempPets <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold hover:text-gold'"
+                                    :disabled="tempPets <= 0">-</button>
                                 <span x-text="tempPets" class="font-extrabold w-4 text-center"></span>
-                                <button @click.stop="tempPets++"
+                                <button @click.stop="tempPets++; if(tempAdults === 0) tempAdults = 1;"
                                     class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gold hover:text-gold transition-colors">+</button>
                             </div>
                         </div>
+
                         <div class="pt-4 flex justify-end">
                             <button @click.stop="aplicarHuespedes()"
                                 class="bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded-xl transition-colors shadow-md">Aplicar</button>
@@ -206,7 +223,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10"
             x-show="propiedadesFiltradas.length > 0">
             <template x-for="prop in propiedadesFiltradas" :key="prop.id">
-                <a :href="`suite.html?id=${prop.id}&in=${filtros.in}&out=${filtros.out}&pax=${filtros.pax}`"
+                <a :href="`suite.html?id=${prop.id}&in=${filtros.in}&out=${filtros.out}&ad=${filtros.ad}&ni=${filtros.ni}&bb=${filtros.bb}&ma=${filtros.ma}`"
                     class="group cursor-pointer flex flex-col">
                     <div class="relative w-full aspect-[4/3] rounded-[24px] overflow-hidden mb-4 bg-gray-200">
                         <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80'"
@@ -257,27 +274,28 @@
                 openLocation: false,
                 openGuests: false,
 
-                // Contadores temporales para el menú de huéspedes
-                tempAdults: 0,
+                // ✨ Contadores temporales (Inicializados con mínimo 1 adulto)
+                tempAdults: 1,
                 tempChildren: 0,
                 tempInfants: 0,
                 tempPets: 0,
 
                 fp: null,
 
+                // ✨ Filtros completos
                 filtros: {
                     loc: '',
                     in: '',
                     out: '',
-                    pax: 0
+                    ad: 1,
+                    ni: 0,
+                    bb: 0,
+                    ma: 0
                 },
 
                 async initApp() {
                     this.activarNavbarDinamica();
                     this.leerFiltrosURL();
-
-                    // Si viene con huéspedes en la URL, se los ponemos a los adultos temporales
-                    if (this.filtros.pax > 0) this.tempAdults = this.filtros.pax;
 
                     await this.cargarDesdeBD();
                     this.extraerUbicacionesUnicas();
@@ -289,7 +307,24 @@
                     this.filtros.loc = params.get('loc') || '';
                     this.filtros.in = params.get('in') || '';
                     this.filtros.out = params.get('out') || '';
-                    this.filtros.pax = parseInt(params.get('pax')) || 0;
+
+                    // Lectura inteligente de los nuevos parámetros
+                    this.filtros.ad = parseInt(params.get('ad')) || 1;
+                    this.filtros.ni = parseInt(params.get('ni')) || 0;
+                    this.filtros.bb = parseInt(params.get('bb')) || 0;
+                    this.filtros.ma = parseInt(params.get('ma')) || 0;
+
+                    // Fallback para URLs viejas (pax)
+                    if (params.get('pax') && !params.get('ad')) {
+                        let paxViejo = parseInt(params.get('pax'));
+                        this.filtros.ad = paxViejo > 0 ? paxViejo : 1;
+                    }
+
+                    // Sincronizar temporales
+                    this.tempAdults = this.filtros.ad;
+                    this.tempChildren = this.filtros.ni;
+                    this.tempInfants = this.filtros.bb;
+                    this.tempPets = this.filtros.ma;
                 },
 
                 initCalendario() {
@@ -337,38 +372,59 @@
                 },
 
                 extraerUbicacionesUnicas() {
-                    const lugaresSet = new Set();
+                    const lugaresMap = new Map();
                     this.todasPropiedades.forEach(p => {
                         if (p.ciudad) {
-                            const str = p.departamento ? `${p.ciudad}, ${p.departamento}` : p.ciudad;
-                            lugaresSet.add(str);
+                            let ciudad = p.ciudad.trim();
+                            let depto = p.departamento ? p.departamento.trim() : '';
+                            let locStr = depto ? `${ciudad}, ${depto}` : ciudad;
+
+                            let keyNormalizada = locStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                            if (!lugaresMap.has(keyNormalizada)) {
+                                lugaresMap.set(keyNormalizada, locStr);
+                            } else {
+                                let tieneTildeNuevo = /[\u0300-\u036f]/.test(locStr.normalize("NFD"));
+                                let tieneTildeViejo = /[\u0300-\u036f]/.test(lugaresMap.get(keyNormalizada).normalize("NFD"));
+                                if (tieneTildeNuevo && !tieneTildeViejo) lugaresMap.set(keyNormalizada, locStr);
+                            }
                         }
                     });
-                    this.lugaresDisponibles = Array.from(lugaresSet).sort();
+                    this.lugaresDisponibles = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
                 },
 
-                // Esta función se ejecuta SOLO cuando le dan al botón "Aplicar"
+                // ✨ Aplicar los huéspedes a los filtros finales
                 aplicarHuespedes() {
-                    // Calculamos el total y lo pasamos al filtro real
-                    this.filtros.pax = this.tempAdults + this.tempChildren;
+                    this.filtros.ad = this.tempAdults;
+                    this.filtros.ni = this.tempChildren;
+                    this.filtros.bb = this.tempInfants;
+                    this.filtros.ma = this.tempPets;
+
                     this.openGuests = false;
                     this.aplicarFiltrosYURL();
                 },
 
                 aplicarFiltrosYURL() {
                     const url = new URL(window.location);
+
                     if (this.filtros.loc) url.searchParams.set('loc', this.filtros.loc); else url.searchParams.delete('loc');
                     if (this.filtros.in) url.searchParams.set('in', this.filtros.in); else url.searchParams.delete('in');
                     if (this.filtros.out) url.searchParams.set('out', this.filtros.out); else url.searchParams.delete('out');
-                    if (this.filtros.pax > 0) url.searchParams.set('pax', this.filtros.pax); else url.searchParams.delete('pax');
+
+                    // ✨ Reescribimos la URL con los datos específicos
+                    url.searchParams.delete('pax'); // Limpiamos la basura vieja si existe
+                    if (this.filtros.ad > 0) url.searchParams.set('ad', this.filtros.ad); else url.searchParams.delete('ad');
+                    if (this.filtros.ni > 0) url.searchParams.set('ni', this.filtros.ni); else url.searchParams.delete('ni');
+                    if (this.filtros.bb > 0) url.searchParams.set('bb', this.filtros.bb); else url.searchParams.delete('bb');
+                    if (this.filtros.ma > 0) url.searchParams.set('ma', this.filtros.ma); else url.searchParams.delete('ma');
 
                     window.history.pushState({}, '', url);
                     this.aplicarFiltros();
                 },
 
                 limpiarFiltros() {
-                    this.filtros = { loc: '', in: '', out: '', pax: 0 };
-                    this.tempAdults = 0;
+                    this.filtros = { loc: '', in: '', out: '', ad: 1, ni: 0, bb: 0, ma: 0 };
+                    this.tempAdults = 1;
                     this.tempChildren = 0;
                     this.tempInfants = 0;
                     this.tempPets = 0;
@@ -378,7 +434,10 @@
 
                 aplicarFiltros() {
                     this.propiedadesFiltradas = this.todasPropiedades.filter(prop => {
-                        if (this.filtros.pax > 0 && prop.capacidad_huespedes < this.filtros.pax) return false;
+                        // ✨ FILTRO ESTRICTO: Solo sumar adultos y niños (Los que pagan/cuentan para capacidad)
+                        let huespedesPagadores = this.filtros.ad + this.filtros.ni;
+
+                        if (huespedesPagadores > 0 && prop.capacidad_huespedes < huespedesPagadores) return false;
 
                         if (this.filtros.loc && this.filtros.loc !== 'Destino') {
                             const termino = this.filtros.loc.split(',')[0].toLowerCase().trim(); // Busca solo "Chía"
@@ -389,6 +448,14 @@
 
                         return true;
                     });
+                },
+
+                // ✨ LÓGICA VISUAL DE LA BARRA
+                textoHuespedesBarra() {
+                    let totalPagadores = this.filtros.ad + this.filtros.ni;
+                    if (totalPagadores + this.filtros.bb + this.filtros.ma === 0) return '¿Cuántos?';
+
+                    return `${totalPagadores} huésped${totalPagadores !== 1 ? 'es' : ''}${this.filtros.bb > 0 ? ', ' + this.filtros.bb + ' bb' : ''}${this.filtros.ma > 0 ? ', ' + this.filtros.ma + ' masc' : ''}`;
                 },
 
                 textoFechas() {
