@@ -64,6 +64,14 @@
             font-weight: bold;
         }
 
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled:hover {
+            background: #f3f4f6 !important;
+            color: #d1d5db !important;
+            text-decoration: line-through;
+            cursor: not-allowed;
+        }
+
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -181,7 +189,7 @@
                         <h2 class="text-2xl font-extrabold text-navy mb-2"
                             x-text="`${propiedad.tipo_propiedad} entero en ${propiedad.ciudad}`"></h2>
                         <ol class="flex flex-wrap gap-x-2 text-gray-600 font-medium">
-                            <li x-text="`${propiedad.capacidad_huespedes} huéspedes`"></li><span>·</span>
+                            <li x-text="`${propiedad.capacidad_huespedes} huéspedes max`"></li><span>·</span>
                             <li
                                 x-text="`${propiedad.habitaciones} habitación${propiedad.habitaciones > 1 ? 'es' : ''}`">
                             </li><span>·</span>
@@ -266,7 +274,7 @@
                         <div>
                             <span class="text-2xl lg:text-3xl font-extrabold text-white"
                                 x-text="formatearDinero(propiedad.precio_noche)"></span>
-                            <span class="text-gray-300 font-medium block">/ noche</span>
+                            <span class="text-gray-300 font-medium block">/ noche base</span>
                         </div>
                     </div>
 
@@ -295,12 +303,12 @@
                         <div class="p-3 sm:p-4 cursor-pointer relative hover:bg-white/5 transition-colors rounded-b-2xl"
                             @click="openWidgetGuests = !openWidgetGuests">
                             <label
-                                class="block text-[10px] font-bold uppercase tracking-widest text-white/70 pointer-events-none">Huéspedes</label>
+                                class="block text-[10px] font-bold uppercase tracking-widest text-white/70 pointer-events-none">Acompañantes</label>
                             <div
                                 class="text-sm font-bold text-white flex justify-between items-center mt-1 pointer-events-none">
                                 <div class="truncate pr-2">
                                     <span
-                                        x-text="`${adults + children} huésped${(adults + children) !== 1 ? 'es' : ''}`"></span>
+                                        x-text="`${adults + children} huésped${(adults + children) !== 1 ? 'es' : ''}${infants > 0 ? ', ' + infants + ' bb' : ''}${pets > 0 ? ', ' + pets + ' masc' : ''}`"></span>
                                 </div>
                                 <svg class="w-5 h-5 text-gold transform transition-transform flex-shrink-0"
                                     :class="openWidgetGuests ? 'rotate-180' : ''" fill="none" stroke="currentColor"
@@ -317,6 +325,7 @@
                                 <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                     <div>
                                         <div class="font-bold text-navy text-base">Adultos</div>
+                                        <div class="text-sm text-gray-400 font-medium">13+ años</div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="adults > 1 ? adults-- : null"
@@ -324,8 +333,10 @@
                                             :disabled="adults <= 1">-</button>
                                         <span x-text="adults"
                                             class="text-navy w-4 text-center text-base font-extrabold">1</span>
-                                        <button @click.stop="adults++"
-                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
+                                        <button
+                                            @click.stop="(adults + children) < propiedad.capacidad_huespedes ? adults++ : null"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 transition-colors"
+                                            :class="(adults + children) >= propiedad.capacidad_huespedes ? 'opacity-30 cursor-not-allowed' : 'hover:border-gray-800'">+</button>
                                     </div>
                                 </div>
 
@@ -340,16 +351,39 @@
                                             :disabled="children <= 0">-</button>
                                         <span x-text="children"
                                             class="text-navy w-4 text-center text-base font-extrabold">0</span>
-                                        <button @click.stop="children++"
+                                        <button
+                                            @click.stop="(adults + children) < propiedad.capacidad_huespedes ? children++ : null"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 transition-colors"
+                                            :class="(adults + children) >= propiedad.capacidad_huespedes ? 'opacity-30 cursor-not-allowed' : 'hover:border-gray-800'">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center py-3 border-b border-gray-100 relative">
+                                    <div class="absolute left-[-24px] top-0 bottom-0 w-1 bg-success"></div>
+                                    <div>
+                                        <div class="font-bold text-navy text-base">Bebés</div>
+                                        <div class="text-[10px] text-success font-bold uppercase mt-0.5">No pagan extra
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3 items-center">
+                                        <button @click.stop="infants > 0 ? infants-- : null"
+                                            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors"
+                                            :disabled="infants <= 0">-</button>
+                                        <span x-text="infants"
+                                            class="text-navy w-4 text-center text-base font-extrabold">0</span>
+                                        <button @click.stop="infants < 3 ? infants++ : null"
                                             class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-between items-center py-4 border-b border-gray-100">
+                                <div class="flex justify-between items-center py-4 relative">
+                                    <div class="absolute left-[-24px] top-0 bottom-0 w-1 bg-warning" x-show="pets > 0">
+                                    </div>
                                     <div>
                                         <div class="font-bold text-navy text-base">Mascotas</div>
-                                        <div class="text-[10px] text-warning font-bold uppercase mt-0.5">Aplica Tarifa
-                                            Extra</div>
+                                        <div class="text-[10px] text-warning font-bold uppercase mt-0.5"
+                                            x-text="`+$${(propiedad.precio_mascota || 0).toLocaleString('es-CO')} c/u`">
+                                        </div>
                                     </div>
                                     <div class="flex gap-3 items-center">
                                         <button @click.stop="pets > 0 ? pets-- : null"
@@ -357,7 +391,7 @@
                                             :disabled="pets <= 0">-</button>
                                         <span x-text="pets"
                                             class="text-navy w-4 text-center text-base font-extrabold">0</span>
-                                        <button @click.stop="pets++"
+                                        <button @click.stop="pets < 2 ? pets++ : null"
                                             class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-800 transition-colors">+</button>
                                     </div>
                                 </div>
@@ -379,19 +413,32 @@
 
                     <div x-show="noches > 0" x-transition class="mt-6">
                         <div class="space-y-4 text-gray-300 text-sm font-medium border-b border-white/10 pb-6 mb-6">
+
                             <div class="flex justify-between">
                                 <span class="underline"
-                                    x-text="`${formatearDinero(propiedad.precio_noche)} x ${noches} noche${noches > 1 ? 's' : ''}`"></span>
-                                <span class="text-white"
-                                    x-text="formatearDinero(propiedad.precio_noche * noches)"></span>
+                                    x-text="`Estadía por ${noches} noche${noches > 1 ? 's' : ''}`"></span>
+                                <span class="text-white" x-text="formatearDinero(calcularSubtotalNoches())"></span>
                             </div>
+
+                            <template
+                                x-if="((adults + children) > (propiedad.huespedes_base || 1)) && (propiedad.precio_huesped_extra > 0)">
+                                <div class="flex justify-between text-gold">
+                                    <span class="underline" x-text="`Huésped(es) Extra x ${noches} noche(s)`"></span>
+                                    <span class="font-bold"
+                                        x-text="formatearDinero(((adults + children) - propiedad.huespedes_base) * propiedad.precio_huesped_extra * noches)"></span>
+                                </div>
+                            </template>
+
                             <div class="flex justify-between">
-                                <span class="underline">Tarifa de limpieza</span>
-                                <span class="text-white" x-text="formatearDinero(tarifaLimpieza)"></span>
+                                <span class="underline">Tarifa única de limpieza</span>
+                                <span class="text-white" x-text="formatearDinero(propiedad.tarifa_aseo)"></span>
                             </div>
-                            <div class="flex justify-between text-warning" x-show="pets > 0">
-                                <span class="underline" x-text="`Tarifa por Mascota (${pets})`"></span>
-                                <span class="font-bold" x-text="formatearDinero(tarifaMascota * pets)"></span>
+
+                            <div class="flex justify-between text-warning"
+                                x-show="pets > 0 && propiedad.precio_mascota > 0">
+                                <span class="underline" x-text="`Mascota(s) x ${noches} noche(s)`"></span>
+                                <span class="font-bold"
+                                    x-text="formatearDinero(propiedad.precio_mascota * pets * noches)"></span>
                             </div>
                         </div>
 
@@ -465,6 +512,15 @@
                     <p class="text-3xl font-black text-gold" x-text="formatearDinero(calcularTotal())"></p>
                 </div>
 
+                <div class="mb-6 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1 ml-1">Tu Nombre Completo *</label>
+                        <input type="text" x-model="nombreHuesped" required
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold text-sm font-medium"
+                            placeholder="Ej: Juan Pérez">
+                    </div>
+                </div>
+
                 <p class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4">Selecciona tu método de
                     pago:</p>
 
@@ -496,113 +552,33 @@
                             </svg>
                         </div>
                     </label>
-
-                    <label
-                        class="flex items-center justify-between p-4 bg-white border-2 rounded-2xl cursor-pointer transition-all"
-                        :class="metodoSeleccionado === 'Mercado Pago' ? 'border-gold shadow-md' : 'border-gray-100 hover:border-gray-300'">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="metodoPago" value="Mercado Pago" x-model="metodoSeleccionado"
-                                class="hidden">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-[#009EE3] text-white font-black flex items-center justify-center text-xs tracking-tighter">
-                                MP</div>
-                            <div>
-                                <p class="font-bold text-navy text-sm">Mercado Pago</p>
-                                <p class="text-[11px] text-gray-500 mt-0.5">Tarjetas de Crédito / PSE / Internacional
-                                </p>
-                            </div>
-                        </div>
-                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
-                            :class="metodoSeleccionado === 'Mercado Pago' ? 'border-gold bg-gold' : 'border-gray-300'">
-                            <svg x-show="metodoSeleccionado === 'Mercado Pago'" class="w-3 h-3 text-white" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                    </label>
                 </div>
             </div>
 
             <div class="p-6 bg-white border-t border-gray-100">
                 <button @click="procesarReserva()"
                     class="w-full font-extrabold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2"
-                    :class="metodoSeleccionado !== '' ? (metodoSeleccionado === 'Transferencia' ? 'bg-success hover:bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white') : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
-                    :disabled="metodoSeleccionado === '' || cargandoPago">
+                    :class="(metodoSeleccionado !== '' && nombreHuesped.length > 2) ? (metodoSeleccionado === 'Transferencia' ? 'bg-success hover:bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white') : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
+                    :disabled="metodoSeleccionado === '' || nombreHuesped.length <= 2 || cargandoPago">
 
                     <svg x-show="metodoSeleccionado === 'Transferencia'" class="w-5 h-5" fill="currentColor"
                         viewBox="0 0 24 24">
                         <path
                             d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.327.101.144.447.712.947 1.156.643.57 1.205.748 1.349.835.143.087.229.072.316-.029l.36-.433c.114-.144.23-.115.36-.065l1.287.607c.144.072.245.108.281.166.035.058.035.332-.109.737z" />
                     </svg>
-                    <svg x-show="metodoSeleccionado === 'Mercado Pago' && !cargandoPago" class="w-5 h-5" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                    </svg>
 
-                    <span x-show="cargandoPago">Conectando pasarela...</span>
+                    <span x-show="cargandoPago">Asegurando reserva...</span>
                     <span x-show="!cargandoPago"
-                        x-text="metodoSeleccionado === 'Transferencia' ? 'Contactar a Edwin por WhatsApp' : (metodoSeleccionado === 'Mercado Pago' ? 'Pagar de forma segura en línea' : 'Selecciona un método')"></span>
+                        x-text="metodoSeleccionado === 'Transferencia' ? 'Reservar y Contactar por WhatsApp' : 'Selecciona un método'"></span>
                 </button>
+                <p x-show="metodoSeleccionado !== '' && nombreHuesped.length <= 2"
+                    class="text-xs text-red-500 text-center mt-2 font-medium animate-pulse">Por favor, escribe tu nombre
+                    completo para continuar.</p>
             </div>
         </div>
     </div>
 
     <footer class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10 mt-10">
-        <div
-            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
-        </div>
-        <div
-            class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Tu apartamento puede generar
-                más.<br><span class="text-gold">Nosotros lo hacemos posible.</span></h2>
-            <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
-            <div class="mb-10">
-                <div class="inline-flex items-center gap-3 mb-2">
-                    <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
-                    <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
-                            class="font-light text-gray-400">Apartasuites</span></span>
-                </div>
-                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">Administración estratégica para
-                    rentas cortas</p>
-            </div>
-
-            <div class="flex justify-center gap-8 mb-16">
-                <a href="#"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
-                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
-                        <path
-                            d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
-                    </svg></a>
-                <a href="#"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
-                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg></a>
-                <a href="mailto:info@gestandovalor.com"
-                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group"><svg
-                        class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                    </svg></a>
-            </div>
-
-            <div
-                class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-                <p>© 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
-                <div class="flex gap-6">
-                    <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
-                    <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
-                </div>
-            </div>
-        </div>
     </footer>
 
     <script>
@@ -624,20 +600,34 @@
             });
         });
 
+        function getLocalDateString(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function suiteApp() {
             return {
                 cargando: true,
                 cargandoPago: false,
-                propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '' },
+                propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
+                reservasFechas: [], // Aquí guardaremos las fechas ocupadas para bloquear el calendario
 
                 openModalText: false,
-                adults: 1, children: 0, infants: 0, pets: 0,
+
+                // ✨ NUEVOS DATOS DESGLOSADOS
+                adults: 1,
+                children: 0,
+                infants: 0,
+                pets: 0,
+
+                nombreHuesped: '', // Para guardar en la BD directamente
+
                 openWidgetGuests: false,
                 checkinRaw: '', checkoutRaw: '',
                 checkinLabel: '', checkoutLabel: '',
                 noches: 0,
-                tarifaLimpieza: 55000,
-                tarifaMascota: 30000,
                 mapa: null,
 
                 modalPago: false,
@@ -668,11 +658,16 @@
 
                     if (!id) { window.location.href = 'alojamientos.html'; return; }
 
-                    if (params.get('pax')) {
+                    // ✨ LECTURA DEL DESGLOSE DESDE LA URL
+                    if (params.get('ad')) this.adults = parseInt(params.get('ad'));
+                    if (params.get('ni')) this.children = parseInt(params.get('ni'));
+                    if (params.get('bb')) this.infants = parseInt(params.get('bb'));
+                    if (params.get('ma')) this.pets = parseInt(params.get('ma'));
+
+                    // Fallback por si usan el link viejo con 'pax'
+                    if (params.get('pax') && !params.get('ad')) {
                         let parsedPax = parseInt(params.get('pax'));
                         this.adults = parsedPax > 0 ? parsedPax : 1;
-                    } else {
-                        this.adults = 1;
                     }
 
                     const inDate = params.get('in');
@@ -683,6 +678,18 @@
                         if (res.ok) {
                             this.propiedad = await res.json();
                             this.propiedad.precio_noche = Number(this.propiedad.precio_noche) || 0;
+
+                            // ✨ DESCARGAMOS TARIFAS ESPECIALES
+                            try {
+                                const tRes = await fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${id}`);
+                                if (tRes.ok) this.propiedad.tarifas_especiales = await tRes.json();
+                                else this.propiedad.tarifas_especiales = [];
+                            } catch (e) { this.propiedad.tarifas_especiales = []; }
+
+                            // Traemos las reservas de esta propiedad para bloquear el calendario del cliente
+                            const resRes = await fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${id}`);
+                            if (resRes.ok) this.reservasFechas = await resRes.json();
+
                             setTimeout(() => this.iniciarMapa(), 300);
                         } else {
                             alert("Propiedad no encontrada");
@@ -717,13 +724,20 @@
                 initCalendario(defaultIn, defaultOut) {
                     const that = this;
 
+                    const deshabilitadas = this.reservasFechas.map(r => ({
+                        from: getLocalDateString(new Date(r.check_in)),
+                        to: new Date(new Date(r.check_out).getTime() - 86400000).toISOString().split('T')[0]
+                    }));
+
                     flatpickr("#suite-calendar", {
                         mode: "range",
                         minDate: "today",
                         dateFormat: "Y-m-d",
                         defaultDate: [defaultIn, defaultOut].filter(Boolean),
+                        disable: deshabilitadas,
                         locale: "es",
                         showMonths: window.innerWidth > 768 ? 2 : 1,
+                        disableMobile: "true",
                         onChange: function (selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
                                 that.checkinRaw = instance.formatDate(selectedDates[0], "Y-m-d");
@@ -794,12 +808,58 @@
                     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor || 0);
                 },
 
-                calcularTotal() {
-                    let total = (this.propiedad.precio_noche * this.noches) + this.tarifaLimpieza;
-                    if (this.pets > 0) {
-                        total += (this.tarifaMascota * this.pets);
+                haySuperposicion(checkInStr, checkOutStr) {
+                    if (!checkInStr || !checkOutStr) return false;
+                    const inTime = new Date(checkInStr + "T12:00:00").getTime();
+                    const outTime = new Date(checkOutStr + "T12:00:00").getTime();
+
+                    return this.reservasFechas.some(res => {
+                        const resInTime = new Date(getLocalDateString(new Date(res.check_in)) + "T12:00:00").getTime();
+                        const resOutTime = new Date(getLocalDateString(new Date(res.check_out)) + "T12:00:00").getTime();
+                        return (inTime < resOutTime) && (outTime > resInTime);
+                    });
+                },
+
+                // ✨ CÁLCULO DÍA POR DÍA INYECTADO (AQUÍ ESTÁ LA MAGIA)
+                obtenerPrecioPorDia(fechaStr) {
+                    if (!fechaStr) return this.propiedad.precio_noche;
+                    const f = new Date(fechaStr + "T12:00:00").getTime();
+                    let tarifaEspecial = (this.propiedad.tarifas_especiales || []).find(t => {
+                        const tIn = new Date(t.fecha_inicio).getTime();
+                        const tOut = new Date(t.fecha_fin).getTime();
+                        return f >= tIn && f <= tOut;
+                    });
+                    return tarifaEspecial ? tarifaEspecial.precio : (this.propiedad.precio_noche || 0);
+                },
+
+                calcularSubtotalNoches() {
+                    let total = 0;
+                    if (!this.checkinRaw) return total;
+                    let d = new Date(this.checkinRaw + "T12:00:00");
+                    for (let i = 0; i < this.noches; i++) {
+                        total += this.obtenerPrecioPorDia(getLocalDateString(d));
+                        d.setDate(d.getDate() + 1);
                     }
                     return total;
+                },
+
+                // ✨ NUEVO CÁLCULO DE TOTAL BASADO EN EL DÍA A DÍA
+                calcularTotal() {
+                    let totalBase = this.calcularSubtotalNoches();
+                    let totalAseo = this.propiedad.tarifa_aseo || 0;
+
+                    let extraCost = 0;
+                    let pagadores = this.adults + this.children;
+                    let basePermitida = this.propiedad.huespedes_base || 1;
+
+                    if (pagadores > basePermitida) {
+                        let extras = pagadores - basePermitida;
+                        extraCost = (extras * (this.propiedad.precio_huesped_extra || 0)) * this.noches;
+                    }
+
+                    let mascotaCost = (this.propiedad.precio_mascota || 0) * this.pets * this.noches;
+
+                    return totalBase + totalAseo + extraCost + mascotaCost;
                 },
 
                 abrirModalPago() {
@@ -807,32 +867,74 @@
                         alert("Por favor, selecciona las fechas de tu viaje en el calendario.");
                         return;
                     }
+                    if (this.haySuperposicion(this.checkinRaw, this.checkoutRaw)) {
+                        alert("⚠️ ERROR: Las fechas seleccionadas ya no están disponibles.");
+                        return;
+                    }
+
                     this.metodoSeleccionado = '';
+                    this.nombreHuesped = '';
                     this.modalPago = true;
                 },
 
                 async procesarReserva() {
+                    this.cargandoPago = true;
                     const totalPagar = this.calcularTotal();
                     const totalStr = this.formatearDinero(totalPagar);
-                    const totalHuespedes = this.adults + this.children + this.infants;
 
-                    if (this.metodoSeleccionado === 'Transferencia') {
+                    // ✨ 1. CREAMOS LA RESERVA AUTOMÁTICA EN LA BASE DE DATOS
+                    try {
+                        const payload = {
+                            propiedad_id: this.propiedad.id,
+                            huesped_nombre: this.nombreHuesped,
+                            check_in: new Date(this.checkinRaw + "T15:00:00").toISOString(),
+                            check_out: new Date(this.checkoutRaw + "T11:00:00").toISOString(),
 
-                        let texto = `¡Hola Edwin! 👋 Quiero confirmar mi reserva por Transferencia:\n\n`;
-                        texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
-                        texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
-                        texto += `👥 *Huéspedes:* ${totalHuespedes} persona(s)\n`;
-                        if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets} (Aplica tarifa extra)\n`;
-                        texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
-                        texto += `Quedo atento/a para enviar el comprobante de Nequi, Bancolombia o Bre-B y recibir las instrucciones de acceso. 🔑`;
+                            // Desglose enviado a la base de datos
+                            adultos: this.adults,
+                            ninos: this.children,
+                            bebes: this.infants,
+                            mascotas: this.pets,
+                            cantidad_huespedes: this.adults + this.children, // Pagadores
 
-                        this.modalPago = false;
-                        const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
-                        window.open(urlWA, '_blank');
+                            monto_total: totalPagar,
+                            canal: 'Directa',
+                            estado_reserva: 'Por Confirmar Pago'
+                        };
 
-                    } else if (this.metodoSeleccionado === 'Mercado Pago') {
-                        // TODO: Aquí conectaremos tu backend con Mercado Pago.
-                        alert("¡Siguiente paso! Pásame tu Access Token de Mercado Pago para conectarlo al Backend y automatizar esto.");
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!res.ok) throw new Error("Las fechas fueron ocupadas recientemente.");
+
+                        // ✨ 2. REDIRECCIÓN AL WHATSAPP O MERCADO PAGO
+                        if (this.metodoSeleccionado === 'Transferencia') {
+                            let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
+                            texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
+                            texto += `👤 *A nombre de:* ${this.nombreHuesped}\n`;
+                            texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
+                            texto += `👥 *Adultos:* ${this.adults}\n`;
+                            if (this.children > 0) texto += `👦 *Niños:* ${this.children}\n`;
+                            if (this.infants > 0) texto += `👶 *Bebés:* ${this.infants}\n`;
+                            if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets}\n`;
+                            texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
+                            texto += `Quedo atento/a para enviar el comprobante y recibir las instrucciones de acceso. 🔑`;
+
+                            this.modalPago = false;
+                            const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
+                            window.open(urlWA, '_blank');
+
+                            // Recargar la página para limpiar el calendario después del éxito
+                            setTimeout(() => window.location.reload(), 2000);
+                        }
+
+                    } catch (error) {
+                        alert(error.message || "Error al conectar con el servidor.");
+                    } finally {
+                        this.cargandoPago = false;
                     }
                 }
             }
