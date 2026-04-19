@@ -94,6 +94,18 @@
         .modal-scroll::-webkit-scrollbar-thumb:hover {
             background: #D1D5DB;
         }
+
+        /* ✨ CLASE MAGICA PARA OCULTAR SCROLLBAR EN LA GALERÍA MÓVIL ✨ */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
     </style>
 </head>
 
@@ -106,7 +118,7 @@
     </div>
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
@@ -151,13 +163,14 @@
                 class="mt-8 bg-gold text-navy text-lg font-extrabold py-4 w-full max-w-xs rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] text-center">Contacto</a>
         </div>
     </div>
+
     <main class="pt-36 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando" style="display: none;">
 
-        <section class="mb-8">
+        <section class="mb-6 md:mb-8">
             <h1 class="text-3xl md:text-4xl font-extrabold text-navy leading-tight mb-3" x-text="propiedad.titulo"></h1>
             <div class="flex justify-between items-center text-sm text-gray-600 font-medium">
                 <p class="underline" x-text="`${propiedad.ciudad}, ${propiedad.departamento}, Colombia`"></p>
-                <div class="flex gap-4">
+                <div class="hidden md:flex gap-4">
                     <button
                         class="flex items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-xl transition-colors text-navy font-bold">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,16 +193,18 @@
 
             <div class="w-full lg:w-[65%] xl:w-[70%]">
 
-                <section class="relative rounded-[32px] overflow-hidden mb-12 shadow-lg">
-                    <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-3 h-[350px] md:h-[400px] bg-gray-100">
-                        <div class="md:col-span-2 md:row-span-2 relative group cursor-pointer overflow-hidden">
+                <section
+                    class="relative rounded-2xl md:rounded-[32px] overflow-hidden mb-8 md:mb-12 shadow-lg md:shadow-lg shadow-gray-200/50">
+
+                    <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100">
+                        <div class="col-span-2 row-span-2 relative group cursor-pointer overflow-hidden">
                             <img :src="propiedad.fotos[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80'"
                                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                             <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
                             </div>
                         </div>
                         <template x-for="i in [1, 2, 3, 4]">
-                            <div class="hidden md:block relative group cursor-pointer overflow-hidden bg-gray-200">
+                            <div class="relative group cursor-pointer overflow-hidden bg-gray-200">
                                 <template x-if="propiedad.fotos[i]">
                                     <img :src="propiedad.fotos[i]"
                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
@@ -197,8 +212,26 @@
                             </div>
                         </template>
                     </div>
+
+                    <div
+                        class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100">
+                        <template x-for="(foto, index) in propiedad.fotos" :key="index">
+                            <div class="w-full h-full shrink-0 snap-center relative">
+                                <img :src="foto" class="w-full h-full object-cover">
+                                <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-widest"
+                                    x-text="`${index + 1} / ${propiedad.fotos.length}`">
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="!propiedad.fotos || propiedad.fotos.length === 0"
+                            class="w-full h-full shrink-0 snap-center relative">
+                            <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"
+                                class="w-full h-full object-cover">
+                        </div>
+                    </div>
+
                     <button
-                        class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-xl text-navy font-bold flex items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm">
+                        class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-xl text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
@@ -207,7 +240,6 @@
                         Ver todas
                     </button>
                 </section>
-
                 <div class="flex justify-between items-start pb-8 border-b border-gray-100">
                     <div>
                         <h2 class="text-2xl font-extrabold text-navy mb-2"
@@ -276,7 +308,7 @@
                     </div>
 
                     <div
-                        class="relative w-full h-[450px] rounded-[32px] overflow-hidden shadow-xl border border-gray-100">
+                        class="relative w-full h-[350px] md:h-[450px] rounded-[32px] overflow-hidden shadow-xl border border-gray-100">
                         <button @click="centrarMapa()"
                             class="absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur-sm text-navy font-bold py-2.5 px-4 rounded-full shadow-lg border border-gray-200 flex items-center gap-2 hover:bg-white transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -637,7 +669,8 @@
                 cargando: true,
                 cargandoPago: false,
 
-                mobileMenuOpen: false, // <-- AÑADIDO PARA EL MENÚ
+                // ✨ ESTADOS AÑADIDOS
+                mobileMenuOpen: false,
 
                 propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
                 reservasFechas: [],
