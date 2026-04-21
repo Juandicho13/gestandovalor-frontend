@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
@@ -95,22 +95,19 @@
             background: #D1D5DB;
         }
 
-        /* ✨ CLASE MAGICA PARA OCULTAR SCROLLBAR EN LA GALERÍA MÓVIL ✨ */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
 
         .no-scrollbar {
             -ms-overflow-style: none;
-            /* IE and Edge */
             scrollbar-width: none;
-            /* Firefox */
         }
     </style>
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-white" x-data="suiteApp()" x-init="initApp()"
-    :class="(openModalText || modalPago || mobileMenuOpen) ? 'overflow-hidden' : ''">
+    :class="(openModalText || modalPago || mobileMenuOpen || openModalFotos) ? 'overflow-hidden' : ''">
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mb-4"></div>
@@ -196,15 +193,16 @@
                 <section
                     class="relative rounded-2xl md:rounded-[32px] overflow-hidden mb-8 md:mb-12 shadow-lg md:shadow-lg shadow-gray-200/50">
 
-                    <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100">
-                        <div class="col-span-2 row-span-2 relative group cursor-pointer overflow-hidden">
+                    <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100 cursor-pointer"
+                        @click="openModalFotos = true">
+                        <div class="col-span-2 row-span-2 relative group overflow-hidden">
                             <img :src="propiedad.fotos[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80'"
                                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                             <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
                             </div>
                         </div>
                         <template x-for="i in [1, 2, 3, 4]">
-                            <div class="relative group cursor-pointer overflow-hidden bg-gray-200">
+                            <div class="relative group overflow-hidden bg-gray-200">
                                 <template x-if="propiedad.fotos[i]">
                                     <img :src="propiedad.fotos[i]"
                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
@@ -213,8 +211,8 @@
                         </template>
                     </div>
 
-                    <div
-                        class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100">
+                    <div class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100 cursor-pointer"
+                        @click="openModalFotos = true">
                         <template x-for="(foto, index) in propiedad.fotos" :key="index">
                             <div class="w-full h-full shrink-0 snap-center relative">
                                 <img :src="foto" class="w-full h-full object-cover">
@@ -230,8 +228,8 @@
                         </div>
                     </div>
 
-                    <button
-                        class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-xl text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm">
+                    <button @click="openModalFotos = true"
+                        class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-xl text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm z-10">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
@@ -240,6 +238,7 @@
                         Ver todas
                     </button>
                 </section>
+
                 <div class="flex justify-between items-start pb-8 border-b border-gray-100">
                     <div>
                         <h2 class="text-2xl font-extrabold text-navy mb-2"
@@ -511,6 +510,57 @@
         </div>
     </main>
 
+    <div x-show="openModalFotos" style="display: none;"
+        class="fixed inset-0 z-[250] bg-white flex flex-col transform transition-transform duration-300"
+        x-transition:enter="ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+        x-transition:leave="ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
+
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+            <button @click="openModalFotos = false"
+                class="p-2 hover:bg-gray-100 rounded-full transition-colors text-navy">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <div class="flex gap-4">
+                <button
+                    class="font-bold text-navy underline text-sm hover:text-gold transition-colors">Compartir</button>
+                <button class="font-bold text-navy underline text-sm hover:text-gold transition-colors">Guardar</button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-4 md:px-24 lg:px-48 py-8 custom-scrollbar">
+            <h2 class="text-3xl font-extrabold text-navy mb-8">Recorrido fotográfico</h2>
+
+            <div class="flex gap-4 overflow-x-auto pb-6 mb-8 no-scrollbar snap-x">
+                <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
+                    <a :href="'#cat-' + grupo.nombre.replace(/\s+/g, '-')" class="shrink-0 w-32 group snap-start">
+                        <div class="aspect-[4/3] rounded-xl overflow-hidden mb-2 border border-gray-200">
+                            <img :src="grupo.fotos[0].url"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <p class="text-sm font-bold text-navy truncate" x-text="grupo.nombre"></p>
+                    </a>
+                </template>
+            </div>
+
+            <div class="space-y-12">
+                <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
+                    <div :id="'cat-' + grupo.nombre.replace(/\s+/g, '-')">
+                        <h3 class="text-2xl font-extrabold text-navy mb-6" x-text="grupo.nombre"></h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <template x-for="(foto, index) in grupo.fotos" :key="index">
+                                <div class="aspect-[4/3] md:aspect-auto md:h-[300px] rounded-xl overflow-hidden bg-gray-100"
+                                    :class="(grupo.fotos.length === 1 || (index === 0 && grupo.fotos.length % 2 !== 0)) ? 'md:col-span-2 md:h-[500px]' : ''">
+                                    <img :src="foto.url" class="w-full h-full object-cover">
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
     <div x-show="openModalText" style="display: none;"
         class="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 md:p-12">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-md" @click="openModalText = false" x-transition.opacity>
@@ -669,10 +719,10 @@
                 cargando: true,
                 cargandoPago: false,
 
-                // ✨ ESTADOS AÑADIDOS
                 mobileMenuOpen: false,
+                openModalFotos: false, // ✨ ESTADO PARA EL MODAL DE FOTOS TIPO AIRBNB
 
-                propiedad: { id: '', titulo: '', fotos: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
+                propiedad: { id: '', titulo: '', fotos: [], foto_categorias: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
                 reservasFechas: [],
 
                 openModalText: false,
@@ -759,6 +809,26 @@
                     }
                 },
 
+                // ✨ LÓGICA PARA AGRUPAR LAS FOTOS POR CATEGORÍA
+                getFotosAgrupadas() {
+                    const grupos = {};
+                    if (!this.propiedad || !this.propiedad.fotos) return [];
+
+                    this.propiedad.fotos.forEach((fotoUrl, index) => {
+                        let cat = this.propiedad.foto_categorias && this.propiedad.foto_categorias[index] ? this.propiedad.foto_categorias[index] : 'Fotos del alojamiento';
+                        if (cat === 'Sin asignar') cat = 'Otras áreas';
+
+                        if (!grupos[cat]) grupos[cat] = [];
+                        grupos[cat].push({ url: fotoUrl, index: index });
+                    });
+
+                    // Convertir a Array y poner 'Otras áreas' al final si existe
+                    return Object.keys(grupos).map(key => ({
+                        nombre: key,
+                        fotos: grupos[key]
+                    })).sort((a, b) => a.nombre === 'Otras áreas' ? 1 : b.nombre === 'Otras áreas' ? -1 : 0);
+                },
+
                 obtenerResumen() {
                     if (!this.propiedad.descripcion) return 'Aún no hay descripción.';
                     let txt = this.propiedad.descripcion;
@@ -797,7 +867,7 @@
                         onChange: function (selectedDates, dateStr, instance) {
                             if (selectedDates.length === 2) {
                                 that.checkinRaw = instance.formatDate(selectedDates[0], "Y-m-d");
-                                that.checkoutRaw = instance.formatDate(selectedDates[1], "Y-m-d");
+                                pattern = that.checkoutRaw = instance.formatDate(selectedDates[1], "Y-m-d");
                                 that.checkinLabel = instance.formatDate(selectedDates[0], "d M");
                                 that.checkoutLabel = instance.formatDate(selectedDates[1], "d M");
                                 that.calcularNoches(selectedDates[0], selectedDates[1]);
