@@ -588,6 +588,378 @@
             }
         }
     </script>
+
+    <footer x-data="{ openTerminos: false, openPrivacidad: false }"
+        class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10 mt-10">
+
+        <div
+            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
+        </div>
+        <div
+            class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+                Tu apartamento puede generar más.<br>
+                <span class="text-gold">Nosotros lo hacemos posible.</span>
+            </h2>
+
+            <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+
+            <div class="mb-10">
+                <div class="inline-flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
+                    <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
+                            class="font-light text-gray-400">Apartasuites</span></span>
+                </div>
+                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
+                    Administración estratégica para rentas cortas
+                </p>
+            </div>
+
+            <div class="flex justify-center gap-8 mb-16">
+                <a href="https://www.instagram.com/gestandovalor/" target="_blank"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
+                        <path
+                            d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                    </svg>
+                </a>
+
+                <a href="https://www.facebook.com/gestandovalor?locale=es_LA" target="_blank"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                </a>
+
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
+
+                <a href="mailto:info@gestandovalor.com"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                </a>
+            </div>
+
+            <div
+                class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+                <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
+                <div class="flex gap-6">
+                    <button @click="openPrivacidad = true"
+                        class="hover:text-white transition-colors cursor-pointer outline-none">Política de
+                        Privacidad</button>
+                    <button @click="openTerminos = true"
+                        class="hover:text-white transition-colors cursor-pointer outline-none">Términos y
+                        Condiciones</button>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="openTerminos" style="display: none;"
+            class="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 md:p-12 text-left">
+            <div class="absolute inset-0 bg-navy/90 backdrop-blur-md" @click="openTerminos = false"
+                x-transition.opacity></div>
+            <div class="relative w-full max-w-4xl bg-white rounded-[32px] shadow-2xl flex flex-col h-auto max-h-[85vh] transform transition-all overflow-hidden"
+                x-transition:enter="ease-out duration-400" x-transition:enter-start="opacity-0 translate-y-16 scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                x-transition:leave-end="opacity-0 translate-y-16 scale-95">
+
+                <div
+                    class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 shrink-0 bg-white z-10">
+                    <h2 class="text-xl md:text-2xl font-extrabold text-navy">Términos y Condiciones</h2>
+                    <button @click="openTerminos = false"
+                        class="bg-gray-100 hover:bg-gray-200 text-navy p-3 rounded-full transition-colors focus:outline-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div
+                    class="flex-1 overflow-y-auto p-6 md:p-8 modal-scroll text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+                    <div>
+                        <p class="font-bold text-navy">www.gestandovalor.com</p>
+                        <p>Gestando Valor S.A.S — Servicios de administración de inmuebles, rentas cortas y alojamiento.
+                        </p>
+                        <p class="text-sm text-gray-500">Fecha de entrada en vigor: 02/03/2026</p>
+                    </div>
+                    <p>Bienvenido a <strong>Gestando Valor S.A.S.</strong> (en adelante “Gestando Valor”, “nosotros” o
+                        “la Empresa”). Estos Términos y Condiciones regulan el uso de este sitio web
+                        www.gestandovalor.com (el “Sitio Web”) y la contratación de los servicios ofrecidos por
+                        nosotros, relacionados con la administración de rentas cortas, gestión de alojamientos y
+                        servicios inmobiliarios.</p>
+                    <p>Al acceder, navegar o usar este Sitio Web y/o contratar alguno de nuestros servicios, usted (en
+                        adelante, “Usuario”, “Cliente” o “Propietario/Huésped”) acepta plenamente y sin reservas estos
+                        Términos y Condiciones.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">1. DEFINICIONES</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Servicios:</strong> Todas las actividades, procesos, productos o prestaciones
+                            ofrecidas por Gestando Valor, incluyendo la gestión de inmuebles para rentas cortas,
+                            administración de alojamientos, atención a huéspedes, marketing, reservas y demás servicios
+                            asociados a la explotación de propiedades.</li>
+                        <li><strong>Usuario:</strong> Cualquier persona que visita el Sitio Web o contrata los
+                            Servicios, ya sea como propietario de un inmueble, huésped o tercero autorizado.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">2. ACEPTACIÓN Y APLICACIÓN</h3>
+                    <p>Al acceder y utilizar este Sitio Web o ingresar datos para servicios, usted declara que ha leído,
+                        entendido y acepta estos Términos y Condiciones, junto con cualquier otra política publicada en
+                        el Sitio Web, incluidas la Política de Privacidad y la Política de Cookies.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">3. USO DEL SITIO WEB</h3>
+                    <ul class="list-none space-y-2">
+                        <li><strong>3.1.</strong> Este Sitio Web está disponible para mayores de edad y personas con
+                            capacidad legal para contratar.</li>
+                        <li><strong>3.2.</strong> El Usuario se compromete a utilizar el Sitio Web con fines lícitos y
+                            de acuerdo con la ley y estos Términos.</li>
+                        <li><strong>3.3.</strong> Está prohibido usar el Sitio Web para acciones que generen daño,
+                            fraude o vulneren sistemas o datos de terceros.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">4. SERVICIOS DE ADMINISTRACIÓN Y
+                        ALOJAMIENTO</h3>
+                    <ul class="list-none space-y-2">
+                        <li><strong>4.1.</strong> Gestando Valor presta servicios de administración de inmuebles
+                            destinados a rentas cortas, así como la gestión del alojamiento a huéspedes en propiedades
+                            bajo su administración.</li>
+                        <li><strong>4.2.</strong> Los servicios contratados y sus características específicas se
+                            detallarán en los acuerdos individuales, contratos o cotizaciones aceptadas por el Cliente.
+                        </li>
+                        <li><strong>4.3.</strong> Gestando Valor podrá realizar acciones necesarias para la prestación
+                            del servicio, incluyendo la publicación en plataformas de reserva, atención a huéspedes,
+                            cobro de tarifas de alquiler y demás tareas inherentes a la gestión administrativa.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">5. RESERVAS, PAGOS Y TARIFAS</h3>
+                    <ul class="list-none space-y-2">
+                        <li><strong>5.1.</strong> Las tarifas por los servicios de administración podrán variar según el
+                            tipo de inmueble, duración, ubicación y características del servicio contratado.</li>
+                        <li><strong>5.2.</strong> El Cliente acepta pagar las tarifas acordadas de forma puntual, en la
+                            forma establecida en su contrato o cotización.</li>
+                        <li><strong>5.3.</strong> Gestando Valor puede retener comisiones de las rentas facturadas al
+                            huésped como se pacte con el propietario.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">6. DERECHOS DE PROPIETARIOS Y HUÉSPEDES
+                    </h3>
+                    <ul class="list-none space-y-2">
+                        <li><strong>6.1.</strong> Los propietarios tienen derecho a acceder a información de sus
+                            inmuebles y rentas generadas.</li>
+                        <li><strong>6.2.</strong> Los huéspedes tienen derecho a recibir servicios de alojamiento
+                            conforme a lo contratado, con seguridad, calidad y claridad de términos.</li>
+                        <li><strong>6.3.</strong> Cualquier uso indebido de los espacios, daños o violaciones a normas
+                            de convivencia podrán dar lugar a sanciones, cargos adicionales o cancelación de servicios.
+                        </li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">7. PROPIEDAD INTELECTUAL</h3>
+                    <p>Todo contenido del Sitio Web (textos, imágenes, marcas, logos, diseño, etc.) es propiedad de
+                        Gestando Valor o de terceros que nos otorgan licencia, y se protege conforme a las leyes de
+                        propiedad intelectual aplicables. Queda prohibida su reproducción, distribución o transmisión
+                        sin autorización expresa.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">8. RESPONSABILIDAD Y EXCLUSIONES</h3>
+                    <ul class="list-none space-y-2">
+                        <li><strong>8.1.</strong> Gestando Valor no será responsable por daños indirectos, lucro cesante
+                            o pérdida de ingresos derivados del uso del Sitio Web o de los Servicios, salvo en los casos
+                            que la ley lo exija.</li>
+                        <li><strong>8.2.</strong> La Empresa no asume responsabilidad por cambios en políticas de
+                            terceros (plataformas de reserva, pasarelas de pago o sistemas de alojamiento) que puedan
+                            afectar disponibilidad o tarifas.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">9. PROTECCIÓN DE DATOS PERSONALES</h3>
+                    <p>El tratamiento de datos personales se rige por la Política de Privacidad publicada en el Sitio
+                        Web www.gestandovalor.com y conforme a la legislación colombiana, incluyendo la Ley 1581 de 2012
+                        y el Decreto 1377 de 2013. El Usuario declara haberla leído y comprenderla.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">10. MODIFICACIONES Y TERMINACIÓN</h3>
+                    <ul class="list-none space-y-2">
+                        <li><strong>10.1.</strong> Gestando Valor se reserva el derecho de modificar estos Términos y
+                            Condiciones en cualquier momento.</li>
+                        <li><strong>10.2.</strong> Los cambios surtirán efecto desde su publicación en el Sitio Web.
+                        </li>
+                        <li><strong>10.3.</strong> El uso continuado del Sitio Web después de cualquier modificación
+                            implicará la aceptación de los nuevos términos.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">11. LEY APLICABLE Y JURISDICCIÓN</h3>
+                    <p>Estos Términos se rigen por las leyes de la República de Colombia. Cualquier controversia será
+                        sometida a los tribunales competentes del domicilio social de Gestando Valor.</p>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="openPrivacidad" style="display: none;"
+            class="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 md:p-12 text-left">
+            <div class="absolute inset-0 bg-navy/90 backdrop-blur-md" @click="openPrivacidad = false"
+                x-transition.opacity></div>
+            <div class="relative w-full max-w-4xl bg-white rounded-[32px] shadow-2xl flex flex-col h-auto max-h-[85vh] transform transition-all overflow-hidden"
+                x-transition:enter="ease-out duration-400" x-transition:enter-start="opacity-0 translate-y-16 scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                x-transition:leave-end="opacity-0 translate-y-16 scale-95">
+
+                <div
+                    class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 shrink-0 bg-white z-10">
+                    <h2 class="text-xl md:text-2xl font-extrabold text-navy">Política de Privacidad</h2>
+                    <button @click="openPrivacidad = false"
+                        class="bg-gray-100 hover:bg-gray-200 text-navy p-3 rounded-full transition-colors focus:outline-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div
+                    class="flex-1 overflow-y-auto p-6 md:p-8 modal-scroll text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-navy">POLÍTICA DE PRIVACIDAD Y TRATAMIENTO DE DATOS PERSONALES
+                        </h2>
+                        <p class="font-bold text-navy">Gestando Valor – www.gestandovalor.com</p>
+                        <p class="text-sm text-gray-500">Última actualización: 02/03/2026</p>
+                    </div>
+                    <p>En <strong>Gestando Valor</strong> valoramos tu confianza. Por eso protegemos tu información
+                        personal y la tratamos de forma responsable, transparente y segura, de acuerdo con la
+                        legislación colombiana sobre protección de datos personales.</p>
+                    <p>Esta Política explica cómo recopilamos, usamos y protegemos tus datos cuando visitas nuestro
+                        sitio web, solicitas nuestros servicios de administración de rentas cortas o te hospedas en
+                        alguno de los alojamientos que gestionamos.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">1. ¿Quién es el responsable de tus datos?
+                    </h3>
+                    <ul class="list-none space-y-1">
+                        <li><strong>Razón social:</strong> Gestando Valor SAS</li>
+                        <li><strong>NIT:</strong> 901.722.952-3</li>
+                        <li><strong>Ciudad:</strong> Chía, Cundinamarca, Colombia</li>
+                        <li><strong>Correo electrónico:</strong> gestandovalor@gmail.com</li>
+                        <li><strong>Teléfono:</strong> 394095505</li>
+                    </ul>
+                    <p>Gestando Valor es responsable del tratamiento de los datos personales que nos compartes como
+                        propietario, huésped o usuario del sitio web.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">2. ¿Qué información recopilamos?</h3>
+                    <p>Recopilamos únicamente la información necesaria para ofrecerte un servicio eficiente y seguro.
+                    </p>
+
+                    <h4 class="font-bold text-navy mt-4">Si eres propietario o cliente</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Nombre completo</li>
+                        <li>Documento de identidad</li>
+                        <li>Teléfono y correo electrónico</li>
+                        <li>Información del inmueble</li>
+                        <li>Datos bancarios (solo para pagos y transferencias)</li>
+                        <li>Información contractual</li>
+                    </ul>
+
+                    <h4 class="font-bold text-navy mt-4">Si eres huésped</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Nombre completo</li>
+                        <li>Documento de identidad</li>
+                        <li>Teléfono y correo electrónico</li>
+                        <li>Nacionalidad</li>
+                        <li>Fechas de estadía</li>
+                        <li>Información requerida por la normativa legal y de seguridad</li>
+                    </ul>
+
+                    <h4 class="font-bold text-navy mt-4">Si navegas por nuestra web</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Dirección IP</li>
+                        <li>Tipo de dispositivo y navegador</li>
+                        <li>Información de navegación y cookies</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">3. ¿Para qué usamos tus datos?</h3>
+                    <p>Utilizamos tu información para:</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Gestionar reservas y estadías</li>
+                        <li>Administrar inmuebles destinados a rentas cortas</li>
+                        <li>Coordinar check-in, check-out y atención a huéspedes</li>
+                        <li>Cumplir obligaciones legales y de registro</li>
+                        <li>Realizar pagos, cobros y procesos administrativos</li>
+                        <li>Comunicarnos contigo sobre el servicio</li>
+                        <li>Mejorar nuestra plataforma y experiencia de usuario</li>
+                        <li>Enviarte información comercial o promociones (solo si nos autorizas)</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">4. Autorización del uso de tus datos</h3>
+                    <p>Al completar formularios, firmar contratos o usar nuestros servicios, autorizas de manera previa,
+                        expresa e informada a Gestando Valor para tratar tus datos personales conforme a esta política.
+                    </p>
+                    <p>Puedes revocar esta autorización en cualquier momento.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">5. Uso de cookies</h3>
+                    <p>Nuestro sitio web utiliza cookies para mejorar la navegación, analizar el uso del sitio y
+                        ofrecerte una mejor experiencia. Puedes aceptar, rechazar o configurar las cookies desde tu
+                        navegador cuando lo desees.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">6. ¿Compartimos tu información?</h3>
+                    <p>Solo compartimos tus datos cuando es necesario para prestar el servicio, por ejemplo con:</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Plataformas de reservas y alojamiento</li>
+                        <li>Proveedores de pagos y servicios tecnológicos</li>
+                        <li>Autoridades competentes cuando la ley lo exige</li>
+                    </ul>
+                    <p>Siempre garantizamos que esta información sea tratada con confidencialidad y seguridad.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">7. Tus derechos como titular de datos
+                    </h3>
+                    <p>En cualquier momento puedes:</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Conocer qué datos tenemos sobre ti</li>
+                        <li>Actualizar o corregir tu información</li>
+                        <li>Solicitar la eliminación de tus datos</li>
+                        <li>Revocar tu autorización</li>
+                        <li>Presentar consultas o reclamos</li>
+                        <li>Acudir a la Superintendencia de Industria y Comercio si lo consideras necesario</li>
+                    </ul>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">8. ¿Cómo ejercer tus derechos?</h3>
+                    <p>Escríbenos al correo: <strong>gestandovalor@gmail.com</strong></p>
+                    <p>Incluye: Tu nombre completo, el detalle de tu solicitud y un medio de contacto.</p>
+                    <p>Tiempos de respuesta: Consultas (hasta 10 días hábiles) y Reclamos (hasta 15 días hábiles).</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">9. Seguridad de la información</h3>
+                    <p>Protegemos tu información con medidas técnicas y administrativas diseñadas para evitar accesos no
+                        autorizados, pérdida o uso indebido de los datos. Aunque ningún sistema es 100% infalible,
+                        trabajamos constantemente para mantener altos estándares de seguridad.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">10. Conservación de los datos</h3>
+                    <p>Conservamos tu información solo durante el tiempo necesario para cumplir con las finalidades del
+                        servicio o las obligaciones legales.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">11. Información de menores de edad</h3>
+                    <p>Nuestros servicios no están dirigidos a menores de edad. En el caso de huéspedes menores, el
+                        tratamiento de datos se realiza únicamente para fines legales y de seguridad, con autorización
+                        de sus representantes.</p>
+
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">12. Cambios en esta política</h3>
+                    <p>Podremos actualizar esta Política cuando sea necesario. Cualquier cambio será publicado en
+                        www.gestandovalor.com.</p>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+
 </body>
 
 </html>
