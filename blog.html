@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+    <link rel="icon" type="image/png" href="Logo.png?v=1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog - GestandoValor</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -13,8 +15,8 @@
             theme: {
                 extend: {
                     colors: {
-                        navy: '#0B132B', 
-                        gold: '#D4AF37', 
+                        navy: '#0B132B',
+                        gold: '#D4AF37',
                         lightGray: '#F9FAFB'
                     }
                 }
@@ -22,97 +24,126 @@
         }
     </script>
 </head>
+
 <body class="font-sans text-gray-800 antialiased bg-navy" x-data="blogPublico()" x-init="init()">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
         <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+                class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+
+        <div
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
-            <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors text-white border-b-2 border-gold pb-1">Blog</a>
+            <a href="blog.html"
+                class="text-sm font-medium hover:text-gold transition-colors text-white border-b-2 border-gold pb-1">Blog</a>
             <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
-            <a href="login.html" class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar Sesión</a>
+            <a href="login.html"
+                class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar
+                Sesión</a>
         </div>
 
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
-            <a href="index.html#contacto" class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 inline-block">Contacto</a>
+            <a href="index.html#contacto"
+                class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 inline-block">Contacto</a>
         </div>
 
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300" :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center" :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
         </button>
     </nav>
 
-    <div x-show="mobileMenuOpen" 
-         style="display: none;"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-300"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
-        
+    <div x-show="mobileMenuOpen" style="display: none;" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+
         <div class="flex flex-col items-center gap-8 w-full mt-10">
             <a href="index.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white">Inicio</a>
-            <a href="blog.html" @click="mobileMenuOpen = false" class="text-2xl font-medium text-gray-300 hover:text-gold">Blog</a>
-            <a href="alojamientos.html" @click="mobileMenuOpen = false" class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
-            <a href="login.html" @click="mobileMenuOpen = false" class="text-2xl font-medium text-gray-300 hover:text-gold">Iniciar Sesión</a>
-            <a href="index.html#contacto" @click="mobileMenuOpen = false" class="mt-8 bg-gold text-navy text-lg font-extrabold py-4 w-full max-w-xs rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] text-center">Contacto</a>
+            <a href="blog.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Blog</a>
+            <a href="alojamientos.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
+            <a href="login.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Iniciar Sesión</a>
+            <a href="index.html#contacto" @click="mobileMenuOpen = false"
+                class="mt-8 bg-gold text-navy text-lg font-extrabold py-4 w-full max-w-xs rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] text-center">Contacto</a>
         </div>
     </div>
 
-    <section class="relative bg-navy text-white pt-40 pb-20 flex items-center justify-center text-center overflow-hidden rounded-b-[60px] shadow-xl z-10">
+    <section
+        class="relative bg-navy text-white pt-40 pb-20 flex items-center justify-center text-center overflow-hidden rounded-b-[60px] shadow-xl z-10">
         <div class="absolute inset-0 z-0 opacity-20">
-            <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Espacio de trabajo elegante" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                alt="Espacio de trabajo elegante" class="w-full h-full object-cover">
         </div>
         <div class="absolute inset-0 bg-gradient-to-b from-navy/50 to-navy z-0"></div>
 
         <div class="relative z-10 max-w-3xl mx-auto px-6">
             <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Blog GV</span>
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">Artículos para propietarios</h1>
-            <p class="text-lg text-gray-300 leading-relaxed">Descubre estrategias, tendencias y consejos de expertos para maximizar los ingresos de tu apartasuite.</p>
+            <p class="text-lg text-gray-300 leading-relaxed">Descubre estrategias, tendencias y consejos de expertos
+                para maximizar los ingresos de tu apartasuite.</p>
         </div>
     </section>
 
     <section class="pt-24 pb-24 bg-lightGray relative -mt-10 z-0 min-h-screen">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            
+
             <div x-show="cargando" class="text-center py-20">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
                 <p class="text-navy font-bold">Cargando los últimos artículos...</p>
             </div>
 
             <div x-show="!cargando && articulos.length === 0" style="display: none;" class="text-center py-20">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
                 <h3 class="text-2xl font-extrabold text-navy mb-2">Próximamente</h3>
                 <p class="text-gray-500">Estamos preparando contenido increíble para ti. ¡Vuelve pronto!</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10" x-show="!cargando && articulos.length > 0" style="display: none;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10" x-show="!cargando && articulos.length > 0"
+                style="display: none;">
                 <template x-for="art in articulos" :key="art.id">
-                    
-                    <article class="bg-white rounded-[30px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col hover:-translate-y-1">
-                        
+
+                    <article
+                        class="bg-white rounded-[30px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col hover:-translate-y-1">
+
                         <a :href="`articulo.html?id=${art.id}`" class="relative h-60 overflow-hidden block">
-                            <img :src="art.foto_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'" :alt="art.titulo" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                            <div class="absolute top-4 left-4 bg-navy/90 backdrop-blur-md text-gold text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider border border-white/10" x-text="art.categoria"></div>
+                            <img :src="art.foto_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'"
+                                :alt="art.titulo"
+                                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute top-4 left-4 bg-navy/90 backdrop-blur-md text-gold text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider border border-white/10"
+                                x-text="art.categoria"></div>
                         </a>
-                        
+
                         <div class="p-8 flex-1 flex flex-col">
-                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3 block" x-text="`${formatearFecha(art.createdAt)} • ${art.tiempo_lectura} min lectura`"></span>
-                            
+                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3 block"
+                                x-text="`${formatearFecha(art.createdAt)} • ${art.tiempo_lectura} min lectura`"></span>
+
                             <a :href="`articulo.html?id=${art.id}`" class="block mb-4">
-                                <h2 class="text-xl font-extrabold text-navy group-hover:text-gold transition-colors leading-snug" x-text="art.titulo"></h2>
+                                <h2 class="text-xl font-extrabold text-navy group-hover:text-gold transition-colors leading-snug"
+                                    x-text="art.titulo"></h2>
                             </a>
-                            
-                            <a :href="`articulo.html?id=${art.id}`" class="mt-auto text-navy font-bold text-sm flex items-center gap-2 hover:text-gold transition-colors w-max">
+
+                            <a :href="`articulo.html?id=${art.id}`"
+                                class="mt-auto text-navy font-bold text-sm flex items-center gap-2 hover:text-gold transition-colors w-max">
                                 Leer artículo
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m-4-4H3"/></svg>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m-4-4H3" />
+                                </svg>
                             </a>
                         </div>
                     </article>
@@ -123,65 +154,84 @@
         </div>
     </section>
 
-   <footer class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10">
-    
-    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
-    
-    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <footer class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10">
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-        
-        <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            Tu apartamento puede generar más.<br>
-            <span class="text-gold">Nosotros lo hacemos posible.</span>
-        </h2>
+        <div
+            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
+        </div>
 
-        <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+        <div
+            class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
+        </div>
 
-        <div class="mb-10">
-            <div class="inline-flex items-center gap-3 mb-2">
-                <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
-                <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span class="font-light text-gray-400">Apartasuites</span></span>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+                Tu apartamento puede generar más.<br>
+                <span class="text-gold">Nosotros lo hacemos posible.</span>
+            </h2>
+
+            <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+
+            <div class="mb-10">
+                <div class="inline-flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
+                    <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
+                            class="font-light text-gray-400">Apartasuites</span></span>
+                </div>
+                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
+                    Administración estratégica para rentas cortas
+                </p>
             </div>
-            <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
-                Administración estratégica para rentas cortas
-            </p>
-        </div>
 
-        <div class="flex justify-center gap-8 mb-16">
-            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/>
-                    <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/>
-                </svg>
-            </a>
+            <div class="flex justify-center gap-8 mb-16">
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
+                        <path
+                            d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                    </svg>
+                </a>
 
-            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            </a>
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                </a>
 
-            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
 
-            <a href="mailto:info@gestandovalor.com" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                </svg>
-            </a>
-        </div>
-        
-
-        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-            <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
-                <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
+                <a href="mailto:info@gestandovalor.com"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                </a>
             </div>
-        </div>
 
-    </div>
-</footer>
+
+            <div
+                class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+                <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
+                    <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
 
     <script>
         function blogPublico() {
@@ -222,9 +272,9 @@
 
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10'); 
+                    logo.classList.replace('h-16', 'h-10');
                     navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
                 } else {
                     logo.classList.replace('h-10', 'h-16');
                     navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
@@ -234,4 +284,5 @@
         });
     </script>
 </body>
+
 </html>

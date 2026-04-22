@@ -1,42 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+    <link rel="icon" type="image/png" href="Logo.png?v=1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cargando artículo... - GestandoValor Apartasuites</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
+
     <script>
         tailwind.config = {
-            theme: { 
-                extend: { 
-                    colors: { navy: '#0B132B', gold: '#D4AF37', lightGray: '#F9FAFB' } 
-                } 
+            theme: {
+                extend: {
+                    colors: { navy: '#0B132B', gold: '#D4AF37', lightGray: '#F9FAFB' }
+                }
             }
         }
     </script>
 </head>
+
 <body class="font-sans text-gray-800 antialiased bg-white" x-data="lectorArticulo()" x-init="init()">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+                class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+
+        <div
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
             <a href="blog.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Blog</a>
             <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
         </div>
 
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
-            <a href="index.html#contacto" class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</a>
+            <a href="index.html#contacto"
+                class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</a>
         </div>
 
-        <button class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+        <button
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
             <span class="w-6 h-[2px] bg-gold"></span>
             <span class="w-6 h-[2px] bg-gold"></span>
             <span class="w-6 h-[2px] bg-gold"></span>
@@ -49,28 +57,36 @@
     </div>
 
     <div x-show="!cargando && articulo" style="display: none;">
-        
+
         <header class="pt-40 pb-12 max-w-7xl mx-auto px-6 lg:px-12">
-            <h1 class="text-4xl md:text-7xl font-extrabold text-navy leading-tight mb-10 max-w-6xl" x-text="articulo?.titulo"></h1>
-            
-            <div class="flex flex-wrap items-center gap-6 text-gray-500 font-medium text-base border-t border-gray-100 pt-8 max-w-6xl">
-                <span class="bg-navy text-gold text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" x-text="articulo?.categoria"></span>
+            <h1 class="text-4xl md:text-7xl font-extrabold text-navy leading-tight mb-10 max-w-6xl"
+                x-text="articulo?.titulo"></h1>
+
+            <div
+                class="flex flex-wrap items-center gap-6 text-gray-500 font-medium text-base border-t border-gray-100 pt-8 max-w-6xl">
+                <span class="bg-navy text-gold text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider"
+                    x-text="articulo?.categoria"></span>
                 <span>•</span>
                 <span class="flex items-center gap-1" x-text="formatearFecha(articulo?.createdAt)"></span>
                 <span>•</span>
                 <span class="flex items-center gap-1">
-                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                     <span x-text="`${articulo?.tiempo_lectura} min de lectura`"></span>
                 </span>
             </div>
         </header>
 
         <section class="max-w-7xl mx-auto px-6 lg:px-12 mb-16">
-            <img :src="articulo?.foto_url || 'https://via.placeholder.com/1600x800?text=Cargando+Imagen'" class="w-full h-auto max-h-[650px] object-cover rounded-[30px] shadow-2xl">
+            <img :src="articulo?.foto_url || 'https://via.placeholder.com/1600x800?text=Cargando+Imagen'"
+                class="w-full h-auto max-h-[650px] object-cover rounded-[30px] shadow-2xl">
         </section>
 
         <article class="max-w-7xl mx-auto px-6 lg:px-12 pb-24">
-            <div class="prose prose-xl md:prose-2xl prose-headings:text-navy prose-headings:font-extrabold prose-p:text-gray-800 prose-a:text-gold max-w-5xl mx-auto leading-relaxed prose-img:rounded-[20px] prose-img:shadow-md" x-html="formatearTexto(articulo?.contenido)">
+            <div class="prose prose-xl md:prose-2xl prose-headings:text-navy prose-headings:font-extrabold prose-p:text-gray-800 prose-a:text-gold max-w-5xl mx-auto leading-relaxed prose-img:rounded-[20px] prose-img:shadow-md"
+                x-html="formatearTexto(articulo?.contenido)">
             </div>
         </article>
 
@@ -80,17 +96,22 @@
                     <div class="w-2.5 h-10 bg-gold rounded-full"></div>
                     <h3 class="text-3xl md:text-5xl font-extrabold text-navy">Te podría interesar...</h3>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                     <template x-for="rel in articulosRelacionados" :key="rel.id">
-                        <a :href="`articulo.html?id=${rel.id}`" class="bg-white rounded-[30px] overflow-hidden shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <a :href="`articulo.html?id=${rel.id}`"
+                            class="bg-white rounded-[30px] overflow-hidden shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                             <div class="relative h-56 bg-gray-200 overflow-hidden">
-                                <img :src="rel.foto_url || 'https://via.placeholder.com/800x600?text=Sin+Imagen'" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                                <div class="absolute top-4 left-4 bg-navy/90 backdrop-blur-md text-gold text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider" x-text="rel.categoria"></div>
+                                <img :src="rel.foto_url || 'https://via.placeholder.com/800x600?text=Sin+Imagen'"
+                                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute top-4 left-4 bg-navy/90 backdrop-blur-md text-gold text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider"
+                                    x-text="rel.categoria"></div>
                             </div>
                             <div class="p-8 flex-1 flex flex-col">
-                                <h4 class="text-xl font-extrabold text-navy mb-4 leading-tight group-hover:text-gold transition-colors" x-text="rel.titulo"></h4>
-                                <span class="mt-auto text-gray-400 text-xs font-bold uppercase tracking-wider" x-text="`Lectura: ${rel.tiempo_lectura} min`"></span>
+                                <h4 class="text-xl font-extrabold text-navy mb-4 leading-tight group-hover:text-gold transition-colors"
+                                    x-text="rel.titulo"></h4>
+                                <span class="mt-auto text-gray-400 text-xs font-bold uppercase tracking-wider"
+                                    x-text="`Lectura: ${rel.tiempo_lectura} min`"></span>
                             </div>
                         </a>
                     </template>
@@ -100,74 +121,99 @@
 
     </div>
 
-    <div x-show="!cargando && !articulo" style="display: none;" class="min-h-screen flex flex-col items-center justify-center bg-lightGray text-center px-6">
+    <div x-show="!cargando && !articulo" style="display: none;"
+        class="min-h-screen flex flex-col items-center justify-center bg-lightGray text-center px-6">
         <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
         </div>
         <h2 class="text-3xl font-extrabold text-navy mb-4">Artículo no encontrado</h2>
         <p class="text-gray-500 mb-8">El enlace podría estar roto o el artículo fue eliminado.</p>
-        <a href="blog.html" class="bg-navy text-white font-bold px-8 py-3 rounded-full hover:bg-gold hover:text-navy transition-colors">Volver al Blog principal</a>
+        <a href="blog.html"
+            class="bg-navy text-white font-bold px-8 py-3 rounded-full hover:bg-gold hover:text-navy transition-colors">Volver
+            al Blog principal</a>
     </div>
 
     <footer class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10">
-    
-    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
-    
-    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-        
-        <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            Tu apartamento puede generar más.<br>
-            <span class="text-gold">Nosotros lo hacemos posible.</span>
-        </h2>
+        <div
+            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
+        </div>
 
-        <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+        <div
+            class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
+        </div>
 
-        <div class="mb-10">
-            <div class="inline-flex items-center gap-3 mb-2">
-                <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
-                <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span class="font-light text-gray-400">Apartasuites</span></span>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+                Tu apartamento puede generar más.<br>
+                <span class="text-gold">Nosotros lo hacemos posible.</span>
+            </h2>
+
+            <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
+
+            <div class="mb-10">
+                <div class="inline-flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
+                    <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
+                            class="font-light text-gray-400">Apartasuites</span></span>
+                </div>
+                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
+                    Administración estratégica para rentas cortas
+                </p>
             </div>
-            <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
-                Administración estratégica para rentas cortas
-            </p>
-        </div>
 
-        <div class="flex justify-center gap-8 mb-16">
-            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/>
-                    <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/>
-                </svg>
-            </a>
+            <div class="flex justify-center gap-8 mb-16">
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.2-4.356-2.623-6.78-6.979-6.98C15.668.014 15.259 0 12 0z" />
+                        <path
+                            d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                    </svg>
+                </a>
 
-            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            </a>
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                </a>
 
-            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
+                <a href="#"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
 
-            <a href="mailto:info@gestandovalor.com" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                </svg>
-            </a>
-        </div>
-        
-
-        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-            <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
-                <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
+                <a href="mailto:info@gestandovalor.com"
+                    class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                </a>
             </div>
-        </div>
 
-    </div>
-</footer>
+
+            <div
+                class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+                <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
+                    <a href="#" class="hover:text-white transition-colors">Términos y Condiciones</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
 
     <script>
         function lectorArticulo() {
@@ -175,7 +221,7 @@
                 cargando: true,
                 articulo: null,
                 articulosRelacionados: [],
-                
+
                 async init() {
                     const urlParams = new URLSearchParams(window.location.search);
                     const id = urlParams.get('id');
@@ -205,7 +251,7 @@
                         this.cargando = false;
                     }
                 },
-                
+
                 // FORMATO DE FECHA CORREGIDO ("04 MAR 2026")
                 formatearFecha(fechaIso) {
                     if (!fechaIso) return 'Hoy';
@@ -213,7 +259,7 @@
                     const fecha = new Date(fechaIso);
                     return fecha.toLocaleDateString('es-ES', opciones).replace('.', '').toUpperCase();
                 },
-                
+
                 // FORMATO DE TEXTO PROTEGIDO (No rompe el HTML de tu editor)
                 formatearTexto(texto) {
                     if (!texto) return '';
@@ -230,13 +276,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[760px]'; 
+            const largoPildora = 'max-w-[760px]';
 
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10'); 
+                    logo.classList.replace('h-16', 'h-10');
                     navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
                 } else {
                     logo.classList.replace('h-10', 'h-16');
                     navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
@@ -246,4 +292,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -1,3 +1,4 @@
 {
-    "livePreview.defaultPreviewPath": "/admin_blog.html"
+    "livePreview.defaultPreviewPath": "/admin_blog.html",
+    "liveServer.settings.port": 5502
 }

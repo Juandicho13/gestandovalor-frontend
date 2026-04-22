@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+    <link rel="icon" type="image/png" href="Logo.png?v=1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operación y Usuarios - GestandoValor</title>
@@ -12,45 +14,76 @@
         }
     </script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="panelOperaciones()" x-init="init()">
 
-    <nav id="navbar" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo" class="h-16 w-auto object-contain transition-all duration-700">
+            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+                class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+        <div
+            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
             <a href="admin_dashboard.html" class="text-sm font-medium hover:text-gold transition-colors">Mi Panel</a>
             <a href="solicitudes.html" class="text-sm font-medium hover:text-gold transition-colors">Solicitudes</a>
             <a href="reservas.html" class="text-sm font-medium hover:text-gold transition-colors">Reservas</a>
-            <a href="operacion.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Operación y Usuarios</a>
+            <a href="operacion.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Operación y
+                Usuarios</a>
             <a href="propiedades.html" class="text-sm font-medium hover:text-gold transition-colors">Propiedades</a>
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            <a href="login.html" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> Salir
+            <a href="login.html"
+                class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg> Salir
             </a>
         </div>
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">E</div>
+            <div
+                class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">
+                E</div>
         </div>
     </nav>
 
     <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div
+            class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none">
+        </div>
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Control Central</span>
+                    <span class="text-gold font-bold tracking-widest uppercase text-xs mb-2 block">Control
+                        Central</span>
                     <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Centro de Mando</h1>
-                    <p class="text-gray-400 mt-3 text-lg">Supervisa la operación diaria o gestiona los accesos de todos tus usuarios.</p>
+                    <p class="text-gray-400 mt-3 text-lg">Supervisa la operación diaria o gestiona los accesos de todos
+                        tus usuarios.</p>
                 </div>
                 <div class="flex bg-white/10 p-1.5 rounded-full border border-white/20 mt-4 md:mt-0">
-                    <button @click="vistaActiva = 'operacion'" class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300" :class="vistaActiva === 'operacion' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">Operación en Vivo</button>
-                    <button @click="vistaActiva = 'usuarios'" class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300" :class="vistaActiva === 'usuarios' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">Gestión de Usuarios</button>
+                    <button @click="vistaActiva = 'operacion'"
+                        class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300"
+                        :class="vistaActiva === 'operacion' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">Operación
+                        en Vivo</button>
+                    <button @click="vistaActiva = 'usuarios'"
+                        class="px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300"
+                        :class="vistaActiva === 'usuarios' ? 'bg-gold text-navy shadow-md' : 'text-gray-300 hover:text-white'">Gestión
+                        de Usuarios</button>
                 </div>
             </div>
         </div>
@@ -62,10 +95,10 @@
 
     <section class="py-12 -mt-10 relative z-20 min-h-screen" x-show="!cargando" style="display: none;">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            
+
             <div x-show="vistaActiva === 'operacion'" x-transition.opacity>
                 <div class="max-w-5xl mx-auto space-y-8">
-                    
+
                     <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-2xl font-extrabold text-navy flex items-center gap-3">
@@ -74,43 +107,70 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <template x-for="miembro in equipoRadar" :key="miembro.id">
-                                <div class="p-6 rounded-3xl border flex items-start gap-4 transition-shadow hover:shadow-lg" :class="miembro.rol === 'AMA_LLAVES' ? 'border-green-100 bg-green-50/50' : 'border-blue-100 bg-blue-50/50'">
-                                    <div class="w-14 h-14 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-inner" :class="miembro.rol === 'AMA_LLAVES' ? 'bg-success' : 'bg-navy'" x-text="miembro.rol === 'AMA_LLAVES' ? 'AL' : 'EA'"></div>
+                                <div class="p-6 rounded-3xl border flex items-start gap-4 transition-shadow hover:shadow-lg"
+                                    :class="miembro.rol === 'AMA_LLAVES' ? 'border-green-100 bg-green-50/50' : 'border-blue-100 bg-blue-50/50'">
+                                    <div class="w-14 h-14 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-inner"
+                                        :class="miembro.rol === 'AMA_LLAVES' ? 'bg-success' : 'bg-navy'"
+                                        x-text="miembro.rol === 'AMA_LLAVES' ? 'AL' : 'EA'"></div>
                                     <div>
                                         <h4 class="font-bold text-navy text-lg mb-1" x-text="miembro.nombre"></h4>
-                                        <p x-show="miembro.estado === 'Disponible'" class="text-sm font-extrabold mb-2 flex items-center gap-1" :class="miembro.rol === 'AMA_LLAVES' ? 'text-success' : 'text-gray-500'">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Disponible
+                                        <p x-show="miembro.estado === 'Disponible'"
+                                            class="text-sm font-extrabold mb-2 flex items-center gap-1"
+                                            :class="miembro.rol === 'AMA_LLAVES' ? 'text-success' : 'text-gray-500'">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg> Disponible
                                         </p>
                                         <div x-show="miembro.estado === 'Ocupado'">
-                                            <p class="text-sm text-blue-600 font-extrabold mb-2 flex items-center gap-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <span x-text="`En ${miembro.ubicacion}`"></span>
+                                            <p
+                                                class="text-sm text-blue-600 font-extrabold mb-2 flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg> <span x-text="`En ${miembro.ubicacion}`"></span>
                                             </p>
-                                            <div class="flex gap-3 text-[11px] text-gray-500 bg-white px-3 py-1.5 rounded-md border border-gray-100 inline-flex shadow-sm">
-                                                <span><strong class="text-navy">Inició:</strong> <span x-text="miembro.checkIn"></span></span>
+                                            <div
+                                                class="flex gap-3 text-[11px] text-gray-500 bg-white px-3 py-1.5 rounded-md border border-gray-100 inline-flex shadow-sm">
+                                                <span><strong class="text-navy">Inició:</strong> <span
+                                                        x-text="miembro.checkIn"></span></span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </template>
-                            <p x-show="equipoRadar.length === 0" class="text-sm text-gray-500 col-span-2 text-center py-4">No hay personal operativo registrado.</p>
+                            <p x-show="equipoRadar.length === 0"
+                                class="text-sm text-gray-500 col-span-2 text-center py-4">No hay personal operativo
+                                registrado.</p>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 overflow-hidden">
-                        <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <div
+                            class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                             <h2 class="text-xl font-extrabold text-navy">Novedades y Reportes</h2>
                         </div>
                         <div class="divide-y divide-gray-100">
                             <template x-for="nov in novedades" :key="nov.id">
                                 <div class="p-6 md:px-8 hover:bg-gray-50 transition-colors flex items-center gap-5">
-                                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-danger flex-shrink-0">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <div
+                                        class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-danger flex-shrink-0">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-navy text-lg" x-text="nov.novedad_reportada"></h3>
                                         <div class="flex items-center gap-2 mt-1.5">
-                                            <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1 rounded-full" x-text="nov.propiedad ? nov.propiedad.titulo : 'Propiedad'"></span>
-                                            <span class="text-xs text-gray-400" x-text="new Date(nov.created_at).toLocaleDateString('es-CO')"></span>
+                                            <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1 rounded-full"
+                                                x-text="nov.propiedad ? nov.propiedad.titulo : 'Propiedad'"></span>
+                                            <span class="text-xs text-gray-400"
+                                                x-text="new Date(nov.created_at).toLocaleDateString('es-CO')"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -128,8 +188,12 @@
             <div x-show="vistaActiva === 'usuarios'" x-transition.opacity style="display: none;">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <h2 class="text-2xl font-extrabold text-navy">Directorio General de Usuarios</h2>
-                    <button @click="abrirModalCrear()" class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2 border border-yellow-600 w-full md:w-auto justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                    <button @click="abrirModalCrear()"
+                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2 border border-yellow-600 w-full md:w-auto justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
                         + Nuevo Usuario
                     </button>
                 </div>
@@ -139,11 +203,17 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-gray-50 border-b border-gray-100">
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Nombre</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rol</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Usuario (Login)</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Propiedades</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                        Nombre</th>
+                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rol
+                                    </th>
+                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                        Usuario (Login)</th>
+                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                        Propiedades</th>
+                                    <th
+                                        class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">
+                                        Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
@@ -152,35 +222,44 @@
                                         <td class="p-5">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                                                     :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
-                                                     x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
+                                                    :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
+                                                    x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
                                                 </div>
                                                 <p class="font-bold text-navy" x-text="usr.nombre"></p>
                                             </div>
                                         </td>
                                         <td class="p-5">
-                                            <span class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
-                                                  :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }" 
-                                                  x-text="formatearRol(usr.rol)">
+                                            <span
+                                                class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
+                                                :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }"
+                                                x-text="formatearRol(usr.rol)">
                                             </span>
                                         </td>
                                         <td class="p-5">
-                                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200" x-text="usr.username"></span>
+                                            <span
+                                                class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200"
+                                                x-text="usr.username"></span>
                                         </td>
                                         <td class="p-5">
-                                            <span x-show="usr.rol === 'PROPIETARIO'" class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30">
-                                                <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span> Asignadas
+                                            <span x-show="usr.rol === 'PROPIETARIO'"
+                                                class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30">
+                                                <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span>
+                                                Asignadas
                                             </span>
-                                            <span x-show="usr.rol !== 'PROPIETARIO'" class="text-xs text-gray-400 font-bold">-</span>
+                                            <span x-show="usr.rol !== 'PROPIETARIO'"
+                                                class="text-xs text-gray-400 font-bold">-</span>
                                         </td>
                                         <td class="p-5 text-right">
-                                            <button @click="abrirEdicion(usr)" class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
-                                            <button @click="eliminarUsuario(usr.id, usr.nombre)" class="text-red-400 hover:text-danger font-bold text-sm transition-colors">Eliminar</button>
+                                            <button @click="abrirEdicion(usr)"
+                                                class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
+                                            <button @click="eliminarUsuario(usr.id, usr.nombre)"
+                                                class="text-red-400 hover:text-danger font-bold text-sm transition-colors">Eliminar</button>
                                         </td>
                                     </tr>
                                 </template>
                                 <tr x-show="usuarios.length === 0">
-                                    <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay usuarios registrados en la base de datos.</td>
+                                    <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay usuarios
+                                        registrados en la base de datos.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -191,43 +270,66 @@
         </div>
     </section>
 
-    <div x-show="modalFormulario" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+    <div x-show="modalFormulario" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalFormulario = false"></div>
-        
-        <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] flex flex-col">
+
+        <div
+            class="bg-white rounded-[40px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all p-8 max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center mb-6 shrink-0 border-b border-gray-100 pb-4">
-                <h3 class="text-2xl font-extrabold text-navy" x-text="modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario'"></h3>
-                <button @click="modalFormulario = false" class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                <h3 class="text-2xl font-extrabold text-navy" x-text="modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario'">
+                </h3>
+                <button @click="modalFormulario = false"
+                    class="text-gray-400 hover:text-navy bg-gray-50 p-2 rounded-full"><svg class="w-5 h-5" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
             </div>
 
             <form @submit.prevent="guardarUsuario" class="space-y-5 overflow-y-auto custom-scrollbar pr-2 pb-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre Completo</label>
-                    <input type="text" x-model="formUsuario.nombre" required placeholder="Ej: Carlos Mendoza" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy font-bold">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre
+                        Completo</label>
+                    <input type="text" x-model="formUsuario.nombre" required placeholder="Ej: Carlos Mendoza"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy font-bold">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Puesto / Rol en el sistema</label>
-                    <select x-model="formUsuario.rol" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy cursor-pointer font-bold">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Puesto / Rol en
+                        el sistema</label>
+                    <select x-model="formUsuario.rol"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm text-navy cursor-pointer font-bold">
                         <option value="ASEO">Equipo de Aseo (Limpieza)</option>
                         <option value="AMA_LLAVES">Ama de Llaves (Supervisión)</option>
                         <option value="PROPIETARIO">Propietario / Inversionista (VIP)</option>
                         <option value="ADMIN">Administrador General</option>
                     </select>
                 </div>
-                
-                <div class="p-4 rounded-xl transition-colors duration-300 border" :class="formUsuario.rol === 'PROPIETARIO' ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'">
-                    <p class="text-xs font-bold mb-3 flex items-center gap-1 uppercase tracking-wider" :class="formUsuario.rol === 'PROPIETARIO' ? 'text-yellow-700' : 'text-gray-600'">
-                        <svg class="w-4 h-4" :class="formUsuario.rol === 'PROPIETARIO' ? 'text-gold' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+
+                <div class="p-4 rounded-xl transition-colors duration-300 border"
+                    :class="formUsuario.rol === 'PROPIETARIO' ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'">
+                    <p class="text-xs font-bold mb-3 flex items-center gap-1 uppercase tracking-wider"
+                        :class="formUsuario.rol === 'PROPIETARIO' ? 'text-yellow-700' : 'text-gray-600'">
+                        <svg class="w-4 h-4" :class="formUsuario.rol === 'PROPIETARIO' ? 'text-gold' : 'text-gray-400'"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                         Datos de Acceso (Login)
                     </p>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <input type="text" x-model="formUsuario.username" placeholder="Usuario" required class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
+                            <input type="text" x-model="formUsuario.username" placeholder="Usuario" required
+                                class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
                         </div>
                         <div>
-                            <input type="text" x-model="formUsuario.password" :placeholder="modoEdicion ? 'Cambiar contraseña' : 'Contraseña'" :required="!modoEdicion" minlength="6" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
-                            <p class="text-[10px] mt-1 ml-1" :class="modoEdicion ? 'text-blue-500 font-bold' : 'text-gray-500'">
+                            <input type="text" x-model="formUsuario.password"
+                                :placeholder="modoEdicion ? 'Cambiar contraseña' : 'Contraseña'"
+                                :required="!modoEdicion" minlength="6"
+                                class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
+                            <p class="text-[10px] mt-1 ml-1"
+                                :class="modoEdicion ? 'text-blue-500 font-bold' : 'text-gray-500'">
                                 <span x-show="!modoEdicion">Mínimo 6 caracteres.</span>
                                 <span x-show="modoEdicion">Contraseña actual visible.</span>
                             </p>
@@ -235,26 +337,37 @@
                     </div>
                 </div>
 
-                <div x-show="formUsuario.rol === 'PROPIETARIO'" x-transition.opacity class="border-t border-gray-100 pt-4" style="display: none;">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex justify-between items-center">
+                <div x-show="formUsuario.rol === 'PROPIETARIO'" x-transition.opacity
+                    class="border-t border-gray-100 pt-4" style="display: none;">
+                    <label
+                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex justify-between items-center">
                         Asignar Apartamentos
-                        <span class="text-[10px] text-navy bg-gold px-2 py-0.5 rounded-full font-bold" x-text="propiedadesSeleccionadas.length + ' seleccionadas'"></span>
+                        <span class="text-[10px] text-navy bg-gold px-2 py-0.5 rounded-full font-bold"
+                            x-text="propiedadesSeleccionadas.length + ' seleccionadas'"></span>
                     </label>
-                    
-                    <p x-show="propiedadesReales.length === 0" class="text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100 mb-2">
+
+                    <p x-show="propiedadesReales.length === 0"
+                        class="text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100 mb-2">
                         Aún no has creado propiedades en el sistema.
                     </p>
 
                     <div class="grid grid-cols-2 gap-3">
                         <template x-for="prop in propiedadesReales" :key="prop.id">
                             <label class="relative cursor-pointer group block">
-                                <input type="checkbox" :value="prop.id" x-model="propiedadesSeleccionadas" class="peer sr-only">
-                                <div class="rounded-xl overflow-hidden border-4 border-transparent peer-checked:border-gold transition-all relative h-28 shadow-sm group-hover:shadow-md bg-gray-100">
-                                    <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : 'https://via.placeholder.com/400x300?text=Sin+Foto'" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/40 to-transparent"></div>
+                                <input type="checkbox" :value="prop.id" x-model="propiedadesSeleccionadas"
+                                    class="peer sr-only">
+                                <div
+                                    class="rounded-xl overflow-hidden border-4 border-transparent peer-checked:border-gold transition-all relative h-28 shadow-sm group-hover:shadow-md bg-gray-100">
+                                    <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : 'https://via.placeholder.com/400x300?text=Sin+Foto'"
+                                        class="w-full h-full object-cover">
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/40 to-transparent">
+                                    </div>
                                     <div class="absolute bottom-2 left-2 right-2">
-                                        <p class="text-white text-xs font-extrabold truncate drop-shadow-md" x-text="prop.titulo || prop.tipo_propiedad || 'Propiedad'"></p>
-                                        <p class="text-gray-300 text-[10px] uppercase font-bold" x-text="prop.ciudad || 'Sin ciudad'"></p>
+                                        <p class="text-white text-xs font-extrabold truncate drop-shadow-md"
+                                            x-text="prop.titulo || prop.tipo_propiedad || 'Propiedad'"></p>
+                                        <p class="text-gray-300 text-[10px] uppercase font-bold"
+                                            x-text="prop.ciudad || 'Sin ciudad'"></p>
                                     </div>
                                 </div>
                             </label>
@@ -263,7 +376,9 @@
                 </div>
 
                 <div class="pt-4 pb-2 sticky bottom-0 bg-white border-t border-gray-100">
-                    <button type="submit" class="w-full bg-navy text-white font-extrabold py-4 rounded-xl hover:bg-blue-900 transition-colors shadow-lg" :disabled="procesando">
+                    <button type="submit"
+                        class="w-full bg-navy text-white font-extrabold py-4 rounded-xl hover:bg-blue-900 transition-colors shadow-lg"
+                        :disabled="procesando">
                         <span x-show="!procesando" x-text="modoEdicion ? 'Guardar Cambios' : 'Crear Usuario'"></span>
                         <span x-show="procesando">Procesando servidor...</span>
                     </button>
@@ -276,20 +391,20 @@
         function panelOperaciones() {
             return {
                 mobileMenuOpen: false,
-                vistaActiva: 'operacion', 
+                vistaActiva: 'operacion',
                 cargando: true,
                 procesando: false,
 
                 usuarios: [],
                 propiedadesReales: [],
-                
-                equipoRadar: [], 
+
+                equipoRadar: [],
                 novedades: [],
 
                 modalFormulario: false,
                 modoEdicion: false,
                 formUsuario: { id: '', nombre: '', username: '', password: '', rol: 'PROPIETARIO' },
-                propiedadesSeleccionadas: [], 
+                propiedadesSeleccionadas: [],
 
                 async init() {
                     await this.cargarDatosCompletos();
@@ -313,7 +428,7 @@
                                 const dataProp = await resProp.json();
                                 this.propiedadesReales = Array.isArray(dataProp) ? dataProp : [];
                             }
-                        } catch(e) { this.propiedadesReales = []; }
+                        } catch (e) { this.propiedadesReales = []; }
 
                         let tareasActivas = [];
                         try {
@@ -321,7 +436,7 @@
                             if (resTareas.ok) {
                                 tareasActivas = await resTareas.json();
                             }
-                        } catch(e) { console.log('Aún no hay tareas creadas'); }
+                        } catch (e) { console.log('Aún no hay tareas creadas'); }
 
                         const personalOperativo = listaUsuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
                         this.equipoRadar = personalOperativo.map(emp => {
@@ -330,7 +445,7 @@
                                 ...emp,
                                 estado: tareaActual ? 'Ocupado' : 'Disponible',
                                 ubicacion: tareaActual && tareaActual.propiedad ? tareaActual.propiedad.titulo : 'En base',
-                                checkIn: tareaActual ? new Date(tareaActual.created_at).toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'}) : null
+                                checkIn: tareaActual ? new Date(tareaActual.created_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : null
                             };
                         });
 
@@ -344,11 +459,11 @@
                 },
 
                 formatearRol(rolBD) {
-                    if(!rolBD) return 'Sin Asignar';
-                    if(rolBD === 'PROPIETARIO') return 'Propietario VIP';
-                    if(rolBD === 'ASEO') return 'Personal de Aseo';
-                    if(rolBD === 'AMA_LLAVES') return 'Ama de Llaves';
-                    if(rolBD === 'ADMIN') return 'Administrador';
+                    if (!rolBD) return 'Sin Asignar';
+                    if (rolBD === 'PROPIETARIO') return 'Propietario VIP';
+                    if (rolBD === 'ASEO') return 'Personal de Aseo';
+                    if (rolBD === 'AMA_LLAVES') return 'Ama de Llaves';
+                    if (rolBD === 'ADMIN') return 'Administrador';
                     return rolBD;
                 },
 
@@ -361,15 +476,15 @@
 
                 abrirEdicion(usuario) {
                     this.modoEdicion = true;
-                    this.formUsuario = { 
-                        id: usuario.id, 
-                        nombre: usuario.nombre, 
-                        username: usuario.username, 
-                        password: usuario.password || '', 
-                        rol: usuario.rol 
+                    this.formUsuario = {
+                        id: usuario.id,
+                        nombre: usuario.nombre,
+                        username: usuario.username,
+                        password: usuario.password || '',
+                        rol: usuario.rol
                     };
-                    
-                    if(usuario.propiedades && usuario.propiedades.length > 0) {
+
+                    if (usuario.propiedades && usuario.propiedades.length > 0) {
                         this.propiedadesSeleccionadas = usuario.propiedades.map(p => p.id);
                     } else {
                         this.propiedadesSeleccionadas = [];
@@ -380,11 +495,11 @@
 
                 async guardarUsuario() {
                     this.procesando = true;
-                    
-                    const url = this.modoEdicion 
-                        ? `https://gestandovalor-backend.onrender.com/usuarios/${this.formUsuario.id}` 
+
+                    const url = this.modoEdicion
+                        ? `https://gestandovalor-backend.onrender.com/usuarios/${this.formUsuario.id}`
                         : 'https://gestandovalor-backend.onrender.com/usuarios';
-                    
+
                     const metodo = this.modoEdicion ? 'PATCH' : 'POST';
 
                     const payload = { ...this.formUsuario };
@@ -403,7 +518,7 @@
 
                         if (response.ok) {
                             this.modalFormulario = false;
-                            await this.cargarDatosCompletos(); 
+                            await this.cargarDatosCompletos();
                         } else {
                             alert('Hubo un error al guardar. Verifica que el usuario de login no esté repetido.');
                         }
@@ -416,15 +531,15 @@
                 },
 
                 async eliminarUsuario(id, nombre) {
-                    if(!confirm(`⚠️ ¿Estás totalmente seguro de BORRAR a "${nombre}"?\nLe quitarás el acceso inmediato a la app.`)) return;
-                    
+                    if (!confirm(`⚠️ ¿Estás totalmente seguro de BORRAR a "${nombre}"?\nLe quitarás el acceso inmediato a la app.`)) return;
+
                     try {
                         const response = await fetch(`https://gestandovalor-backend.onrender.com/usuarios/${id}`, {
                             method: 'DELETE'
                         });
 
                         if (response.ok) {
-                            await this.cargarDatosCompletos(); 
+                            await this.cargarDatosCompletos();
                         } else {
                             alert('No se pudo eliminar el usuario.');
                         }
@@ -438,12 +553,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[700px]'; 
+            const largoPildora = 'max-w-[700px]';
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10'); 
+                    logo.classList.replace('h-16', 'h-10');
                     navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50'); 
+                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
                 } else {
                     logo.classList.replace('h-10', 'h-16');
                     navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
@@ -453,4 +568,5 @@
         });
     </script>
 </body>
+
 </html>
