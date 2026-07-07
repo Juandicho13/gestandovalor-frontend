@@ -67,7 +67,6 @@
             z-index: 99999 !important;
         }
 
-        /* ✨ ESTILO PARA FECHAS OCUPADAS EN EL SELECTOR DE FLATPICKR */
         .flatpickr-day.flatpickr-disabled,
         .flatpickr-day.flatpickr-disabled:hover {
             background: #f3f4f6 !important;
@@ -132,7 +131,6 @@
                     <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Calendario de Reservas</h1>
                 </div>
                 <div class="flex flex-wrap items-center gap-4">
-
                     <button @click="sincronizar()"
                         class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +138,6 @@
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg> Sincronizar
                     </button>
-
                     <button @click="abrirModalConfigTarifas()" x-show="propiedadActiva" style="display: none;"
                         class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,10 +146,8 @@
                             </path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        Configurar Tarifas
+                        </svg> Configurar Tarifas
                     </button>
-
                     <button @click="abrirModalNueva()"
                         class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,8 +164,29 @@
             <div class="flex flex-col lg:flex-row gap-8">
 
                 <div
-                    class="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar lg:w-24 shrink-0 pb-4 lg:pb-0 z-30">
-                    <template x-for="prop in propiedades" :key="prop.id">
+                    class="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar lg:w-24 shrink-0 pb-4 lg:pb-0 z-40 relative">
+
+                    <div class="relative w-16 h-16 shrink-0 lg:mb-2 z-50">
+                        <div class="absolute top-0 left-0 h-16 bg-white rounded-2xl shadow-sm border-2 flex items-center cursor-pointer transition-all duration-300 overflow-hidden"
+                            :class="buscando || busquedaPropiedad !== '' ? 'w-56 z-50 border-gold shadow-lg' : 'w-16 z-10 border-gray-100 hover:border-gold hover:shadow-md'"
+                            @click="buscando = true; $nextTick(() => $refs.searchInput.focus())"
+                            @click.outside="if(busquedaPropiedad === '') buscando = false">
+
+                            <div class="w-16 h-16 shrink-0 flex items-center justify-center transition-colors"
+                                :class="buscando || busquedaPropiedad !== '' ? 'text-gold' : 'text-gray-400'">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+
+                            <input type="text" x-ref="searchInput" x-model="busquedaPropiedad"
+                                class="w-full h-full bg-transparent outline-none pr-4 text-sm text-navy font-bold placeholder-gray-300"
+                                placeholder="Buscar suite...">
+                        </div>
+                    </div>
+
+                    <template x-for="prop in propiedadesFiltradas" :key="prop.id">
                         <button @click="seleccionarPropiedad(prop)"
                             class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
                             :class="propiedadActiva?.id === prop.id ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'"
@@ -181,6 +197,12 @@
                                 class="absolute inset-0 border-2 border-gold rounded-2xl pointer-events-none"></div>
                         </button>
                     </template>
+
+                    <div x-show="propiedadesFiltradas.length === 0" class="w-16 text-center mt-2"
+                        style="display: none;">
+                        <span class="text-[10px] text-gray-400 font-bold leading-tight block">No
+                            hay<br>coincidencias</span>
+                    </div>
                 </div>
 
                 <div class="flex-1 min-w-0 flex flex-col gap-8" x-show="propiedadActiva" style="display: none;">
@@ -243,7 +265,7 @@
                                         :class="{
                                             'opacity-40 bg-gray-50': !diaObj.esMesActual,
                                             'hover:bg-gray-50 cursor-pointer': diaObj.esMesActual && !diaObj.estaBloqueadoTotal,
-                                            'bg-gray-100/50 cursor-not-allowed opacity-60': diaObj.esMesActual && diaObj.estaBloqueadoTotal // ✨ BLOQUEO VISUAL
+                                            'bg-gray-100/50 cursor-not-allowed opacity-60': diaObj.esMesActual && diaObj.estaBloqueadoTotal
                                         }"
                                         @click="if(diaObj.esMesActual && !diaObj.estaBloqueadoTotal) seleccionarRangoTarifa(diaObj.fecha)">
 
@@ -647,7 +669,6 @@
 
             <form @submit.prevent="guardarReserva()">
                 <div class="space-y-4">
-
                     <div>
                         <label
                             class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Nombre
@@ -749,14 +770,23 @@
                     </div>
                 </div>
 
-                <div class="pt-6 mt-4 border-t border-gray-100 flex gap-4">
+                <div class="pt-6 mt-4 border-t border-gray-100 flex gap-3">
+                    <button type="button" x-show="formReserva.id"
+                        @click="borrarReservaDirecto(formReserva.id); modalReserva = false"
+                        class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-extrabold py-4 px-5 rounded-full transition-all shadow-sm flex justify-center items-center shrink-0"
+                        title="Eliminar Reserva">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
                     <button type="button" @click="modalReserva = false"
-                        class="w-1/3 bg-gray-100 text-gray-600 font-extrabold py-4 rounded-full hover:bg-gray-200 transition-colors shadow-sm">Cancelar</button>
+                        class="flex-1 bg-gray-100 text-gray-600 font-extrabold py-4 rounded-full hover:bg-gray-200 transition-colors shadow-sm">Cancelar</button>
                     <button type="submit"
-                        class="w-2/3 bg-navy text-white font-extrabold py-4 rounded-full hover:bg-blue-900 transition-transform active:scale-95 shadow-lg flex justify-center items-center gap-2">
+                        class="flex-[2] bg-navy text-white font-extrabold py-4 rounded-full hover:bg-blue-900 transition-transform active:scale-95 shadow-lg flex justify-center items-center gap-2">
                         <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg> Guardar Reserva
+                        </svg> <span x-text="formReserva.id ? 'Guardar Cambios' : 'Crear Reserva'"></span>
                     </button>
                 </div>
             </form>
@@ -795,6 +825,17 @@
                 cargando: true,
                 propiedades: [],
                 propiedadActiva: null,
+
+                // ✨ NUEVAS VARIABLES PARA EL BUSCADOR LUPA ✨
+                busquedaPropiedad: '',
+                buscando: false,
+
+                // ✨ FILTRO AUTOMÁTICO DE PROPIEDADES ✨
+                get propiedadesFiltradas() {
+                    if (this.busquedaPropiedad.trim() === '') return this.propiedades;
+                    return this.propiedades.filter(p => p.titulo.toLowerCase().includes(this.busquedaPropiedad.toLowerCase()));
+                },
+
                 reservas: [],
                 tarifasEspeciales: [],
 
@@ -820,7 +861,6 @@
 
                 stats: { ingresos: 0, noches: 0, huespedes: 0 },
 
-                // ✨ DICCIONARIO DE FESTIVOS COLOMBIA (2025 y 2026 - Ley Emiliani)
                 festivos: {
                     // 2025
                     "2025-01-01": "Año Nuevo", "2025-01-06": "Reyes Magos", "2025-03-24": "Día de San José",
@@ -924,7 +964,6 @@
                         let f1 = this.rangoSeleccionado[0]; let f2 = fecha;
                         this.rangoSeleccionado = f1 > f2 ? [f2, f1] : [f1, f2];
 
-                        // ✨ CANDADO ANTICHOQUES AL SELECCIONAR EN CUADRÍCULA
                         if (this.haySuperposicion(this.rangoSeleccionado[0], this.rangoSeleccionado[1])) {
                             alert("⚠️ El rango que seleccionaste choca con una reserva existente en el calendario.");
                             this.rangoSeleccionado = [];
@@ -945,14 +984,12 @@
                     let fIn = this.rangoSeleccionado[0];
                     let fOut = this.rangoSeleccionado[1];
 
-                    // ✨ CANDADO 1: Si seleccionaron el mismo día en la cuadrícula, sumar 1 día al check-out
                     if (fIn === fOut) {
                         let dateObj = new Date(fIn + "T12:00:00");
                         dateObj.setDate(dateObj.getDate() + 1);
                         fOut = dateObj.toISOString().split('T')[0];
                     }
 
-                    // ✨ CANDADO ANTICHOQUES PARA LA CUADRÍCULA
                     if (this.haySuperposicion(fIn, fOut)) {
                         alert("⚠️ El rango que seleccionaste choca con una reserva existente en el calendario.");
                         this.cerrarAccionRango();
@@ -975,7 +1012,6 @@
                     this.generarMesVisual();
                 },
 
-                // ✨ NUEVO: Función para detectar choques de reservas
                 haySuperposicion(checkInStr, checkOutStr, excludeReservaId = null) {
                     if (!checkInStr || !checkOutStr) return false;
 
@@ -988,14 +1024,10 @@
                         const resInTime = new Date(getLocalDateString(res.check_in) + "T12:00:00").getTime();
                         const resOutTime = new Date(getLocalDateString(res.check_out) + "T12:00:00").getTime();
 
-                        // Hay cruce si el nuevo Check-in es ANTES del Check-out existente
-                        // Y el nuevo Check-out es DESPUÉS del Check-in existente.
-                        // (Permite que alguien salga el mismo día que otro entra)
                         return (inTime < resOutTime) && (outTime > resInTime);
                     });
                 },
 
-                // ✨ OPTIMISTIC UI PARA TARIFAS 🚀
                 async guardarTarifaRapida() {
                     if (this.rangoSeleccionado.length !== 2) return;
 
@@ -1006,11 +1038,10 @@
                         precio: Number(this.precioEspecialTemporal)
                     };
 
-                    // ✨ MAGIA OPTIMISTA: Reflejamos el cambio en pantalla antes del servidor
                     let tarifaTemporal = { ...payload, id: 'temp_' + Date.now() };
                     this.tarifasEspeciales.push(tarifaTemporal);
 
-                    this.cerrarAccionRango(); // Cierra el modal y limpia la selección visualmente de inmediato
+                    this.cerrarAccionRango();
 
                     try {
                         const res = await fetch('https://gestandovalor-backend.onrender.com/tarifas', {
@@ -1019,18 +1050,15 @@
 
                         if (res.ok) {
                             const resGuardada = await res.json();
-                            // Reemplazamos la temporal por el ID real silenciosamente
                             let idx = this.tarifasEspeciales.findIndex(t => t.id === tarifaTemporal.id);
                             if (idx > -1) this.tarifasEspeciales[idx] = resGuardada;
                         } else {
-                            // 🛑 FALLO DEL SERVIDOR
                             this.tarifasEspeciales = this.tarifasEspeciales.filter(t => t.id !== tarifaTemporal.id);
                             this.generarMesVisual();
                             const err = await res.json();
                             alert(`⚠️ Error del Servidor:\n${err.message || 'No se pudo guardar la tarifa.'}`);
                         }
                     } catch (e) {
-                        // 🛑 FALLO DE INTERNET
                         this.tarifasEspeciales = this.tarifasEspeciales.filter(t => t.id !== tarifaTemporal.id);
                         this.generarMesVisual();
                         alert("⚠️ Error de conexión al intentar guardar la tarifa.");
@@ -1127,8 +1155,8 @@
                             dia: i, fecha: dateStr, esMesActual: true,
                             resLlena: resLlena, resLlegada: resLlegada, resSalida: resSalida,
                             precio: precioDelDia, tienePrecioEspecial: precioDelDia !== Number(this.propiedadActiva?.precio_noche),
-                            estaBloqueadoTotal: !!resLlena || (!!resLlegada && !!resSalida), // ✨ BLOQUEO VISUAL
-                            nombreFestivo: this.festivos[dateStr] || null // ✨ ASIGNAMOS EL FESTIVO AL DÍA
+                            estaBloqueadoTotal: !!resLlena || (!!resLlegada && !!resSalida),
+                            nombreFestivo: this.festivos[dateStr] || null
                         });
                     }
                     this.diasCalendario = diasArray;
@@ -1195,12 +1223,11 @@
                 initFlatpickrReserva(defaultDates = []) {
                     const that = this;
 
-                    // ✨ GENERAR LISTA DE FECHAS DESHABILITADAS PARA EL SELECTOR
                     const deshabilitadas = this.reservas
                         .filter(r => r.id !== this.formReserva.id)
                         .map(r => ({
                             from: getLocalDateString(r.check_in),
-                            to: new Date(new Date(r.check_out).getTime() - 86400000).toISOString().split('T')[0] // Se libera el día de salida
+                            to: new Date(new Date(r.check_out).getTime() - 86400000).toISOString().split('T')[0]
                         }));
 
                     setTimeout(() => {
@@ -1210,10 +1237,9 @@
                             dateFormat: "Y-m-d",
                             defaultDate: defaultDates,
                             locale: "es",
-                            disable: deshabilitadas, // ✨ CANDADO EN EL SELECTOR
+                            disable: deshabilitadas,
                             onChange: function (selectedDates, dateStr, instance) {
                                 if (selectedDates.length === 2) {
-                                    // ✨ CANDADO 2: Si eligen el mismo día en el modal, se corrige automático
                                     if (selectedDates[0].getTime() === selectedDates[1].getTime()) {
                                         let nextDay = new Date(selectedDates[0]);
                                         nextDay.setDate(nextDay.getDate() + 1);
@@ -1224,7 +1250,6 @@
                                     let chkIn = instance.formatDate(selectedDates[0], "Y-m-d");
                                     let chkOut = instance.formatDate(selectedDates[1], "Y-m-d");
 
-                                    // ✨ CANDADO ANTICHOQUES: Verifica que no pise otra reserva
                                     if (that.haySuperposicion(chkIn, chkOut, that.formReserva.id)) {
                                         alert("⚠️ Las fechas seleccionadas chocan con una reserva existente. Por favor elige otras fechas.");
                                         instance.clear();
@@ -1246,19 +1271,16 @@
                 async guardarReserva() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
 
-                    // ✨ CANDADO 3: Bloqueo de fechas iguales
                     if (this.formReserva.check_in === this.formReserva.check_out) {
                         alert("⚠️ ERROR: La reserva debe ser de mínimo 1 noche.");
                         return;
                     }
 
-                    // ✨ CANDADO 4 (Definitivo): Última revisión de choques antes de enviar
                     if (this.haySuperposicion(this.formReserva.check_in, this.formReserva.check_out, this.formReserva.id)) {
                         alert("⚠️ ERROR: Las fechas se cruzan con una reserva que ya está en el calendario.");
                         return;
                     }
 
-                    // 1. Preparamos los datos
                     const dateInString = this.formReserva.check_in + "T" + this.formReserva.hora_llegada + ":00";
                     const dateOutString = this.formReserva.check_out + "T" + this.formReserva.hora_salida + ":00";
 
@@ -1280,7 +1302,6 @@
                         method = 'PATCH';
                     }
 
-                    // 🚀 MAGIA OPTIMISTA PARA RESERVAS
                     let tempId = this.formReserva.id ? this.formReserva.id : 'temp_' + Date.now();
                     let reservaVisual = { ...payload, id: tempId };
 
@@ -1329,7 +1350,6 @@
                 async borrarReservaDirecto(id) {
                     if (!confirm("¿Borrar reserva permanentemente?")) return;
 
-                    // Magia optimista para el borrado
                     let backupReservas = [...this.reservas];
                     this.reservas = this.reservas.filter(r => r.id !== id);
                     this.generarMesVisual();
@@ -1353,18 +1373,15 @@
 
                 formatearPrecioCalendario(valor) { return valor ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor) : ''; },
                 formatearDinero(valor) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor || 0); },
-
                 formatearFechaCorta(fechaStr) {
                     const d = new Date(fechaStr);
                     return d.toLocaleDateString('es-CO', { month: 'short', day: '2-digit' }).replace('.', '');
                 },
-
                 formatearHora(fechaStr) {
                     if (!fechaStr) return '';
                     const d = new Date(fechaStr);
                     return d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
                 },
-
                 obtenerIniciales(nombre) { return nombre ? nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'GV'; },
 
                 obtenerColorCanal(canal, tipo) {
@@ -1386,34 +1403,27 @@
     </script>
     <footer x-data="{ openTerminos: false, openPrivacidad: false }"
         class="bg-navy relative pt-24 pb-12 overflow-hidden border-t border-white/10 mt-10">
-
         <div
             class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
         </div>
         <div
             class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none">
         </div>
-
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-
             <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
                 Tu apartamento puede generar más.<br>
                 <span class="text-gold">Nosotros lo hacemos posible.</span>
             </h2>
-
             <div class="w-12 h-1 bg-white/20 mx-auto my-10 rounded-full"></div>
-
             <div class="mb-10">
                 <div class="inline-flex items-center gap-3 mb-2">
                     <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-navy font-bold">G</div>
                     <span class="text-2xl font-bold tracking-widest text-white uppercase">GestandoValor <span
                             class="font-light text-gray-400">Apartasuites</span></span>
                 </div>
-                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
-                    Administración estratégica para rentas cortas
-                </p>
+                <p class="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">Administración estratégica para
+                    rentas cortas</p>
             </div>
-
             <div class="flex justify-center gap-8 mb-16">
                 <a href="https://www.instagram.com/gestandovalor/" target="_blank"
                     class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
@@ -1424,7 +1434,6 @@
                             d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zM18.406 4.155a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
                     </svg>
                 </a>
-
                 <a href="https://www.facebook.com/gestandovalor?locale=es_LA" target="_blank"
                     class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -1432,7 +1441,6 @@
                             d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                 </a>
-
                 <a href="#"
                     class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -1440,7 +1448,6 @@
                             d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>
                 </a>
-
                 <a href="mailto:info@gestandovalor.com"
                     class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-navy hover:bg-gold hover:border-gold transition-all duration-300 group">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -1449,7 +1456,6 @@
                     </svg>
                 </a>
             </div>
-
             <div
                 class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
                 <p>&copy; 2026 GestandoValor Apartasuites. Todos los derechos reservados.</p>
@@ -1473,7 +1479,6 @@
                 x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                 x-transition:leave-end="opacity-0 translate-y-16 scale-95">
-
                 <div
                     class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 shrink-0 bg-white z-10">
                     <h2 class="text-xl md:text-2xl font-extrabold text-navy">Términos y Condiciones</h2>
@@ -1485,7 +1490,6 @@
                         </svg>
                     </button>
                 </div>
-
                 <div
                     class="flex-1 overflow-y-auto p-6 md:p-8 modal-scroll text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
                     <div>
@@ -1502,7 +1506,6 @@
                     <p>Al acceder, navegar o usar este Sitio Web y/o contratar alguno de nuestros servicios, usted (en
                         adelante, “Usuario”, “Cliente” o “Propietario/Huésped”) acepta plenamente y sin reservas estos
                         Términos y Condiciones.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">1. DEFINICIONES</h3>
                     <ul class="list-disc pl-5 space-y-2">
                         <li><strong>Servicios:</strong> Todas las actividades, procesos, productos o prestaciones
@@ -1512,12 +1515,10 @@
                         <li><strong>Usuario:</strong> Cualquier persona que visita el Sitio Web o contrata los
                             Servicios, ya sea como propietario de un inmueble, huésped o tercero autorizado.</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">2. ACEPTACIÓN Y APLICACIÓN</h3>
                     <p>Al acceder y utilizar este Sitio Web o ingresar datos para servicios, usted declara que ha leído,
                         entendido y acepta estos Términos y Condiciones, junto con cualquier otra política publicada en
                         el Sitio Web, incluidas la Política de Privacidad y la Política de Cookies.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">3. USO DEL SITIO WEB</h3>
                     <ul class="list-none space-y-2">
                         <li><strong>3.1.</strong> Este Sitio Web está disponible para mayores de edad y personas con
@@ -1527,7 +1528,6 @@
                         <li><strong>3.3.</strong> Está prohibido usar el Sitio Web para acciones que generen daño,
                             fraude o vulneren sistemas o datos de terceros.</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">4. SERVICIOS DE ADMINISTRACIÓN Y
                         ALOJAMIENTO</h3>
                     <ul class="list-none space-y-2">
@@ -1541,7 +1541,6 @@
                             del servicio, incluyendo la publicación en plataformas de reserva, atención a huéspedes,
                             cobro de tarifas de alquiler y demás tareas inherentes a la gestión administrativa.</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">5. RESERVAS, PAGOS Y TARIFAS</h3>
                     <ul class="list-none space-y-2">
                         <li><strong>5.1.</strong> Las tarifas por los servicios de administración podrán variar según el
@@ -1551,7 +1550,6 @@
                         <li><strong>5.3.</strong> Gestando Valor puede retener comisiones de las rentas facturadas al
                             huésped como se pacte con el propietario.</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">6. DERECHOS DE PROPIETARIOS Y HUÉSPEDES
                     </h3>
                     <ul class="list-none space-y-2">
@@ -1563,13 +1561,11 @@
                             de convivencia podrán dar lugar a sanciones, cargos adicionales o cancelación de servicios.
                         </li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">7. PROPIEDAD INTELECTUAL</h3>
                     <p>Todo contenido del Sitio Web (textos, imágenes, marcas, logos, diseño, etc.) es propiedad de
                         Gestando Valor o de terceros que nos otorgan licencia, y se protege conforme a las leyes de
                         propiedad intelectual aplicables. Queda prohibida su reproducción, distribución o transmisión
                         sin autorización expresa.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">8. RESPONSABILIDAD Y EXCLUSIONES</h3>
                     <ul class="list-none space-y-2">
                         <li><strong>8.1.</strong> Gestando Valor no será responsable por daños indirectos, lucro cesante
@@ -1579,12 +1575,10 @@
                             terceros (plataformas de reserva, pasarelas de pago o sistemas de alojamiento) que puedan
                             afectar disponibilidad o tarifas.</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">9. PROTECCIÓN DE DATOS PERSONALES</h3>
                     <p>El tratamiento de datos personales se rige por la Política de Privacidad publicada en el Sitio
                         Web www.gestandovalor.com y conforme a la legislación colombiana, incluyendo la Ley 1581 de 2012
                         y el Decreto 1377 de 2013. El Usuario declara haberla leído y comprenderla.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">10. MODIFICACIONES Y TERMINACIÓN</h3>
                     <ul class="list-none space-y-2">
                         <li><strong>10.1.</strong> Gestando Valor se reserva el derecho de modificar estos Términos y
@@ -1594,7 +1588,6 @@
                         <li><strong>10.3.</strong> El uso continuado del Sitio Web después de cualquier modificación
                             implicará la aceptación de los nuevos términos.</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">11. LEY APLICABLE Y JURISDICCIÓN</h3>
                     <p>Estos Términos se rigen por las leyes de la República de Colombia. Cualquier controversia será
                         sometida a los tribunales competentes del domicilio social de Gestando Valor.</p>
@@ -1611,7 +1604,6 @@
                 x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                 x-transition:leave-end="opacity-0 translate-y-16 scale-95">
-
                 <div
                     class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 shrink-0 bg-white z-10">
                     <h2 class="text-xl md:text-2xl font-extrabold text-navy">Política de Privacidad</h2>
@@ -1623,7 +1615,6 @@
                         </svg>
                     </button>
                 </div>
-
                 <div
                     class="flex-1 overflow-y-auto p-6 md:p-8 modal-scroll text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
                     <div>
@@ -1638,7 +1629,6 @@
                     <p>Esta Política explica cómo recopilamos, usamos y protegemos tus datos cuando visitas nuestro
                         sitio web, solicitas nuestros servicios de administración de rentas cortas o te hospedas en
                         alguno de los alojamientos que gestionamos.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">1. ¿Quién es el responsable de tus datos?
                     </h3>
                     <ul class="list-none space-y-1">
@@ -1650,11 +1640,9 @@
                     </ul>
                     <p>Gestando Valor es responsable del tratamiento de los datos personales que nos compartes como
                         propietario, huésped o usuario del sitio web.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">2. ¿Qué información recopilamos?</h3>
                     <p>Recopilamos únicamente la información necesaria para ofrecerte un servicio eficiente y seguro.
                     </p>
-
                     <h4 class="font-bold text-navy mt-4">Si eres propietario o cliente</h4>
                     <ul class="list-disc pl-5 space-y-1">
                         <li>Nombre completo</li>
@@ -1664,7 +1652,6 @@
                         <li>Datos bancarios (solo para pagos y transferencias)</li>
                         <li>Información contractual</li>
                     </ul>
-
                     <h4 class="font-bold text-navy mt-4">Si eres huésped</h4>
                     <ul class="list-disc pl-5 space-y-1">
                         <li>Nombre completo</li>
@@ -1674,14 +1661,12 @@
                         <li>Fechas de estadía</li>
                         <li>Información requerida por la normativa legal y de seguridad</li>
                     </ul>
-
                     <h4 class="font-bold text-navy mt-4">Si navegas por nuestra web</h4>
                     <ul class="list-disc pl-5 space-y-1">
                         <li>Dirección IP</li>
                         <li>Tipo de dispositivo y navegador</li>
                         <li>Información de navegación y cookies</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">3. ¿Para qué usamos tus datos?</h3>
                     <p>Utilizamos tu información para:</p>
                     <ul class="list-disc pl-5 space-y-1">
@@ -1694,18 +1679,15 @@
                         <li>Mejorar nuestra plataforma y experiencia de usuario</li>
                         <li>Enviarte información comercial o promociones (solo si nos autorizas)</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">4. Autorización del uso de tus datos</h3>
                     <p>Al completar formularios, firmar contratos o usar nuestros servicios, autorizas de manera previa,
                         expresa e informada a Gestando Valor para tratar tus datos personales conforme a esta política.
                     </p>
                     <p>Puedes revocar esta autorización en cualquier momento.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">5. Uso de cookies</h3>
                     <p>Nuestro sitio web utiliza cookies para mejorar la navegación, analizar el uso del sitio y
                         ofrecerte una mejor experiencia. Puedes aceptar, rechazar o configurar las cookies desde tu
                         navegador cuando lo desees.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">6. ¿Compartimos tu información?</h3>
                     <p>Solo compartimos tus datos cuando es necesario para prestar el servicio, por ejemplo con:</p>
                     <ul class="list-disc pl-5 space-y-1">
@@ -1714,7 +1696,6 @@
                         <li>Autoridades competentes cuando la ley lo exige</li>
                     </ul>
                     <p>Siempre garantizamos que esta información sea tratada con confidencialidad y seguridad.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">7. Tus derechos como titular de datos
                     </h3>
                     <p>En cualquier momento puedes:</p>
@@ -1726,33 +1707,27 @@
                         <li>Presentar consultas o reclamos</li>
                         <li>Acudir a la Superintendencia de Industria y Comercio si lo consideras necesario</li>
                     </ul>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">8. ¿Cómo ejercer tus derechos?</h3>
                     <p>Escríbenos al correo: <strong>gestandovalor@gmail.com</strong></p>
                     <p>Incluye: Tu nombre completo, el detalle de tu solicitud y un medio de contacto.</p>
                     <p>Tiempos de respuesta: Consultas (hasta 10 días hábiles) y Reclamos (hasta 15 días hábiles).</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">9. Seguridad de la información</h3>
                     <p>Protegemos tu información con medidas técnicas y administrativas diseñadas para evitar accesos no
                         autorizados, pérdida o uso indebido de los datos. Aunque ningún sistema es 100% infalible,
                         trabajamos constantemente para mantener altos estándares de seguridad.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">10. Conservación de los datos</h3>
                     <p>Conservamos tu información solo durante el tiempo necesario para cumplir con las finalidades del
                         servicio o las obligaciones legales.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">11. Información de menores de edad</h3>
                     <p>Nuestros servicios no están dirigidos a menores de edad. En el caso de huéspedes menores, el
                         tratamiento de datos se realiza únicamente para fines legales y de seguridad, con autorización
                         de sus representantes.</p>
-
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">12. Cambios en esta política</h3>
                     <p>Podremos actualizar esta Política cuando sea necesario. Cualquier cambio será publicado en
                         www.gestandovalor.com.</p>
                 </div>
             </div>
         </div>
-
     </footer>
 </body>
 
