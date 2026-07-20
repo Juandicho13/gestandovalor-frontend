@@ -27,13 +27,15 @@
         }
     </script>
     <style>
-        .flatpickr-calendar {
+        <style>.flatpickr-calendar {
             border-radius: 24px !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
             border: none !important;
             padding: 20px !important;
             font-family: sans-serif;
             margin-top: 20px;
+            /* Fix ancho máximo en móviles */
+            max-width: 95vw !important;
         }
 
         .flatpickr-day.selected,
@@ -68,6 +70,29 @@
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
+        }
+
+        /* ✨ FIX PARA EL CALENDARIO EN MÓVILES (DOMINGO CORTADO) ✨ */
+        .flatpickr-innerContainer,
+        .flatpickr-rContainer,
+        .flatpickr-days,
+        .dayContainer {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .flatpickr-weekdays {
+            width: 100% !important;
+        }
+
+        /* Forza a que cada día y título de día ocupe exactamente 1/7 del ancho total */
+        .flatpickr-day,
+        span.flatpickr-weekday {
+            flex-basis: 14.285% !important;
+            max-width: 14.285% !important;
+            width: 14.285% !important;
+            margin: 0 !important;
         }
     </style>
 </head>
