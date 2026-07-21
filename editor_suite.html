@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Convertidor para fotos HEIC de iPhone -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -181,7 +183,7 @@
                         class="absolute bottom-6 right-6 bg-white border border-gray-900 text-gray-900 font-bold text-[12px] py-2 px-4 rounded-lg shadow-lg hover:bg-gray-100 transition-transform hover:scale-[1.02] flex items-center gap-2 z-30">
                         <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
                             <path
-                                d="M3 2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-2zM3 7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-2zM3 12a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2z" />
+                                d="M3 2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-2zM3 12a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H8zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2z" />
                         </svg>
                         Mostrar todas las fotos (<span x-text="propiedad.fotos.length"></span>)
                     </button>
@@ -517,7 +519,8 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    <input type="file" multiple accept="image/*" class="hidden" @change="procesarFotos($event)">
+                    <input type="file" multiple accept="image/*, .heic, .heif" class="hidden"
+                        @change="procesarFotos($event)">
                 </label>
             </div>
 
@@ -847,7 +850,6 @@
                     }
                 },
 
-                // ✨ FUNCIÓN NUEVA: El mapa busca SOLO la ciudad y departamento, no la dirección exacta
                 async buscarCoordenadasPorTexto() {
                     if (!this.propiedad.ciudad) return;
                     try {
@@ -861,9 +863,8 @@
                             const nuevaLng = parseFloat(data[0].lon);
 
                             if (this.mapa) {
-                                this.mapa.setView([nuevaLat, nuevaLng], 14); // Zoom 14 = vista de ciudad
+                                this.mapa.setView([nuevaLat, nuevaLng], 14);
 
-                                // Solo movemos el pin al centro si apenas están creando el anuncio
                                 if (!this.propiedad.lat || this.propiedad.lat === 4.8587) {
                                     this.propiedad.lat = nuevaLat;
                                     this.propiedad.lng = nuevaLng;
@@ -876,9 +877,8 @@
                     }
                 },
 
-                // ✨ FUNCIÓN ACTUALIZADA: 100% manual y segura para no reescribir textos
                 iniciarMapa() {
-                    let lat = 4.8587, lng = -74.0581; // Por defecto Chía
+                    let lat = 4.8587, lng = -74.0581;
                     let tieneCoordenadasViejas = this.propiedad.lat && this.propiedad.lng && this.propiedad.lat !== 4.8587;
 
                     if (tieneCoordenadasViejas) {
@@ -889,7 +889,6 @@
                         this.propiedad.lng = lng;
                     }
 
-                    // Si ya tenía coordenadas exactas, acercamos más la cámara (zoom 16). Si no, lo dejamos más general (zoom 13).
                     let zoomLevel = tieneCoordenadasViejas ? 16 : 13;
                     this.mapa = L.map('mapa-interactivo').setView([lat, lng], zoomLevel);
 
@@ -903,12 +902,10 @@
 
                     setTimeout(() => { this.mapa.invalidateSize(); }, 500);
 
-                    // Si es nuevo, centramos la cámara en la ciudad automáticamente
                     if (!tieneCoordenadasViejas && this.propiedad.ciudad) {
                         this.buscarCoordenadasPorTexto();
                     }
 
-                    // 🚀 MAGIA: Mover el pin SOLO actualiza latitud y longitud. ¡NUNCA toca tus textos!
                     this.marcador.on('dragend', e => {
                         this.propiedad.lat = e.target.getLatLng().lat;
                         this.propiedad.lng = e.target.getLatLng().lng;
@@ -930,17 +927,87 @@
                     }
                 },
 
-                procesarFotos(event) {
+                async procesarFotos(event) {
                     const archivos = event.target.files;
                     if (!archivos) return;
+
+                    this.cargando = true; // Prendemos el loader de la pantalla
+
                     for (let i = 0; i < archivos.length; i++) {
+                        let archivo = archivos[i];
+                        let nombreArchivo = archivo.name ? archivo.name.toLowerCase() : '';
+
+                        try {
+                            // 1. MAGIA PARA iPHONE: Si es HEIC, lo pasamos a JPEG
+                            if (nombreArchivo.endsWith('.heic') || nombreArchivo.endsWith('.heif')) {
+                                if (typeof window.heic2any !== "undefined") {
+                                    const blobConvertido = await window.heic2any({
+                                        blob: archivo,
+                                        toType: "image/jpeg",
+                                        quality: 0.8
+                                    });
+                                    archivo = Array.isArray(blobConvertido) ? blobConvertido[0] : blobConvertido;
+                                } else {
+                                    alert("El convertidor de iPhone está cargando, intenta en 2 segundos.");
+                                    continue;
+                                }
+                            }
+
+                            // 2. ACHICAR Y SACAR FORMATO FINAL (Canvas)
+                            const fotoLista = await this.convertirYComprimirImagen(archivo);
+
+                            // 3. METER A LA GALERÍA VISUAL
+                            this.propiedad.fotos.push(fotoLista);
+                            this.propiedad.foto_categorias.push('Sin asignar');
+
+                        } catch (error) {
+                            console.error("Error con una foto:", error);
+                            alert("No se pudo procesar una de las imágenes. Asegúrate de que sea un formato válido.");
+                        }
+                    }
+
+                    this.cargando = false; // Apagamos el loader
+                    event.target.value = ''; // Limpiamos el input por si quieres re-subir la misma
+                },
+
+                // El motorcito que le quita peso a las fotos
+                convertirYComprimirImagen(archivo) {
+                    return new Promise((resolve, reject) => {
                         const lector = new FileReader();
                         lector.onload = (e) => {
-                            this.propiedad.fotos.push(e.target.result);
-                            this.propiedad.foto_categorias.push('Sin asignar');
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                let width = img.width;
+                                let height = img.height;
+
+                                // Límite de 1600px para que GestandoValor cargue rapidísimo
+                                const MAX_TAMANO = 1600;
+                                if (width > height) {
+                                    if (width > MAX_TAMANO) {
+                                        height *= MAX_TAMANO / width;
+                                        width = MAX_TAMANO;
+                                    }
+                                } else {
+                                    if (height > MAX_TAMANO) {
+                                        width *= MAX_TAMANO / height;
+                                        height = MAX_TAMANO;
+                                    }
+                                }
+
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+
+                                resolve(canvas.toDataURL('image/jpeg', 0.8));
+                            };
+                            img.onerror = () => reject(new Error("Error en imagen"));
+                            img.src = e.target.result;
                         };
-                        lector.readAsDataURL(archivos[i]);
-                    }
+                        lector.onerror = () => reject(new Error("Error en lector"));
+                        lector.readAsDataURL(archivo);
+                    });
                 },
 
                 eliminarFoto(index) {
