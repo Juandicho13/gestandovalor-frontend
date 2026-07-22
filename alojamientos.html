@@ -26,6 +26,7 @@
             }
         }
     </script>
+
     <style>
         .flatpickr-calendar {
             border-radius: 24px !important;
@@ -72,29 +73,33 @@
             margin: 0;
         }
 
-        /* ✨ FIX PARA EL CALENDARIO EN MÓVILES (DOMINGO CORTADO) ✨ */
-        .flatpickr-innerContainer,
-        .flatpickr-rContainer,
-        .flatpickr-days,
-        .dayContainer {
-            width: 100% !important;
-            min-width: 100% !important;
-            max-width: 100% !important;
-        }
+        /* ✨ FIX SOLO PARA MÓVILES (Evita que se rompan los 2 meses en PC) ✨ */
+        @media (max-width: 768px) {
 
-        .flatpickr-weekdays {
-            width: 100% !important;
-        }
+            .flatpickr-innerContainer,
+            .flatpickr-rContainer,
+            .flatpickr-days,
+            .dayContainer {
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+            }
 
-        /* Forza a que cada día y título de día ocupe exactamente 1/7 del ancho total */
-        .flatpickr-day,
-        span.flatpickr-weekday {
-            flex-basis: 14.285% !important;
-            max-width: 14.285% !important;
-            width: 14.285% !important;
-            margin: 0 !important;
+            .flatpickr-weekdays {
+                width: 100% !important;
+            }
+
+            /* Forza a que cada día y título de día ocupe exactamente 1/7 del ancho total */
+            .flatpickr-day,
+            span.flatpickr-weekday {
+                flex-basis: 14.285% !important;
+                max-width: 14.285% !important;
+                width: 14.285% !important;
+                margin: 0 !important;
+            }
         }
     </style>
+
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-navy" x-data="buscadorApp()" x-init="initApp()">
