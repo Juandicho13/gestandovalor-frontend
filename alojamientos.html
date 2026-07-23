@@ -359,8 +359,29 @@
                 },
 
                 async cargarDestinosDinamicos() {
+                    // 1. Revisamos la memoria del celular
+                    const guardados = localStorage.getItem('gv_destinos_cache');
+                    let destinosEnMemoria = [];
+
+                    if (guardados) {
+                        try {
+                            destinosEnMemoria = JSON.parse(guardados);
+                        } catch (e) {
+                            destinosEnMemoria = [];
+                        }
+                    }
+
+                    // 2. BLINDAJE: Si la memoria está vacía o rota, forzamos la carga de Chía
+                    if (!destinosEnMemoria || destinosEnMemoria.length === 0) {
+                        this.lugaresDisponibles = ['Chía, Cundinamarca'];
+                    } else {
+                        this.lugaresDisponibles = destinosEnMemoria;
+                    }
+
+                    // 3. Vamos a buscar los datos frescos al servidor en las sombras
                     try {
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/ciudades');
+
                         if (res.ok) {
                             const data = await res.json();
                             const lugaresMap = new Map();
@@ -378,21 +399,29 @@
 
                                     if (!lugaresMap.has(keyNormalizada)) {
                                         lugaresMap.set(keyNormalizada, locStr);
-                                    } else {
-                                        let tieneTildeNuevo = /[\u0300-\u036f]/.test(locStr.normalize("NFD"));
-                                        let tieneTildeViejo = /[\u0300-\u036f]/.test(lugaresMap.get(keyNormalizada).normalize("NFD"));
-
-                                        if (tieneTildeNuevo && !tieneTildeViejo) {
-                                            lugaresMap.set(keyNormalizada, locStr);
-                                        }
                                     }
                                 }
                             });
 
-                            this.lugaresDisponibles = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
+                            const nuevosLugares = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
+
+                            // Si el servidor nos devolvió ciudades reales, actualizamos la lista y la memoria
+                            if (nuevosLugares.length > 0) {
+                                this.lugaresDisponibles = nuevosLugares;
+                                localStorage.setItem('gv_destinos_cache', JSON.stringify(nuevosLugares));
+                            }
+                        } else {
+                            // Si el backend (Render) da error 404 o 500, mantenemos Chía por defecto
+                            if (this.lugaresDisponibles.length === 0) {
+                                this.lugaresDisponibles = ['Chía, Cundinamarca'];
+                            }
                         }
                     } catch (e) {
-                        console.error("Error al cargar ubicaciones", e);
+                        console.error("Error de red o backend dormido:", e);
+                        // Si no hay internet o el servidor está dormido, forzamos Chía
+                        if (this.lugaresDisponibles.length === 0) {
+                            this.lugaresDisponibles = ['Chía, Cundinamarca'];
+                        }
                     }
                 },
 
