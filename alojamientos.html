@@ -310,54 +310,40 @@
                 fp: null,
                 lugaresDisponibles: [],
 
-                async cargarDestinosDinamicos() {
-                    // 1. PRECARGA INSTANTÁNEA: Buscamos si ya los guardamos en la memoria del celular antes
-                    const guardados = localStorage.getItem('gv_destinos_cache');
-                    if (guardados) {
-                        this.lugaresDisponibles = JSON.parse(guardados);
-                    } else {
-                        // Si es la primera vez en la vida que entra, ponemos esto para que no diga "Cargando..."
-                        this.lugaresDisponibles = ['Chía, Cundinamarca'];
-                    }
+                // ✨ AQUÍ ESTÁ LA FUNCIÓN QUE SE HABÍA BORRADO ✨
+                async initApp() {
+                    this.activarNavbarDinamica();
+                    await this.cargarDestinosDinamicos();
 
-                    try {
-                        // 2. LA RUTA MÁGICA: Apuntamos al endpoint ultraligero que creaste en NestJS
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/ciudades');
-
-                        if (res.ok) {
-                            const data = await res.json();
-                            const lugaresMap = new Map();
-
-                            data.forEach(p => {
-                                if (p.ciudad) {
-                                    let ciudad = p.ciudad.trim();
-                                    let depto = p.departamento ? p.departamento.trim() : '';
-                                    let locStr = depto ? `${ciudad}, ${depto}` : ciudad;
-
-                                    let keyNormalizada = locStr
-                                        .toLowerCase()
-                                        .normalize("NFD")
-                                        .replace(/[\u0300-\u036f]/g, "");
-
-                                    if (!lugaresMap.has(keyNormalizada)) {
-                                        lugaresMap.set(keyNormalizada, locStr);
-                                    }
-                                }
-                            });
-
-                            const nuevosLugares = Array.from(lugaresMap.values()).sort((a, b) => a.localeCompare(b));
-
-                            // 3. Actualizamos la lista y la guardamos en el celular para la próxima vez
-                            if (nuevosLugares.length > 0) {
-                                this.lugaresDisponibles = nuevosLugares;
-                                localStorage.setItem('gv_destinos_cache', JSON.stringify(nuevosLugares));
+                    this.fp = flatpickr("#airbnb-calendar", {
+                        mode: "range",
+                        minDate: "today",
+                        dateFormat: "Y-m-d",
+                        altInput: true,
+                        altFormat: "d M",
+                        locale: "es",
+                        showMonths: window.innerWidth > 768 ? 2 : 1,
+                        disableMobile: "true",
+                        onChange: (selectedDates, dateStr, instance) => {
+                            if (selectedDates.length === 2) {
+                                this.checkin = instance.formatDate(selectedDates[0], "Y-m-d");
+                                this.checkout = instance.formatDate(selectedDates[1], "Y-m-d");
+                            } else {
+                                this.checkin = '';
+                                this.checkout = '';
                             }
                         }
-                    } catch (e) {
-                        console.error("Error al cargar ubicaciones", e);
+                    });
+
+                    const triggerDiv = document.getElementById('datepicker-trigger');
+                    if (triggerDiv) {
+                        triggerDiv.addEventListener('click', () => {
+                            this.fp.open();
+                        });
                     }
                 },
 
+                // ✨ VERSIÓN ÚNICA Y BLINDADA DE LA CARGA DE DESTINOS ✨
                 async cargarDestinosDinamicos() {
                     // 1. Revisamos la memoria del celular
                     const guardados = localStorage.getItem('gv_destinos_cache');
