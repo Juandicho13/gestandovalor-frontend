@@ -376,7 +376,7 @@
 
                 async cargarDesdeBD() {
                     try {
-                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades/resultados');
                         if (response.ok) {
                             let data = await response.json();
 
