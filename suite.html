@@ -164,62 +164,6 @@
 
     <main class="pt-36 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando" style="display: none;">
 
-        <section
-            class="relative rounded-2xl md:rounded-[32px] overflow-hidden mb-8 md:mb-12 shadow-lg md:shadow-lg shadow-gray-200/50">
-
-            <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100 cursor-pointer"
-                @click="openModalFotos = true">
-                <!-- ✨ FOTO PRINCIPAL: Carga Inmediata ✨ -->
-                <div class="col-span-2 row-span-2 relative group overflow-hidden">
-                    <img :src="propiedad.fotos[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80'"
-                        decoding="sync"
-                        class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
-                    </div>
-                </div>
-
-                <!-- ✨ FOTOS SECUNDARIAS: Carga Perezosa (Lazy) ✨ -->
-                <template x-for="i in [1, 2, 3, 4]">
-                    <div class="relative group overflow-hidden bg-gray-200">
-                        <template x-if="propiedad.fotos[i]">
-                            <img :src="propiedad.fotos[i]" loading="lazy" decoding="async"
-                                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                        </template>
-                    </div>
-                </template>
-            </div>
-
-            <!-- ✨ GALERÍA MÓVIL ✨ -->
-            <div class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100 cursor-pointer"
-                @click="openModalFotos = true">
-                <!-- La primera imagen es normal, las demás son lazy -->
-                <template x-for="(foto, index) in propiedad.fotos" :key="index">
-                    <div class="w-full h-full shrink-0 snap-center relative">
-                        <img :src="foto" :loading="index === 0 ? 'eager' : 'lazy'"
-                            :decoding="index === 0 ? 'sync' : 'async'" class="w-full h-full object-cover">
-                        <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-widest"
-                            x-text="`${index + 1} / ${propiedad.fotos.length}`">
-                        </div>
-                    </div>
-                </template>
-                <div x-show="!propiedad.fotos || propiedad.fotos.length === 0"
-                    class="w-full h-full shrink-0 snap-center relative">
-                    <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"
-                        class="w-full h-full object-cover">
-                </div>
-            </div>
-
-            <button @click="openModalFotos = true"
-                class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-xl text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm z-10">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                    </path>
-                </svg>
-                Ver todas
-            </button>
-        </section>
-
         <div class="flex flex-col lg:flex-row gap-12 relative">
 
             <div class="w-full lg:w-[65%] xl:w-[70%]">
