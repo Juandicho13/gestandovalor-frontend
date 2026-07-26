@@ -377,22 +377,10 @@
                 async cargarDesdeBD() {
                     try {
                         const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades/resultados');
-                        if (response.ok) {
-                            let data = await response.json();
-
-                            this.todasPropiedades = await Promise.all(data.map(async (prop) => {
-                                try {
-                                    const tRes = await fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${prop.id}`);
-                                    if (tRes.ok) prop.tarifas_especiales = await tRes.json();
-                                    else prop.tarifas_especiales = [];
-                                } catch (e) {
-                                    prop.tarifas_especiales = [];
-                                }
-                                return prop;
-                            }));
-
-                            this.aplicarFiltros();
-                        }
+                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                        const data = await response.json();
+                        this.todasPropiedades = data.map(p => ({ ...p, tarifas_especiales: p.tarifas_especiales || [] }));
+                        this.aplicarFiltros();
                     } catch (error) {
                         console.error('Error cargando propiedades:', error);
                     } finally {
