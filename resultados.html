@@ -243,29 +243,43 @@
                 <a :href="`suite.html?id=${prop.id}&in=${filtros.in}&out=${filtros.out}&ad=${filtros.ad}&ni=${filtros.ni}&bb=${filtros.bb}&ma=${filtros.ma}`"
                     class="group cursor-pointer flex flex-col tarjeta-lazy">
 
-                    <!-- Placeholder local: aparece solo si la propiedad no tiene fotos. Cero peticiones a la red. -->
-                    <template x-if="!prop.fotos || prop.fotos.length === 0">
-                        <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
-                            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" stroke-width="1.5"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 6.75h.008v.008H18V6.75z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M2.25 6a1.5 1.5 0 011.5-1.5h16.5a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H3.75A1.5 1.5 0 012.25 18V6z" />
+                    <div
+                        class="relative w-full aspect-[4/3] rounded-[24px] overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200">
+
+                        <!-- Placeholder local: aparece solo si la propiedad no tiene fotos. Cero peticiones a la red. -->
+                        <template x-if="!prop.fotos || prop.fotos.length === 0">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
+                                <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" stroke-width="1.5"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 6.75h.008v.008H18V6.75z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 6a1.5 1.5 0 011.5-1.5h16.5a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H3.75A1.5 1.5 0 012.25 18V6z" />
+                                </svg>
+                                <span class="text-xs font-bold uppercase tracking-widest">Sin foto</span>
+                            </div>
+                        </template>
+
+                        <!-- La foto real: las 4 primeras cargan con prioridad, el resto en diferido -->
+                        <template x-if="prop.fotos && prop.fotos.length > 0">
+                            <img :src="prop.fotos[0]" :loading="index < 4 ? 'eager' : 'lazy'"
+                                :fetchpriority="index < 4 ? 'high' : 'auto'" decoding="async"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </template>
+
+                        <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+
+                        <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-extrabold text-navy shadow-sm"
+                            x-text="prop.tipo_propiedad"></div>
+
+                        <button class="absolute top-3 right-3 text-white hover:text-gold transition-colors z-10">
+                            <svg class="w-7 h-7 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
-                            <span class="text-xs font-bold uppercase tracking-widest">Sin foto</span>
-                        </div>
-                    </template>
-
-                    <!-- La foto real: las 4 primeras cargan con prioridad, el resto en diferido -->
-                    <template x-if="prop.fotos && prop.fotos.length > 0">
-                        <img :src="prop.fotos[0]" :loading="index < 4 ? 'eager' : 'lazy'"
-                            :fetchpriority="index < 4 ? 'high' : 'auto'" decoding="async"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </template>
-
-                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
+                        </button>
                     </div>
+
                     <div class="flex justify-between items-start">
                         <div class="pr-2">
                             <h3 class="font-extrabold text-navy text-lg leading-tight line-clamp-1"
