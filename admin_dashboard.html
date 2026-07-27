@@ -433,7 +433,7 @@
 
                 async cargarPropiedades() {
                     try {
-                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades');
+                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades/admin');
                         if (response.ok) this.propiedades = await response.json();
                     } catch (error) { console.error('Error:', error); }
                 },
