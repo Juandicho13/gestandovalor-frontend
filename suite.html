@@ -174,19 +174,24 @@
                     <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100 cursor-pointer"
                         @click="openModalFotos = true">
                         <!-- ✨ FOTO PRINCIPAL: Carga Inmediata ✨ -->
-                        <div class="col-span-2 row-span-2 relative group overflow-hidden">
-                            <img :src="propiedad.fotos[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80'"
-                                decoding="sync"
-                                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                        <div class="col-span-2 row-span-2 relative group overflow-hidden bg-gray-200">
+                            <template x-if="propiedad.numFotos > 0">
+                                <img :src="fotoUrl(0)" decoding="sync"
+                                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                            </template>
+                            <template x-if="!propiedad.numFotos">
+                                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"
+                                    class="w-full h-full object-cover">
+                            </template>
                             <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
                             </div>
                         </div>
 
                         <!-- ✨ FOTOS SECUNDARIAS: Carga Perezosa (Lazy) ✨ -->
-                        <template x-for="i in [1, 2, 3, 4]">
+                        <template x-for="i in [1, 2, 3, 4]" :key="i">
                             <div class="relative group overflow-hidden bg-gray-200">
-                                <template x-if="propiedad.fotos[i]">
-                                    <img :src="propiedad.fotos[i]" loading="lazy" decoding="async"
+                                <template x-if="propiedad.numFotos > i">
+                                    <img :src="fotoUrl(i)" loading="lazy" decoding="async"
                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                                 </template>
                             </div>
@@ -196,18 +201,16 @@
                     <!-- ✨ GALERÍA MÓVIL ✨ -->
                     <div class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100 cursor-pointer"
                         @click="openModalFotos = true">
-                        <!-- La primera imagen es normal, las demás son lazy -->
-                        <template x-for="(foto, index) in propiedad.fotos" :key="index">
+                        <template x-for="i in propiedad.numFotos" :key="i">
                             <div class="w-full h-full shrink-0 snap-center relative">
-                                <img :src="foto" :loading="index === 0 ? 'eager' : 'lazy'"
-                                    :decoding="index === 0 ? 'sync' : 'async'" class="w-full h-full object-cover">
+                                <img :src="fotoUrl(i - 1)" :loading="i === 1 ? 'eager' : 'lazy'"
+                                    :decoding="i === 1 ? 'sync' : 'async'" class="w-full h-full object-cover">
                                 <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-widest"
-                                    x-text="`${index + 1} / ${propiedad.fotos.length}`">
+                                    x-text="`${i} / ${propiedad.numFotos}`">
                                 </div>
                             </div>
                         </template>
-                        <div x-show="!propiedad.fotos || propiedad.fotos.length === 0"
-                            class="w-full h-full shrink-0 snap-center relative">
+                        <div x-show="!propiedad.numFotos" class="w-full h-full shrink-0 snap-center relative">
                             <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"
                                 class="w-full h-full object-cover">
                         </div>
@@ -1138,7 +1141,7 @@
                     const outDate = params.get('out');
 
                     try {
-                        const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${id}`);
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${id}/detalle`);
                         if (res.ok) {
                             this.propiedad = await res.json();
                             this.propiedad.precio_noche = Number(this.propiedad.precio_noche) || 0;
@@ -1165,20 +1168,24 @@
                     }
                 },
 
+                // Construye la URL de una foto por índice
+                fotoUrl(index) {
+                    return `https://gestandovalor-backend.onrender.com/propiedades/${this.propiedad.id}/foto/${index}`;
+                },
+
                 // ✨ LÓGICA PARA AGRUPAR LAS FOTOS POR CATEGORÍA
                 getFotosAgrupadas() {
                     const grupos = {};
-                    if (!this.propiedad || !this.propiedad.fotos) return [];
+                    if (!this.propiedad || !this.propiedad.numFotos) return [];
 
-                    this.propiedad.fotos.forEach((fotoUrl, index) => {
+                    for (let index = 0; index < this.propiedad.numFotos; index++) {
                         let cat = this.propiedad.foto_categorias && this.propiedad.foto_categorias[index] ? this.propiedad.foto_categorias[index] : 'Fotos del alojamiento';
                         if (cat === 'Sin asignar') cat = 'Otras áreas';
 
                         if (!grupos[cat]) grupos[cat] = [];
-                        grupos[cat].push({ url: fotoUrl, index: index });
-                    });
+                        grupos[cat].push({ url: this.fotoUrl(index), index: index });
+                    }
 
-                    // Convertir a Array y poner 'Otras áreas' al final si existe
                     return Object.keys(grupos).map(key => ({
                         nombre: key,
                         fotos: grupos[key]
