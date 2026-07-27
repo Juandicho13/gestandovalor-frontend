@@ -1141,19 +1141,17 @@
                     const outDate = params.get('out');
 
                     try {
-                        const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${id}/detalle`);
+                        const [res, tRes, resRes] = await Promise.all([
+                            fetch(`https://gestandovalor-backend.onrender.com/propiedades/${id}/detalle`),
+                            fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${id}`).catch(() => null),
+                            fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${id}`).catch(() => null),
+                        ]);
+
                         if (res.ok) {
                             this.propiedad = await res.json();
                             this.propiedad.precio_noche = Number(this.propiedad.precio_noche) || 0;
-
-                            try {
-                                const tRes = await fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${id}`);
-                                if (tRes.ok) this.propiedad.tarifas_especiales = await tRes.json();
-                                else this.propiedad.tarifas_especiales = [];
-                            } catch (e) { this.propiedad.tarifas_especiales = []; }
-
-                            const resRes = await fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${id}`);
-                            if (resRes.ok) this.reservasFechas = await resRes.json();
+                            this.propiedad.tarifas_especiales = (tRes && tRes.ok) ? await tRes.json() : [];
+                            if (resRes && resRes.ok) this.reservasFechas = await resRes.json();
 
                             setTimeout(() => this.iniciarMapa(), 300);
                         } else {
