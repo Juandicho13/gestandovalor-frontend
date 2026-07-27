@@ -161,7 +161,7 @@
 
     <section class="py-12 -mt-10 relative z-20 min-h-screen">
         <div class="w-[95%] max-w-[1600px] mx-auto px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row gap-8">
+            <div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
 
                 <div class="lg:w-72 shrink-0 flex flex-col gap-3 z-40 relative">
 
@@ -279,14 +279,13 @@
 
                         <div class="w-full overflow-x-auto pb-2 relative z-10 custom-scroll">
                             <div
-                                class="min-w-[1000px] border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
-                                <template x-for="dia in ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']">
-                                    <div class="bg-gray-50 p-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest"
-                                        x-text="dia"></div>
+                                class="min-w-[640px] lg:min-w-0 border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
+                                <div class="bg-gray-50 py-2 md:py-3 px-1 text-center text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest"
+                                    x-text="dia"></div>
                                 </template>
 
                                 <template x-for="(diaObj, index) in diasCalendario" :key="index">
-                                    <div class="min-h-[120px] bg-white relative transition-colors border border-gray-50"
+                                    <div class="min-h-[72px] md:min-h-[88px] lg:min-h-[96px] bg-white relative transition-colors border border-gray-50"
                                         :class="{
                                             'opacity-40 bg-gray-50': !diaObj.esMesActual,
                                             'hover:bg-gray-50 cursor-pointer': diaObj.esMesActual && !diaObj.estaBloqueadoTotal,
