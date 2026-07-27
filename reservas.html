@@ -163,46 +163,70 @@
         <div class="w-[95%] max-w-[1600px] mx-auto px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-8">
 
-                <div
-                    class="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar lg:w-24 shrink-0 pb-4 lg:pb-0 z-40 relative">
+                <div class="lg:w-72 shrink-0 flex flex-col gap-3 z-40 relative">
 
-                    <div class="relative w-16 h-16 shrink-0 lg:mb-2 z-50">
-                        <div class="absolute top-0 left-0 h-16 bg-white rounded-2xl shadow-sm border-2 flex items-center cursor-pointer transition-all duration-300 overflow-hidden"
-                            :class="buscando || busquedaPropiedad !== '' ? 'w-56 z-50 border-gold shadow-lg' : 'w-16 z-10 border-gray-100 hover:border-gold hover:shadow-md'"
-                            @click="buscando = true; $nextTick(() => $refs.searchInput.focus())"
-                            @click.outside="if(busquedaPropiedad === '') buscando = false">
-
-                            <div class="w-16 h-16 shrink-0 flex items-center justify-center transition-colors"
-                                :class="buscando || busquedaPropiedad !== '' ? 'text-gold' : 'text-gray-400'">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
-
-                            <input type="text" x-ref="searchInput" x-model="busquedaPropiedad"
-                                class="w-full h-full bg-transparent outline-none pr-4 text-sm text-navy font-bold placeholder-gray-300"
-                                placeholder="Buscar suite...">
-                        </div>
+                    <div
+                        class="flex items-center bg-white rounded-2xl shadow-sm border-2 border-gray-100 focus-within:border-gold transition-colors h-14 px-4">
+                        <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" x-model="busquedaPropiedad" @input="indiceVisible = 0"
+                            class="w-full h-full bg-transparent outline-none px-3 text-sm text-navy font-bold placeholder-gray-300"
+                            placeholder="Buscar suite...">
+                        <button x-show="busquedaPropiedad !== ''" @click="busquedaPropiedad = ''; indiceVisible = 0"
+                            class="text-gray-400 hover:text-navy shrink-0" style="display: none;">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
 
-                    <template x-for="(prop, index) in propiedades" :key="prop.id">
+                    <button @click="indiceVisible = Math.max(0, indiceVisible - 1)" :disabled="indiceVisible === 0"
+                        class="w-full h-8 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center transition-all"
+                        :class="indiceVisible === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold hover:text-gold text-navy'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                        </svg>
+                    </button>
+
+                    <template x-for="prop in propiedadesVisibles" :key="prop.id">
                         <button @click="seleccionarPropiedad(prop)"
-                            class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
-                            :class="propiedadActiva?.id === prop.id ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'"
-                            :title="prop.titulo">
-                            <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''"
-                                :loading="index < 5 ? 'eager' : 'lazy'" decoding="async"
-                                @error="$el.style.display = 'none'" class="w-full h-full object-cover">
-                            <div x-show="propiedadActiva?.id === prop.id"
-                                class="absolute inset-0 border-2 border-gold rounded-2xl pointer-events-none"></div>
+                            class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 transition-all duration-300 text-left bg-white"
+                            :class="propiedadActiva?.id === prop.id ? 'border-gold shadow-lg' : 'border-transparent shadow-sm hover:border-gray-200'">
+                            <div
+                                class="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center">
+                                <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''" loading="lazy"
+                                    decoding="async" @error="$el.style.display = 'none'"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-extrabold text-navy text-sm leading-tight line-clamp-2"
+                                    x-text="prop.titulo || 'Sin título'"></div>
+                                <div class="text-[11px] text-gray-400 truncate mt-0.5" x-text="prop.ciudad || ''"></div>
+                            </div>
                         </button>
                     </template>
 
-                    <div x-show="propiedadesFiltradas.length === 0" class="w-16 text-center mt-2"
-                        style="display: none;">
-                        <span class="text-[10px] text-gray-400 font-bold leading-tight block">No
-                            hay<br>coincidencias</span>
+                    <div x-show="propiedadesFiltradas.length === 0" class="text-center py-6" style="display: none;">
+                        <span class="text-xs text-gray-400 font-bold">No hay coincidencias</span>
+                    </div>
+
+                    <button
+                        @click="indiceVisible = Math.min(Math.max(0, propiedadesFiltradas.length - 3), indiceVisible + 1)"
+                        :disabled="indiceVisible + 3 >= propiedadesFiltradas.length"
+                        class="w-full h-8 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center transition-all"
+                        :class="indiceVisible + 3 >= propiedadesFiltradas.length ? 'opacity-30 cursor-not-allowed' : 'hover:border-gold hover:text-gold text-navy'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div class="text-center text-[11px] text-gray-400 font-bold"
+                        x-show="propiedadesFiltradas.length > 0"
+                        x-text="`${indiceVisible + 1}–${Math.min(indiceVisible + 3, propiedadesFiltradas.length)} de ${propiedadesFiltradas.length}`">
                     </div>
                 </div>
 
@@ -829,12 +853,18 @@
 
                 // ✨ NUEVAS VARIABLES PARA EL BUSCADOR LUPA ✨
                 busquedaPropiedad: '',
+                indiceVisible: 0,
                 buscando: false,
 
                 // ✨ FILTRO AUTOMÁTICO DE PROPIEDADES ✨
                 get propiedadesFiltradas() {
                     if (this.busquedaPropiedad.trim() === '') return this.propiedades;
-                    return this.propiedades.filter(p => p.titulo.toLowerCase().includes(this.busquedaPropiedad.toLowerCase()));
+                    const termino = this.busquedaPropiedad.toLowerCase();
+                    return this.propiedades.filter(p => (p.titulo || '').toLowerCase().includes(termino));
+                },
+
+                get propiedadesVisibles() {
+                    return this.propiedadesFiltradas.slice(this.indiceVisible, this.indiceVisible + 3);
                 },
 
                 reservas: [],
