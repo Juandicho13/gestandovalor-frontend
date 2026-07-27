@@ -269,7 +269,7 @@
                         </div>
 
                         <!-- La foto, servida como archivo aparte y cacheable -->
-                        <img :src="`https://gestandovalor-backend.onrender.com/propiedades/${prop.id}/foto/0`"
+                        <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''"
                             :loading="index < 4 ? 'eager' : 'lazy'" :fetchpriority="index < 4 ? 'high' : 'auto'"
                             decoding="async" @error="$el.style.display = 'none'"
                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">

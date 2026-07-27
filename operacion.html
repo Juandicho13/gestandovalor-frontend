@@ -358,7 +358,7 @@
                                     class="peer sr-only">
                                 <div
                                     class="rounded-xl overflow-hidden border-4 border-transparent peer-checked:border-gold transition-all relative h-28 shadow-sm group-hover:shadow-md bg-gray-100">
-                                    <img :src="`https://gestandovalor-backend.onrender.com/propiedades/${prop.id}/foto/0`"
+                                    <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''"
                                         class="w-full h-full object-cover">
                                     <div
                                         class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/40 to-transparent">

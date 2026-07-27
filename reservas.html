@@ -191,7 +191,7 @@
                             class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all duration-300 shrink-0"
                             :class="propiedadActiva?.id === prop.id ? 'border-gold shadow-lg transform scale-110' : 'border-transparent shadow opacity-60 hover:opacity-100'"
                             :title="prop.titulo">
-                            <img :src="`https://gestandovalor-backend.onrender.com/propiedades/${prop.id}/foto/0`"
+                            <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''"
                                 :loading="index < 5 ? 'eager' : 'lazy'" decoding="async"
                                 @error="$el.style.display = 'none'" class="w-full h-full object-cover">
                             <div x-show="propiedadActiva?.id === prop.id"
