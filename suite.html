@@ -108,7 +108,7 @@
 </head>
 
 <body class="font-sans text-gray-800 antialiased bg-white" x-data="suiteApp()" x-init="initApp()"
-    :class="(openModalText || modalPago || mobileMenuOpen || openModalFotos) ? 'overflow-hidden' : ''">
+    :class="(openModalText || modalPago || mobileMenuOpen || openModalFotos || openModalServicios) ? 'overflow-hidden' : ''">
 
     <div x-show="cargando" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mb-4"></div>
@@ -173,47 +173,36 @@
 
                     <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100 cursor-pointer"
                         @click="openModalFotos = true">
-                        <!-- ✨ FOTO PRINCIPAL: Carga Inmediata ✨ -->
                         <div class="col-span-2 row-span-2 relative group overflow-hidden bg-gray-200">
-                            <template x-if="propiedad.numFotos > 0">
-                                <img :src="fotoUrl(0)" decoding="sync"
+                            <template x-if="propiedad.fotos && propiedad.fotos.length > 0">
+                                <img :src="propiedad.fotos[0]" decoding="sync"
                                     class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                            </template>
-                            <template x-if="!propiedad.numFotos">
-                                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"
-                                    class="w-full h-full object-cover">
                             </template>
                             <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
                             </div>
                         </div>
 
-                        <!-- ✨ FOTOS SECUNDARIAS: Carga Perezosa (Lazy) ✨ -->
                         <template x-for="i in [1, 2, 3, 4]" :key="i">
                             <div class="relative group overflow-hidden bg-gray-200">
-                                <template x-if="propiedad.numFotos > i">
-                                    <img :src="fotoUrl(i)" loading="lazy" decoding="async"
+                                <template x-if="propiedad.fotos && propiedad.fotos.length > i">
+                                    <img :src="propiedad.fotos[i]" loading="lazy" decoding="async"
                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                                 </template>
                             </div>
                         </template>
                     </div>
 
-                    <!-- ✨ GALERÍA MÓVIL ✨ -->
                     <div class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100 cursor-pointer"
                         @click="openModalFotos = true">
-                        <template x-for="i in propiedad.numFotos" :key="i">
+                        <template x-for="(foto, i) in (propiedad.fotos || [])" :key="i">
                             <div class="w-full h-full shrink-0 snap-center relative">
-                                <img :src="fotoUrl(i - 1)" :loading="i === 1 ? 'eager' : 'lazy'"
-                                    :decoding="i === 1 ? 'sync' : 'async'" class="w-full h-full object-cover">
+                                <img :src="foto" :loading="i === 0 ? 'eager' : 'lazy'"
+                                    :decoding="i === 0 ? 'sync' : 'async'" class="w-full h-full object-cover">
                                 <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-widest"
-                                    x-text="`${i} / ${propiedad.numFotos}`">
+                                    x-text="`${i + 1} / ${propiedad.fotos.length}`">
                                 </div>
                             </div>
                         </template>
-                        <div x-show="!propiedad.numFotos" class="w-full h-full shrink-0 snap-center relative">
-                            <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"
-                                class="w-full h-full object-cover">
-                        </div>
                     </div>
 
                     <button @click="openModalFotos = true"
@@ -279,7 +268,7 @@
                             </div>
                         </template>
                     </div>
-                    <button x-show="propiedad.comodidades.length > 6"
+                    <button x-show="propiedad.comodidades.length > 6" @click="openModalServicios = true"
                         class="mt-8 border border-gray-900 text-gray-900 font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors">
                         Mostrar las <span x-text="propiedad.comodidades.length"></span> amenidades
                     </button>
@@ -497,7 +486,31 @@
 
         </div>
     </main>
-
+    <div x-show="openModalServicios" style="display: none;"
+        class="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="openModalServicios = false"></div>
+        <div
+            class="relative w-full max-w-2xl bg-white rounded-[32px] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+            <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 shrink-0">
+                <h2 class="text-xl md:text-2xl font-extrabold text-navy">Lo que ofrece este lugar</h2>
+                <button @click="openModalServicios = false"
+                    class="bg-gray-100 hover:bg-gray-200 text-navy p-3 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 md:p-8">
+                <template x-for="comodidad in propiedad.comodidades" :key="comodidad">
+                    <div class="flex items-center gap-4 py-4 border-b border-gray-100 last:border-0 text-gray-700">
+                        <div x-html="obtenerIcono(comodidad)" class="text-navy shrink-0"></div>
+                        <span class="font-medium" x-text="comodidad"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
     <div x-show="openModalFotos" style="display: none;"
         class="fixed inset-0 z-[250] bg-white flex flex-col transform transition-transform duration-300"
         x-transition:enter="ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
@@ -1079,7 +1092,8 @@
                 cargandoPago: false,
 
                 mobileMenuOpen: false,
-                openModalFotos: false, // ✨ ESTADO PARA EL MODAL DE FOTOS TIPO AIRBNB
+                openModalFotos: false,
+                openModalServicios: false,
 
                 propiedad: { id: '', titulo: '', fotos: [], foto_categorias: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
                 reservasFechas: [],
@@ -1119,6 +1133,10 @@
                     'Piscina': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>',
                     'Jacuzzi': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>',
                     'default': '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>'
+                    'Wifi': '<path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>',
+                    'Cocina': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>',
+                    'Lavadora': '<path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
+                    'TV': '<path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>',
                 },
 
                 async initApp() {
@@ -1166,22 +1184,17 @@
                     }
                 },
 
-                // Construye la URL de una foto por índice
-                fotoUrl(index) {
-                    return `https://gestandovalor-backend.onrender.com/propiedades/${this.propiedad.id}/foto/${index}`;
-                },
-
                 // ✨ LÓGICA PARA AGRUPAR LAS FOTOS POR CATEGORÍA
                 getFotosAgrupadas() {
                     const grupos = {};
-                    if (!this.propiedad || !this.propiedad.numFotos) return [];
+                    if (!this.propiedad || !this.propiedad.fotos) return [];
 
-                    for (let index = 0; index < this.propiedad.numFotos; index++) {
+                    for (let index = 0; index < this.propiedad.fotos.length; index++) {
                         let cat = this.propiedad.foto_categorias && this.propiedad.foto_categorias[index] ? this.propiedad.foto_categorias[index] : 'Fotos del alojamiento';
                         if (cat === 'Sin asignar') cat = 'Otras áreas';
 
                         if (!grupos[cat]) grupos[cat] = [];
-                        grupos[cat].push({ url: this.fotoUrl(index), index: index });
+                        grupos[cat].push({ url: this.propiedad.fotos[index], index: index });
                     }
 
                     return Object.keys(grupos).map(key => ({
@@ -1289,8 +1302,8 @@
                 },
 
                 obtenerIcono(nombreComodidad) {
-                    const svgPath = this.iconosSVG[nombreComodidad] || this.iconosSVG['default'];
-                    return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${svgPath}"></path></svg>`;
+                    const contenido = this.iconosSVG[nombreComodidad] || this.iconosSVG['default'];
+                    return `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${contenido}</svg>`;
                 },
 
                 formatearDinero(valor) {
