@@ -245,9 +245,10 @@
                             <button type="button" @click.prevent="toggleComodidad(comodidad.id)"
                                 class="flex items-center gap-4 p-3 rounded-2xl border-2 transition-all w-full text-left"
                                 :class="propiedad.comodidades.includes(comodidad.id) ? 'border-navy bg-navy/5 text-navy font-bold' : 'border-gray-200 hover:border-navy hover:bg-gray-50'">
-                                <div x-html="comodidad.svg" class="w-6 h-6 shrink-0"
+                                <svg x-html="comodidad.svg" class="w-6 h-6 shrink-0" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24"
                                     :class="propiedad.comodidades.includes(comodidad.id) ? 'text-navy' : 'text-gray-400'">
-                                </div>
+                                </svg>
                                 <span class="text-sm lg:text-base" x-text="comodidad.nombre"></span>
                             </button>
                         </template>
@@ -419,7 +420,8 @@
                                     <div class="flex justify-between items-center py-5 border-b border-gray-50 cursor-pointer group hover:bg-gray-50 px-4 -mx-4 rounded-xl transition-colors"
                                         @click="toggleComodidad(comodidad.id)">
                                         <div class="flex gap-4 items-center">
-                                            <div x-html="comodidad.svg" class="w-6 h-6 shrink-0 text-navy"></div>
+                                            <svg x-html="comodidad.svg" class="w-6 h-6 shrink-0 text-navy" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24"></svg>
                                             <div>
                                                 <div class="font-medium text-gray-900 text-lg"
                                                     x-text="comodidad.nombre"></div>
