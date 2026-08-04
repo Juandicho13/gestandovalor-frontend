@@ -234,16 +234,9 @@
                                                 class="w-full h-full object-cover">
                                         </div>
                                         <div class="flex-1">
-                                            <div class="flex flex-wrap items-center gap-2">
-                                                <h4 class="text-lg font-extrabold text-navy"
-                                                    x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
-                                                </h4>
-                                                <span x-show="String(tarea.estado || '').toLowerCase() === 'en progreso'"
-                                                    style="display: none;"
-                                                    class="text-[9px] font-extrabold uppercase tracking-widest px-2 py-1 rounded-md bg-blue-50 text-blue-600 border border-blue-100 animate-pulse">
-                                                    Limpiando ahora
-                                                </span>
-                                            </div>
+                                            <h4 class="text-lg font-extrabold text-navy"
+                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
+                                            </h4>
 
                                             <p
                                                 class="text-[11px] font-bold text-blue-600 mb-1.5 flex items-center gap-1">
@@ -578,33 +571,15 @@
             </div>
             <div class="space-y-4">
                 <template x-for="tarea in tareasConReporte" :key="tarea.id">
-                    <div class="p-4 border rounded-2xl flex items-start gap-4"
-                        :class="tarea.novedad_estado === 'Resuelta' ? 'border-green-100 bg-green-50/50' : 'border-red-100 bg-red-50/50'">
-                        <div class="w-full">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h4 class="text-sm font-bold text-navy"
-                                    x-text="`Reporte en ${(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')}`">
-                                </h4>
-                                <span
-                                    class="text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full border"
-                                    :class="tarea.novedad_estado === 'Resuelta' ? 'bg-white text-success border-green-200' : 'bg-white text-danger border-red-200'"
-                                    x-text="tarea.novedad_estado === 'Resuelta' ? 'Resuelta' : 'Pendiente'"></span>
-                            </div>
+                    <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-navy"
+                                x-text="`Reporte en ${(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')}`">
+                            </h4>
                             <p class="text-xs text-gray-500 mt-1"
                                 x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`"></p>
-                            <p x-show="tarea.novedad_reportada"
-                                class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100 whitespace-pre-line"
+                            <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100"
                                 x-text="`&quot;${tarea.novedad_reportada}&quot;`"></p>
-
-                            <div x-show="(tarea.novedad_fotos || []).length > 0" class="flex flex-wrap gap-2 mt-3"
-                                style="display: none;">
-                                <template x-for="(foto, i) in (tarea.novedad_fotos || [])" :key="i">
-                                    <a :href="foto" target="_blank" rel="noopener"
-                                        class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:ring-2 hover:ring-gold transition-all block">
-                                        <img :src="foto" loading="lazy" class="w-full h-full object-cover">
-                                    </a>
-                                </template>
-                            </div>
                         </div>
                     </div>
                 </template>
@@ -775,7 +750,7 @@
                 },
 
                 get tareasConReporte() {
-                    return this.tareas.filter(t => (t.novedad_reportada && t.novedad_reportada.trim() !== '') || (t.novedad_fotos || []).length > 0).map(t => ({
+                    return this.tareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').map(t => ({
                         ...t,
                         nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
                         nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
@@ -788,7 +763,7 @@
 
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
-                        if (this.esAseoAbierto(t)) {
+                        if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
                             const id = String(t.propiedad_id);
                             conteoAseosPendientes[id] = (conteoAseosPendientes[id] || 0) + 1;
                         }
@@ -847,14 +822,8 @@
                     return reservasAMostrar;
                 },
 
-                // Un aseo sigue "abierto" mientras no se complete: incluye el que están limpiando ahora
-                esAseoAbierto(tarea) {
-                    const estado = String(tarea.estado || 'pendiente').toLowerCase();
-                    return estado === 'pendiente' || estado === 'en progreso';
-                },
-
                 get tareasPendientes() {
-                    return this.tareas.filter(t => this.esAseoAbierto(t)).map(t => {
+                    return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
                         const futurasReservas = this.reservas.filter(r => {
                             if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
                             const checkInDate = new Date(r.check_in);
