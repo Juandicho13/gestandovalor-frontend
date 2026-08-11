@@ -280,8 +280,9 @@
                         <div class="w-full overflow-x-auto pb-2 relative z-10 custom-scroll">
                             <div
                                 class="min-w-[640px] lg:min-w-0 border border-gray-200 bg-gray-200 rounded-3xl overflow-hidden grid grid-cols-7 gap-px shadow-sm">
-                                <div class="bg-gray-50 py-2 md:py-3 px-1 text-center text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest"
-                                    x-text="dia"></div>
+                                <template x-for="dia in diasSemana" :key="dia">
+                                    <div class="bg-gray-50 py-2 md:py-3 px-1 text-center text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest"
+                                        x-text="dia"></div>
                                 </template>
 
                                 <template x-for="(diaObj, index) in diasCalendario" :key="index">
