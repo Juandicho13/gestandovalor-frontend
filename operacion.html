@@ -423,12 +423,18 @@
                         }
 
                         try {
-                            const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades/admin');
+                            const resProp = await fetch('https://gestandovalor-backend.onrender.com/propiedades/admin');
                             if (resProp.ok) {
                                 const dataProp = await resProp.json();
                                 this.propiedadesReales = Array.isArray(dataProp) ? dataProp : [];
+                            } else {
+                                console.error('Propiedades: el servidor respondió', resProp.status);
+                                this.propiedadesReales = [];
                             }
-                        } catch (e) { this.propiedadesReales = []; }
+                        } catch (e) {
+                            console.error('Error cargando propiedades:', e);
+                            this.propiedadesReales = [];
+                        }
 
                         let tareasActivas = [];
                         try {
