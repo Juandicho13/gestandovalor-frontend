@@ -851,6 +851,8 @@
                 propiedades: [],
                 propiedadActiva: null,
 
+                diasSemana: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+
                 // ✨ NUEVAS VARIABLES PARA EL BUSCADOR LUPA ✨
                 busquedaPropiedad: '',
                 indiceVisible: 0,
@@ -1157,8 +1159,7 @@
                     const primerDiaMes = new Date(year, month, 1);
                     const ultimoDiaMes = new Date(year, month + 1, 0);
                     const diasEnMes = ultimoDiaMes.getDate();
-                    let primerDiaIndex = primerDiaMes.getDay();
-
+                    let primerDiaIndex = primerDiaMes.getDay() === 0 ? 6 : primerDiaMes.getDay() - 1;
                     let diasArray = [];
                     const ultimoDiaMesAnterior = new Date(year, month, 0).getDate();
                     for (let i = 0; i < primerDiaIndex; i++) {
