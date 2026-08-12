@@ -359,9 +359,40 @@
                     return this.misLiquidaciones.filter(l => l.propiedad_id === this.filtroPropiedadId);
                 },
 
-                descargarPDF(base64String, nombreArchivo) {
-                    const link = document.createElement('a'); link.href = base64String; link.download = nombreArchivo || 'Liquidacion.pdf';
-                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                async descargarPDF(base64String, nombreArchivo) {
+                    try {
+                        // 1. Convertimos los datos del PDF a un archivo real
+                        const res = await fetch(base64String);
+                        const blob = await res.blob();
+                        const nombre = nombreArchivo || 'Liquidacion.pdf';
+                        const file = new File([blob], nombre, { type: 'application/pdf' });
+
+                        // 2. Verificamos si es un celular compatible (iPhone/Android)
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: 'Liquidación GestandoValor',
+                                text: 'Aquí está tu documento de liquidación.'
+                            });
+                        } else {
+                            // 3. Descarga normal para computadores
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.style.display = 'none';
+                            link.href = url;
+                            link.download = nombre;
+                            document.body.appendChild(link);
+                            link.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(link);
+                        }
+                    } catch (error) {
+                        // Si el usuario cancela en el iPhone, no mostramos alerta. Solo si hay un error real.
+                        if (error.name !== 'AbortError') {
+                            console.error(error);
+                            alert("Hubo un problema al abrir el documento.");
+                        }
+                    }
                 },
 
                 cerrarSesion() { localStorage.removeItem('gv_usuario_actual'); window.location.href = 'login.html'; }
