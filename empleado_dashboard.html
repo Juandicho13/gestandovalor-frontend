@@ -52,35 +52,61 @@
         <p class="font-bold text-navy animate-pulse">Sincronizando ruta...</p>
     </div>
 
-    <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy"
-        x-show="!aseoActivo">
-        <a href="empleado_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo"
-                class="h-16 w-auto object-contain transition-all duration-700">
-        </a>
+    <!-- Lado derecho: Enlaces, Menú Móvil y Avatar -->
+    <div class="flex items-center gap-4 md:gap-6" x-data="{ menuAbierto: false }">
 
-        <div
-            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="empleado_dashboard.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Mi
-                Panel</a>
-            <div class="h-5 w-px bg-white/20 ml-2"></div>
+        <!-- Enlaces Escritorio (Ocultos en móvil) -->
+        <div class="hidden md:flex items-center gap-6">
+            <a href="#" class="text-gold text-sm font-bold border-b-2 border-gold pb-1">Mi Panel</a>
             <button @click="cerrarSesion()"
-                class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                class="text-white hover:text-red-400 transition-colors text-sm font-bold flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
                 </svg>
                 Salir
             </button>
         </div>
 
-        <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform"
-                x-text="iniciales">
-            </div>
+        <!-- Avatar -->
+        <div
+            class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-sm md:text-lg shadow-lg">
+            RI
         </div>
-    </nav>
+
+        <!-- Botón Menú Hamburguesa (Solo Móvil) -->
+        <button @click="menuAbierto = !menuAbierto"
+            class="md:hidden text-white focus:outline-none p-1 transition-transform hover:scale-110">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                </path>
+            </svg>
+        </button>
+
+        <!-- Menú Desplegable Móvil -->
+        <div x-show="menuAbierto" @click.away="menuAbierto = false"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-[-10px]" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-[-10px]"
+            class="absolute top-20 right-4 bg-navy border border-white/10 rounded-xl shadow-2xl p-4 flex flex-col gap-4 md:hidden min-w-[160px] z-50"
+            style="display: none;">
+
+            <a href="#" class="text-gold text-sm font-bold pb-3 border-b border-white/10">Mi Panel</a>
+
+            <button @click="cerrarSesion()"
+                class="text-white hover:text-red-400 transition-colors text-sm font-bold flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+                Salir
+            </button>
+        </div>
+
+    </div>
 
     <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden"
         x-show="!aseoActivo">
