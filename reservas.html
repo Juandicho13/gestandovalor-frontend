@@ -90,38 +90,51 @@
         <p class="font-bold text-navy animate-pulse">Sincronizando sistema...</p>
     </div>
 
-    <nav id="navbar" style="z-index: 1000;"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-[1000] flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+    <nav id="navbar"
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
 
-        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+        <a href="admin_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
 
         <div
             class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
-            <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
-            <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
+            <a href="admin_dashboard.html" class="text-sm font-medium hover:text-gold transition-colors">Mi
+                Panel</a>
+            <a href="solicitudes.html" class="text-sm font-medium hover:text-gold transition-colors">Solicitudes</a>
+            <a href="reservas.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Reservas</a>
+            <a href="operacion.html" class="text-sm font-medium hover:text-gold transition-colors">Operación</a>
+            <a href="propiedades.html" class="text-sm font-medium hover:text-gold transition-colors">Propiedades</a>
+
             <div class="h-5 w-px bg-white/20 ml-2"></div>
-            <a href="login.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1 ml-2">Iniciar
-                Sesión</a>
-        </div>
 
-        <div class="flex items-center gap-4 flex-shrink-0 z-[60]">
-            <button
-                class="hidden md:block bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
-
-            <button @click="mobileMenuOpen = !mobileMenuOpen"
-                class="md:hidden flex flex-col justify-center items-center w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10 ml-2 relative">
-                <span class="w-6 h-[2px] bg-gold transition-all duration-300 absolute"
-                    :class="mobileMenuOpen ? 'rotate-45' : '-translate-y-2'"></span>
-                <span class="w-6 h-[2px] bg-gold transition-all duration-300 absolute"
-                    :class="mobileMenuOpen ? 'opacity-0' : 'opacity-100'"></span>
-                <span class="w-6 h-[2px] bg-gold transition-all duration-300 absolute"
-                    :class="mobileMenuOpen ? '-rotate-45' : 'translate-y-2'"></span>
+            <button @click="localStorage.removeItem('gv_usuario_actual'); window.location.href = 'login.html'"
+                class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors ml-2 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Salir
             </button>
         </div>
+
+        <div class="hidden md:flex items-center gap-4 flex-shrink-0">
+            <div
+                class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-extrabold shadow-lg border-2 border-gold">
+                E
+            </div>
+        </div>
+
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        </button>
     </nav>
 
     <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
