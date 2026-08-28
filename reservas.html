@@ -1802,19 +1802,28 @@
     </footer>
 
     <!-- Modal Menú Móvil -->
-    <div x-show="mobileMenuOpen" style="display: none; z-index: 999;"
-        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+    <div x-show="mobileMenuOpen" style="display: none;" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+
         <div class="flex flex-col items-center gap-8 w-full mt-10">
-            <a href="index.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white">Inicio</a>
-            <a href="blog.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gray-300 hover:text-gold">Blog</a>
-            <a href="alojamientos.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
-            <a href="login.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gold border-b-2 border-gold pb-1">Iniciar Sesión</a>
+            <a href="admin_dashboard.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Mi Panel</a>
+            <a href="solicitudes.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Solicitudes</a>
+            <a href="reservas.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Reservas</a>
+            <a href="operacion.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Operación</a>
+            <a href="propiedades.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Propiedades</a>
+
+            <button @click="localStorage.removeItem('gv_usuario_actual'); window.location.href = 'login.html'"
+                class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">
+                Salir del Sistema
+            </button>
         </div>
     </div>
 </body>
