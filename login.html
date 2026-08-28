@@ -25,210 +25,236 @@
     </script>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-navy" x-data="{ openContact: false }">
+<body class="font-sans text-gray-800 antialiased bg-navy" x-data="{ openContact: false, mobileMenuOpen: false }"></body>
 
-    <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
-        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo"
-                class="h-16 w-auto object-contain transition-all duration-700">
-        </a>
+<nav id="navbar"
+    class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+    <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
+        <img id="nav-logo-combined" src="GV.png" alt="Logo"
+            class="h-16 w-auto object-contain transition-all duration-700">
+    </a>
 
+    <div
+        class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
+        <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
+        <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
+        <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
+
+        <div class="h-5 w-px bg-white/20 ml-2"></div>
+
+        <a href="login.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1 ml-2">Iniciar
+            Sesión</a>
+    </div>
+
+    <div class="flex items-center gap-4 flex-shrink-0 z-[60]">
+        <!-- Botón Contacto Solo para PC -->
+        <button
+            class="hidden md:block bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
+
+        <!-- Menú Hamburguesa Solo para Móvil -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10 ml-2">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        </button>
+    </div>
+    <!-- Modal Menú Móvil -->
+    <div x-show="mobileMenuOpen" style="display: none;" x-transition.opacity
+        class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+        <div class="flex flex-col items-center gap-8 w-full mt-10">
+            <a href="index.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white">Inicio</a>
+            <a href="blog.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Blog</a>
+            <a href="alojamientos.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
+            <a href="login.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gold border-b-2 border-gold pb-1">Iniciar Sesión</a>
+            <a href="index.html#contacto" @click="mobileMenuOpen = false"
+                class="mt-8 bg-gold text-navy text-lg font-extrabold py-4 w-full max-w-xs rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] text-center">Contacto</a>
+        </div>
+    </div>
+</nav>
+
+<section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden bg-navy">
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+            class="w-full h-full object-cover opacity-10">
+    </div>
+
+    <div class="relative z-10 w-full max-w-md px-6">
         <div
-            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300">
-            <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
-            <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
-            <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
+            class="bg-white rounded-[40px] p-10 md:p-12 shadow-2xl border border-gray-100 transform transition-all hover:shadow-gold/10 hover:shadow-2xl">
 
-            <div class="h-5 w-px bg-white/20 ml-2"></div>
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 bg-navy rounded-2xl flex items-center justify-center shadow-inner mx-auto mb-6">
+                    <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-navy tracking-tight mb-2">Portal GV</h1>
+                <p class="text-gray-500 text-sm">Ingresa a tu espacio de trabajo o inversión.</p>
+            </div>
 
-            <a href="login.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1 ml-2">Iniciar
-                Sesión</a>
-        </div>
-
-        <div class="flex items-center gap-4 flex-shrink-0">
-            <a href="index.html#contacto"
-                class="bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</a>
-        </div>
-    </nav>
-
-    <section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden bg-navy">
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-                class="w-full h-full object-cover opacity-10">
-        </div>
-
-        <div class="relative z-10 w-full max-w-md px-6">
-            <div
-                class="bg-white rounded-[40px] p-10 md:p-12 shadow-2xl border border-gray-100 transform transition-all hover:shadow-gold/10 hover:shadow-2xl">
-
-                <div class="text-center mb-10">
-                    <div
-                        class="w-16 h-16 bg-navy rounded-2xl flex items-center justify-center shadow-inner mx-auto mb-6">
-                        <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                    </div>
-                    <h1 class="text-3xl font-extrabold text-navy tracking-tight mb-2">Portal GV</h1>
-                    <p class="text-gray-500 text-sm">Ingresa a tu espacio de trabajo o inversión.</p>
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label for="username"
+                        class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 pl-2">Usuario de
+                        Acceso</label>
+                    <input type="text" id="username" name="username" placeholder="Ej: carlos_mendoza"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors"
+                        required>
                 </div>
 
-                <form id="loginForm" class="space-y-6">
-                    <div>
-                        <label for="username"
-                            class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 pl-2">Usuario de
-                            Acceso</label>
-                        <input type="text" id="username" name="username" placeholder="Ej: carlos_mendoza"
-                            class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors"
+                <div x-data="{ showPass: false }">
+                    <div class="flex items-center justify-between mb-2 pl-2 pr-2">
+                        <label for="password"
+                            class="block text-xs font-bold uppercase tracking-widest text-gray-500">Contraseña</label>
+                        <a href="#" class="text-xs font-bold text-gold hover:text-navy transition-colors">¿Olvidaste
+                            tu clave?</a>
+                    </div>
+                    <div class="relative">
+                        <input :type="showPass ? 'text' : 'password'" id="password" name="password"
+                            placeholder="••••••••"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-6 pr-12 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors"
                             required>
-                    </div>
 
-                    <div x-data="{ showPass: false }">
-                        <div class="flex items-center justify-between mb-2 pl-2 pr-2">
-                            <label for="password"
-                                class="block text-xs font-bold uppercase tracking-widest text-gray-500">Contraseña</label>
-                            <a href="#" class="text-xs font-bold text-gold hover:text-navy transition-colors">¿Olvidaste
-                                tu clave?</a>
-                        </div>
-                        <div class="relative">
-                            <input :type="showPass ? 'text' : 'password'" id="password" name="password"
-                                placeholder="••••••••"
-                                class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-6 pr-12 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors"
-                                required>
-
-                            <button type="button" @click="showPass = !showPass"
-                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gold transition-colors focus:outline-none">
-                                <svg x-show="!showPass" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <svg x-show="showPass" style="display: none;" class="w-6 h-6" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="mensajeError" style="display: none;"
-                        class="bg-red-50 text-red-500 text-sm font-bold p-3 rounded-xl border border-red-100 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Usuario o contraseña incorrectos.</span>
-                    </div>
-
-                    <div class="pt-4">
-                        <button id="btnSubmit" type="submit"
-                            class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold text-lg py-5 rounded-full shadow-lg transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300 active:scale-95">
-                            Acceder al sistema
+                        <button type="button" @click="showPass = !showPass"
+                            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gold transition-colors focus:outline-none">
+                            <svg x-show="!showPass" class="w-6 h-6" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg x-show="showPass" style="display: none;" class="w-6 h-6" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
                         </button>
                     </div>
-                </form>
+                </div>
 
-            </div>
+                <div id="mensajeError" style="display: none;"
+                    class="bg-red-50 text-red-500 text-sm font-bold p-3 rounded-xl border border-red-100 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Usuario o contraseña incorrectos.</span>
+                </div>
+
+                <div class="pt-4">
+                    <button id="btnSubmit" type="submit"
+                        class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold text-lg py-5 rounded-full shadow-lg transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300 active:scale-95">
+                        Acceder al sistema
+                    </button>
+                </div>
+            </form>
+
         </div>
-    </section>
+    </div>
+</section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Lógica visual del Navbar
-            const navbar = document.getElementById('navbar');
-            const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[760px]';
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lógica visual del Navbar
+        const navbar = document.getElementById('navbar');
+        const logo = document.getElementById('nav-logo-combined');
+        const largoPildora = 'max-w-[760px]';
 
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10');
-                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                } else {
-                    logo.classList.replace('h-10', 'h-16');
-                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                }
-            });
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                logo.classList.replace('h-16', 'h-10');
+                navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+            } else {
+                logo.classList.replace('h-10', 'h-16');
+                navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+                navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+            }
+        });
 
-            // LÓGICA DE LOGIN CONECTADA A LA BASE DE DATOS
-            const loginForm = document.getElementById('loginForm');
-            const btnSubmit = document.getElementById('btnSubmit');
-            const mensajeError = document.getElementById('mensajeError');
+        // LÓGICA DE LOGIN CONECTADA A LA BASE DE DATOS
+        const loginForm = document.getElementById('loginForm');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const mensajeError = document.getElementById('mensajeError');
 
-            loginForm.addEventListener('submit', async function (e) {
-                e.preventDefault();
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
 
-                const textoOriginal = btnSubmit.textContent;
-                btnSubmit.textContent = 'Verificando...';
-                btnSubmit.disabled = true;
-                mensajeError.style.display = 'none';
+            const textoOriginal = btnSubmit.textContent;
+            btnSubmit.textContent = 'Verificando...';
+            btnSubmit.disabled = true;
+            mensajeError.style.display = 'none';
 
-                // ==========================================
-                // LLAVE MAESTRA TEMPORAL
-                // ==========================================
-                if (username === 'EdwinyMarce' && password === 'Gaby2012') {
-                    localStorage.setItem('gv_usuario_actual', JSON.stringify({ nombre: 'Edwin y Marce', rol: 'ADMIN' }));
-                    window.location.href = 'admin_dashboard.html';
-                    return;
-                }
+            // ==========================================
+            // LLAVE MAESTRA TEMPORAL
+            // ==========================================
+            if (username === 'EdwinyMarce' && password === 'Gaby2012') {
+                localStorage.setItem('gv_usuario_actual', JSON.stringify({ nombre: 'Edwin y Marce', rol: 'ADMIN' }));
+                window.location.href = 'admin_dashboard.html';
+                return;
+            }
 
-                try {
-                    // Llamamos a la base de datos en Render
-                    const respuesta = await fetch('https://gestandovalor-backend.onrender.com/usuarios/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
+            try {
+                // Llamamos a la base de datos en Render
+                const respuesta = await fetch('https://gestandovalor-backend.onrender.com/usuarios/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
 
-                    if (respuesta.ok) {
-                        const data = await respuesta.json();
-                        const usuario = data.usuario;
+                if (respuesta.ok) {
+                    const data = await respuesta.json();
+                    const usuario = data.usuario;
 
-                        // Guardamos quién entró en la memoria del navegador
-                        localStorage.setItem('gv_usuario_actual', JSON.stringify(usuario));
+                    // Guardamos quién entró en la memoria del navegador
+                    localStorage.setItem('gv_usuario_actual', JSON.stringify(usuario));
 
-                        // Redirige según el Rol
-                        switch (usuario.rol) {
-                            case 'ADMIN':
-                                window.location.href = 'admin_dashboard.html';
-                                break;
-                            case 'AMA_LLAVES':
-                                window.location.href = 'ama_llaves_dashboard.html';
-                                break;
-                            case 'ASEO':
-                                window.location.href = 'empleado_dashboard.html';
-                                break;
-                            case 'PROPIETARIO':
-                                window.location.href = 'propietario_dashboard.html';
-                                break;
-                            default:
-                                alert('Tu usuario no tiene un rol asignado. Contacta al administrador.');
-                                btnSubmit.textContent = textoOriginal;
-                                btnSubmit.disabled = false;
-                        }
-                    } else {
-                        // Credenciales incorrectas
-                        mensajeError.style.display = 'flex';
-                        btnSubmit.textContent = textoOriginal;
-                        btnSubmit.disabled = false;
+                    // Redirige según el Rol
+                    switch (usuario.rol) {
+                        case 'ADMIN':
+                            window.location.href = 'admin_dashboard.html';
+                            break;
+                        case 'AMA_LLAVES':
+                            window.location.href = 'ama_llaves_dashboard.html';
+                            break;
+                        case 'ASEO':
+                            window.location.href = 'empleado_dashboard.html';
+                            break;
+                        case 'PROPIETARIO':
+                            window.location.href = 'propietario_dashboard.html';
+                            break;
+                        default:
+                            alert('Tu usuario no tiene un rol asignado. Contacta al administrador.');
+                            btnSubmit.textContent = textoOriginal;
+                            btnSubmit.disabled = false;
                     }
-                } catch (error) {
-                    console.error('Error de conexión:', error);
-                    alert('El servidor está despertando (Render gratuito). Intenta de nuevo en unos segundos.');
+                } else {
+                    // Credenciales incorrectas
+                    mensajeError.style.display = 'flex';
                     btnSubmit.textContent = textoOriginal;
                     btnSubmit.disabled = false;
                 }
-            });
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                alert('El servidor está despertando (Render gratuito). Intenta de nuevo en unos segundos.');
+                btnSubmit.textContent = textoOriginal;
+                btnSubmit.disabled = false;
+            }
         });
-    </script>
+    });
+</script>
 </body>
 
 </html>
