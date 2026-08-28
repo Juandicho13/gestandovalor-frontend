@@ -27,8 +27,8 @@
 
 <body class="font-sans text-gray-800 antialiased bg-navy" x-data="{ openContact: false, mobileMenuOpen: false }"></body>
 
-<nav id="navbar"
-    class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
+<nav id="navbar" style="z-index: 1000;"
+    class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
     <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
         <img id="nav-logo-combined" src="GV.png" alt="Logo"
             class="h-16 w-auto object-contain transition-all duration-700">
@@ -255,6 +255,25 @@
         });
     });
 </script>
+
+<!-- Modal Menú Móvil (Pegar justo antes de cerrar body) -->
+<div x-show="mobileMenuOpen" style="display: none; z-index: 999;" x-transition.opacity
+    class="fixed inset-0 bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+    <div class="flex flex-col items-center gap-8 w-full mt-10">
+        <a href="index.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white">Inicio</a>
+        <a href="blog.html" @click="mobileMenuOpen = false"
+            class="text-2xl font-medium text-gray-300 hover:text-gold">Blog</a>
+        <a href="alojamientos.html" @click="mobileMenuOpen = false"
+            class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
+        <a href="login.html" @click="mobileMenuOpen = false"
+            class="text-2xl font-medium text-gold border-b-2 border-gold pb-1">Iniciar Sesión</a>
+        <a href="index.html#contacto" @click="mobileMenuOpen = false"
+            class="mt-8 bg-gold text-navy text-lg font-extrabold py-4 w-full max-w-xs rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] text-center">Contacto</a>
+    </div>
+</div>
+
+</body>
+
 </body>
 
 </html>
