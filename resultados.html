@@ -69,24 +69,24 @@
 
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-md overflow-visible border-white/10 w-full max-w-full h-24 rounded-none px-4 md:px-10 border-b bg-navy/90 shadow-sm">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-md overflow-visible border-white/10 w-full max-w-full h-24 rounded-none px-3 md:px-10 border-b bg-navy/90 shadow-sm">
 
-        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 w-[50px] md:w-[120px]">
+        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 w-[40px] md:w-[120px]">
             <img id="nav-logo-combined" src="GV.png" alt="Logo"
-                class="h-16 w-auto object-contain transition-all duration-700">
+                class="h-12 md:h-16 w-auto object-contain transition-all duration-700">
         </a>
 
-        <div class="flex-1 flex justify-center mx-2 md:mx-4 transition-all duration-700 z-[60]">
+        <div class="flex-1 flex justify-center mx-2 md:mx-4 transition-all duration-700 z-[60] min-w-0">
             <div
-                class="flex items-center bg-white/5 border border-white/10 shadow-sm rounded-full py-1.5 md:py-2 px-2 md:px-4 backdrop-blur-sm relative">
+                class="flex items-center bg-white/5 border border-white/10 shadow-sm rounded-full py-1.5 md:py-2 px-1.5 md:px-4 backdrop-blur-sm relative w-full max-w-[320px] md:max-w-none md:w-auto justify-between">
 
-                <div class="relative cursor-pointer px-2 md:px-4 border-r border-white/20 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group"
+                <div class="relative cursor-pointer px-1 md:px-4 border-r border-white/20 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center justify-center h-full group min-w-0 flex-[1.2] md:flex-1"
                     @click.stop="openLocation = !openLocation; openGuests = false">
-                    <div class="text-[10px] md:text-sm font-bold truncate max-w-[80px] md:max-w-[120px]"
+                    <div class="text-[10px] md:text-sm font-bold truncate w-full text-center"
                         x-text="filtros.loc || 'Destino'"></div>
 
                     <div x-show="openLocation" @click.away="openLocation = false" x-transition.opacity
-                        class="absolute top-[180%] left-0 w-64 bg-white rounded-2xl shadow-2xl py-2 z-50 border border-gray-100 text-left text-navy cursor-default"
+                        class="absolute top-[180%] left-[-10px] md:left-0 w-64 bg-white rounded-2xl shadow-2xl py-2 z-50 border border-gray-100 text-left text-navy cursor-default"
                         style="display: none;">
                         <template x-for="lugar in lugaresDisponibles" :key="lugar">
                             <div @click.stop="filtros.loc = lugar; openLocation = false; aplicarFiltrosYURL();"
@@ -99,19 +99,21 @@
                 </div>
 
                 <div id="nav-datepicker-trigger"
-                    class="relative cursor-pointer px-2 md:px-4 border-r border-white/20 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group">
-                    <div class="text-[10px] md:text-sm font-bold whitespace-nowrap" x-text="textoFechas()"></div>
+                    class="relative cursor-pointer px-1 md:px-4 border-r border-white/20 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center justify-center h-full group min-w-0 flex-[1.5] md:flex-1">
+                    <div class="text-[10px] md:text-sm font-bold truncate w-full text-center" x-text="textoFechas()">
+                    </div>
                     <input id="nav-calendar" type="text"
                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 </div>
 
-                <div class="relative cursor-pointer px-2 md:px-4 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center h-full group"
+                <div class="relative cursor-pointer px-1 md:px-4 text-gray-300 hover:text-gold transition-colors duration-300 flex items-center justify-center h-full group min-w-0 flex-[0.8] md:flex-1"
                     @click.stop="openGuests = !openGuests; openLocation = false">
-                    <div class="text-[10px] md:text-sm font-bold whitespace-nowrap" x-text="textoHuespedesBarra()">
+                    <div class="text-[10px] md:text-sm font-bold truncate w-full text-center"
+                        x-text="textoHuespedesBarra()">
                     </div>
 
                     <div x-show="openGuests" @click.away="openGuests = false" x-transition.opacity
-                        class="absolute top-[180%] right-0 md:left-0 w-[300px] md:w-[350px] bg-white rounded-[32px] shadow-2xl p-6 z-50 border border-gray-100 text-left text-navy cursor-default"
+                        class="absolute top-[180%] right-[-30px] md:left-0 w-[280px] md:w-[350px] bg-white rounded-[32px] shadow-2xl p-6 z-50 border border-gray-100 text-left text-navy cursor-default"
                         style="display: none;">
 
                         <div class="flex justify-between items-center pb-4 border-b border-gray-100">
@@ -190,7 +192,7 @@
                 </div>
 
                 <button @click.stop="aplicarFiltrosYURL(true)"
-                    class="bg-gold hover:bg-yellow-500 rounded-full p-1.5 md:p-2 ml-1 md:ml-2 text-navy transition-colors shrink-0 shadow-sm hover:scale-105">
+                    class="bg-gold hover:bg-yellow-500 rounded-full p-1.5 md:p-2 ml-1 text-navy transition-colors flex-shrink-0 shadow-sm hover:scale-105">
                     <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" stroke-width="3"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -200,7 +202,7 @@
             </div>
         </div>
 
-        <div class="w-[50px] md:w-[120px] flex-shrink-0 hidden sm:block"></div>
+        <div class="w-[40px] md:w-[120px] flex-shrink-0 hidden sm:block"></div>
     </nav>
 
     <main class="pt-32 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12">
