@@ -152,9 +152,9 @@
                     </p>
                 </div>
 
-                <div class="flex gap-4">
+                <div class="flex flex-wrap gap-3 mt-4 md:mt-0 w-full md:w-auto">
                     <button x-show="vista === 'detalle'" @click="vista = 'grid'" style="display: none;"
-                        class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center gap-2">
+                        class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-full font-bold transition-colors backdrop-blur-md text-sm flex items-center justify-center gap-2 flex-grow md:flex-grow-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -162,7 +162,7 @@
                     </button>
 
                     <button x-show="vista === 'detalle'" @click="eliminarPropiedad()" style="display: none;"
-                        class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-6 py-3 rounded-full font-extrabold transition-all shadow-sm text-sm flex items-center gap-2">
+                        class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-6 py-3 rounded-full font-extrabold transition-all shadow-sm text-sm flex items-center justify-center gap-2 flex-grow md:flex-grow-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -170,14 +170,15 @@
                     </button>
 
                     <button x-show="vista === 'detalle'" @click="abrirModalEditar()" style="display: none;"
-                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center justify-center gap-2 flex-grow md:flex-grow-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg> Editar Propiedad
                     </button>
+
                     <button x-show="vista === 'grid'" @click="abrirModalNueva()"
-                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2">
+                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center justify-center gap-2 flex-grow md:flex-grow-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg> Crear Anuncio
