@@ -29,6 +29,7 @@
 
 <nav id="navbar" style="z-index: 1000;"
     class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+
     <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0">
         <img id="nav-logo-combined" src="GV.png" alt="Logo"
             class="h-16 w-auto object-contain transition-all duration-700">
@@ -51,31 +52,16 @@
         <button
             class="hidden md:block bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
 
-        <!-- Menú Hamburguesa Solo para Móvil -->
+        <!-- Menú Hamburguesa Solo para Móvil (Animación X corregida) -->
         <button @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10 ml-2">
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
-                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
-                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
-            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
-                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+            class="md:hidden flex flex-col justify-center items-center w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10 ml-2 relative">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 absolute"
+                :class="mobileMenuOpen ? 'rotate-45' : '-translate-y-2'"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 absolute"
+                :class="mobileMenuOpen ? 'opacity-0' : 'opacity-100'"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 absolute"
+                :class="mobileMenuOpen ? '-rotate-45' : 'translate-y-2'"></span>
         </button>
-    </div>
-    <!-- Modal Menú Móvil -->
-    <div x-show="mobileMenuOpen" style="display: none;" x-transition.opacity
-        class="fixed inset-0 z-[100] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
-        <div class="flex flex-col items-center gap-8 w-full mt-10">
-            <a href="index.html" @click="mobileMenuOpen = false" class="text-2xl font-bold text-white">Inicio</a>
-            <a href="blog.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gray-300 hover:text-gold">Blog</a>
-            <a href="alojamientos.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
-            <a href="login.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gold border-b-2 border-gold pb-1">Iniciar Sesión</a>
-            <a href="index.html#contacto" @click="mobileMenuOpen = false"
-                class="mt-8 bg-gold text-navy text-lg font-extrabold py-4 w-full max-w-xs rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] text-center">Contacto</a>
-        </div>
     </div>
 </nav>
 
@@ -256,7 +242,7 @@
     });
 </script>
 
-<!-- Modal Menú Móvil (Pegar justo antes de cerrar body) -->
+<!-- Modal Menú Móvil (Fuera del Nav para que no se superponga) -->
 <div x-show="mobileMenuOpen" style="display: none; z-index: 999;" x-transition.opacity
     class="fixed inset-0 bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
     <div class="flex flex-col items-center gap-8 w-full mt-10">
