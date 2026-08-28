@@ -52,20 +52,20 @@
         <p class="font-bold text-navy animate-pulse">Sincronizando ruta...</p>
     </div>
 
-    <!-- Navbar Estilo Isla Dinámica -->
-    <nav id="navbar"
-        class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-5xl flex items-center justify-between px-6 py-3 bg-navy/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl transition-all"
-        x-show="!aseoActivo">
+    <!-- Contenedor principal para Navbar e Isla Dinámica -->
+    <div x-data="{ mobileMenuOpen: false }">
 
-        <!-- Lado izquierdo: Logo -->
-        <a href="#" class="flex items-center shrink-0 transition-transform hover:scale-105">
-            <img src="GV.png" alt="Logo" class="h-10 md:h-12 w-auto object-contain">
-        </a>
+        <!-- Navbar Estilo Isla Dinámica (Idéntico a index.html) -->
+        <nav id="navbar"
+            class="fixed left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 top-5 w-[95%] max-w-[760px] h-14 rounded-full shadow-2xl border bg-navy/80 px-6"
+            x-show="!aseoActivo">
 
-        <!-- Lado derecho: Enlaces, Menú Móvil y Avatar -->
-        <div class="flex items-center gap-3 md:gap-6 relative" x-data="{ menuAbierto: false }">
+            <!-- Logo -->
+            <a href="#" class="flex items-center shrink-0 transition-transform hover:scale-105">
+                <img src="GV.png" alt="Logo" class="h-8 w-auto object-contain">
+            </a>
 
-            <!-- Enlaces Escritorio (Ocultos en móvil) -->
+            <!-- Lado Derecho: Pantallas Grandes (Oculto en celular) -->
             <div class="hidden md:flex items-center gap-6">
                 <a href="#" class="text-gold text-sm font-bold border-b-2 border-gold pb-1">Mi Panel</a>
                 <button @click="cerrarSesion()"
@@ -77,39 +77,55 @@
                     </svg>
                     Salir
                 </button>
+                <!-- Avatar -->
+                <div
+                    class="w-8 h-8 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-sm shadow-lg shrink-0">
+                    RI
+                </div>
             </div>
 
-            <!-- Botón Menú Hamburguesa (Solo Móvil) -->
-            <button @click="menuAbierto = !menuAbierto"
-                class="md:hidden text-white focus:outline-none p-2 transition-transform hover:scale-110">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
-            </button>
+            <!-- Lado Derecho: Móvil (Oculto en pantallas grandes) -->
+            <div class="flex items-center gap-3 md:hidden">
+                <!-- Avatar -->
+                <div
+                    class="w-8 h-8 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-sm shadow-lg shrink-0">
+                    RI
+                </div>
 
-            <!-- Avatar -->
-            <div
-                class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-sm md:text-base shadow-lg shrink-0">
-                RI
+                <!-- Botón Hamburguesa / Cerrar -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="text-gold focus:outline-none p-1 transition-transform hover:scale-110">
+                    <!-- Icono de 3 rayas (aparece cuando está cerrado) -->
+                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <!-- Icono de X (aparece cuando está abierto) -->
+                    <svg x-show="mobileMenuOpen" style="display: none;" class="w-6 h-6" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
             </div>
+        </nav>
 
-            <!-- Menú Desplegable Móvil -->
-            <div x-show="menuAbierto" @click.away="menuAbierto = false"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 translate-y-[-10px] scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                x-transition:leave-end="opacity-0 translate-y-[-10px] scale-95"
-                class="absolute top-[130%] right-0 bg-navy/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 flex flex-col gap-4 md:hidden min-w-[180px] z-[100]"
-                style="display: none;">
+        <!-- Menú Móvil Pantalla Completa (Idéntico a index.html) -->
+        <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden"
+            style="display: none;">
 
-                <a href="#" class="text-gold text-sm font-bold pb-3 border-b border-white/10">Mi Panel</a>
+            <div class="flex flex-col items-center gap-8 w-full">
+                <!-- Links gigantes centrados -->
+                <a href="#" @click="mobileMenuOpen = false" class="text-gold text-2xl font-bold transition-colors">Mi
+                    Panel</a>
 
-                <button @click="cerrarSesion()"
-                    class="text-white hover:text-red-400 transition-colors text-sm font-bold flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button @click="cerrarSesion(); mobileMenuOpen = false"
+                    class="text-white hover:text-red-400 text-2xl font-bold transition-colors flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
                         </path>
@@ -117,9 +133,9 @@
                     Salir
                 </button>
             </div>
-
         </div>
-    </nav>
+
+    </div>
 
     <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden"
         x-show="!aseoActivo">
