@@ -114,16 +114,51 @@
         <p class="font-bold text-navy animate-pulse">Cargando editor WYSIWYG...</p>
     </div>
 
-    <nav class="mt-[85px] md:mt-14 pt-6 px-6 md:px-10 pb-6 flex items-center justify-between border-b bg-navy">
-        <a href="#" class="flex items-center flex-shrink-0"><img src="GV.png" alt="Logo"
-                class="h-10 w-auto object-contain"></a>
-        <div class="hidden md:flex items-center gap-6 justify-center flex-1 text-white opacity-50 pointer-events-none">
-            <span class="text-sm font-medium">Inicio</span> <span class="text-sm font-medium">Blog</span> <span
-                class="text-sm font-medium text-gold">Alojamientos</span>
+    <!-- Navbar Unificado -->
+    <nav
+        class="fixed top-0 left-0 w-full z-[1000] bg-navy/95 backdrop-blur-md border-b border-white/10 px-4 md:px-10 h-20 md:h-24 flex items-center justify-between shadow-xl transition-all">
+
+        <!-- Izquierda: Logo -->
+        <a href="admin_dashboard.html" class="flex items-center gap-3 md:gap-4 transition-transform hover:scale-105">
+            <img src="GV.png" alt="Logo" class="h-10 md:h-14 w-auto object-contain">
+            <span
+                class="text-white font-bold text-sm md:text-base hidden sm:block border-l border-white/20 pl-4 ml-2">Editor
+                de Propiedad</span>
+        </a>
+
+        <!-- Derecha: Botones de Acción y Estado -->
+        <div class="flex items-center gap-3 md:gap-6">
+
+            <!-- Indicador "En Vivo" (Solo visible en pantallas medianas o más grandes) -->
+            <div class="hidden md:flex flex-col justify-center items-end mr-2">
+                <span
+                    class="text-gold text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-1.5">
+                    <span
+                        class="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]"></span>
+                    Edición en Vivo
+                </span>
+            </div>
+
+            <button @click="window.history.back()"
+                class="bg-white/10 hover:bg-white/20 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-full transition-colors text-[11px] md:text-sm font-bold flex items-center gap-1.5 border border-white/10 backdrop-blur-sm">
+                <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+                <span class="hidden sm:inline">Descartar</span>
+            </button>
+
+            <button @click="guardarCambios()"
+                class="bg-gold hover:bg-yellow-500 text-navy px-4 md:px-6 py-2 md:py-2.5 rounded-full transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] text-[11px] md:text-sm font-extrabold flex items-center gap-1.5 hover:scale-105">
+                <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Guardar <span class="hidden sm:inline">Cambios</span>
+            </button>
         </div>
     </nav>
 
-    <main class="pt-8 pb-32 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando && propiedad"
+    <main class="pt-28 pb-32 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando && propiedad">
         style="display: none;">
 
         <section class="mb-8">
