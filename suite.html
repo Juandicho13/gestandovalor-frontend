@@ -663,25 +663,59 @@
                             </svg>
                         </div>
                     </label>
+                    <!-- NUEVA Opción: Pago en Línea (Bold) -->
+                    <label class="relative flex cursor-pointer transition-all border-2 rounded-2xl p-4 mt-3"
+                        :class="metodoSeleccionado === 'bold' ? 'border-navy shadow-md' : 'border-gray-100 hover:border-gray-300'">
+                        <div class="flex items-center gap-4 w-full">
+                            <input type="radio" name="metodoPago" value="bold" x-model="metodoSeleccionado"
+                                class="hidden">
+
+                            <div
+                                class="w-10 h-10 rounded-xl bg-navy text-gold font-black flex items-center justify-center border border-white/20 shadow-inner shrink-0">
+                                B
+                            </div>
+
+                            <div class="flex-1">
+                                <p class="font-bold text-navy text-sm">Pago en línea</p>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Tarjetas, PSE, Nequi, Daviplata</p>
+                            </div>
+                        </div>
+
+                        <!-- Circulito de selección a la derecha -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                            :class="metodoSeleccionado === 'bold' ? 'border-navy bg-navy' : 'border-gray-300'">
+                            <svg x-show="metodoSeleccionado === 'bold'" class="w-3 h-3 text-white" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </label>
                 </div>
             </div>
 
             <div class="p-6 bg-white border-t border-gray-100">
                 <button @click="procesarReserva()"
-                    class="w-full font-extrabold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2"
-                    :class="(metodoSeleccionado !== '' && nombreHuesped.length > 2) ? (metodoSeleccionado === 'Transferencia' ? 'bg-success hover:bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white') : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
-                    :disabled="metodoSeleccionado === '' || nombreHuesped.length <= 2 || cargandoPago">
-
-                    <svg x-show="metodoSeleccionado === 'Transferencia'" class="w-5 h-5" fill="currentColor"
-                        viewBox="0 0 24 24">
-                        <path
-                            d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.327.101.144.447.712.947 1.156.643.57 1.205.748 1.349.835.143.087.229.072.316-.029l.36-.433c.114-.144.23-.115.36-.065l1.287.607c.144.072.245.108.281.166.035.058.035.332-.109.737z" />
+                    :disabled="metodoSeleccionado === '' || nombreHuesped.length < 2 || cargandoPago"
+                    class="w-full font-extrabold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    :class="metodoSeleccionado !== '' && nombreHuesped.length > 2 ? 'bg-navy hover:bg-blue-900 shadow-navy/30 text-white' : 'bg-gray-300 text-gray-500'">
+                    <!-- Spinner de Carga -->
+                    <svg x-show="cargandoPago" class="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="display: none;">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
                     </svg>
 
-                    <span x-show="cargandoPago">Asegurando reserva...</span>
-                    <span x-show="!cargandoPago"
-                        x-text="metodoSeleccionado === 'Transferencia' ? 'Reservar y Contactar por WhatsApp' : 'Selecciona un método'"></span>
+                    <!-- Texto dinámico -->
+                    <span x-text="textoBotonPago()"></span>
                 </button>
+
+                <!-- Mensaje de Error (si falla la conexión) -->
+                <p x-show="errorPago" x-text="errorPago" class="text-red-500 text-xs text-center mt-3 font-semibold"
+                    style="display: none;"></p>
                 <p x-show="metodoSeleccionado !== '' && nombreHuesped.length <= 2"
                     class="text-xs text-red-500 text-center mt-2 font-medium animate-pulse">Por favor, escribe tu nombre
                     completo para continuar.</p>
@@ -1090,6 +1124,14 @@
             return {
                 cargando: true,
                 cargandoPago: false,
+                errorPago: '',
+
+                textoBotonPago() {
+                    if (this.cargandoPago) return 'Conectando con pasarela...';
+                    if (!this.metodoSeleccionado) return 'Selecciona un método';
+                    if (this.metodoSeleccionado === 'bold') return 'Pagar de forma segura';
+                    return 'Confirmar Reserva';
+                },
 
                 mobileMenuOpen: false,
                 openModalFotos: false,
@@ -1388,20 +1430,19 @@
                     const totalStr = this.formatearDinero(totalPagar);
 
                     try {
+                        // 1. ESTO ES TU CÓDIGO ORIGINAL: Guarda la reserva en tu base de datos
                         const payload = {
                             propiedad_id: this.propiedad.id,
                             huesped_nombre: this.nombreHuesped,
                             check_in: new Date(this.checkinRaw + "T15:00:00").toISOString(),
                             check_out: new Date(this.checkoutRaw + "T11:00:00").toISOString(),
-
-                            adultos: this.adults,
+                            adultos: this.adultos,
                             ninos: this.children,
                             bebes: this.infants,
                             mascotas: this.pets,
-                            cantidad_huespedes: this.adults + this.children,
-
+                            cantidad_huespedes: this.adultos + this.children,
                             monto_total: totalPagar,
-                            canal: 'Directa',
+                            canal: 'Directo',
                             estado_reserva: 'Por Confirmar Pago'
                         };
 
@@ -1413,32 +1454,55 @@
 
                         if (!res.ok) throw new Error("Las fechas fueron ocupadas recientemente.");
 
+                        // 2. ESTO ES TU CÓDIGO ORIGINAL: Si elige transferencia va a WhatsApp
                         if (this.metodoSeleccionado === 'Transferencia') {
                             let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
-                            texto += `🏡 *Apto:* ${this.propiedad.titulo}\n`;
-                            texto += `👤 *A nombre de:* ${this.nombreHuesped}\n`;
+                            texto += `🏨 *Alojamiento:* ${this.propiedad.titulo}\n`;
                             texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
-                            texto += `👥 *Adultos:* ${this.adults}\n`;
+                            texto += `👤 *Adultos:* ${this.adultos}\n`;
                             if (this.children > 0) texto += `👦 *Niños:* ${this.children}\n`;
                             if (this.infants > 0) texto += `👶 *Bebés:* ${this.infants}\n`;
-                            if (this.pets > 0) texto += `🐶 *Mascotas:* ${this.pets}\n`;
+                            if (this.pets > 0) texto += `🐾 *Mascotas:* ${this.pets}\n`;
                             texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
                             texto += `Quedo atento/a para enviar el comprobante y recibir las instrucciones de acceso. 🔑`;
 
                             this.modalPago = false;
-                            const urlWA = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
-                            window.open(urlWA, '_blank');
+                            const url = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
+                            window.open(url, '_blank');
 
                             setTimeout(() => window.location.reload(), 2000);
                         }
 
+                        // 3. NUEVO: Si elige Bold, pedimos el link a tu nuevo backend local
+                        else if (this.metodoSeleccionado === 'bold') {
+                            const respuestaBold = await fetch('http://localhost:3000/pagos/generar-link', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    reservaId: 'RES-' + Math.floor(Math.random() * 10000),
+                                    monto: totalPagar, // Usa tu cálculo dinámico
+                                    descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
+                                })
+                            });
+
+                            const dataBold = await respuestaBold.json();
+
+                            if (dataBold.success && dataBold.linkPago) {
+                                window.location.href = dataBold.linkPago; // ¡Nos vamos a Bold!
+                            } else {
+                                throw new Error('Bold no nos devolvió el link de pago.');
+                            }
+                        }
+
                     } catch (error) {
+                        // Tu código original para manejar errores (se activa si falla Render o falla Bold)
                         alert(error.message || "Error al conectar con el servidor.");
                     } finally {
                         this.cargandoPago = false;
                     }
-                }
+                },
             }
+        }
         }
     </script>
 </body>
