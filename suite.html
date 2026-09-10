@@ -1430,11 +1430,9 @@
                     const totalStr = this.formatearDinero(totalPagar);
 
                     try {
-
-
-                        // 1. ESTO ES TU CÓDIGO ORIGINAL: Guarda la reserva en tu base de datos
+                        // 1. Guarda la reserva en tu base de datos
                         const payload = {
-                            propiedad_id: this.propiedad.id, // <-- Solo dejamos esta, que es la que Prisma quiere
+                            propiedad_id: this.propiedad.id,
                             huesped_nombre: this.nombreHuesped,
                             check_in: new Date(this.checkinRaw + "T15:00:00").toISOString(),
                             check_out: new Date(this.checkoutRaw + "T11:00:00").toISOString(),
@@ -1447,80 +1445,70 @@
                             canal: 'Directo',
                             estado_reserva: 'Por Confirmar Pago'
                         };
-                        const dataBold = await respuestaBold.json();
 
-                        if (dataBold.success && dataBold.linkPago) {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
 
+                        if (!res.ok) {
+                            const errorBackend = await res.json();
+                            console.error("🔥 Error real del servidor:", errorBackend);
+                            alert("El backend rechazó la reserva por esto: " + JSON.stringify(errorBackend.message || errorBackend));
+                            throw new Error("Las fechas fueron ocupadas recientemente.");
+                        }
+
+                        // 2. Si elige Transferencia Directa
+                        if (this.metodoSeleccionado === 'Transferencia') {
+                            let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
+                            texto += `🏨 *Alojamiento:* ${this.propiedad.titulo}\n`;
+                            texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
+                            texto += `👤 *Adultos:* ${this.adultos}\n`;
+                            if (this.children > 0) texto += `👦 *Niños:* ${this.children}\n`;
+                            if (this.infants > 0) texto += `👶 *Bebés:* ${this.infants}\n`;
+                            if (this.pets > 0) texto += `🐾 *Mascotas:* ${this.pets}\n`;
+                            texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
+                            texto += `Quedo atento/a para enviar el comprobante y recibir las instrucciones de acceso. 🔑`;
+
+                            this.modalPago = false;
+                            const url = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
+                            window.open(url, '_blank');
+
+                            setTimeout(() => window.location.reload(), 2000);
+                        }
+
+                        // 3. Si elige Bold, pedimos el link
+                        else if (this.metodoSeleccionado === 'bold') {
+                            const respuestaBold = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    reservaId: 'RES-' + Math.floor(Math.random() * 10000),
+                                    monto: totalPagar,
+                                    descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
+                                })
+                            });
 
                             const dataBold = await respuestaBold.json();
-                            console.log("Respuesta completa de Bold:", dataBold); // 👀 Agregamos esto para espiar
+                            console.log("🔥 Respuesta completa de Bold:", dataBold); // Espía
 
                             if (dataBold.success && dataBold.linkPago) {
-
-                                const res = await fetch('https://gestandovalor-backend.onrender.com/reservas', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(payload)
-                                });
-
-                                // 👇 ESTO ES LO ÚNICO QUE CAMBIA: Capturamos el error real de Render
-                                if (!res.ok) {
-                                    const errorBackend = await res.json();
-                                    console.error("🔥 Error real del servidor:", errorBackend);
-                                    alert("El backend rechazó la reserva por esto: " + JSON.stringify(errorBackend.message || errorBackend));
-                                    throw new Error("Las fechas fueron ocupadas recientemente.");
-                                }
-
-                                // 2. ESTO ES TU CÓDIGO ORIGINAL: Si elige transferencia va a WhatsApp
-                                if (this.metodoSeleccionado === 'Transferencia') {
-                                    let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
-                                    texto += `🏨 *Alojamiento:* ${this.propiedad.titulo}\n`;
-                                    texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
-                                    texto += `👤 *Adultos:* ${this.adultos}\n`;
-                                    if (this.children > 0) texto += `👦 *Niños:* ${this.children}\n`;
-                                    if (this.infants > 0) texto += `👶 *Bebés:* ${this.infants}\n`;
-                                    if (this.pets > 0) texto += `🐾 *Mascotas:* ${this.pets}\n`;
-                                    texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
-                                    texto += `Quedo atento/a para enviar el comprobante y recibir las instrucciones de acceso. 🔑`;
-
-                                    this.modalPago = false;
-                                    const url = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
-                                    window.open(url, '_blank');
-
-                                    setTimeout(() => window.location.reload(), 2000);
-                                }
-
-                                // 3. NUEVO: Si elige Bold, pedimos el link a tu nuevo backend local
-                                else if (this.metodoSeleccionado === 'bold') {
-                                    // Llamamos a tu backend en producción
-                                    const respuestaBold = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            reservaId: 'RES-' + Math.floor(Math.random() * 10000),
-                                            monto: totalPagar,
-                                            descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
-                                        })
-                                    });
-
-                                    const dataBold = await respuestaBold.json();
-
-                                    if (dataBold.success && dataBold.linkPago) {
-                                        window.location.href = dataBold.linkPago; // ¡Nos vamos a Bold!
-                                    } else {
-                                        throw new Error('Bold no nos devolvió el link de pago.');
-                                    }
-                                }
-
-                            } catch (error) {
-                                // Tu código original para manejar errores (se activa si falla Render o falla Bold)
-                                alert(error.message || "Error al conectar con el servidor.");
-                            } finally {
-                                this.cargandoPago = false;
+                                window.location.href = dataBold.linkPago; // Redirección a la pasarela
+                            } else {
+                                alert("Error con Bold: " + JSON.stringify(dataBold));
+                                throw new Error('Bold no nos devolvió el link de pago.');
                             }
-                        },
+                        }
+
+                    } catch (error) {
+                        alert(error.message || "Error al conectar con el servidor.");
+                    } finally {
+                        this.cargandoPago = false;
                     }
+                },
             }
+        }
     </script>
 </body>
 
