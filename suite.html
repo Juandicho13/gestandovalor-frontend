@@ -1452,7 +1452,13 @@
                             body: JSON.stringify(payload)
                         });
 
-                        if (!res.ok) throw new Error("Las fechas fueron ocupadas recientemente.");
+                        // 👇 ESTO ES LO ÚNICO QUE CAMBIA: Capturamos el error real de Render
+                        if (!res.ok) {
+                            const errorBackend = await res.json();
+                            console.error("🔥 Error real del servidor:", errorBackend);
+                            alert("El backend rechazó la reserva por esto: " + JSON.stringify(errorBackend.message || errorBackend));
+                            throw new Error("Las fechas fueron ocupadas recientemente.");
+                        }
 
                         // 2. ESTO ES TU CÓDIGO ORIGINAL: Si elige transferencia va a WhatsApp
                         if (this.metodoSeleccionado === 'Transferencia') {
