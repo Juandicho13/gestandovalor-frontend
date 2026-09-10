@@ -1432,19 +1432,15 @@
                     try {
                         // 1. ESTO ES TU CÓDIGO ORIGINAL: Guarda la reserva en tu base de datos
                         const payload = {
-                            propiedadId: this.propiedad.id, // <-- Formato exacto que Prisma exige
-                            propiedad_id: this.propiedad.id, // <-- Por si tu DTO original lo necesita
+                            propiedad_id: this.propiedad.id, // <-- Solo dejamos esta, que es la que Prisma quiere
                             huesped_nombre: this.nombreHuesped,
                             check_in: new Date(this.checkinRaw + "T15:00:00").toISOString(),
                             check_out: new Date(this.checkoutRaw + "T11:00:00").toISOString(),
-
-                            // Blindamos con Number() y || 0 para que JAMÁS se vaya un null
                             adultos: Number(this.adultos) || 1,
                             ninos: Number(this.children) || 0,
                             bebes: Number(this.infants) || 0,
                             mascotas: Number(this.pets) || 0,
                             cantidad_huespedes: (Number(this.adultos) || 1) + (Number(this.children) || 0),
-
                             monto_total: totalPagar,
                             canal: 'Directo',
                             estado_reserva: 'Por Confirmar Pago'
