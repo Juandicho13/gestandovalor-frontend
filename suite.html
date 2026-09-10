@@ -1475,12 +1475,13 @@
 
                         // 3. NUEVO: Si elige Bold, pedimos el link a tu nuevo backend local
                         else if (this.metodoSeleccionado === 'bold') {
-                            const respuestaBold = await fetch('http://localhost:3000/pagos/generar-link', {
+                            // Llamamos a tu backend en producción
+                            const respuestaBold = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     reservaId: 'RES-' + Math.floor(Math.random() * 10000),
-                                    monto: totalPagar, // Usa tu cálculo dinámico
+                                    monto: totalPagar,
                                     descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
                                 })
                             });
