@@ -2,6 +2,7 @@
 <html lang="es" class="scroll-smooth">
 
 <head>
+    <script type="text/javascript" src="https://checkout.bold.co/library/boldPaymentButton.js"></script>
     <link rel="icon" type="image/png" href="Logo.png?v=1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1482,25 +1483,38 @@
                         }
 
                         // 3. Si elige Bold, pedimos el link
+                        // 3. Si elige Bold, abrimos la pasarela flotante
                         else if (this.metodoSeleccionado === 'bold') {
-                            const respuestaBold = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
+                            // Pedimos la firma segura al backend
+                            const respuestaFirma = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    reservaId: reservaCreada.id, // 👈 antes: 'RES-' + Math.floor(Math.random() * 10000)
+                                    reservaId: 'RES-' + Math.floor(Math.random() * 10000),
                                     monto: totalPagar,
                                     descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
                                 })
                             });
 
-                            const dataBold = await respuestaBold.json();
-                            console.log("🔥 Respuesta completa de Bold:", dataBold); // Espía
+                            const dataFirma = await respuestaFirma.json();
+                            console.log("Firma generada:", dataFirma);
 
-                            if (dataBold.success && dataBold.linkPago) {
-                                window.location.href = dataBold.linkPago; // Redirección a la pasarela
+                            if (dataFirma.success && dataFirma.hash) {
+                                // Inicializamos la cajita flotante de Bold
+                                const checkout = new BoldCheckout({
+                                    orderId: dataFirma.referencia,
+                                    currency: "COP",
+                                    amount: dataFirma.monto.toString(),
+                                    apiKey: "TU_LLAVE_DE_IDENTIDAD", // <-- Ojo, aquí pones la Llave de Identidad de Bold
+                                    checksum: dataFirma.hash,
+                                    renderMode: "modal", // Esto hace que sea flotante
+                                    redirectionUrl: "https://gestandovalor.com" // A dónde lo envías tras pagar
+                                });
+
+                                // ¡Abrimos la cajita!
+                                checkout.open();
                             } else {
-                                alert("Error con Bold: " + JSON.stringify(dataBold));
-                                throw new Error('Bold no nos devolvió el link de pago.');
+                                alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
                             }
                         }
 
