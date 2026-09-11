@@ -1460,8 +1460,9 @@
                             throw new Error("Las fechas fueron ocupadas recientemente.");
                         }
 
-                        // 👇 NUEVO: guardamos la reserva que el backend acaba de crear, con su ID real
-                        const reservaCreada = await res.json();
+                        // 👇 1. CAPTURAMOS EL ID REAL DE LA RESERVA RECIÉN CREADA EN LA BASE DE DATOS
+                        const reservaGuardada = await res.json();
+                        const idRealReserva = reservaGuardada.id;
 
                         // 2. Si elige Transferencia Directa
                         if (this.metodoSeleccionado === 'Transferencia') {
@@ -1482,15 +1483,14 @@
                             setTimeout(() => window.location.reload(), 2000);
                         }
 
-                        // 3. Si elige Bold, pedimos el link
                         // 3. Si elige Bold, abrimos la pasarela flotante
                         else if (this.metodoSeleccionado === 'bold') {
-                            // Pedimos la firma segura al backend
+                            // Pedimos la firma segura al backend usando el ID REAL
                             const respuestaFirma = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    reservaId: 'RES-' + Math.floor(Math.random() * 10000),
+                                    reservaId: idRealReserva, // 👇 2. ¡AQUÍ ENVIAMOS EL ID REAL A BOLD Y A PRISMA!
                                     monto: totalPagar,
                                     descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
                                 })
@@ -1500,18 +1500,16 @@
                             console.log("Firma generada:", dataFirma);
 
                             if (dataFirma.success && dataFirma.hash) {
-                                // Inicializamos la cajita flotante de Bold
                                 const checkout = new BoldCheckout({
                                     orderId: dataFirma.referencia,
                                     currency: "COP",
                                     amount: dataFirma.monto.toString(),
-                                    apiKey: "dyEOwR7HyT0i6ErChs-Bos_9MDyT0e0o4Gtnteodr_A", // <-- Ojo, aquí pones la Llave de Identidad de Bold
+                                    apiKey: "hU8E_C6tEZLhUW9GkO_qaR2kOZFTrzooJRDxtf4wCHk", // Tu llave pública correcta
                                     checksum: dataFirma.hash,
-                                    renderMode: "modal", // Esto hace que sea flotante
-                                    redirectionUrl: "https://gestandovalor.com" // A dónde lo envías tras pagar
+                                    renderMode: "modal",
+                                    redirectionUrl: "https://gestandovalor.com"
                                 });
 
-                                // ¡Abrimos la cajita!
                                 checkout.open();
                             } else {
                                 alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
