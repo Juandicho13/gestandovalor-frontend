@@ -1459,6 +1459,9 @@
                             throw new Error("Las fechas fueron ocupadas recientemente.");
                         }
 
+                        // 👇 NUEVO: guardamos la reserva que el backend acaba de crear, con su ID real
+                        const reservaCreada = await res.json();
+
                         // 2. Si elige Transferencia Directa
                         if (this.metodoSeleccionado === 'Transferencia') {
                             let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
@@ -1484,7 +1487,7 @@
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    reservaId: 'RES-' + Math.floor(Math.random() * 10000),
+                                    reservaId: reservaCreada.id, // 👈 antes: 'RES-' + Math.floor(Math.random() * 10000)
                                     monto: totalPagar,
                                     descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
                                 })
