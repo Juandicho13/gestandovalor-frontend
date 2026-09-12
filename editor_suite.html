@@ -529,7 +529,6 @@
 
     <div x-show="modalFotos" style="display: none;" class="fixed inset-0 z-[1100] bg-white flex flex-col"
         x-transition.opacity>
-        x-transition.opacity>
 
         <!-- HEADER DEL MODAL (AHORA CON BOTONES CLAROS Y FUNCIONALES) -->
         <div
@@ -561,7 +560,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                    Organizar orden (1, 2, 3...)
+                    todas las fotos
                 </button>
 
                 <!-- Botón Subir Fotos -->
@@ -961,6 +960,7 @@
                     }
                 },
 
+                // 1. LA FUNCIÓN PRINCIPAL QUE PROCESA Y SUBE
                 async procesarFotos(event) {
                     const archivos = event.target.files;
                     if (!archivos || archivos.length === 0) return;
@@ -972,7 +972,7 @@
                         let nombreArchivo = archivo.name ? archivo.name.toLowerCase() : '';
 
                         try {
-                            // 1. MAGIA PARA iPHONE (HEIC)
+                            // MAGIA PARA iPHONE (HEIC)
                             if (nombreArchivo.endsWith('.heic') || nombreArchivo.endsWith('.heif')) {
                                 if (typeof window.heic2any !== "undefined") {
                                     const blobConvertido = await window.heic2any({
@@ -988,31 +988,18 @@
                                 }
                             }
 
-                            // 2. COMPRESOR MÁGICO A WEBP
+                            // COMPRESOR A WEBP
                             const { blob, extension } = await this.convertirYComprimirImagen(archivo);
 
-                            // 3. ENVIAR A RENDER/SUPABASE
-                            const formData = new FormData();
-                            const fileName = `img_${Date.now()}.${extension}`;
-                            formData.append('file', blob, fileName);
+                            // AQUÍ ESTABA EL ERROR: RESTAURAMOS TU MÉTODO ORIGINAL DE SUPABASE
+                            const url = await this.subirFotoAStorage(blob, extension);
 
-                            const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/upload-foto', {
-                                method: 'POST',
-                                body: formData
-                            });
+                            // GUARDAR EN INTERFAZ
+                            this.propiedad.fotos.push(url);
 
-                            if (!res.ok) throw new Error('Falló la subida al servidor');
-
-                            const data = await res.json();
-
-                            // 4. GUARDAR EN INTERFAZ
-                            if (data.url) {
-                                this.propiedad.fotos.push(data.url);
-
-                                // Si estaba dentro de una categoría, la asigna de una vez, si no, va a 'Sin asignar'
-                                const categoriaDestino = this.vistaModalFotos === 'detalle_categoria' ? this.categoriaSeleccionada : 'Sin asignar';
-                                this.propiedad.foto_categorias.push(categoriaDestino);
-                            }
+                            // Asignación automática de categoría
+                            const categoriaDestino = this.vistaModalFotos === 'detalle_categoria' ? this.categoriaSeleccionada : 'Sin asignar';
+                            this.propiedad.foto_categorias.push(categoriaDestino);
 
                         } catch (error) {
                             console.error("Error con una foto:", error);
@@ -1024,28 +1011,30 @@
                     event.target.value = ''; // Limpia el input
                 },
 
-                // Pide permiso al backend y sube el archivo directo a Supabase
+                // 2. RESTAURAMOS TU MOTOR ORIGINAL DE SUPABASE (¡NO LO BORRES!)
                 async subirFotoAStorage(blob, extension) {
+                    // Paso A: Pedimos el link firmado al backend
                     const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/url-subida', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             extension: extension,
-                            propiedadId: this.propiedad.id || undefined
+                            propiedadId: this.propiedadId || undefined // Usamos propiedadId en vez de propiedad.id
                         })
                     });
 
-                    if (!res.ok) throw new Error('No se pudo preparar la subida');
+                    if (!res.ok) throw new Error('No se pudo preparar la subida en el servidor');
 
                     const { signedUrl, publicUrl } = await res.json();
 
+                    // Paso B: Subimos la foto directo a Supabase
                     const subida = await fetch(signedUrl, {
                         method: 'PUT',
                         headers: { 'Content-Type': blob.type },
                         body: blob
                     });
 
-                    if (!subida.ok) throw new Error('Falló la subida a Storage');
+                    if (!subida.ok) throw new Error('Falló la subida directa a Storage');
 
                     return publicUrl;
                 },
