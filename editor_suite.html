@@ -990,20 +990,36 @@
                                         quality: 0.8
                                     });
                                     archivo = Array.isArray(blobConvertido) ? blobConvertido[0] : blobConvertido;
+                                    // Forzamos el nombre para que el empaquetador no falle
+                                    archivo = new File([archivo], "foto_iphone.jpg", { type: "image/jpeg" });
                                 } else {
                                     alert("El convertidor de iPhone está cargando, intenta en 2 segundos.");
                                     continue;
                                 }
                             }
 
-                            // 2. ACHICAR Y COMPRIMIR (devuelve archivo binario, no texto)
+                            // 2. ACHICAR Y COMPRIMIR CON TU MOTOR NATIVO (Se mantiene intacto)
                             const { blob, extension } = await this.convertirYComprimirImagen(archivo);
 
-                            // 3. SUBIR DIRECTO A STORAGE Y GUARDAR SOLO LA URL
-                            const url = await this.subirFotoAStorage(blob, extension);
+                            // 3. ENVIAR DIRECTO AL BACKEND (NUEVA CONEXIÓN FORMDATA)
+                            const formData = new FormData();
+                            const fileName = `img_${Date.now()}.${extension}`;
+                            formData.append('file', blob, fileName);
 
-                            this.propiedad.fotos.push(url);
-                            this.propiedad.foto_categorias.push('Sin asignar');
+                            const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/upload-foto', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            if (!res.ok) throw new Error('Falló la subida al servidor');
+
+                            const data = await res.json();
+
+                            // 4. GUARDAR URL Y REFLEJAR EN LA INTERFAZ
+                            if (data.url) {
+                                this.propiedad.fotos.push(data.url);
+                                this.propiedad.foto_categorias.push('Sin asignar');
+                            }
 
                         } catch (error) {
                             console.error("Error con una foto:", error);
@@ -1012,34 +1028,12 @@
                     }
 
                     this.cargando = false;
-                    event.target.value = '';
+                    event.target.value = ''; // Limpiar input para futuras subidas
                 },
 
-                // Pide permiso al backend y sube el archivo directo a Supabase
-                async subirFotoAStorage(blob, extension) {
-                    const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/url-subida', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            extension: extension,
-                            propiedadId: this.propiedad.id || undefined
-                        })
-                    });
 
-                    if (!res.ok) throw new Error('No se pudo preparar la subida');
 
-                    const { signedUrl, publicUrl } = await res.json();
 
-                    const subida = await fetch(signedUrl, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': blob.type },
-                        body: blob
-                    });
-
-                    if (!subida.ok) throw new Error('Falló la subida a Storage');
-
-                    return publicUrl;
-                },
 
                 // El motorcito que le quita peso a las fotos
                 convertirYComprimirImagen(archivo) {
