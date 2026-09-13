@@ -1501,7 +1501,7 @@
 
                             if (dataFirma.success && dataFirma.hash) {
 
-                                // 1. Guardamos el resumen en la memoria del navegador para la pantalla de éxito
+                                // 1. Guardamos el resumen para la pantalla de WhatsApp
                                 localStorage.setItem('reservaExitosa', JSON.stringify({
                                     alojamiento: this.propiedad.titulo,
                                     checkin: this.checkinLabel,
@@ -1511,35 +1511,23 @@
                                     telefono: this.telefonoAdmin
                                 }));
 
-                                if (dataFirma.success && dataFirma.hash) {
+                                // 2. Inicializamos Bold con tu LLAVE DE IDENTIDAD DE PRUEBAS
+                                const checkout = new BoldCheckout({
+                                    orderId: dataFirma.referencia,
+                                    currency: "COP",
+                                    amount: dataFirma.monto.toString(),
+                                    apiKey: "dyEoWR7HyTOi6ErChs-Bos_9MDyT0e0o4Gtnteodr_A", // 👈 Tu Llave de Pruebas exacta
+                                    integritySignature: dataFirma.hash,
+                                    renderMode: "modal", // 👈 Lo mantiene como widget flotante
+                                    redirectionUrl: "https://gestandovalor.com/confirmacion.html"
+                                });
 
-                                    // 1. Guardamos el resumen en la memoria del navegador
-                                    localStorage.setItem('reservaExitosa', JSON.stringify({
-                                        alojamiento: this.propiedad.titulo,
-                                        checkin: this.checkinLabel,
-                                        checkout: this.checkoutLabel,
-                                        huespedes: this.adultos + this.children,
-                                        total: totalStr,
-                                        telefono: this.telefonoAdmin
-                                    }));
-
-                                    // 2. Inicializamos Bold con la llave correcta y en modo flotante
-                                    const checkout = new BoldCheckout({
-                                        orderId: dataFirma.referencia,
-                                        currency: "COP",
-                                        amount: dataFirma.monto.toString(),
-                                        apiKey: "dyEoWR7HyTOi6ErChs-Bos_9MDyT0e0o4Gtnteodr_A", // 👈 Tu Llave de Identidad de Pruebas correcta
-                                        integritySignature: dataFirma.hash,
-                                        renderMode: "modal", // 👈 ESTO ES LO QUE LO HACE FLOTANTE
-                                        redirectionUrl: "https://gestandovalor.com/confirmacion.html"
-                                    });
-
-                                    // 3. Abrimos la pasarela
-                                    checkout.open();
-                                } else {
-                                    alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
-                                }
+                                // 3. Abrimos el widget
+                                checkout.open();
+                            } else {
+                                alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
                             }
+
                         }
 
                     } catch (error) {
