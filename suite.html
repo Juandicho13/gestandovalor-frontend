@@ -1501,6 +1501,7 @@
 
                             if (dataFirma.success && dataFirma.hash) {
 
+                                // 1. Guardamos los datos para el mensaje de WhatsApp
                                 localStorage.setItem('reservaExitosa', JSON.stringify({
                                     alojamiento: this.propiedad.titulo,
                                     checkin: this.checkinLabel,
@@ -1510,19 +1511,21 @@
                                     telefono: this.telefonoAdmin
                                 }));
 
+                                // 2. Inicializamos Bold para REDIRECCIÓN TOTAL (Sin renderMode)
                                 const checkout = new BoldCheckout({
                                     orderId: dataFirma.referencia,
                                     currency: "COP",
                                     amount: dataFirma.monto.toString(),
-                                    apiKey: "3dBucIiYpfdNlceLnN43-NH1GFhdA8SnRgZsOFzfQ_4", // 👈 ¡AHORA SÍ, LA LLAVE EXACTA!
+                                    apiKey: "3dBucliYpfdNlceLnN43-NH1GFhdA8SnRgZsOFzfQ_4", // Tu llave real
                                     integritySignature: dataFirma.hash,
-                                    renderMode: "modal",
+                                    // Al no poner renderMode, Bold hará una redirección a pantalla completa
                                     redirectionUrl: "https://gestandovalor.com/confirmacion.html"
                                 });
 
+                                // 3. Enviamos al cliente a la página segura de Bold
                                 checkout.open();
                             } else {
-                                alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
+                                alert("No pudimos generar la firma de seguridad.");
                             }
 
                         }
