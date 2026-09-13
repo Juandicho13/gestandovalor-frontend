@@ -1500,17 +1500,28 @@
                             console.log("Firma generada:", dataFirma);
 
                             if (dataFirma.success && dataFirma.hash) {
-                                // Inicializamos la pasarela de Bold
+
+                                // 1. Guardamos el resumen en la memoria del navegador para la pantalla de éxito
+                                localStorage.setItem('reservaExitosa', JSON.stringify({
+                                    alojamiento: this.propiedad.titulo,
+                                    checkin: this.checkinLabel,
+                                    checkout: this.checkoutLabel,
+                                    huespedes: this.adultos + this.children,
+                                    total: totalStr,
+                                    telefono: this.telefonoAdmin
+                                }));
+
+                                // 2. Inicializamos Bold con tu llave de PRUEBAS
                                 const checkout = new BoldCheckout({
                                     orderId: dataFirma.referencia,
                                     currency: "COP",
                                     amount: dataFirma.monto.toString(),
-                                    apiKey: "3dBucIiYpfdNlceLnN43-NH1GFhdA8SnRgZsOFzfQ_4",
-                                    integritySignature: dataFirma.hash, // 👈 ¡ESTA ES LA PALABRA CLAVE CORRECTA!
-                                    redirectionUrl: "https://gestandovalor.com"
+                                    apiKey: "hU8E_C6tEZLhUW9GkO_qaR2kOZFTrzooJRDxtf4wCHk", // Llave de Identidad de PRUEBAS
+                                    integritySignature: dataFirma.hash,
+                                    redirectionUrl: "https://gestandovalor.com/confirmacion.html" // 👈 Aquí lo mandamos al terminar
                                 });
 
-                                // ¡Abrimos la pasarela!
+                                // 3. Abrimos la pasarela
                                 checkout.open();
                             } else {
                                 alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
