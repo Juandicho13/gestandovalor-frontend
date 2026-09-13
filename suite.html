@@ -1511,20 +1511,34 @@
                                     telefono: this.telefonoAdmin
                                 }));
 
-                                // 2. Inicializamos Bold con tu llave de PRUEBAS
-                                const checkout = new BoldCheckout({
-                                    orderId: dataFirma.referencia,
-                                    currency: "COP",
-                                    amount: dataFirma.monto.toString(),
-                                    apiKey: "hU8E_C6tEZLhUW9GkO_qaR2kOZFTrzooJRDxtf4wCHk", // Llave de Identidad de PRUEBAS
-                                    integritySignature: dataFirma.hash,
-                                    redirectionUrl: "https://gestandovalor.com/confirmacion.html" // 👈 Aquí lo mandamos al terminar
-                                });
+                                if (dataFirma.success && dataFirma.hash) {
 
-                                // 3. Abrimos la pasarela
-                                checkout.open();
-                            } else {
-                                alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
+                                    // 1. Guardamos el resumen en la memoria del navegador
+                                    localStorage.setItem('reservaExitosa', JSON.stringify({
+                                        alojamiento: this.propiedad.titulo,
+                                        checkin: this.checkinLabel,
+                                        checkout: this.checkoutLabel,
+                                        huespedes: this.adultos + this.children,
+                                        total: totalStr,
+                                        telefono: this.telefonoAdmin
+                                    }));
+
+                                    // 2. Inicializamos Bold con la llave correcta y en modo flotante
+                                    const checkout = new BoldCheckout({
+                                        orderId: dataFirma.referencia,
+                                        currency: "COP",
+                                        amount: dataFirma.monto.toString(),
+                                        apiKey: "dyEoWR7HyTOi6ErChs-Bos_9MDyT0e0o4Gtnteodr_A", // 👈 Tu Llave de Identidad de Pruebas correcta
+                                        integritySignature: dataFirma.hash,
+                                        renderMode: "modal", // 👈 ESTO ES LO QUE LO HACE FLOTANTE
+                                        redirectionUrl: "https://gestandovalor.com/confirmacion.html"
+                                    });
+
+                                    // 3. Abrimos la pasarela
+                                    checkout.open();
+                                } else {
+                                    alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
+                                }
                             }
                         }
 
