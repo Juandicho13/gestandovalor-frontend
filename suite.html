@@ -1501,7 +1501,6 @@
 
                             if (dataFirma.success && dataFirma.hash) {
 
-                                // 1. Guardamos el resumen para la pantalla de WhatsApp
                                 localStorage.setItem('reservaExitosa', JSON.stringify({
                                     alojamiento: this.propiedad.titulo,
                                     checkin: this.checkinLabel,
@@ -1511,18 +1510,16 @@
                                     telefono: this.telefonoAdmin
                                 }));
 
-                                // 2. Inicializamos Bold con tu LLAVE DE IDENTIDAD DE PRUEBAS
                                 const checkout = new BoldCheckout({
                                     orderId: dataFirma.referencia,
                                     currency: "COP",
                                     amount: dataFirma.monto.toString(),
-                                    apiKey: "dyEoWR7HyTOi6ErChs-Bos_9MDyT0e0o4Gtnteodr_A", // 👈 Tu Llave de Pruebas exacta
+                                    apiKey: "dyEoWR7HyTOI6ErChs-Bos_9MDyT0eOo4Gtnteodr_A", // 👈 ¡AHORA SÍ, LA LLAVE EXACTA!
                                     integritySignature: dataFirma.hash,
-                                    renderMode: "modal", // 👈 Lo mantiene como widget flotante
+                                    renderMode: "modal",
                                     redirectionUrl: "https://gestandovalor.com/confirmacion.html"
                                 });
 
-                                // 3. Abrimos el widget
                                 checkout.open();
                             } else {
                                 alert("No pudimos generar la llave de seguridad: " + JSON.stringify(dataFirma));
