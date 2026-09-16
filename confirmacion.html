@@ -4,25 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva Confirmada | Gestando Valor</title>
+    <title>Estado de tu pago | Gestando Valor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 flex items-center justify-center min-h-screen font-sans" x-data="confirmacionApp()">
 
-    <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center border border-gray-100 m-4">
-        <!-- Icono de Éxito animado -->
-        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-            </svg>
-        </div>
+    <div x-cloak class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center border border-gray-100 m-4">
 
-        <h1 class="text-3xl font-extrabold text-gray-900 mb-2">¡Pago Exitoso!</h1>
-        <p class="text-gray-500 mb-8 font-medium">Tu reserva ha sido procesada y asegurada correctamente.</p>
+        <!-- ================= PAGO APROBADO ================= -->
+        <template x-if="estado === 'aprobado'">
+            <div>
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">¡Pago Exitoso!</h1>
+                <p class="text-gray-500 mb-8 font-medium">Tu reserva ha sido procesada y asegurada correctamente.</p>
+            </div>
+        </template>
 
-        <!-- Resumen de Compra -->
+        <!-- ================= PAGO PENDIENTE ================= -->
+        <template x-if="estado === 'pendiente'">
+            <div>
+                <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Pago en proceso</h1>
+                <p class="text-gray-500 mb-8 font-medium">Tu banco aún está confirmando el pago. Escríbenos y te
+                    avisamos apenas se apruebe.</p>
+            </div>
+        </template>
+
+        <!-- ================= PAGO RECHAZADO / FALLIDO ================= -->
+        <template x-if="estado === 'fallido'">
+            <div>
+                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Pago no completado</h1>
+                <p class="text-gray-500 mb-8 font-medium">No se realizó ningún cobro. Escríbenos por WhatsApp y te
+                    ayudamos a terminar tu reserva.</p>
+            </div>
+        </template>
+
+        <!-- Resumen de la reserva -->
         <div class="bg-gray-50 rounded-2xl p-6 text-left mb-8 border border-gray-200">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Resumen de tu reserva</h2>
 
@@ -39,9 +78,16 @@
                     <span class="font-medium">Huéspedes:</span>
                     <span class="font-bold" x-text="reserva.huespedes"></span>
                 </div>
+                <div class="flex justify-between items-center" x-show="referencia">
+                    <span class="font-medium">Referencia:</span>
+                    <span class="font-bold text-xs" x-text="referencia"></span>
+                </div>
                 <div class="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
-                    <span class="font-bold text-gray-900">Total Pagado:</span>
-                    <span class="font-extrabold text-xl text-green-600" x-text="reserva.total"></span>
+                    <span class="font-bold text-gray-900"
+                        x-text="estado === 'aprobado' ? 'Total Pagado:' : 'Total:'"></span>
+                    <span class="font-extrabold text-xl"
+                        :class="estado === 'aprobado' ? 'text-green-600' : 'text-gray-900'"
+                        x-text="reserva.total"></span>
                 </div>
             </div>
         </div>
@@ -51,16 +97,23 @@
             class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 rounded-xl transition-transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-3">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path
-                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.450-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
             </svg>
             Contactar por WhatsApp
         </button>
-        <p class="text-xs text-gray-400 mt-4">Paso final: Escríbenos para enviarte las instrucciones de acceso.</p>
+        <p class="text-xs text-gray-400 mt-4" x-text="estado === 'aprobado'
+            ? 'Paso final: Escríbenos para enviarte las instrucciones de acceso.'
+            : 'Estamos para ayudarte con tu reserva.'"></p>
+
+        <a href="index.html"
+            class="inline-block mt-6 text-sm font-bold text-gray-500 underline hover:text-gray-800">Volver al inicio</a>
     </div>
 
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('confirmacionApp', () => ({
+                estado: 'pendiente', // aprobado | pendiente | fallido
+                referencia: '',
                 reserva: {
                     alojamiento: 'Cargando...',
                     checkin: '',
@@ -69,24 +122,50 @@
                     total: '',
                     telefono: '3000000000'
                 },
+
                 init() {
+                    // Bold regresa a esta página así:
+                    // confirmacion.html?bold-order-id=BP-123&bold-tx-status=approved
+                    const params = new URLSearchParams(window.location.search);
+                    const statusBold = (params.get('bold-tx-status') || '').toLowerCase();
+                    this.referencia = params.get('bold-order-id') || '';
+
+                    if (statusBold === 'approved') {
+                        this.estado = 'aprobado';
+                    } else if (statusBold === 'pending' || statusBold === 'processing') {
+                        this.estado = 'pendiente';
+                    } else {
+                        this.estado = 'fallido';
+                    }
+
                     const datosGuardados = localStorage.getItem('reservaExitosa');
                     if (datosGuardados) {
-                        this.reserva = JSON.parse(datosGuardados);
+                        this.reserva = { ...this.reserva, ...JSON.parse(datosGuardados) };
                     }
                 },
+
                 irAWhatsApp() {
-                    let mensaje = `¡Hola! Acabo de completar el pago de mi reserva por Bold. ✅\n\n`;
+                    let mensaje = '';
+
+                    if (this.estado === 'aprobado') {
+                        mensaje = `¡Hola! Acabo de completar el pago de mi reserva por Bold. ✅\n\n`;
+                    } else if (this.estado === 'pendiente') {
+                        mensaje = `¡Hola! Hice el pago de mi reserva por Bold y aparece en proceso. ⏳\n\n`;
+                    } else {
+                        mensaje = `¡Hola! Intenté pagar mi reserva por Bold pero el pago no se completó. ❌\n\n`;
+                    }
+
                     mensaje += `🏨 *Alojamiento:* ${this.reserva.alojamiento}\n`;
                     mensaje += `📅 *Fechas:* ${this.reserva.checkin} al ${this.reserva.checkout}\n`;
-                    mensaje += `💰 *Pagado:* ${this.reserva.total}\n\n`;
-                    mensaje += `Quedo atento/a para recibir las instrucciones de acceso. 🔑`;
+                    mensaje += `💰 *Total:* ${this.reserva.total}\n`;
+                    if (this.referencia) mensaje += `🧾 *Referencia:* ${this.referencia}\n`;
+                    mensaje += `\n`;
+                    mensaje += this.estado === 'aprobado'
+                        ? `Quedo atento/a para recibir las instrucciones de acceso. 🔑`
+                        : `¿Me ayudan a finalizar la reserva?`;
 
                     const url = `https://wa.me/57${this.reserva.telefono}?text=${encodeURIComponent(mensaje)}`;
                     window.open(url, '_blank');
-
-                    // Opcional: Limpiar los datos después de ir a WhatsApp
-                    // localStorage.removeItem('reservaExitosa');
                 }
             }))
         })
