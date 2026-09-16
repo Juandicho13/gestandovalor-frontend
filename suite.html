@@ -304,8 +304,105 @@
 
             </div>
 
-            <div class="w-full lg:w-[35%] xl:w-[30%] relative z-40">
-                <div class="sticky top-28 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-5 lg:p-6">
+            <div class="w-full lg:w-[35%] xl:w-[30%] relative z-40"
+                :class="modoReserva ? 'order-first lg:order-none' : ''">
+
+                <!-- ✨ MODO "MI RESERVA": resumen de la compra, sin opciones de pago -->
+                <template x-if="modoReserva">
+                    <div
+                        class="sticky top-28 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-5 lg:p-6 text-white">
+
+                        <!-- Cargando -->
+                        <div x-show="cargandoReserva" class="py-10 flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-full border-4 border-gold/30 border-t-gold animate-spin mb-4">
+                            </div>
+                            <p class="text-sm text-gray-300 font-medium">Cargando tu reserva...</p>
+                        </div>
+
+                        <!-- Reserva confirmada o en proceso -->
+                        <div
+                            x-show="!cargandoReserva && (reservaInfo.estado === 'aprobado' || reservaInfo.estado === 'pendiente')">
+                            <div class="flex items-center justify-between gap-3 mb-5">
+                                <h2 class="text-xl font-extrabold">Tu reserva</h2>
+                                <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full"
+                                    :class="reservaInfo.estado === 'aprobado' ? 'bg-gold/15 text-gold' : 'bg-warning/15 text-warning'"
+                                    x-text="reservaInfo.estado === 'aprobado' ? 'Confirmada' : 'Pago en proceso'"></span>
+                            </div>
+
+                            <div class="grid grid-cols-2 border border-white/15 rounded-2xl overflow-hidden mb-5">
+                                <div class="p-4 border-r border-white/15">
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+                                        Llegada</p>
+                                    <p class="font-extrabold" x-text="fechaLarga(reservaInfo.check_in)"></p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">Desde las 3:00 p. m.</p>
+                                </div>
+                                <div class="p-4">
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Salida
+                                    </p>
+                                    <p class="font-extrabold" x-text="fechaLarga(reservaInfo.check_out)"></p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">Hasta las 11:00 a. m.</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="space-y-2.5 text-sm text-gray-300 font-medium border-b border-white/10 pb-4 mb-4">
+                                <div class="flex justify-between gap-4">
+                                    <span>Noches</span>
+                                    <span class="text-white font-bold" x-text="nochesReserva()"></span>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <span>Huéspedes</span>
+                                    <span class="text-white font-bold text-right"
+                                        x-text="textoHuespedesReserva()"></span>
+                                </div>
+                                <div class="flex justify-between gap-4">
+                                    <span>Referencia</span>
+                                    <span class="text-white font-bold text-xs break-all text-right"
+                                        x-text="referenciaReserva"></span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center font-extrabold text-lg mb-6">
+                                <span x-text="reservaInfo.estado === 'aprobado' ? 'Total pagado' : 'Total'"></span>
+                                <span class="text-gold" x-text="formatearDinero(reservaInfo.monto)"></span>
+                            </div>
+
+                            <a :href="`https://wa.me/57${telefonoAdmin}`" target="_blank" rel="noopener"
+                                class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3.5 rounded-full transition-transform hover:-translate-y-0.5 shadow-lg flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+                                </svg>
+                                Escribir por WhatsApp
+                            </a>
+                            <p class="text-center text-[10px] text-gray-400 mt-3">Te enviamos por ahí las instrucciones
+                                de acceso.</p>
+                        </div>
+
+                        <!-- Reserva no válida -->
+                        <div x-show="!cargandoReserva && reservaInfo.estado === 'rechazado'" class="text-center py-4">
+                            <h2 class="text-xl font-extrabold mb-2">No encontramos una reserva activa</h2>
+                            <p class="text-sm text-gray-300 mb-6">El pago de esta referencia no se completó.</p>
+                            <button @click="salirModoReserva()"
+                                class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3.5 rounded-full transition-colors">
+                                Ver disponibilidad
+                            </button>
+                        </div>
+
+                        <!-- Error de conexión -->
+                        <div x-show="!cargandoReserva && reservaInfo.estado === 'error'" class="text-center py-4">
+                            <h2 class="text-xl font-extrabold mb-2">No pudimos cargar tu reserva</h2>
+                            <p class="text-sm text-gray-300 mb-6">Revisa tu conexión e intenta de nuevo.</p>
+                            <button @click="cargarReserva()"
+                                class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-3.5 rounded-full transition-colors">
+                                Reintentar
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="!modoReserva"
+                    class="sticky top-28 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-5 lg:p-6">
 
                     <div class="flex justify-between items-end mb-5">
                         <div>
@@ -521,6 +618,42 @@
         x-transition:enter="ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
         x-transition:leave="ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
 
+        <!-- ✨ Recorrido fotográfico: cada foto conserva su formato real (horizontal o vertical) -->
+        <style>
+            .fila-tour+.fila-tour {
+                margin-top: 1rem;
+            }
+
+            .foto-tour {
+                display: block;
+                width: 100%;
+                max-width: calc(85vh * var(--r, 1.5));
+                aspect-ratio: var(--r, 1.5);
+                margin: 0 auto;
+                border-radius: 0.75rem;
+                overflow: hidden;
+                background: #f3f4f6;
+            }
+
+            .fila-tour .foto-tour+.foto-tour {
+                margin-top: 0.75rem;
+            }
+
+            @media (min-width: 768px) {
+                .fila-tour.fila-doble {
+                    display: flex;
+                    gap: 1rem;
+                }
+
+                .fila-tour.fila-doble .foto-tour {
+                    flex: var(--r, 1.5) 1 0%;
+                    width: auto;
+                    max-width: none;
+                    margin: 0;
+                }
+            }
+        </style>
+
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
             <button @click="openModalFotos = false"
                 class="p-2 hover:bg-gray-100 rounded-full transition-colors text-navy">
@@ -535,38 +668,43 @@
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-4 md:px-24 lg:px-48 py-8 custom-scrollbar">
-            <h2 class="text-3xl font-extrabold text-navy mb-8">Recorrido fotográfico</h2>
+        <div class="flex-1 overflow-y-auto px-4 md:px-12 lg:px-24 py-8 custom-scrollbar">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl font-extrabold text-navy mb-8">Recorrido fotográfico</h2>
 
-            <div class="flex gap-4 overflow-x-auto pb-6 mb-8 no-scrollbar snap-x">
-                <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
-                    <a :href="'#cat-' + grupo.nombre.replace(/\s+/g, '-')" class="shrink-0 w-32 group snap-start">
-                        <div class="aspect-[4/3] rounded-xl overflow-hidden mb-2 border border-gray-200">
-                            <img :src="grupo.fotos[0].url"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <p class="text-sm font-bold text-navy truncate" x-text="grupo.nombre"></p>
-                    </a>
-                </template>
-            </div>
+                <div class="flex gap-4 overflow-x-auto pb-6 mb-8 no-scrollbar snap-x">
+                    <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
+                        <a :href="'#cat-' + grupo.nombre.replace(/\s+/g, '-')" class="shrink-0 w-32 group snap-start">
+                            <div class="aspect-[4/3] rounded-xl overflow-hidden mb-2 border border-gray-200">
+                                <img :src="grupo.fotos[0].url"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <p class="text-sm font-bold text-navy truncate" x-text="grupo.nombre"></p>
+                        </a>
+                    </template>
+                </div>
 
-            <div class="space-y-12">
-                <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
-                    <div :id="'cat-' + grupo.nombre.replace(/\s+/g, '-')">
-                        <h3 class="text-2xl font-extrabold text-navy mb-6" x-text="grupo.nombre"></h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <template x-for="(foto, index) in grupo.fotos" :key="index">
-                                <div class="aspect-[4/3] md:aspect-auto md:h-[300px] rounded-xl overflow-hidden bg-gray-100"
-                                    :class="(grupo.fotos.length === 1 || (index === 0 && grupo.fotos.length % 2 !== 0)) ? 'md:col-span-2 md:h-[500px]' : ''">
-                                    <template x-if="openModalFotos">
-                                        <img :src="foto.url" loading="lazy" decoding="async"
-                                            class="w-full h-full object-cover">
+                <div class="space-y-14">
+                    <template x-for="grupo in getFotosAgrupadas()" :key="grupo.nombre">
+                        <div :id="'cat-' + grupo.nombre.replace(/\s+/g, '-')">
+                            <h3 class="text-2xl font-extrabold text-navy mb-6" x-text="grupo.nombre"></h3>
+
+                            <template x-for="(fila, f) in filasDeFotos(grupo.fotos)" :key="f">
+                                <div class="fila-tour" :class="fila.length === 2 ? 'fila-doble' : ''">
+                                    <template x-for="foto in fila" :key="foto.index">
+                                        <div class="foto-tour" :style="`--r: ${proporcionFoto(foto.url)}`">
+                                            <template x-if="openModalFotos">
+                                                <img :src="foto.url" loading="lazy" decoding="async"
+                                                    @load="registrarProporcion(foto.url, $event.target)"
+                                                    class="w-full h-full object-cover">
+                                            </template>
+                                        </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -1202,11 +1340,24 @@
                     'TV': '<path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>',
                 },
 
+                // ✨ MODO "MI RESERVA" (se abre desde la página de confirmación)
+                modoReserva: false,
+                cargandoReserva: false,
+                referenciaReserva: '',
+                reservaInfo: { estado: '', check_in: '', check_out: '', adultos: 0, ninos: 0, bebes: 0, mascotas: 0, monto: 0 },
+
+                // ✨ Proporción real (ancho / alto) de cada foto para el recorrido fotográfico
+                proporcionesFotos: {},
+
                 async initApp() {
                     const params = new URLSearchParams(window.location.search);
                     const id = params.get('id');
 
                     if (!id) { window.location.href = 'alojamientos.html'; return; }
+
+                    this.referenciaReserva = params.get('reserva') || '';
+                    this.modoReserva = !!this.referenciaReserva;
+                    if (this.modoReserva) document.title = 'Tu reserva | GestandoValor';
 
                     if (params.get('ad')) this.adults = parseInt(params.get('ad'));
                     if (params.get('ni')) this.children = parseInt(params.get('ni'));
@@ -1218,8 +1369,11 @@
                         this.adults = parsedPax > 0 ? parsedPax : 1;
                     }
 
-                    const inDate = params.get('in');
-                    const outDate = params.get('out');
+                    let inDate = params.get('in');
+                    let outDate = params.get('out');
+
+                    // La reserva se consulta al mismo tiempo que el alojamiento
+                    const promesaReserva = this.modoReserva ? this.cargarReserva(id) : Promise.resolve();
 
                     try {
                         const [res, tRes, resRes] = await Promise.all([
@@ -1239,11 +1393,108 @@
                             alert("Propiedad no encontrada");
                             window.location.href = 'alojamientos.html';
                         }
+
+                        await promesaReserva;
+                        if (this.modoReserva && this.reservaInfo.check_in) {
+                            inDate = this.reservaInfo.check_in;
+                            outDate = this.reservaInfo.check_out;
+                        }
                     } catch (e) {
                         console.error(e);
                     } finally {
                         this.cargando = false;
                         setTimeout(() => this.initCalendario(inDate, outDate), 100);
+                    }
+                },
+
+                async cargarReserva(idPropiedad) {
+                    this.cargandoReserva = true;
+                    try {
+                        const res = await fetch('https://gestandovalor-backend.onrender.com/pagos/verificar', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ referencia: this.referenciaReserva })
+                        });
+
+                        if (res.status === 404) { this.reservaInfo.estado = 'rechazado'; return; }
+                        if (!res.ok) { this.reservaInfo.estado = 'error'; return; }
+
+                        const data = await res.json();
+
+                        // Si la referencia es de otro alojamiento, abrimos el correcto
+                        const idActual = idPropiedad || this.propiedad.id;
+                        if (data.propiedad_id && idActual && data.propiedad_id !== idActual) {
+                            window.location.replace(`suite.html?id=${data.propiedad_id}&reserva=${encodeURIComponent(this.referenciaReserva)}`);
+                            return;
+                        }
+
+                        this.reservaInfo = { ...this.reservaInfo, ...data };
+
+                        if (data.estado === 'aprobado' || data.estado === 'pendiente') {
+                            this.adults = Number(data.adultos) || 1;
+                            this.children = Number(data.ninos) || 0;
+                            this.infants = Number(data.bebes) || 0;
+                            this.pets = Number(data.mascotas) || 0;
+                        }
+                    } catch (e) {
+                        console.error('No se pudo cargar la reserva', e);
+                        this.reservaInfo.estado = 'error';
+                    } finally {
+                        this.cargandoReserva = false;
+                    }
+                },
+
+                salirModoReserva() {
+                    this.modoReserva = false;
+                    document.title = 'Reserva tu Suite - GestandoValor';
+                    window.history.replaceState({}, '', `suite.html?id=${this.propiedad.id}`);
+                },
+
+                fechaLarga(fechaIso) {
+                    if (!fechaIso) return '';
+                    const texto = new Date(fechaIso + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
+                    return texto.charAt(0).toUpperCase() + texto.slice(1);
+                },
+
+                nochesReserva() {
+                    if (!this.reservaInfo.check_in || !this.reservaInfo.check_out) return '';
+                    const d1 = new Date(this.reservaInfo.check_in + 'T12:00:00');
+                    const d2 = new Date(this.reservaInfo.check_out + 'T12:00:00');
+                    const n = Math.round((d2 - d1) / 86400000);
+                    return n === 1 ? '1 noche' : `${n} noches`;
+                },
+
+                textoHuespedesReserva() {
+                    const r = this.reservaInfo;
+                    const total = (Number(r.adultos) || 0) + (Number(r.ninos) || 0);
+                    let texto = `${total} huésped${total !== 1 ? 'es' : ''}`;
+                    if (Number(r.bebes) > 0) texto += `, ${r.bebes} bebé${r.bebes > 1 ? 's' : ''}`;
+                    if (Number(r.mascotas) > 0) texto += `, ${r.mascotas} mascota${r.mascotas > 1 ? 's' : ''}`;
+                    return texto;
+                },
+
+                // ✨ RECORRIDO FOTOGRÁFICO: filas de 1 o 2 fotos con su formato real
+                filasDeFotos(fotos) {
+                    const filas = [];
+                    let i = 0;
+                    // Si la categoría tiene cantidad impar, la primera foto va sola
+                    if (fotos.length % 2 === 1) {
+                        filas.push([fotos[0]]);
+                        i = 1;
+                    }
+                    for (; i < fotos.length; i += 2) {
+                        filas.push(fotos.slice(i, i + 2));
+                    }
+                    return filas;
+                },
+
+                proporcionFoto(url) {
+                    return this.proporcionesFotos[url] || 1.5;
+                },
+
+                registrarProporcion(url, img) {
+                    if (img.naturalWidth && img.naturalHeight) {
+                        this.proporcionesFotos[url] = Number((img.naturalWidth / img.naturalHeight).toFixed(4));
                     }
                 },
 

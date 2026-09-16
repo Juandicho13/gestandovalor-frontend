@@ -192,9 +192,9 @@
                         x-text="estado === 'aprobado' ? 'Recibir instrucciones de acceso' : 'Hablar con GestandoValor'"></span>
                 </button>
 
-                <a href="alojamientos.html"
-                    class="inline-block mt-6 text-sm font-bold text-navy underline hover:text-gold transition-colors">Ver
-                    alojamientos</a>
+                <a :href="enlaceAlojamiento()"
+                    class="inline-block mt-6 text-sm font-bold text-navy underline hover:text-gold transition-colors"
+                    x-text="propiedadId && estado !== 'fallido' ? 'Ver mi reserva' : 'Ver alojamientos'"></a>
             </div>
         </div>
 
@@ -221,6 +221,7 @@
             Alpine.data('confirmacionApp', () => ({
                 estado: 'verificando', // verificando | aprobado | pendiente | fallido
                 referencia: '',
+                propiedadId: '',
                 verificando: false,
                 reserva: {
                     nombre: '',
@@ -306,6 +307,7 @@
                         if (!res.ok) return null;
 
                         const data = await res.json();
+                        if (data.propiedad_id) this.propiedadId = data.propiedad_id;
 
                         // Si abrieron la página en otro dispositivo, completamos con los datos del servidor
                         if (!this.reserva.alojamiento && data.alojamiento) this.reserva.alojamiento = data.alojamiento;
@@ -320,6 +322,13 @@
                         console.error('No se pudo verificar el pago', e);
                         return null;
                     }
+                },
+
+                enlaceAlojamiento() {
+                    if (this.propiedadId && this.estado !== 'fallido') {
+                        return `suite.html?id=${this.propiedadId}&reserva=${encodeURIComponent(this.referencia)}`;
+                    }
+                    return 'alojamientos.html';
                 },
 
                 irAWhatsApp() {

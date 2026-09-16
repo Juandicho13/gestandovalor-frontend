@@ -25,7 +25,7 @@
     </script>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-navy" x-data="blogPublico()" x-init="init()">
+<body class="font-sans text-gray-800 antialiased bg-navy" x-data="blogPublico()">
 
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-10 border-b bg-navy">
@@ -534,11 +534,24 @@
                 URL_API: 'https://gestandovalor-backend.onrender.com/blog/resumen',
 
                 async init() {
+                    // 1. Mostramos al instante lo último que se cargó en este navegador
+                    try {
+                        const guardado = JSON.parse(localStorage.getItem('gv_blog_resumen') || 'null');
+                        if (Array.isArray(guardado) && guardado.length > 0) {
+                            this.articulos = guardado;
+                            this.cargando = false;
+                        }
+                    } catch (e) { }
+
+                    // 2. Pedimos la versión actualizada al servidor
                     try {
                         const response = await fetch(this.URL_API);
                         if (response.ok) {
                             const data = await response.json();
                             this.articulos = data.filter(a => a.estado === 'Publicado');
+                            try {
+                                localStorage.setItem('gv_blog_resumen', JSON.stringify(this.articulos));
+                            } catch (e) { }
                         }
                     } catch (error) {
                         console.error('Error cargando el blog público:', error);

@@ -22,7 +22,7 @@
     </script>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-white" x-data="lectorArticulo()" x-init="init()">
+<body class="font-sans text-gray-800 antialiased bg-white" x-data="lectorArticulo()">
 
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
@@ -523,16 +523,35 @@
                         return;
                     }
 
+                    const API = 'https://gestandovalor-backend.onrender.com';
+
+                    // Si ya leíste este artículo en este navegador, aparece al instante
                     try {
-                        const resArticulo = await fetch(`https://gestandovalor-backend.onrender.com/blog/${id}`);
+                        const guardado = JSON.parse(localStorage.getItem(`gv_blog_articulo_${id}`) || 'null');
+                        if (guardado) {
+                            this.articulo = guardado;
+                            document.title = `${guardado.titulo} - GestandoValor Apartasuites`;
+                            this.cargando = false;
+                        }
+                    } catch (e) { }
+
+                    try {
+                        // El artículo y la lista corta (sin textos ni fotos pesadas) se piden al mismo tiempo
+                        const [resArticulo, resResumen] = await Promise.all([
+                            fetch(`${API}/blog/publico/${id}`),
+                            fetch(`${API}/blog/resumen`).catch(() => null)
+                        ]);
+
                         if (resArticulo.ok) {
                             this.articulo = await resArticulo.json();
                             document.title = `${this.articulo.titulo} - GestandoValor Apartasuites`;
+                            try {
+                                localStorage.setItem(`gv_blog_articulo_${id}`, JSON.stringify(this.articulo));
+                            } catch (e) { }
                         }
 
-                        const resTodos = await fetch(`https://gestandovalor-backend.onrender.com/blog`);
-                        if (resTodos.ok) {
-                            const todos = await resTodos.json();
+                        if (resResumen && resResumen.ok) {
+                            const todos = await resResumen.json();
                             let filtrados = todos.filter(a => a.id != id && a.estado === 'Publicado');
                             filtrados = filtrados.sort(() => 0.5 - Math.random());
                             this.articulosRelacionados = filtrados.slice(0, 3);
