@@ -1483,51 +1483,44 @@
                             setTimeout(() => window.location.reload(), 2000);
                         }
 
-                        // 3. Si elige Bold, abrimos la pasarela flotante
+                        // 3. Si elige Bold, abrimos la pasarela
                         else if (this.metodoSeleccionado === 'bold') {
-                            // Pedimos la firma segura al backend usando el ID REAL
+                            // Pedimos firma, monto y llave de identidad al backend
                             const respuestaFirma = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    reservaId: idRealReserva, // 👇 2. ¡AQUÍ ENVIAMOS EL ID REAL A BOLD Y A PRISMA!
-                                    monto: totalPagar,
-                                    descripcion: `Reserva de ${this.nombreHuesped} en ${this.propiedad.titulo}`
-                                })
+                                body: JSON.stringify({ reservaId: idRealReserva })
                             });
 
                             const dataFirma = await respuestaFirma.json();
-                            console.log("Firma generada:", dataFirma);
 
-                            if (dataFirma.success && dataFirma.hash) {
-
-                                // 1. Guardamos los datos para el mensaje de WhatsApp
-                                localStorage.setItem('reservaExitosa', JSON.stringify({
-                                    alojamiento: this.propiedad.titulo,
-                                    checkin: this.checkinLabel,
-                                    checkout: this.checkoutLabel,
-                                    huespedes: this.adultos + this.children,
-                                    total: totalStr,
-                                    telefono: this.telefonoAdmin
-                                }));
-
-                                // 2. Inicializamos Bold para REDIRECCIÓN TOTAL (Sin renderMode)
-                                const checkout = new BoldCheckout({
-                                    orderId: dataFirma.referencia,
-                                    currency: "COP",
-                                    amount: dataFirma.monto.toString(),
-                                    apiKey: "3dBucliYpfdNlceLnN43-NH1GFhdA8SnRgZsOFzfQ_4", // Tu llave real
-                                    integritySignature: dataFirma.hash,
-                                    // Al no poner renderMode, Bold hará una redirección a pantalla completa
-                                    redirectionUrl: "https://gestandovalor.com/confirmacion.html"
-                                });
-
-                                // 3. Enviamos al cliente a la página segura de Bold
-                                checkout.open();
-                            } else {
-                                alert("No pudimos generar la firma de seguridad.");
+                            if (!respuestaFirma.ok || !dataFirma.success || !dataFirma.hash || !dataFirma.apiKey) {
+                                console.error("Respuesta del backend de pagos:", dataFirma);
+                                alert("No pudimos iniciar el pago en línea. Intenta de nuevo o elige transferencia.");
+                                return;
                             }
 
+                            // Guardamos los datos para el mensaje de WhatsApp
+                            localStorage.setItem('reservaExitosa', JSON.stringify({
+                                alojamiento: this.propiedad.titulo,
+                                checkin: this.checkinLabel,
+                                checkout: this.checkoutLabel,
+                                huespedes: this.adultos + this.children,
+                                total: totalStr,
+                                telefono: this.telefonoAdmin
+                            }));
+
+                            // Todo viene del backend: nada escrito a mano
+                            const checkout = new BoldCheckout({
+                                orderId: dataFirma.referencia,
+                                currency: dataFirma.moneda,
+                                amount: String(dataFirma.monto),
+                                apiKey: dataFirma.apiKey,
+                                integritySignature: dataFirma.hash,
+                                redirectionUrl: "https://gestandovalor.com/confirmacion.html"
+                            });
+
+                            checkout.open();
                         }
 
                     } catch (error) {
