@@ -4,9 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado de tu pago | Gestando Valor</title>
+    <title>Estado de tu reserva | GestandoValor</title>
+    <link rel="icon" type="image/png" href="Logo.png?v=1">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B',
+                        gold: '#D4AF37',
+                        lightGray: '#F9FAFB',
+                        success: '#10B981',
+                        warning: '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         [x-cloak] {
             display: none !important;
@@ -14,100 +30,153 @@
     </style>
 </head>
 
-<body class="bg-gray-50 flex items-center justify-center min-h-screen font-sans" x-data="confirmacionApp()">
+<body class="bg-navy min-h-screen font-sans text-gray-800 relative overflow-x-hidden" x-data="confirmacionApp()">
 
-    <div x-cloak class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center border border-gray-100 m-4">
+    <!-- Brillo dorado de fondo -->
+    <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
+    </div>
+    <div
+        class="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gold/10 rounded-full blur-[120px] pointer-events-none">
+    </div>
 
-        <!-- ================= PAGO APROBADO ================= -->
-        <template x-if="estado === 'aprobado'">
-            <div>
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">¡Pago Exitoso!</h1>
-                <p class="text-gray-500 mb-8 font-medium">Tu reserva ha sido procesada y asegurada correctamente.</p>
+    <main class="relative z-10 flex flex-col items-center px-4 py-10 min-h-screen">
+
+        <!-- Logo -->
+        <a href="index.html" class="mb-8">
+            <img src="GV.png" alt="GestandoValor" class="h-16 w-auto object-contain">
+        </a>
+
+        <div x-cloak class="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden">
+
+            <!-- ============ ENCABEZADO SEGÚN ESTADO ============ -->
+            <div class="px-8 pt-10 pb-8 text-center border-b border-gray-100">
+
+                <!-- Aprobado -->
+                <template x-if="estado === 'aprobado'">
+                    <div>
+                        <div
+                            class="w-20 h-20 bg-navy rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-gold/20">
+                            <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2">Pago aprobado</p>
+                        <h1 class="text-3xl font-extrabold text-navy mb-2"
+                            x-text="primerNombre ? `¡Gracias, ${primerNombre}!` : '¡Reserva confirmada!'"></h1>
+                        <p class="text-gray-500 text-sm font-medium">Tu reserva quedó asegurada. Ya casi estás listo
+                            para tu estadía.</p>
+                    </div>
+                </template>
+
+                <!-- Pendiente -->
+                <template x-if="estado === 'pendiente'">
+                    <div>
+                        <div
+                            class="w-20 h-20 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-warning/10">
+                            <svg class="w-10 h-10 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-[11px] font-black text-warning uppercase tracking-[0.2em] mb-2">Pago en proceso
+                        </p>
+                        <h1 class="text-3xl font-extrabold text-navy mb-2">Estamos confirmando</h1>
+                        <p class="text-gray-500 text-sm font-medium">Tu banco aún está validando el pago. Te avisaremos
+                            apenas se apruebe.</p>
+                    </div>
+                </template>
+
+                <!-- Rechazado / fallido -->
+                <template x-if="estado === 'fallido'">
+                    <div>
+                        <div
+                            class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-red-50/60">
+                            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <p class="text-[11px] font-black text-red-500 uppercase tracking-[0.2em] mb-2">Pago no
+                            completado</p>
+                        <h1 class="text-3xl font-extrabold text-navy mb-2">No se realizó el cobro</h1>
+                        <p class="text-gray-500 text-sm font-medium">Escríbenos por WhatsApp y te ayudamos a terminar tu
+                            reserva.</p>
+                    </div>
+                </template>
             </div>
-        </template>
 
-        <!-- ================= PAGO PENDIENTE ================= -->
-        <template x-if="estado === 'pendiente'">
-            <div>
-                <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+            <!-- ============ RESUMEN ============ -->
+            <div class="p-8 bg-lightGray">
+                <h2 class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Resumen de tu reserva
+                </h2>
+
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="text-gray-500 font-medium">Alojamiento</span>
+                        <span class="font-bold text-navy text-right" x-text="reserva.alojamiento"></span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="text-gray-500 font-medium">Fechas</span>
+                        <span class="font-bold text-navy text-right"
+                            x-text="`${reserva.checkin} al ${reserva.checkout}`"></span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4" x-show="reserva.noches">
+                        <span class="text-gray-500 font-medium">Noches</span>
+                        <span class="font-bold text-navy" x-text="reserva.noches"></span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4" x-show="reserva.huespedes">
+                        <span class="text-gray-500 font-medium">Huéspedes</span>
+                        <span class="font-bold text-navy" x-text="reserva.huespedes"></span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4" x-show="referencia">
+                        <span class="text-gray-500 font-medium">Referencia</span>
+                        <span class="font-bold text-navy text-xs" x-text="referencia"></span>
+                    </div>
                 </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Pago en proceso</h1>
-                <p class="text-gray-500 mb-8 font-medium">Tu banco aún está confirmando el pago. Escríbenos y te
-                    avisamos apenas se apruebe.</p>
+
+                <!-- Total -->
+                <div class="bg-navy rounded-2xl p-5 text-center shadow-lg shadow-navy/20 mt-6">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1"
+                        x-text="estado === 'aprobado' ? 'Total pagado' : 'Total de la reserva'"></p>
+                    <p class="text-3xl font-black text-gold" x-text="reserva.total"></p>
+                </div>
+
+                <!-- Datos de contacto -->
+                <div class="mt-6 bg-white border border-gray-200 rounded-2xl p-4"
+                    x-show="reserva.telefonoHuesped || reserva.email">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Te contactaremos a
+                    </p>
+                    <p class="text-sm font-bold text-navy" x-show="reserva.telefonoHuesped"
+                        x-text="`📱 ${reserva.telefonoHuesped}`"></p>
+                    <p class="text-sm font-bold text-navy break-all" x-show="reserva.email"
+                        x-text="`✉️ ${reserva.email}`"></p>
+                </div>
             </div>
-        </template>
 
-        <!-- ================= PAGO RECHAZADO / FALLIDO ================= -->
-        <template x-if="estado === 'fallido'">
-            <div>
-                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12">
-                        </path>
+            <!-- ============ ACCIONES ============ -->
+            <div class="p-8 pt-6 bg-white border-t border-gray-100 text-center">
+                <button @click="irAWhatsApp()"
+                    class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-4 rounded-full transition-transform hover:-translate-y-0.5 shadow-lg shadow-gold/30 flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
                     </svg>
-                </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Pago no completado</h1>
-                <p class="text-gray-500 mb-8 font-medium">No se realizó ningún cobro. Escríbenos por WhatsApp y te
-                    ayudamos a terminar tu reserva.</p>
-            </div>
-        </template>
+                    <span
+                        x-text="estado === 'aprobado' ? 'Recibir instrucciones de acceso' : 'Hablar con GestandoValor'"></span>
+                </button>
 
-        <!-- Resumen de la reserva -->
-        <div class="bg-gray-50 rounded-2xl p-6 text-left mb-8 border border-gray-200">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Resumen de tu reserva</h2>
-
-            <div class="space-y-4 text-gray-700 text-sm">
-                <div class="flex justify-between items-center">
-                    <span class="font-medium">Alojamiento:</span>
-                    <span class="font-bold text-right" x-text="reserva.alojamiento"></span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="font-medium">Fechas:</span>
-                    <span class="font-bold" x-text="`${reserva.checkin} al ${reserva.checkout}`"></span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="font-medium">Huéspedes:</span>
-                    <span class="font-bold" x-text="reserva.huespedes"></span>
-                </div>
-                <div class="flex justify-between items-center" x-show="referencia">
-                    <span class="font-medium">Referencia:</span>
-                    <span class="font-bold text-xs" x-text="referencia"></span>
-                </div>
-                <div class="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
-                    <span class="font-bold text-gray-900"
-                        x-text="estado === 'aprobado' ? 'Total Pagado:' : 'Total:'"></span>
-                    <span class="font-extrabold text-xl"
-                        :class="estado === 'aprobado' ? 'text-green-600' : 'text-gray-900'"
-                        x-text="reserva.total"></span>
-                </div>
+                <a href="index.html"
+                    class="inline-block mt-6 text-sm font-bold text-navy underline hover:text-gold transition-colors">Volver
+                    al inicio</a>
             </div>
         </div>
 
-        <!-- Botón de WhatsApp -->
-        <button @click="irAWhatsApp()"
-            class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 rounded-xl transition-transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-3">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.450-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
-            </svg>
-            Contactar por WhatsApp
-        </button>
-        <p class="text-xs text-gray-400 mt-4" x-text="estado === 'aprobado'
-            ? 'Paso final: Escríbenos para enviarte las instrucciones de acceso.'
-            : 'Estamos para ayudarte con tu reserva.'"></p>
-
-        <a href="index.html"
-            class="inline-block mt-6 text-sm font-bold text-gray-500 underline hover:text-gray-800">Volver al inicio</a>
-    </div>
+        <p class="text-gray-500 text-xs tracking-[0.2em] uppercase font-medium mt-8 text-center">
+            GestandoValor <span class="text-gold">Apartasuites</span>
+        </p>
+    </main>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -115,12 +184,20 @@
                 estado: 'pendiente', // aprobado | pendiente | fallido
                 referencia: '',
                 reserva: {
-                    alojamiento: 'Cargando...',
+                    nombre: '',
+                    telefonoHuesped: '',
+                    email: '',
+                    alojamiento: '',
                     checkin: '',
                     checkout: '',
+                    noches: '',
                     huespedes: '',
                     total: '',
-                    telefono: '3000000000'
+                    telefono: '3194095505'
+                },
+
+                get primerNombre() {
+                    return (this.reserva.nombre || '').trim().split(' ')[0];
                 },
 
                 init() {
@@ -138,9 +215,13 @@
                         this.estado = 'fallido';
                     }
 
-                    const datosGuardados = localStorage.getItem('reservaExitosa');
-                    if (datosGuardados) {
-                        this.reserva = { ...this.reserva, ...JSON.parse(datosGuardados) };
+                    try {
+                        const datosGuardados = localStorage.getItem('reservaExitosa');
+                        if (datosGuardados) {
+                            this.reserva = { ...this.reserva, ...JSON.parse(datosGuardados) };
+                        }
+                    } catch (e) {
+                        console.error('No se pudieron leer los datos de la reserva', e);
                     }
                 },
 
@@ -148,15 +229,20 @@
                     let mensaje = '';
 
                     if (this.estado === 'aprobado') {
-                        mensaje = `¡Hola! Acabo de completar el pago de mi reserva por Bold. ✅\n\n`;
+                        mensaje = `¡Hola GestandoValor! Acabo de completar el pago de mi reserva por Bold. ✅\n\n`;
                     } else if (this.estado === 'pendiente') {
-                        mensaje = `¡Hola! Hice el pago de mi reserva por Bold y aparece en proceso. ⏳\n\n`;
+                        mensaje = `¡Hola GestandoValor! Hice el pago de mi reserva por Bold y aparece en proceso. ⏳\n\n`;
                     } else {
-                        mensaje = `¡Hola! Intenté pagar mi reserva por Bold pero el pago no se completó. ❌\n\n`;
+                        mensaje = `¡Hola GestandoValor! Intenté pagar mi reserva por Bold pero el pago no se completó. ❌\n\n`;
                     }
 
+                    if (this.reserva.nombre) mensaje += `🙋 *Nombre:* ${this.reserva.nombre}\n`;
+                    if (this.reserva.telefonoHuesped) mensaje += `📱 *Celular:* ${this.reserva.telefonoHuesped}\n`;
+                    if (this.reserva.email) mensaje += `✉️ *Correo:* ${this.reserva.email}\n`;
+                    mensaje += `\n`;
                     mensaje += `🏨 *Alojamiento:* ${this.reserva.alojamiento}\n`;
                     mensaje += `📅 *Fechas:* ${this.reserva.checkin} al ${this.reserva.checkout}\n`;
+                    if (this.reserva.huespedes) mensaje += `👥 *Huéspedes:* ${this.reserva.huespedes}\n`;
                     mensaje += `💰 *Total:* ${this.reserva.total}\n`;
                     if (this.referencia) mensaje += `🧾 *Referencia:* ${this.referencia}\n`;
                     mensaje += `\n`;

@@ -470,6 +470,20 @@
                                                             x-text="res.huesped_nombre"></h3>
                                                         <p class="text-xs text-gray-500"
                                                             x-text="`${res.cantidad_huespedes} Huéspedes`"></p>
+                                                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1"
+                                                            x-show="res.huesped_telefono || res.huesped_email">
+                                                            <template x-if="res.huesped_telefono">
+                                                                <a :href="`https://wa.me/${res.huesped_telefono.length === 10 ? '57' + res.huesped_telefono : res.huesped_telefono}`"
+                                                                    target="_blank"
+                                                                    class="text-[11px] font-bold text-green-600 hover:underline"
+                                                                    x-text="`📱 ${res.huesped_telefono}`"></a>
+                                                            </template>
+                                                            <template x-if="res.huesped_email">
+                                                                <a :href="`mailto:${res.huesped_email}`"
+                                                                    class="text-[11px] font-bold text-navy hover:underline"
+                                                                    x-text="`✉️ ${res.huesped_email}`"></a>
+                                                            </template>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -1822,7 +1836,7 @@
 
             <button @click="localStorage.removeItem('gv_usuario_actual'); window.location.href = 'login.html'"
                 class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">
-                Salir del Sistema
+                Salir
             </button>
         </div>
     </div>
