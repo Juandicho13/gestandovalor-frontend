@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estado de tu reserva | GestandoValor</title>
     <link rel="icon" type="image/png" href="Logo.png?v=1">
+    <link rel="preconnect" href="https://gestandovalor-backend.onrender.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
@@ -52,6 +53,21 @@
             <!-- ============ ENCABEZADO SEGÚN ESTADO ============ -->
             <div class="px-8 pt-10 pb-8 text-center border-b border-gray-100">
 
+                <!-- Verificando con Bold -->
+                <template x-if="estado === 'verificando'">
+                    <div>
+                        <div
+                            class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-navy ring-8 ring-gold/20">
+                            <div class="w-10 h-10 rounded-full border-4 border-gold/30 border-t-gold animate-spin">
+                            </div>
+                        </div>
+                        <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2">Un momento</p>
+                        <h1 class="text-3xl font-extrabold text-navy mb-2">Confirmando tu pago</h1>
+                        <p class="text-gray-500 text-sm font-medium">Estamos verificando el pago con Bold para asegurar
+                            tu reserva. No cierres esta página.</p>
+                    </div>
+                </template>
+
                 <!-- Aprobado -->
                 <template x-if="estado === 'aprobado'">
                     <div>
@@ -65,8 +81,8 @@
                         <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2">Pago aprobado</p>
                         <h1 class="text-3xl font-extrabold text-navy mb-2"
                             x-text="primerNombre ? `¡Gracias, ${primerNombre}!` : '¡Reserva confirmada!'"></h1>
-                        <p class="text-gray-500 text-sm font-medium">Tu reserva quedó asegurada. Ya casi estás listo
-                            para tu estadía.</p>
+                        <p class="text-gray-500 text-sm font-medium">Tu reserva quedó asegurada. Escríbenos para recibir
+                            las instrucciones de acceso.</p>
                     </div>
                 </template>
 
@@ -83,8 +99,8 @@
                         <p class="text-[11px] font-black text-warning uppercase tracking-[0.2em] mb-2">Pago en proceso
                         </p>
                         <h1 class="text-3xl font-extrabold text-navy mb-2">Estamos confirmando</h1>
-                        <p class="text-gray-500 text-sm font-medium">Tu banco aún está validando el pago. Te avisaremos
-                            apenas se apruebe.</p>
+                        <p class="text-gray-500 text-sm font-medium">Bold todavía no nos confirma el pago. Puede tardar
+                            unos minutos; vuelve a verificar o escríbenos.</p>
                     </div>
                 </template>
 
@@ -101,8 +117,8 @@
                         <p class="text-[11px] font-black text-red-500 uppercase tracking-[0.2em] mb-2">Pago no
                             completado</p>
                         <h1 class="text-3xl font-extrabold text-navy mb-2">No se realizó el cobro</h1>
-                        <p class="text-gray-500 text-sm font-medium">Escríbenos por WhatsApp y te ayudamos a terminar tu
-                            reserva.</p>
+                        <p class="text-gray-500 text-sm font-medium">Tu reserva no quedó registrada. Escríbenos por
+                            WhatsApp y te ayudamos a terminarla.</p>
                     </div>
                 </template>
             </div>
@@ -113,11 +129,11 @@
                 </h2>
 
                 <div class="space-y-3 text-sm">
-                    <div class="flex justify-between items-center gap-4">
+                    <div class="flex justify-between items-center gap-4" x-show="reserva.alojamiento">
                         <span class="text-gray-500 font-medium">Alojamiento</span>
                         <span class="font-bold text-navy text-right" x-text="reserva.alojamiento"></span>
                     </div>
-                    <div class="flex justify-between items-center gap-4">
+                    <div class="flex justify-between items-center gap-4" x-show="reserva.checkin">
                         <span class="text-gray-500 font-medium">Fechas</span>
                         <span class="font-bold text-navy text-right"
                             x-text="`${reserva.checkin} al ${reserva.checkout}`"></span>
@@ -126,18 +142,22 @@
                         <span class="text-gray-500 font-medium">Noches</span>
                         <span class="font-bold text-navy" x-text="reserva.noches"></span>
                     </div>
-                    <div class="flex justify-between items-center gap-4" x-show="reserva.huespedes">
+                    <div class="flex justify-between items-center gap-4" x-show="totalHuespedes > 0">
                         <span class="text-gray-500 font-medium">Huéspedes</span>
-                        <span class="font-bold text-navy" x-text="reserva.huespedes"></span>
+                        <span class="font-bold text-navy" x-text="totalHuespedes"></span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4" x-show="reserva.mascotas > 0">
+                        <span class="text-gray-500 font-medium">Mascotas</span>
+                        <span class="font-bold text-navy" x-text="reserva.mascotas"></span>
                     </div>
                     <div class="flex justify-between items-center gap-4" x-show="referencia">
                         <span class="text-gray-500 font-medium">Referencia</span>
-                        <span class="font-bold text-navy text-xs" x-text="referencia"></span>
+                        <span class="font-bold text-navy text-xs break-all text-right" x-text="referencia"></span>
                     </div>
                 </div>
 
                 <!-- Total -->
-                <div class="bg-navy rounded-2xl p-5 text-center shadow-lg shadow-navy/20 mt-6">
+                <div class="bg-navy rounded-2xl p-5 text-center shadow-lg shadow-navy/20 mt-6" x-show="reserva.total">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1"
                         x-text="estado === 'aprobado' ? 'Total pagado' : 'Total de la reserva'"></p>
                     <p class="text-3xl font-black text-gold" x-text="reserva.total"></p>
@@ -156,7 +176,12 @@
             </div>
 
             <!-- ============ ACCIONES ============ -->
-            <div class="p-8 pt-6 bg-white border-t border-gray-100 text-center">
+            <div class="p-8 pt-6 bg-white border-t border-gray-100 text-center" x-show="estado !== 'verificando'">
+                <button x-show="estado === 'pendiente'" @click="verificarConReintentos()"
+                    class="w-full mb-3 bg-navy hover:bg-blue-900 text-white font-extrabold py-4 rounded-full transition-colors shadow-lg shadow-navy/20">
+                    Volver a verificar
+                </button>
+
                 <button @click="irAWhatsApp()"
                     class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-4 rounded-full transition-transform hover:-translate-y-0.5 shadow-lg shadow-gold/30 flex items-center justify-center gap-3">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -167,9 +192,9 @@
                         x-text="estado === 'aprobado' ? 'Recibir instrucciones de acceso' : 'Hablar con GestandoValor'"></span>
                 </button>
 
-                <a href="index.html"
-                    class="inline-block mt-6 text-sm font-bold text-navy underline hover:text-gold transition-colors">Volver
-                    al inicio</a>
+                <a href="alojamientos.html"
+                    class="inline-block mt-6 text-sm font-bold text-navy underline hover:text-gold transition-colors">Ver
+                    alojamientos</a>
             </div>
         </div>
 
@@ -179,10 +204,24 @@
     </main>
 
     <script>
+        const API_GV = 'https://gestandovalor-backend.onrender.com';
+        const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+        function fechaCorta(isoDate) {
+            if (!isoDate) return '';
+            const d = new Date(isoDate + 'T12:00:00');
+            return `${d.getDate()} ${MESES[d.getMonth()]}`;
+        }
+
+        function formatearDinero(valor) {
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor);
+        }
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('confirmacionApp', () => ({
-                estado: 'pendiente', // aprobado | pendiente | fallido
+                estado: 'verificando', // verificando | aprobado | pendiente | fallido
                 referencia: '',
+                verificando: false,
                 reserva: {
                     nombre: '',
                     telefonoHuesped: '',
@@ -190,8 +229,11 @@
                     alojamiento: '',
                     checkin: '',
                     checkout: '',
-                    noches: '',
-                    huespedes: '',
+                    noches: 0,
+                    adultos: 0,
+                    ninos: 0,
+                    bebes: 0,
+                    mascotas: 0,
                     total: '',
                     telefono: '3194095505'
                 },
@@ -200,57 +242,119 @@
                     return (this.reserva.nombre || '').trim().split(' ')[0];
                 },
 
-                init() {
-                    // Bold regresa a esta página así:
-                    // confirmacion.html?bold-order-id=BP-123&bold-tx-status=approved
-                    const params = new URLSearchParams(window.location.search);
-                    const statusBold = (params.get('bold-tx-status') || '').toLowerCase();
-                    this.referencia = params.get('bold-order-id') || '';
+                get totalHuespedes() {
+                    return (Number(this.reserva.adultos) || 0) + (Number(this.reserva.ninos) || 0);
+                },
 
-                    if (statusBold === 'approved') {
-                        this.estado = 'aprobado';
-                    } else if (statusBold === 'pending' || statusBold === 'processing') {
-                        this.estado = 'pendiente';
-                    } else {
-                        this.estado = 'fallido';
-                    }
+                async init() {
+                    // Bold regresa así: confirmacion.html?bold-order-id=BP-123&bold-tx-status=approved
+                    const params = new URLSearchParams(window.location.search);
+                    const estadoUrl = (params.get('bold-tx-status') || '').toLowerCase();
 
                     try {
-                        const datosGuardados = localStorage.getItem('reservaExitosa');
-                        if (datosGuardados) {
-                            this.reserva = { ...this.reserva, ...JSON.parse(datosGuardados) };
-                        }
+                        const guardados = JSON.parse(localStorage.getItem('reservaExitosa') || 'null');
+                        if (guardados) this.reserva = { ...this.reserva, ...guardados };
                     } catch (e) {
                         console.error('No se pudieron leer los datos de la reserva', e);
+                    }
+
+                    this.referencia = params.get('bold-order-id') || this.reserva.referencia || '';
+
+                    if (!this.referencia) {
+                        this.estado = 'fallido';
+                        return;
+                    }
+
+                    // Si Bold ya dijo que falló, lo mostramos de una vez y liberamos las fechas
+                    if (['rejected', 'failed', 'voided'].includes(estadoUrl)) {
+                        this.estado = 'fallido';
+                        this.consultarEstado();
+                        return;
+                    }
+
+                    await this.verificarConReintentos();
+                },
+
+                // El estado real lo confirma el backend con Bold (la URL se puede modificar a mano)
+                async verificarConReintentos() {
+                    if (this.verificando) return;
+                    this.verificando = true;
+                    this.estado = 'verificando';
+
+                    for (let intento = 0; intento < 8; intento++) {
+                        const resultado = await this.consultarEstado();
+
+                        if (resultado === 'aprobado') { this.estado = 'aprobado'; break; }
+                        if (resultado === 'rechazado') { this.estado = 'fallido'; break; }
+
+                        await new Promise(resolve => setTimeout(resolve, 4000));
+                    }
+
+                    if (this.estado === 'verificando') this.estado = 'pendiente';
+                    this.verificando = false;
+                },
+
+                async consultarEstado() {
+                    try {
+                        const res = await fetch(`${API_GV}/pagos/verificar`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ referencia: this.referencia })
+                        });
+
+                        if (res.status === 404) return 'rechazado';
+                        if (!res.ok) return null;
+
+                        const data = await res.json();
+
+                        // Si abrieron la página en otro dispositivo, completamos con los datos del servidor
+                        if (!this.reserva.alojamiento && data.alojamiento) this.reserva.alojamiento = data.alojamiento;
+                        if (!this.reserva.checkin && data.check_in) {
+                            this.reserva.checkin = fechaCorta(data.check_in);
+                            this.reserva.checkout = fechaCorta(data.check_out);
+                        }
+                        if (!this.reserva.total && data.monto) this.reserva.total = formatearDinero(data.monto);
+
+                        return data.estado;
+                    } catch (e) {
+                        console.error('No se pudo verificar el pago', e);
+                        return null;
                     }
                 },
 
                 irAWhatsApp() {
-                    let mensaje = '';
+                    const r = this.reserva;
+                    const noches = Number(r.noches) === 1 ? '1 noche' : `${r.noches} noches`;
+                    let texto = '';
 
                     if (this.estado === 'aprobado') {
-                        mensaje = `¡Hola GestandoValor! Acabo de completar el pago de mi reserva por Bold. ✅\n\n`;
+                        texto = `¡Hola! 👋 Acabo de registrar mi reserva:\n\n`;
                     } else if (this.estado === 'pendiente') {
-                        mensaje = `¡Hola GestandoValor! Hice el pago de mi reserva por Bold y aparece en proceso. ⏳\n\n`;
+                        texto = `¡Hola! 👋 Acabo de registrar mi reserva y mi pago con Bold está en proceso:\n\n`;
                     } else {
-                        mensaje = `¡Hola GestandoValor! Intenté pagar mi reserva por Bold pero el pago no se completó. ❌\n\n`;
+                        texto = `¡Hola! 👋 Intenté registrar mi reserva pero el pago con Bold no se completó:\n\n`;
                     }
 
-                    if (this.reserva.nombre) mensaje += `🙋 *Nombre:* ${this.reserva.nombre}\n`;
-                    if (this.reserva.telefonoHuesped) mensaje += `📱 *Celular:* ${this.reserva.telefonoHuesped}\n`;
-                    if (this.reserva.email) mensaje += `✉️ *Correo:* ${this.reserva.email}\n`;
-                    mensaje += `\n`;
-                    mensaje += `🏨 *Alojamiento:* ${this.reserva.alojamiento}\n`;
-                    mensaje += `📅 *Fechas:* ${this.reserva.checkin} al ${this.reserva.checkout}\n`;
-                    if (this.reserva.huespedes) mensaje += `👥 *Huéspedes:* ${this.reserva.huespedes}\n`;
-                    mensaje += `💰 *Total:* ${this.reserva.total}\n`;
-                    if (this.referencia) mensaje += `🧾 *Referencia:* ${this.referencia}\n`;
-                    mensaje += `\n`;
-                    mensaje += this.estado === 'aprobado'
-                        ? `Quedo atento/a para recibir las instrucciones de acceso. 🔑`
-                        : `¿Me ayudan a finalizar la reserva?`;
+                    if (r.alojamiento) texto += `🏨 *Alojamiento:* ${r.alojamiento}\n`;
+                    if (r.checkin) texto += `📅 *Fechas:* ${r.checkin} al ${r.checkout}${r.noches ? ` (${noches})` : ''}\n`;
+                    if (Number(r.adultos) > 0) texto += `👤 *Adultos:* ${r.adultos}\n`;
+                    if (Number(r.ninos) > 0) texto += `👦 *Niños:* ${r.ninos}\n`;
+                    if (Number(r.bebes) > 0) texto += `👶 *Bebés:* ${r.bebes}\n`;
+                    if (Number(r.mascotas) > 0) texto += `🐾 *Mascotas:* ${r.mascotas}\n`;
+                    if (r.total) texto += `💰 *${this.estado === 'aprobado' ? 'Total pagado' : 'Total a pagar'}:* ${r.total}\n`;
 
-                    const url = `https://wa.me/57${this.reserva.telefono}?text=${encodeURIComponent(mensaje)}`;
+                    if (this.estado === 'aprobado') texto += `💳 *Pago:* Aprobado con Bold ✅\n`;
+                    else if (this.estado === 'pendiente') texto += `💳 *Pago:* En proceso ⏳\n`;
+                    else texto += `💳 *Pago:* No completado ❌\n`;
+
+                    if (this.referencia) texto += `🧾 *Referencia:* ${this.referencia}\n`;
+
+                    if (r.nombre || r.telefonoHuesped || r.email) texto += `\n`;
+                    if (r.nombre) texto += `🙋 *A nombre de:* ${r.nombre}\n`;
+                    if (r.telefonoHuesped) texto += `📱 *Celular:* ${r.telefonoHuesped}\n`;
+                    if (r.email) texto += `✉️ *Correo:* ${r.email}\n`;
+
+                    const url = `https://wa.me/57${r.telefono || '3194095505'}?text=${encodeURIComponent(texto.trim())}`;
                     window.open(url, '_blank');
                 }
             }))

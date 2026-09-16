@@ -13,7 +13,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <link rel="preconnect" href="https://gestandovalor-backend.onrender.com" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -118,34 +119,37 @@
 
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
+
         <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 z-[60]">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+            <img id="nav-logo-combined" src="GV.png" alt="GestandoValor"
                 class="h-16 w-auto object-contain transition-all duration-700">
         </a>
-        <div
-            class="hidden md:flex items-center gap-6 justify-center flex-1 transition-all duration-700 whitespace-nowrap pl-4 text-gray-300 z-[60]">
-            <a href="index.html" class="text-sm font-medium hover:text-gold transition-colors">Inicio</a>
-            <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
-            <a href="alojamientos.html"
-                class="text-sm font-medium hover:text-gold transition-colors text-white border-b-2 border-gold pb-1">Alojamientos</a>
-            <a href="login.html"
-                class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar
-                Sesión</a>
-        </div>
-        <div class="flex items-center gap-4 flex-shrink-0 z-[60]">
-            <button
-                class="hidden md:block bg-gold hover:bg-yellow-500 text-navy text-xs font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105">Contacto</button>
 
-            <button @click="mobileMenuOpen = !mobileMenuOpen"
-                class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10 ml-2">
-                <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
-                    :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
-                <span class="w-6 h-[2px] bg-gold transition-all duration-300"
-                    :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
-                <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
-                    :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
-            </button>
+        <!-- ✨ ISLA DE BÚSQUEDA: la misma de resultados. Al tocarla vuelves a ver otros alojamientos -->
+        <div class="flex-1 flex justify-center mx-2 md:mx-6 min-w-0 z-[60]">
+            <a :href="urlResultados()" title="Cambiar búsqueda o ver otros alojamientos"
+                class="group flex items-center bg-white/5 hover:bg-white/10 border border-white/10 shadow-sm rounded-full py-1.5 md:py-2 pl-2 md:pl-4 pr-1.5 md:pr-2 backdrop-blur-sm w-full max-w-[520px] min-w-0 transition-colors">
+                <span
+                    class="flex-[1.2] min-w-0 truncate text-center text-[10px] md:text-sm font-bold text-gray-300 group-hover:text-gold transition-colors px-1 md:px-3 border-r border-white/20"
+                    x-text="textoIslaDestino()"></span>
+                <span
+                    class="flex-[1.5] min-w-0 truncate text-center text-[10px] md:text-sm font-bold text-gray-300 group-hover:text-gold transition-colors px-1 md:px-3 border-r border-white/20"
+                    x-text="textoIslaFechas()"></span>
+                <span
+                    class="flex-[0.9] min-w-0 truncate text-center text-[10px] md:text-sm font-bold text-gray-300 group-hover:text-gold transition-colors px-1 md:px-3"
+                    x-text="textoIslaHuespedes()"></span>
+                <span
+                    class="bg-gold group-hover:bg-yellow-500 rounded-full p-1.5 md:p-2 ml-1 text-navy flex-shrink-0 shadow-sm transition-colors">
+                    <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" stroke-width="3"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+            </a>
         </div>
+
+        <div class="hidden md:block w-[64px] flex-shrink-0"></div>
     </nav>
 
     <div x-show="mobileMenuOpen" style="display: none;" x-transition.opacity
@@ -1221,7 +1225,7 @@
                         const [res, tRes, resRes] = await Promise.all([
                             fetch(`https://gestandovalor-backend.onrender.com/propiedades/${id}/detalle`),
                             fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${id}`).catch(() => null),
-                            fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${id}`).catch(() => null),
+                            fetch(`https://gestandovalor-backend.onrender.com/reservas/ocupacion/${id}`).catch(() => null),
                         ]);
 
                         if (res.ok) {
@@ -1437,112 +1441,177 @@
                     }
 
                     this.metodoSeleccionado = '';
-                    this.nombreHuesped = '';
                     this.modalPago = true;
                 },
 
+                // ✨ ISLA SUPERIOR: muestra la búsqueda actual y lleva de vuelta a los resultados
+                textoIslaDestino() {
+                    const ciudad = (this.propiedad.ciudad || '').trim();
+                    const depto = (this.propiedad.departamento || '').trim();
+                    if (!ciudad) return 'Destino';
+                    return depto ? `${ciudad}, ${depto}` : ciudad;
+                },
+
+                textoIslaFechas() {
+                    if (!this.checkinRaw || !this.checkoutRaw) return 'Fechas';
+                    const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                    const dIn = new Date(this.checkinRaw + "T12:00:00");
+                    const dOut = new Date(this.checkoutRaw + "T12:00:00");
+                    return `${dIn.getDate()} ${meses[dIn.getMonth()]} – ${dOut.getDate()} ${meses[dOut.getMonth()]}`;
+                },
+
+                textoIslaHuespedes() {
+                    const total = (Number(this.adults) || 1) + (Number(this.children) || 0);
+                    let texto = `${total} huésped${total !== 1 ? 'es' : ''}`;
+                    if (this.infants > 0) texto += `, ${this.infants} bb`;
+                    if (this.pets > 0) texto += `, ${this.pets} masc`;
+                    return texto;
+                },
+
+                urlResultados() {
+                    const params = new URLSearchParams();
+                    const destino = this.textoIslaDestino();
+                    if (destino !== 'Destino') params.set('loc', destino);
+                    if (this.checkinRaw && this.checkoutRaw) {
+                        params.set('in', this.checkinRaw);
+                        params.set('out', this.checkoutRaw);
+                    }
+                    params.set('ad', Number(this.adults) || 1);
+                    if (this.children > 0) params.set('ni', this.children);
+                    if (this.infants > 0) params.set('bb', this.infants);
+                    if (this.pets > 0) params.set('ma', this.pets);
+                    return `resultados.html?${params.toString()}`;
+                },
+
+                // ✨ DATOS DEL HUÉSPED Y MENSAJES
+                datosContactoValidos() {
+                    const nombreOk = this.nombreHuesped.trim().length >= 3;
+                    const digitos = this.telefonoHuesped.replace(/\D/g, '');
+                    const telefonoOk = digitos.length >= 7 && digitos.length <= 15;
+                    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(this.emailHuesped.trim());
+                    return nombreOk && telefonoOk && emailOk;
+                },
+
+                datosDeLaReserva() {
+                    const total = this.calcularTotal();
+                    return {
+                        nombre: this.nombreHuesped.trim(),
+                        telefono: this.telefonoHuesped.replace(/\D/g, ''),
+                        email: this.emailHuesped.trim().toLowerCase(),
+                        adultos: Number(this.adults) || 1,
+                        ninos: Number(this.children) || 0,
+                        bebes: Number(this.infants) || 0,
+                        mascotas: Number(this.pets) || 0,
+                        total: total,
+                        totalStr: this.formatearDinero(total)
+                    };
+                },
+
+                mensajeTransferencia(datos) {
+                    const noches = this.noches === 1 ? '1 noche' : `${this.noches} noches`;
+                    let texto = `¡Hola! 👋 Acabo de registrar mi reserva y quiero coordinar mi transferencia:\n\n`;
+                    texto += `🏨 *Alojamiento:* ${this.propiedad.titulo}\n`;
+                    texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${noches})\n`;
+                    texto += `👤 *Adultos:* ${datos.adultos}\n`;
+                    if (datos.ninos > 0) texto += `👦 *Niños:* ${datos.ninos}\n`;
+                    if (datos.bebes > 0) texto += `👶 *Bebés:* ${datos.bebes}\n`;
+                    if (datos.mascotas > 0) texto += `🐾 *Mascotas:* ${datos.mascotas}\n`;
+                    texto += `💰 *Total a pagar:* ${datos.totalStr}\n\n`;
+                    texto += `🙋 *A nombre de:* ${datos.nombre}\n`;
+                    texto += `📱 *Celular:* ${datos.telefono}\n`;
+                    texto += `✉️ *Correo:* ${datos.email}`;
+                    return texto;
+                },
+
                 async procesarReserva() {
-                    this.cargandoPago = true;
-                    const totalPagar = this.calcularTotal();
-                    const totalStr = this.formatearDinero(totalPagar);
+                    if (!this.metodoSeleccionado) return;
 
-                    try {
-                        // 1. Guarda la reserva en tu base de datos
-                        const payload = {
-                            propiedad_id: this.propiedad.id,
-                            huesped_nombre: this.nombreHuesped,
-                            check_in: new Date(this.checkinRaw + "T15:00:00").toISOString(),
-                            check_out: new Date(this.checkoutRaw + "T11:00:00").toISOString(),
-                            adultos: Number(this.adultos) || 1,
-                            ninos: Number(this.children) || 0,
-                            bebes: Number(this.infants) || 0,
-                            mascotas: Number(this.pets) || 0,
-                            cantidad_huespedes: (Number(this.adultos) || 1) + (Number(this.children) || 0),
-                            monto_total: totalPagar,
-                            canal: 'Directo',
-                            estado_reserva: 'Por Confirmar Pago'
-                        };
+                    if (!this.datosContactoValidos()) {
+                        alert("Por favor completa tu nombre, celular y correo.");
+                        return;
+                    }
+                    if (this.haySuperposicion(this.checkinRaw, this.checkoutRaw)) {
+                        alert("⚠️ Las fechas seleccionadas ya no están disponibles. Por favor elige otras.");
+                        return;
+                    }
 
-                        const res = await fetch('https://gestandovalor-backend.onrender.com/reservas', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
+                    const datos = this.datosDeLaReserva();
 
-                        if (!res.ok) {
-                            const errorBackend = await res.json();
-                            console.error("🔥 Error real del servidor:", errorBackend);
-                            alert("El backend rechazó la reserva por esto: " + JSON.stringify(errorBackend.message || errorBackend));
-                            throw new Error("Las fechas fueron ocupadas recientemente.");
-                        }
+                    // 1. TRANSFERENCIA: no se guarda nada, se coordina por WhatsApp
+                    if (this.metodoSeleccionado === 'Transferencia') {
+                        const url = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(this.mensajeTransferencia(datos))}`;
+                        this.modalPago = false;
+                        window.open(url, '_blank');
+                        return;
+                    }
 
-                        // 👇 1. CAPTURAMOS EL ID REAL DE LA RESERVA RECIÉN CREADA EN LA BASE DE DATOS
-                        const reservaGuardada = await res.json();
-                        const idRealReserva = reservaGuardada.id;
+                    // 2. BOLD: el backend aparta las fechas mientras se paga.
+                    //    La reserva aparece en el calendario solo cuando Bold aprueba el pago.
+                    if (this.metodoSeleccionado === 'bold') {
+                        this.cargandoPago = true;
 
-                        // 2. Si elige Transferencia Directa
-                        if (this.metodoSeleccionado === 'Transferencia') {
-                            let texto = `¡Hola Edwin! 👋 Acabo de registrar mi reserva y quiero confirmar por Transferencia:\n\n`;
-                            texto += `🏨 *Alojamiento:* ${this.propiedad.titulo}\n`;
-                            texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${this.noches} noches)\n`;
-                            texto += `👤 *Adultos:* ${this.adultos}\n`;
-                            if (this.children > 0) texto += `👦 *Niños:* ${this.children}\n`;
-                            if (this.infants > 0) texto += `👶 *Bebés:* ${this.infants}\n`;
-                            if (this.pets > 0) texto += `🐾 *Mascotas:* ${this.pets}\n`;
-                            texto += `💰 *Total a pagar:* ${totalStr}\n\n`;
-                            texto += `Quedo atento/a para enviar el comprobante y recibir las instrucciones de acceso. 🔑`;
-
-                            this.modalPago = false;
-                            const url = `https://wa.me/57${this.telefonoAdmin}?text=${encodeURIComponent(texto)}`;
-                            window.open(url, '_blank');
-
-                            setTimeout(() => window.location.reload(), 2000);
-                        }
-
-                        // 3. Si elige Bold, abrimos la pasarela
-                        else if (this.metodoSeleccionado === 'bold') {
-                            // Pedimos firma, monto y llave de identidad al backend
-                            const respuestaFirma = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
+                        try {
+                            const respuesta = await fetch('https://gestandovalor-backend.onrender.com/pagos/generar-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ reservaId: idRealReserva })
+                                body: JSON.stringify({
+                                    propiedad_id: this.propiedad.id,
+                                    huesped_nombre: datos.nombre,
+                                    huesped_telefono: datos.telefono,
+                                    huesped_email: datos.email,
+                                    check_in: this.checkinRaw,
+                                    check_out: this.checkoutRaw,
+                                    adultos: datos.adultos,
+                                    ninos: datos.ninos,
+                                    bebes: datos.bebes,
+                                    mascotas: datos.mascotas,
+                                    monto_total: datos.total
+                                })
                             });
 
-                            const dataFirma = await respuestaFirma.json();
+                            const data = await respuesta.json().catch(() => ({}));
 
-                            if (!respuestaFirma.ok || !dataFirma.success || !dataFirma.hash || !dataFirma.apiKey) {
-                                console.error("Respuesta del backend de pagos:", dataFirma);
-                                alert("No pudimos iniciar el pago en línea. Intenta de nuevo o elige transferencia.");
-                                return;
+                            if (!respuesta.ok || !data.success || !data.hash || !data.apiKey) {
+                                console.error("Respuesta del backend de pagos:", data);
+                                const detalle = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+                                throw new Error(respuesta.status === 409
+                                    ? "Estas fechas acaban de ser reservadas. Por favor elige otras."
+                                    : (detalle || "No pudimos iniciar el pago en línea. Intenta de nuevo o elige transferencia."));
                             }
 
-                            // Guardamos los datos para el mensaje de WhatsApp
+                            // Datos para la página de confirmación y el mensaje de WhatsApp
                             localStorage.setItem('reservaExitosa', JSON.stringify({
+                                referencia: data.referencia,
+                                nombre: datos.nombre,
+                                telefonoHuesped: datos.telefono,
+                                email: datos.email,
                                 alojamiento: this.propiedad.titulo,
                                 checkin: this.checkinLabel,
                                 checkout: this.checkoutLabel,
-                                huespedes: this.adultos + this.children,
-                                total: totalStr,
+                                noches: this.noches,
+                                adultos: datos.adultos,
+                                ninos: datos.ninos,
+                                bebes: datos.bebes,
+                                mascotas: datos.mascotas,
+                                total: datos.totalStr,
                                 telefono: this.telefonoAdmin
                             }));
 
-                            // Todo viene del backend: nada escrito a mano
                             const checkout = new BoldCheckout({
-                                orderId: dataFirma.referencia,
-                                currency: dataFirma.moneda,
-                                amount: String(dataFirma.monto),
-                                apiKey: dataFirma.apiKey,
-                                integritySignature: dataFirma.hash,
+                                orderId: data.referencia,
+                                currency: data.moneda,
+                                amount: String(data.monto),
+                                apiKey: data.apiKey,
+                                integritySignature: data.hash,
                                 redirectionUrl: "https://gestandovalor.com/confirmacion.html"
                             });
 
                             checkout.open();
+                        } catch (error) {
+                            alert(error.message || "Error al conectar con el servidor.");
+                        } finally {
+                            this.cargandoPago = false;
                         }
-
-                    } catch (error) {
-                        alert(error.message || "Error al conectar con el servidor.");
-                    } finally {
-                        this.cargandoPago = false;
                     }
                 },
             }

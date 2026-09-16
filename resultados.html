@@ -12,7 +12,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <link rel="preconnect" href="https://gestandovalor-backend.onrender.com" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
     <script>
         tailwind.config = {
@@ -355,6 +356,10 @@
 
                 fp: null,
 
+                // ✨ Disponibilidad real: ids de alojamientos ocupados en las fechas buscadas
+                propiedadesOcupadas: [],
+                fechasOcupadasCargadas: '',
+
                 filtros: {
                     loc: '',
                     in: '',
@@ -369,9 +374,11 @@
                     this.activarNavbarDinamica();
                     this.leerFiltrosURL();
 
+                    // El calendario se crea de inmediato para que responda al primer clic
+                    this.initCalendario();
+
                     await this.cargarDesdeBD();
                     this.extraerUbicacionesUnicas();
-                    this.initCalendario();
                 },
 
                 leerFiltrosURL() {
@@ -428,7 +435,11 @@
 
                 async cargarDesdeBD() {
                     try {
-                        const response = await fetch('https://gestandovalor-backend.onrender.com/propiedades/resultados');
+                        // Propiedades y disponibilidad se piden al mismo tiempo
+                        const [response] = await Promise.all([
+                            fetch('https://gestandovalor-backend.onrender.com/propiedades/resultados'),
+                            this.cargarOcupadas()
+                        ]);
                         if (!response.ok) throw new Error('HTTP ' + response.status);
                         const data = await response.json();
                         this.todasPropiedades = data.map(p => ({ ...p, tarifas_especiales: p.tarifas_especiales || [] }));
@@ -437,6 +448,34 @@
                         console.error('Error cargando propiedades:', error);
                     } finally {
                         this.cargando = false;
+                    }
+                },
+
+                async cargarOcupadas() {
+                    const clave = (this.filtros.in && this.filtros.out) ? `${this.filtros.in}_${this.filtros.out}` : '';
+                    if (clave === this.fechasOcupadasCargadas) return;
+
+                    if (!clave) {
+                        this.propiedadesOcupadas = [];
+                        this.fechasOcupadasCargadas = '';
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/reservas/ocupadas?in=${this.filtros.in}&out=${this.filtros.out}`);
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        const data = await res.json();
+
+                        // Si el usuario cambió las fechas mientras esperábamos, ignoramos esta respuesta
+                        const claveActual = (this.filtros.in && this.filtros.out) ? `${this.filtros.in}_${this.filtros.out}` : '';
+                        if (claveActual !== clave) return;
+
+                        this.propiedadesOcupadas = data.propiedades || [];
+                        this.fechasOcupadasCargadas = clave;
+                    } catch (error) {
+                        console.error('No se pudo consultar la disponibilidad:', error);
+                        this.propiedadesOcupadas = [];
+                        this.fechasOcupadasCargadas = '';
                     }
                 },
 
@@ -472,7 +511,7 @@
                     this.aplicarFiltrosYURL();
                 },
 
-                aplicarFiltrosYURL(forzarSyncHuespedes = false) {
+                async aplicarFiltrosYURL(forzarSyncHuespedes = false) {
                     if (forzarSyncHuespedes) {
                         this.filtros.ad = this.tempAdults;
                         this.filtros.ni = this.tempChildren;
@@ -495,6 +534,15 @@
                     if (this.filtros.ma > 0) url.searchParams.set('ma', this.filtros.ma); else url.searchParams.delete('ma');
 
                     window.history.pushState({}, '', url);
+
+                    // Si cambiaron las fechas, consultamos otra vez qué está ocupado
+                    const claveNueva = (this.filtros.in && this.filtros.out) ? `${this.filtros.in}_${this.filtros.out}` : '';
+                    if (claveNueva !== this.fechasOcupadasCargadas) {
+                        this.cargando = true;
+                        await this.cargarOcupadas();
+                        this.cargando = false;
+                    }
+
                     this.aplicarFiltros();
                 },
 
@@ -509,6 +557,8 @@
                 },
 
                 aplicarFiltros() {
+                    const hayFechas = !!(this.filtros.in && this.filtros.out);
+
                     this.propiedadesFiltradas = this.todasPropiedades.filter(prop => {
                         let ocupantesReales = this.filtros.ad + this.filtros.ni;
 
@@ -522,6 +572,9 @@
 
                             if (!ciudad.includes(termino) && !depto.includes(termino)) return false;
                         }
+
+                        // ✨ Oculta los alojamientos que ya tienen reserva en esas fechas
+                        if (hayFechas && this.propiedadesOcupadas.includes(prop.id)) return false;
 
                         return true;
                     });

@@ -12,7 +12,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <link rel="preconnect" href="https://gestandovalor-backend.onrender.com" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
     <script>
         tailwind.config = {
@@ -313,8 +314,8 @@
                 // ✨ AQUÍ ESTÁ LA FUNCIÓN QUE SE HABÍA BORRADO ✨
                 async initApp() {
                     this.activarNavbarDinamica();
-                    await this.cargarDestinosDinamicos();
 
+                    // ✨ El calendario se crea de inmediato: ya no espera a que carguen los destinos
                     this.fp = flatpickr("#airbnb-calendar", {
                         mode: "range",
                         minDate: "today",
@@ -341,6 +342,9 @@
                             this.fp.open();
                         });
                     }
+
+                    // Los destinos se cargan en segundo plano (sin bloquear la página)
+                    this.cargarDestinosDinamicos();
                 },
 
                 // ✨ VERSIÓN ÚNICA Y BLINDADA DE LA CARGA DE DESTINOS ✨
