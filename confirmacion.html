@@ -41,164 +41,241 @@
         class="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gold/10 rounded-full blur-[120px] pointer-events-none">
     </div>
 
-    <main class="relative z-10 flex flex-col items-center px-4 py-10 min-h-screen">
+    <main class="relative z-10 flex flex-col items-center px-4 py-10 lg:py-4 min-h-screen lg:justify-center">
 
         <!-- Logo -->
-        <a href="index.html" class="mb-8">
-            <img src="GV.png" alt="GestandoValor" class="h-16 w-auto object-contain">
+        <a href="index.html" class="mb-8 lg:mb-3">
+            <img src="GV.png" alt="GestandoValor" class="h-16 lg:h-11 w-auto object-contain">
         </a>
 
-        <div x-cloak class="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden">
+        <div x-cloak
+            class="bg-white w-full max-w-md lg:max-w-5xl rounded-[32px] lg:rounded-3xl shadow-2xl overflow-hidden lg:grid lg:grid-cols-[1fr_1.1fr]">
 
-            <!-- ============ ENCABEZADO SEGÚN ESTADO ============ -->
-            <div class="px-8 pt-10 pb-8 text-center border-b border-gray-100">
+            <!-- ============ PORTADA DEL ALOJAMIENTO (solo computador) ============ -->
+            <div class="hidden lg:block relative bg-navy min-h-[440px]">
+                <template x-if="servidor.foto_portada">
+                    <img :src="servidor.foto_portada" alt="" class="absolute inset-0 w-full h-full object-cover">
+                </template>
+                <template x-if="!servidor.foto_portada">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <img src="GV.png" alt="" class="h-24 w-auto opacity-30">
+                    </div>
+                </template>
+                <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-8 text-white" x-show="reserva.alojamiento">
+                    <p class="text-[11px] font-black uppercase tracking-[0.2em] text-gold mb-2">Tu alojamiento</p>
+                    <h2 class="text-3xl font-extrabold leading-tight" x-text="reserva.alojamiento"></h2>
+                    <p class="text-sm text-gray-200 mt-1" x-text="ubicacion"></p>
+                </div>
+            </div>
 
-                <!-- Verificando con Bold -->
-                <template x-if="estado === 'verificando'">
-                    <div>
-                        <div
-                            class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-navy ring-8 ring-gold/20">
-                            <div class="w-10 h-10 rounded-full border-4 border-gold/30 border-t-gold animate-spin">
+            <!-- ============ CONTENIDO ============ -->
+            <div class="flex flex-col">
+
+                <!-- Encabezado según estado -->
+                <div class="px-8 pt-10 pb-8 lg:pt-8 lg:pb-6 text-center lg:text-left border-b border-gray-100">
+
+                    <!-- Verificando -->
+                    <template x-if="estado === 'verificando'">
+                        <div class="lg:flex lg:items-center lg:gap-5">
+                            <div
+                                class="w-20 h-20 lg:w-14 lg:h-14 shrink-0 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-6 lg:mb-0 bg-navy ring-8 ring-gold/20">
+                                <div
+                                    class="w-10 h-10 lg:w-7 lg:h-7 rounded-full border-4 border-gold/30 border-t-gold animate-spin">
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2 lg:mb-1">Un
+                                    momento</p>
+                                <h1 class="text-3xl lg:text-2xl font-extrabold text-navy mb-2 lg:mb-1">Confirmando tu
+                                    pago</h1>
+                                <p class="text-gray-500 text-sm font-medium">Estamos verificando el pago con Bold. No
+                                    cierres esta página.</p>
                             </div>
                         </div>
-                        <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2">Un momento</p>
-                        <h1 class="text-3xl font-extrabold text-navy mb-2">Confirmando tu pago</h1>
-                        <p class="text-gray-500 text-sm font-medium">Estamos verificando el pago con Bold para asegurar
-                            tu reserva. No cierres esta página.</p>
-                    </div>
-                </template>
+                    </template>
 
-                <!-- Aprobado -->
-                <template x-if="estado === 'aprobado'">
-                    <div>
-                        <div
-                            class="w-20 h-20 bg-navy rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-gold/20">
-                            <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M5 13l4 4L19 7"></path>
-                            </svg>
+                    <!-- Aprobado -->
+                    <template x-if="estado === 'aprobado'">
+                        <div class="lg:flex lg:items-center lg:gap-5">
+                            <div
+                                class="w-20 h-20 lg:w-14 lg:h-14 shrink-0 bg-navy rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-6 lg:mb-0 ring-8 ring-gold/20">
+                                <svg class="w-10 h-10 lg:w-7 lg:h-7 text-gold" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2 lg:mb-1">Pago
+                                    aprobado</p>
+                                <h1 class="text-3xl lg:text-2xl font-extrabold text-navy mb-2 lg:mb-1"
+                                    x-text="primerNombre ? `¡Gracias, ${primerNombre}!` : '¡Reserva confirmada!'"></h1>
+                                <p class="text-gray-500 text-sm font-medium">Tu reserva quedó asegurada. Escríbenos para
+                                    recibir las instrucciones de acceso.</p>
+                            </div>
                         </div>
-                        <p class="text-[11px] font-black text-gold uppercase tracking-[0.2em] mb-2">Pago aprobado</p>
-                        <h1 class="text-3xl font-extrabold text-navy mb-2"
-                            x-text="primerNombre ? `¡Gracias, ${primerNombre}!` : '¡Reserva confirmada!'"></h1>
-                        <p class="text-gray-500 text-sm font-medium">Tu reserva quedó asegurada. Escríbenos para recibir
-                            las instrucciones de acceso.</p>
-                    </div>
-                </template>
+                    </template>
 
-                <!-- Pendiente -->
-                <template x-if="estado === 'pendiente'">
-                    <div>
-                        <div
-                            class="w-20 h-20 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-warning/10">
-                            <svg class="w-10 h-10 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                    <!-- Pendiente -->
+                    <template x-if="estado === 'pendiente'">
+                        <div class="lg:flex lg:items-center lg:gap-5">
+                            <div
+                                class="w-20 h-20 lg:w-14 lg:h-14 shrink-0 bg-warning/10 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-6 lg:mb-0 ring-8 ring-warning/10">
+                                <svg class="w-10 h-10 lg:w-7 lg:h-7 text-warning" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black text-warning uppercase tracking-[0.2em] mb-2 lg:mb-1">
+                                    Pago en proceso</p>
+                                <h1 class="text-3xl lg:text-2xl font-extrabold text-navy mb-2 lg:mb-1">Estamos
+                                    confirmando</h1>
+                                <p class="text-gray-500 text-sm font-medium">Bold todavía no nos confirma el pago. Puede
+                                    tardar unos minutos; vuelve a verificar o escríbenos.</p>
+                            </div>
                         </div>
-                        <p class="text-[11px] font-black text-warning uppercase tracking-[0.2em] mb-2">Pago en proceso
-                        </p>
-                        <h1 class="text-3xl font-extrabold text-navy mb-2">Estamos confirmando</h1>
-                        <p class="text-gray-500 text-sm font-medium">Bold todavía no nos confirma el pago. Puede tardar
-                            unos minutos; vuelve a verificar o escríbenos.</p>
-                    </div>
-                </template>
+                    </template>
 
-                <!-- Rechazado / fallido -->
-                <template x-if="estado === 'fallido'">
-                    <div>
-                        <div
-                            class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-red-50/60">
-                            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                    <!-- Rechazado / fallido -->
+                    <template x-if="estado === 'fallido'">
+                        <div class="lg:flex lg:items-center lg:gap-5">
+                            <div
+                                class="w-20 h-20 lg:w-14 lg:h-14 shrink-0 bg-red-50 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-6 lg:mb-0 ring-8 ring-red-50/60">
+                                <svg class="w-10 h-10 lg:w-7 lg:h-7 text-red-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black text-red-500 uppercase tracking-[0.2em] mb-2 lg:mb-1">
+                                    Pago no completado</p>
+                                <h1 class="text-3xl lg:text-2xl font-extrabold text-navy mb-2 lg:mb-1">No se realizó el
+                                    cobro</h1>
+                                <p class="text-gray-500 text-sm font-medium">Puedes intentar el pago de nuevo con tus
+                                    mismas fechas o escribirnos por WhatsApp.</p>
+                            </div>
                         </div>
-                        <p class="text-[11px] font-black text-red-500 uppercase tracking-[0.2em] mb-2">Pago no
-                            completado</p>
-                        <h1 class="text-3xl font-extrabold text-navy mb-2">No se realizó el cobro</h1>
-                        <p class="text-gray-500 text-sm font-medium">Tu reserva no quedó registrada. Escríbenos por
-                            WhatsApp y te ayudamos a terminarla.</p>
-                    </div>
-                </template>
-            </div>
+                    </template>
+                </div>
 
-            <!-- ============ RESUMEN ============ -->
-            <div class="p-8 bg-lightGray">
-                <h2 class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Resumen de tu reserva
-                </h2>
+                <!-- Resumen -->
+                <div class="p-8 lg:px-8 lg:py-6 bg-lightGray flex-1">
+                    <h2 class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 lg:mb-3">Resumen de
+                        tu reserva</h2>
 
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between items-center gap-4" x-show="reserva.alojamiento">
-                        <span class="text-gray-500 font-medium">Alojamiento</span>
-                        <span class="font-bold text-navy text-right" x-text="reserva.alojamiento"></span>
+                    <div class="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-2.5 text-sm">
+                        <div class="flex justify-between items-center gap-4 lg:hidden" x-show="reserva.alojamiento">
+                            <span class="text-gray-500 font-medium">Alojamiento</span>
+                            <span class="font-bold text-navy text-right" x-text="reserva.alojamiento"></span>
+                        </div>
+                        <div class="flex justify-between items-center gap-4" x-show="reserva.checkin">
+                            <span class="text-gray-500 font-medium">Fechas</span>
+                            <span class="font-bold text-navy text-right"
+                                x-text="`${reserva.checkin} al ${reserva.checkout}`"></span>
+                        </div>
+                        <div class="flex justify-between items-center gap-4" x-show="reserva.noches">
+                            <span class="text-gray-500 font-medium">Noches</span>
+                            <span class="font-bold text-navy" x-text="reserva.noches"></span>
+                        </div>
+                        <div class="flex justify-between items-center gap-4" x-show="totalHuespedes > 0">
+                            <span class="text-gray-500 font-medium">Huéspedes</span>
+                            <span class="font-bold text-navy" x-text="totalHuespedes"></span>
+                        </div>
+                        <div class="flex justify-between items-center gap-4" x-show="reserva.mascotas > 0">
+                            <span class="text-gray-500 font-medium">Mascotas</span>
+                            <span class="font-bold text-navy" x-text="reserva.mascotas"></span>
+                        </div>
+                        <div class="flex justify-between items-center gap-4 lg:col-span-2" x-show="referencia">
+                            <span class="text-gray-500 font-medium">Referencia</span>
+                            <span class="font-bold text-navy text-xs break-all text-right" x-text="referencia"></span>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center gap-4" x-show="reserva.checkin">
-                        <span class="text-gray-500 font-medium">Fechas</span>
-                        <span class="font-bold text-navy text-right"
-                            x-text="`${reserva.checkin} al ${reserva.checkout}`"></span>
-                    </div>
-                    <div class="flex justify-between items-center gap-4" x-show="reserva.noches">
-                        <span class="text-gray-500 font-medium">Noches</span>
-                        <span class="font-bold text-navy" x-text="reserva.noches"></span>
-                    </div>
-                    <div class="flex justify-between items-center gap-4" x-show="totalHuespedes > 0">
-                        <span class="text-gray-500 font-medium">Huéspedes</span>
-                        <span class="font-bold text-navy" x-text="totalHuespedes"></span>
-                    </div>
-                    <div class="flex justify-between items-center gap-4" x-show="reserva.mascotas > 0">
-                        <span class="text-gray-500 font-medium">Mascotas</span>
-                        <span class="font-bold text-navy" x-text="reserva.mascotas"></span>
-                    </div>
-                    <div class="flex justify-between items-center gap-4" x-show="referencia">
-                        <span class="text-gray-500 font-medium">Referencia</span>
-                        <span class="font-bold text-navy text-xs break-all text-right" x-text="referencia"></span>
+
+                    <div class="mt-6 lg:mt-5 lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-4">
+                        <!-- Total -->
+                        <div class="bg-navy rounded-2xl p-5 lg:p-4 text-center shadow-lg shadow-navy/20 lg:flex lg:flex-col lg:justify-center"
+                            x-show="reserva.total">
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1"
+                                x-text="estado === 'aprobado' ? 'Total pagado' : 'Total de la reserva'"></p>
+                            <p class="text-3xl lg:text-2xl font-black text-gold" x-text="reserva.total"></p>
+                        </div>
+
+                        <!-- Datos de contacto -->
+                        <div class="mt-6 lg:mt-0 bg-white border border-gray-200 rounded-2xl p-4"
+                            x-show="reserva.telefonoHuesped || reserva.email">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Te
+                                contactaremos a</p>
+                            <p class="text-sm font-bold text-navy" x-show="reserva.telefonoHuesped"
+                                x-text="`📱 ${reserva.telefonoHuesped}`"></p>
+                            <p class="text-sm lg:text-xs font-bold text-navy break-all" x-show="reserva.email"
+                                x-text="`✉️ ${reserva.email}`"></p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Total -->
-                <div class="bg-navy rounded-2xl p-5 text-center shadow-lg shadow-navy/20 mt-6" x-show="reserva.total">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1"
-                        x-text="estado === 'aprobado' ? 'Total pagado' : 'Total de la reserva'"></p>
-                    <p class="text-3xl font-black text-gold" x-text="reserva.total"></p>
+                <!-- Acciones -->
+                <div class="p-8 pt-6 lg:px-8 lg:py-5 bg-white border-t border-gray-100 text-center"
+                    x-show="estado !== 'verificando'">
+                    <div class="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3">
+
+                        <!-- Aprobado -->
+                        <template x-if="estado === 'aprobado'">
+                            <button @click="irAWhatsApp()"
+                                class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold text-base lg:text-[15px] whitespace-nowrap px-4 py-4 lg:py-3.5 rounded-full transition-colors shadow-lg shadow-gold/30 flex items-center justify-center gap-2">
+                                <span class="w-5 h-5 shrink-0" x-html="iconoWhatsApp"></span>
+                                Recibir instrucciones
+                            </button>
+                        </template>
+                        <template x-if="estado === 'aprobado'">
+                            <a :href="urlMiReserva()"
+                                class="w-full bg-navy hover:bg-blue-900 text-white font-extrabold text-base lg:text-[15px] whitespace-nowrap px-4 py-4 lg:py-3.5 rounded-full transition-colors flex items-center justify-center">
+                                Ver mi reserva
+                            </a>
+                        </template>
+
+                        <!-- Pendiente -->
+                        <template x-if="estado === 'pendiente'">
+                            <button @click="verificarConReintentos()"
+                                class="w-full bg-navy hover:bg-blue-900 text-white font-extrabold text-base lg:text-[15px] whitespace-nowrap px-4 py-4 lg:py-3.5 rounded-full transition-colors">
+                                Verificar de nuevo
+                            </button>
+                        </template>
+                        <template x-if="estado === 'pendiente'">
+                            <button @click="irAWhatsApp()"
+                                class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold text-base lg:text-[15px] whitespace-nowrap px-4 py-4 lg:py-3.5 rounded-full transition-colors shadow-lg shadow-gold/30 flex items-center justify-center gap-2">
+                                <span class="w-5 h-5 shrink-0" x-html="iconoWhatsApp"></span>
+                                Escribir por WhatsApp
+                            </button>
+                        </template>
+
+                        <!-- Rechazado -->
+                        <template x-if="estado === 'fallido'">
+                            <a :href="urlReintentar()"
+                                :class="preparandoReintento ? 'opacity-60 pointer-events-none' : ''"
+                                class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold text-base lg:text-[15px] whitespace-nowrap px-4 py-4 lg:py-3.5 rounded-full transition-colors shadow-lg shadow-gold/30 flex items-center justify-center"
+                                x-text="preparandoReintento ? 'Preparando...' : 'Intentar de nuevo'"></a>
+                        </template>
+                        <template x-if="estado === 'fallido'">
+                            <button @click="irAWhatsApp()"
+                                class="w-full bg-navy hover:bg-blue-900 text-white font-extrabold text-base lg:text-[15px] whitespace-nowrap px-4 py-4 lg:py-3.5 rounded-full transition-colors flex items-center justify-center gap-2">
+                                <span class="w-5 h-5 shrink-0" x-html="iconoWhatsApp"></span>
+                                Escribir por WhatsApp
+                            </button>
+                        </template>
+                    </div>
+
+                    <a href="alojamientos.html"
+                        class="inline-block mt-5 lg:mt-4 text-sm font-bold text-navy underline hover:text-gold transition-colors">Ver
+                        otros alojamientos</a>
                 </div>
-
-                <!-- Datos de contacto -->
-                <div class="mt-6 bg-white border border-gray-200 rounded-2xl p-4"
-                    x-show="reserva.telefonoHuesped || reserva.email">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Te contactaremos a
-                    </p>
-                    <p class="text-sm font-bold text-navy" x-show="reserva.telefonoHuesped"
-                        x-text="`📱 ${reserva.telefonoHuesped}`"></p>
-                    <p class="text-sm font-bold text-navy break-all" x-show="reserva.email"
-                        x-text="`✉️ ${reserva.email}`"></p>
-                </div>
-            </div>
-
-            <!-- ============ ACCIONES ============ -->
-            <div class="p-8 pt-6 bg-white border-t border-gray-100 text-center" x-show="estado !== 'verificando'">
-                <button x-show="estado === 'pendiente'" @click="verificarConReintentos()"
-                    class="w-full mb-3 bg-navy hover:bg-blue-900 text-white font-extrabold py-4 rounded-full transition-colors shadow-lg shadow-navy/20">
-                    Volver a verificar
-                </button>
-
-                <button @click="irAWhatsApp()"
-                    class="w-full bg-gold hover:bg-yellow-500 text-navy font-extrabold py-4 rounded-full transition-transform hover:-translate-y-0.5 shadow-lg shadow-gold/30 flex items-center justify-center gap-3">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
-                    </svg>
-                    <span
-                        x-text="estado === 'aprobado' ? 'Recibir instrucciones de acceso' : 'Hablar con GestandoValor'"></span>
-                </button>
-
-                <a :href="enlaceAlojamiento()"
-                    class="inline-block mt-6 text-sm font-bold text-navy underline hover:text-gold transition-colors"
-                    x-text="propiedadId && estado !== 'fallido' ? 'Ver mi reserva' : 'Ver alojamientos'"></a>
             </div>
         </div>
 
-        <p class="text-gray-500 text-xs tracking-[0.2em] uppercase font-medium mt-8 text-center">
+        <p class="text-gray-500 text-xs tracking-[0.2em] uppercase font-medium mt-8 lg:mt-3 text-center">
             GestandoValor <span class="text-gold">Apartasuites</span>
         </p>
     </main>
@@ -220,9 +297,20 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('confirmacionApp', () => ({
                 estado: 'verificando', // verificando | aprobado | pendiente | fallido
+                estadoUrl: '',
                 referencia: '',
-                propiedadId: '',
                 verificando: false,
+                preparandoReintento: false,
+
+                iconoWhatsApp: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>',
+
+                // Datos que devuelve el servidor (sirven en cualquier dispositivo)
+                servidor: {
+                    propiedad_id: '', check_in: '', check_out: '', foto_portada: '', ciudad: '', departamento: '',
+                    adultos: 0, ninos: 0, bebes: 0, mascotas: 0
+                },
+
+                // Datos que guardó el navegador antes de ir a Bold
                 reserva: {
                     nombre: '',
                     telefonoHuesped: '',
@@ -247,10 +335,14 @@
                     return (Number(this.reserva.adultos) || 0) + (Number(this.reserva.ninos) || 0);
                 },
 
+                get ubicacion() {
+                    return [this.servidor.ciudad, this.servidor.departamento].filter(Boolean).join(', ');
+                },
+
                 async init() {
                     // Bold regresa así: confirmacion.html?bold-order-id=BP-123&bold-tx-status=approved
                     const params = new URLSearchParams(window.location.search);
-                    const estadoUrl = (params.get('bold-tx-status') || '').toLowerCase();
+                    this.estadoUrl = (params.get('bold-tx-status') || '').toLowerCase();
 
                     try {
                         const guardados = JSON.parse(localStorage.getItem('reservaExitosa') || 'null');
@@ -266,10 +358,13 @@
                         return;
                     }
 
-                    // Si Bold ya dijo que falló, lo mostramos de una vez y liberamos las fechas
-                    if (['rejected', 'failed', 'voided'].includes(estadoUrl)) {
+                    // Si Bold ya dijo que falló, lo mostramos de una vez.
+                    // La consulta libera las fechas para poder pagar de nuevo.
+                    if (['rejected', 'failed', 'voided'].includes(this.estadoUrl)) {
                         this.estado = 'fallido';
-                        this.consultarEstado();
+                        this.preparandoReintento = true;
+                        await this.consultarEstado();
+                        this.preparandoReintento = false;
                         return;
                     }
 
@@ -300,14 +395,14 @@
                         const res = await fetch(`${API_GV}/pagos/verificar`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ referencia: this.referencia })
+                            body: JSON.stringify({ referencia: this.referencia, estado_bold: this.estadoUrl })
                         });
 
                         if (res.status === 404) return 'rechazado';
                         if (!res.ok) return null;
 
                         const data = await res.json();
-                        if (data.propiedad_id) this.propiedadId = data.propiedad_id;
+                        this.servidor = { ...this.servidor, ...data };
 
                         // Si abrieron la página en otro dispositivo, completamos con los datos del servidor
                         if (!this.reserva.alojamiento && data.alojamiento) this.reserva.alojamiento = data.alojamiento;
@@ -316,6 +411,12 @@
                             this.reserva.checkout = fechaCorta(data.check_out);
                         }
                         if (!this.reserva.total && data.monto) this.reserva.total = formatearDinero(data.monto);
+                        if (!this.totalHuespedes && data.adultos) {
+                            this.reserva.adultos = data.adultos;
+                            this.reserva.ninos = data.ninos;
+                            this.reserva.bebes = data.bebes;
+                            this.reserva.mascotas = data.mascotas;
+                        }
 
                         return data.estado;
                     } catch (e) {
@@ -324,11 +425,26 @@
                     }
                 },
 
-                enlaceAlojamiento() {
-                    if (this.propiedadId && this.estado !== 'fallido') {
-                        return `suite.html?id=${this.propiedadId}&reserva=${encodeURIComponent(this.referencia)}`;
-                    }
-                    return 'alojamientos.html';
+                urlMiReserva() {
+                    if (!this.servidor.propiedad_id) return 'alojamientos.html';
+                    return `suite.html?id=${this.servidor.propiedad_id}&reserva=${encodeURIComponent(this.referencia)}`;
+                },
+
+                // Vuelve a la publicación con las mismas fechas y huéspedes, lista para pagar
+                urlReintentar() {
+                    const s = this.servidor;
+                    if (!s.propiedad_id) return 'alojamientos.html';
+                    const params = new URLSearchParams({
+                        id: s.propiedad_id,
+                        in: s.check_in,
+                        out: s.check_out,
+                        ad: s.adultos || 1,
+                        ni: s.ninos || 0,
+                        bb: s.bebes || 0,
+                        ma: s.mascotas || 0,
+                        reintentar: '1'
+                    });
+                    return `suite.html?${params.toString()}`;
                 },
 
                 irAWhatsApp() {

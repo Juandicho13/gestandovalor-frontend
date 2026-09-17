@@ -169,56 +169,55 @@
 
     <main class="pt-36 pb-16 max-w-[1400px] mx-auto px-6 lg:px-12" x-show="!cargando" style="display: none;">
 
+        <!-- ✨ GALERÍA estilo Airbnb: ancho completo, poca separación y esquinas suaves -->
+        <section class="relative rounded-xl overflow-hidden mb-8 md:mb-10">
+
+            <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-[clamp(360px,42vw,560px)] bg-white cursor-pointer"
+                @click="openModalFotos = true">
+                <div class="col-span-2 row-span-2 relative overflow-hidden bg-gray-200">
+                    <template x-if="propiedad.fotos && propiedad.fotos.length > 0">
+                        <img :src="propiedad.fotos[0]" decoding="async" fetchpriority="high"
+                            class="w-full h-full object-cover hover:brightness-90 transition duration-300">
+                    </template>
+                </div>
+
+                <template x-for="i in [1, 2, 3, 4]" :key="i">
+                    <div class="relative overflow-hidden bg-gray-200">
+                        <template x-if="propiedad.fotos && propiedad.fotos.length > i">
+                            <img :src="propiedad.fotos[i]" loading="lazy" decoding="async"
+                                class="w-full h-full object-cover hover:brightness-90 transition duration-300">
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <div class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100 cursor-pointer"
+                @click="openModalFotos = true">
+                <template x-for="(foto, i) in (propiedad.fotos || [])" :key="i">
+                    <div class="w-full h-full shrink-0 snap-center relative">
+                        <img :src="foto" :loading="i === 0 ? 'eager' : 'lazy'" :decoding="i === 0 ? 'sync' : 'async'"
+                            class="w-full h-full object-cover">
+                        <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-widest"
+                            x-text="`${i + 1} / ${propiedad.fotos.length}`">
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <button @click="openModalFotos = true"
+                class="absolute bottom-5 right-5 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-lg text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm z-10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                    </path>
+                </svg>
+                Ver todas
+            </button>
+        </section>
+
         <div class="flex flex-col lg:flex-row gap-12 relative">
 
             <div class="w-full lg:w-[65%] xl:w-[70%]">
-
-                <section
-                    class="relative rounded-2xl md:rounded-[32px] overflow-hidden mb-8 md:mb-12 shadow-lg md:shadow-lg shadow-gray-200/50">
-
-                    <div class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[400px] bg-gray-100 cursor-pointer"
-                        @click="openModalFotos = true">
-                        <div class="col-span-2 row-span-2 relative group overflow-hidden bg-gray-200">
-                            <template x-if="propiedad.fotos && propiedad.fotos.length > 0">
-                                <img :src="propiedad.fotos[0]" decoding="sync"
-                                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                            </template>
-                            <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors">
-                            </div>
-                        </div>
-
-                        <template x-for="i in [1, 2, 3, 4]" :key="i">
-                            <div class="relative group overflow-hidden bg-gray-200">
-                                <template x-if="propiedad.fotos && propiedad.fotos.length > i">
-                                    <img :src="propiedad.fotos[i]" loading="lazy" decoding="async"
-                                        class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                                </template>
-                            </div>
-                        </template>
-                    </div>
-
-                    <div class="flex md:hidden overflow-x-auto snap-x snap-mandatory h-[280px] sm:h-[350px] scroll-smooth no-scrollbar bg-gray-100 cursor-pointer"
-                        @click="openModalFotos = true">
-                        <template x-for="(foto, i) in (propiedad.fotos || [])" :key="i">
-                            <div class="w-full h-full shrink-0 snap-center relative">
-                                <img :src="foto" :loading="i === 0 ? 'eager' : 'lazy'"
-                                    :decoding="i === 0 ? 'sync' : 'async'" class="w-full h-full object-cover">
-                                <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-widest"
-                                    x-text="`${i + 1} / ${propiedad.fotos.length}`">
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    <button @click="openModalFotos = true"
-                        class="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-xl text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm z-10">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                            </path>
-                        </svg>
-                        Ver todas
-                    </button>
                 </section>
 
                 <div class="flex justify-between items-start pb-8 border-b border-gray-100">
@@ -289,7 +288,7 @@
                     </div>
 
                     <div
-                        class="relative w-full h-[350px] md:h-[450px] rounded-[32px] overflow-hidden shadow-xl border border-gray-100">
+                        class="relative w-full h-[350px] md:h-[450px] rounded-xl overflow-hidden border border-gray-200">
                         <button @click="centrarMapa()"
                             class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm text-navy font-bold py-2.5 px-4 rounded-full shadow-lg border border-gray-200 flex items-center gap-2 hover:bg-white transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,7 +309,7 @@
                 <!-- ✨ MODO "MI RESERVA": resumen de la compra, sin opciones de pago -->
                 <template x-if="modoReserva">
                     <div
-                        class="sticky top-28 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-[32px] p-5 lg:p-6 text-white">
+                        class="sticky top-28 bg-navy shadow-[0_20px_40px_rgba(0,0,0,0.3)] rounded-2xl p-5 lg:p-6 text-white">
 
                         <!-- Cargando -->
                         <div x-show="cargandoReserva" class="py-10 flex flex-col items-center">
@@ -1255,19 +1254,31 @@
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');
-            const largoPildora = 'max-w-[760px]';
 
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    logo.classList.replace('h-16', 'h-10');
-                    navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
-                    navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
+            // Mismos colores que el resto del sitio; la píldora va casi sólida
+            // porque esta página tiene fondo blanco
+            const arriba = ['top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-6', 'md:px-10', 'border-b', 'bg-navy'];
+            const pildora = ['top-5', 'w-[95%]', 'max-w-[850px]', 'h-16', 'rounded-full', 'px-4', 'md:px-6', 'shadow-2xl', 'border', 'bg-navy/95'];
+            let enPildora = null;
+
+            const actualizar = () => {
+                const bajo = window.scrollY > 50;
+                if (bajo === enPildora) return; // solo cambia cuando cruza el límite
+                enPildora = bajo;
+
+                if (bajo) {
+                    navbar.classList.remove(...arriba);
+                    navbar.classList.add(...pildora);
+                    logo.style.height = '40px';
                 } else {
-                    logo.classList.replace('h-10', 'h-16');
-                    navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-14', 'rounded-full', 'px-6', 'shadow-2xl', 'border', 'bg-navy/50');
-                    navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-10', 'border-b', 'bg-navy');
+                    navbar.classList.remove(...pildora);
+                    navbar.classList.add(...arriba);
+                    logo.style.height = '';
                 }
-            });
+            };
+
+            window.addEventListener('scroll', actualizar, { passive: true });
+            actualizar();
         });
 
         function getLocalDateString(d) {
@@ -1403,7 +1414,32 @@
                         console.error(e);
                     } finally {
                         this.cargando = false;
-                        setTimeout(() => this.initCalendario(inDate, outDate), 100);
+                        setTimeout(() => {
+                            this.initCalendario(inDate, outDate);
+                            // Viene de un pago rechazado: deja todo listo para pagar otra vez
+                            if (params.get('reintentar') && !this.modoReserva) this.prepararReintento();
+                        }, 100);
+                    }
+                },
+
+                prepararReintento() {
+                    // Recuperamos nombre, celular y correo del intento anterior
+                    try {
+                        const previo = JSON.parse(localStorage.getItem('reservaExitosa') || 'null');
+                        if (previo) {
+                            this.nombreHuesped = previo.nombre || this.nombreHuesped;
+                            this.telefonoHuesped = previo.telefonoHuesped || this.telefonoHuesped;
+                            this.emailHuesped = previo.email || this.emailHuesped;
+                        }
+                    } catch (e) { }
+
+                    // Quitamos "reintentar" de la dirección para que no se repita al recargar
+                    const url = new URL(window.location);
+                    url.searchParams.delete('reintentar');
+                    window.history.replaceState({}, '', url);
+
+                    if (this.noches > 0 && !this.haySuperposicion(this.checkinRaw, this.checkoutRaw)) {
+                        this.abrirModalPago();
                     }
                 },
 

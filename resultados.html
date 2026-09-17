@@ -70,10 +70,10 @@
 
 
     <nav id="navbar"
-        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-md overflow-visible border-white/10 w-full max-w-full h-24 rounded-none px-3 md:px-10 border-b bg-navy/90 shadow-sm">
+        class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-visible border-white/10 w-full max-w-full h-24 rounded-none px-4 md:px-10 border-b bg-navy">
 
-        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 w-[40px] md:w-[120px]">
-            <img id="nav-logo-combined" src="GV.png" alt="Logo"
+        <a href="index.html" class="flex items-center transition-all duration-700 flex-shrink-0 md:w-[120px]">
+            <img id="nav-logo-combined" src="GV.png" alt="GestandoValor"
                 class="h-12 md:h-16 w-auto object-contain transition-all duration-700">
         </a>
 
@@ -243,7 +243,7 @@
                     class="group cursor-pointer flex flex-col tarjeta-lazy">
 
                     <div
-                        class="relative w-full aspect-[4/3] rounded-[24px] overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200">
+                        class="relative w-full aspect-[20/19] rounded-[24px] overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200">
 
                         <!-- Placeholder local: aparece solo si la propiedad no tiene fotos. Cero peticiones a la red. -->
                         <template x-if="!prop.fotos || prop.fotos.length === 0">
@@ -665,19 +665,31 @@
                 activarNavbarDinamica() {
                     const navbar = document.getElementById('navbar');
                     const logo = document.getElementById('nav-logo-combined');
-                    const largoPildora = 'max-w-[850px]';
 
-                    window.addEventListener('scroll', () => {
-                        if (window.scrollY > 50) {
-                            logo.classList.replace('h-16', 'h-10');
-                            navbar.classList.remove('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy/90');
-                            navbar.classList.add('top-5', 'w-[95%]', largoPildora, 'h-16', 'rounded-full', 'px-6', 'shadow-[0_20px_40px_rgba(0,0,0,0.3)]', 'border', 'bg-navy/80');
+                    // Mismos colores que el resto del sitio; la píldora va casi sólida
+                    // porque esta página tiene fondo blanco
+                    const arriba = ['top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy'];
+                    const pildora = ['top-5', 'w-[95%]', 'max-w-[850px]', 'h-16', 'rounded-full', 'px-4', 'md:px-6', 'shadow-2xl', 'border', 'bg-navy/95'];
+                    let enPildora = null;
+
+                    const actualizar = () => {
+                        const bajo = window.scrollY > 50;
+                        if (bajo === enPildora) return; // solo cambia cuando cruza el límite
+                        enPildora = bajo;
+
+                        if (bajo) {
+                            navbar.classList.remove(...arriba);
+                            navbar.classList.add(...pildora);
+                            logo.style.height = '40px';
                         } else {
-                            logo.classList.replace('h-10', 'h-16');
-                            navbar.classList.remove('top-5', 'w-[95%]', largoPildora, 'h-16', 'rounded-full', 'px-6', 'shadow-[0_20px_40px_rgba(0,0,0,0.3)]', 'border', 'bg-navy/80');
-                            navbar.classList.add('top-0', 'w-full', 'max-w-full', 'h-24', 'rounded-none', 'px-4', 'md:px-10', 'border-b', 'bg-navy/90');
+                            navbar.classList.remove(...pildora);
+                            navbar.classList.add(...arriba);
+                            logo.style.height = '';
                         }
-                    });
+                    };
+
+                    window.addEventListener('scroll', actualizar, { passive: true });
+                    actualizar();
                 }
             }
         }
