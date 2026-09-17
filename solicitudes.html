@@ -259,17 +259,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Seguridad: Redirigir si no es ADMIN
-            const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
-            if (usuarioGuardado) {
-                const usuario = JSON.parse(usuarioGuardado);
-                if (usuario.rol !== 'ADMIN') {
-                    alert('⛔ Acceso denegado. Área exclusiva de Administración.');
-                    window.location.href = 'login.html';
-                }
-            } else {
-                window.location.href = 'login.html';
-            }
+
 
             const navbar = document.getElementById('navbar');
             const logo = document.getElementById('nav-logo-combined');

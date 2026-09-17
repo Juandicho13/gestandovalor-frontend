@@ -27,15 +27,8 @@
     </script>
 </head>
 
-<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="{ mobileMenuOpen: false, modalBlog: false }"
-    x-init="
-    // ✨ GUARDIA DE SEGURIDAD DEL ADMIN ✨
-    const usuario = JSON.parse(localStorage.getItem('gv_usuario_actual') || '{}');
-    if (usuario.rol !== 'ADMIN') {
-        alert('⛔ Acceso denegado. Área exclusiva de Administración.');
-        window.location.href = 'login.html';
-    }
-">
+<body class="font-sans text-gray-800 antialiased bg-lightGray" x-data="{ mobileMenuOpen: false, modalBlog: false }">
+    initApp()
 
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
@@ -104,7 +97,7 @@
 
             <button @click="localStorage.removeItem('gv_usuario_actual'); window.location.href = 'login.html'"
                 class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">
-                Salir del Sistema
+                Salir
             </button>
         </div>
     </div>

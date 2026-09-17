@@ -198,7 +198,8 @@
                         </div>
                         <div class="divide-y divide-gray-100">
                             <template x-for="nov in novedades" :key="nov.id">
-                                <div class="p-6 md:px-8 hover:bg-gray-50 transition-colors flex items-center gap-5">
+                                <div class="p-6 md:px-8 hover:bg-gray-50 transition-colors flex items-center gap-5 cursor-pointer"
+                                    @click="abrirNovedad(nov)">
                                     <div
                                         class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-danger flex-shrink-0">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,15 +207,26 @@
                                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                         </svg>
                                     </div>
-                                    <div>
-                                        <h3 class="font-bold text-navy text-lg" x-text="nov.novedad_reportada"></h3>
-                                        <div class="flex items-center gap-2 mt-1.5">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-bold text-navy text-lg line-clamp-2"
+                                            x-text="nov.novedad_reportada"></h3>
+                                        <div class="flex flex-wrap items-center gap-2 mt-1.5">
                                             <span class="text-xs font-bold text-navy bg-gray-100 px-3 py-1 rounded-full"
                                                 x-text="nov.propiedad ? nov.propiedad.titulo : 'Propiedad'"></span>
                                             <span class="text-xs text-gray-400"
                                                 x-text="new Date(nov.created_at).toLocaleDateString('es-CO')"></span>
+                                            <span class="text-xs font-bold px-3 py-1 rounded-full"
+                                                :class="(nov.fotos || []).length > 0 ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400'"
+                                                x-text="(nov.fotos || []).length > 0 ? `📷 ${nov.fotos.length} foto${nov.fotos.length > 1 ? 's' : ''}` : 'Sin fotos'"></span>
                                         </div>
                                     </div>
+                                    <button @click.stop="eliminarNovedad(nov)" title="Eliminar reporte"
+                                        class="p-2.5 rounded-full text-gray-400 hover:text-danger hover:bg-red-50 transition-colors flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </template>
                             <div x-show="novedades.length === 0" class="p-10 text-center">
@@ -222,92 +234,156 @@
                                 <p class="text-gray-500 font-medium">Todo en orden. No hay novedades reportadas.</p>
                             </div>
                         </div>
-                    </div>
 
-                </div>
-            </div>
-
-            <div x-show="vistaActiva === 'usuarios'" x-transition.opacity style="display: none;">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <h2 class="text-2xl font-extrabold text-navy">Directorio General de Usuarios</h2>
-                    <button @click="abrirModalCrear()"
-                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2 border border-yellow-600 w-full md:w-auto justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                        </svg>
-                        + Nuevo Usuario
-                    </button>
-                </div>
-
-                <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-50 border-b border-gray-100">
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-                                        Nombre</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rol
-                                    </th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-                                        Usuario (Login)</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-                                        Propiedades</th>
-                                    <th
-                                        class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">
-                                        Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                <template x-for="usr in usuarios" :key="usr.id || usr.username">
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="p-5">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                                                    :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
-                                                    x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
-                                                </div>
-                                                <p class="font-bold text-navy" x-text="usr.nombre"></p>
+                        <!-- ✨ Detalle del reporte: las fotos solo se cargan al abrirlo -->
+                        <div x-show="novedadActiva" style="display: none;"
+                            class="fixed inset-0 z-[200] flex items-center justify-center px-4" x-transition.opacity>
+                            <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="novedadActiva = null">
+                            </div>
+                            <div
+                                class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
+                                <template x-if="novedadActiva">
+                                    <div>
+                                        <div class="flex items-start justify-between gap-4 mb-5">
+                                            <div>
+                                                <p
+                                                    class="text-[11px] font-black text-danger uppercase tracking-widest mb-1">
+                                                    Reporte de novedad</p>
+                                                <h3 class="text-2xl font-extrabold text-navy"
+                                                    x-text="novedadActiva.propiedad ? novedadActiva.propiedad.titulo : 'Propiedad'">
+                                                </h3>
+                                                <p class="text-xs text-gray-400 mt-1"
+                                                    x-text="`${new Date(novedadActiva.created_at).toLocaleDateString('es-CO')}${novedadActiva.empleado ? ' · ' + novedadActiva.empleado.nombre : ''}`">
+                                                </p>
                                             </div>
-                                        </td>
-                                        <td class="p-5">
-                                            <span
-                                                class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
-                                                :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }"
-                                                x-text="formatearRol(usr.rol)">
-                                            </span>
-                                        </td>
-                                        <td class="p-5">
-                                            <span
-                                                class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200"
-                                                x-text="usr.username"></span>
-                                        </td>
-                                        <td class="p-5">
-                                            <span x-show="usr.rol === 'PROPIETARIO'"
-                                                class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30">
-                                                <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span>
-                                                Asignadas
-                                            </span>
-                                            <span x-show="usr.rol !== 'PROPIETARIO'"
-                                                class="text-xs text-gray-400 font-bold">-</span>
-                                        </td>
-                                        <td class="p-5 text-right">
-                                            <button @click="abrirEdicion(usr)"
-                                                class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
-                                            <button @click="eliminarUsuario(usr.id, usr.nombre)"
-                                                class="text-red-400 hover:text-danger font-bold text-sm transition-colors">Eliminar</button>
-                                        </td>
-                                    </tr>
+                                            <button @click="novedadActiva = null"
+                                                class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <p class="text-navy bg-gray-50 border border-gray-100 rounded-2xl p-4 whitespace-pre-line"
+                                            x-text="novedadActiva.novedad_reportada"></p>
+
+                                        <div class="mt-5" x-show="(novedadActiva.fotos || []).length > 0">
+                                            <p
+                                                class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                                                Evidencia fotográfica</p>
+                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                <template x-for="(foto, i) in (novedadActiva.fotos || [])" :key="i">
+                                                    <a :href="foto" target="_blank" rel="noopener"
+                                                        class="block aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                        <img :src="foto" decoding="async"
+                                                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                                                    </a>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <p class="mt-5 text-sm text-gray-400"
+                                            x-show="(novedadActiva.fotos || []).length === 0">Este reporte no tiene
+                                            fotos.</p>
+
+                                        <div class="mt-6 flex justify-end">
+                                            <button @click="eliminarNovedad(novedadActiva)"
+                                                :disabled="eliminandoNovedad"
+                                                class="bg-red-50 text-danger hover:bg-red-100 font-bold px-5 py-3 rounded-xl transition-colors disabled:opacity-60"
+                                                x-text="eliminandoNovedad ? 'Eliminando...' : 'Eliminar reporte'"></button>
+                                        </div>
+                                    </div>
                                 </template>
-                                <tr x-show="usuarios.length === 0">
-                                    <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay usuarios
-                                        registrados en la base de datos.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
+        </div>
+
+        <div x-show="vistaActiva === 'usuarios'" x-transition.opacity style="display: none;">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <h2 class="text-2xl font-extrabold text-navy">Directorio General de Usuarios</h2>
+                <button @click="abrirModalCrear()"
+                    class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2 border border-yellow-600 w-full md:w-auto justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    + Nuevo Usuario
+                </button>
+            </div>
+
+            <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-100">
+                                <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                    Nombre</th>
+                                <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rol
+                                </th>
+                                <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                    Usuario (Login)</th>
+                                <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                    Propiedades</th>
+                                <th
+                                    class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <template x-for="usr in usuarios" :key="usr.id || usr.username">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-5">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                                                :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
+                                                x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
+                                            </div>
+                                            <p class="font-bold text-navy" x-text="usr.nombre"></p>
+                                        </div>
+                                    </td>
+                                    <td class="p-5">
+                                        <span
+                                            class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
+                                            :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }"
+                                            x-text="formatearRol(usr.rol)">
+                                        </span>
+                                    </td>
+                                    <td class="p-5">
+                                        <span
+                                            class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200"
+                                            x-text="usr.username"></span>
+                                    </td>
+                                    <td class="p-5">
+                                        <span x-show="usr.rol === 'PROPIETARIO'"
+                                            class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30">
+                                            <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span>
+                                            Asignadas
+                                        </span>
+                                        <span x-show="usr.rol !== 'PROPIETARIO'"
+                                            class="text-xs text-gray-400 font-bold">-</span>
+                                    </td>
+                                    <td class="p-5 text-right">
+                                        <button @click="abrirEdicion(usr)"
+                                            class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
+                                        <button @click="eliminarUsuario(usr.id, usr.nombre)"
+                                            class="text-red-400 hover:text-danger font-bold text-sm transition-colors">Eliminar</button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr x-show="usuarios.length === 0">
+                                <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay usuarios
+                                    registrados en la base de datos.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         </div>
     </section>
@@ -442,6 +518,8 @@
 
                 equipoRadar: [],
                 novedades: [],
+                novedadActiva: null,
+                eliminandoNovedad: false,
 
                 modalFormulario: false,
                 modoEdicion: false,
@@ -503,6 +581,27 @@
                         console.error("Error cargando base de datos:", error);
                     } finally {
                         this.cargando = false;
+                    }
+                },
+
+                // ✨ NOVEDADES: ver detalle (con fotos) y eliminar
+                abrirNovedad(nov) {
+                    this.novedadActiva = nov;
+                },
+
+                async eliminarNovedad(nov) {
+                    if (!confirm('¿Eliminar este reporte y sus fotos? La tarea de aseo no se borra.')) return;
+                    this.eliminandoNovedad = true;
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${nov.id}/novedad`, { method: 'DELETE' });
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        this.novedades = this.novedades.filter(n => n.id !== nov.id);
+                        if (this.novedadActiva && this.novedadActiva.id === nov.id) this.novedadActiva = null;
+                    } catch (e) {
+                        console.error(e);
+                        alert('No se pudo eliminar el reporte. Intenta de nuevo.');
+                    } finally {
+                        this.eliminandoNovedad = false;
                     }
                 },
 

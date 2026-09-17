@@ -571,20 +571,41 @@
             </div>
             <div class="space-y-4">
                 <template x-for="tarea in tareasConReporte" :key="tarea.id">
-                    <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl flex items-start gap-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-navy"
-                                x-text="`Reporte en ${(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')}`">
-                            </h4>
-                            <p class="text-xs text-gray-500 mt-1"
-                                x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`"></p>
-                            <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100"
-                                x-text="`&quot;${tarea.novedad_reportada}&quot;`"></p>
-                        </div>
+                    <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl">
+                        <h4 class="text-sm font-bold text-navy"
+                            x-text="`Reporte en ${(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')}`">
+                        </h4>
+                        <p class="text-xs text-gray-500 mt-1" x-text="`Reportado por: ${tarea.nombreEmpleadoSeguro}`">
+                        </p>
+                        <p class="text-xs text-gray-600 mt-2 bg-white p-2 rounded border border-gray-100 whitespace-pre-line"
+                            x-text="tarea.novedad_reportada"></p>
+
+                        <!-- ✨ Fotos: solo se cargan al tocar el botón -->
+                        <button x-show="(tarea.fotos || []).length > 0"
+                            @click="novedadConFotos = (novedadConFotos === tarea.id ? null : tarea.id)"
+                            class="mt-3 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full transition-colors"
+                            x-text="novedadConFotos === tarea.id ? 'Ocultar fotos' : `📷 Ver ${tarea.fotos.length} foto${tarea.fotos.length > 1 ? 's' : ''}`"></button>
+                        <p x-show="(tarea.fotos || []).length === 0" class="mt-2 text-[11px] text-gray-400">Sin fotos
+                        </p>
+
+                        <template x-if="novedadConFotos === tarea.id">
+                            <div class="grid grid-cols-3 gap-2 mt-3">
+                                <template x-for="(foto, i) in tarea.fotos" :key="i">
+                                    <a :href="foto" target="_blank" rel="noopener"
+                                        class="block aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                                        <img :src="foto" decoding="async" class="w-full h-full object-cover">
+                                    </a>
+                                </template>
+                            </div>
+                        </template>
                     </div>
                 </template>
+                <p x-show="tareasConReporte.length === 0" class="text-center text-sm text-gray-400 py-6">No hay
+                    novedades reportadas.</p>
             </div>
+            </template>
         </div>
+    </div>
     </div>
 
     <script>
@@ -610,6 +631,7 @@
                 auditoriaChecklist: {},
 
                 modalReportes: false,
+                novedadConFotos: null,
 
                 // Copia del Checklist de 89 tareas
                 categoriasChecklist: [
@@ -655,11 +677,7 @@
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
-                        if (usuario.rol !== 'AMA_LLAVES' && usuario.rol !== 'ADMIN') {
-                            alert('⛔ Acceso denegado. Pantalla exclusiva para Ama de Llaves.');
-                            window.location.href = 'login.html';
-                            return;
-                        }
+
                         this.nombreUsuario = usuario.nombre.split(' ')[0];
                         this.iniciales = this.nombreUsuario.substring(0, 2).toUpperCase();
                     } else {
