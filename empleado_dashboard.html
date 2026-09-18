@@ -714,11 +714,6 @@
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
 
-                        if (usuario.rol !== 'ASEO' && usuario.rol !== 'ADMIN') {
-                            alert('⛔ Acceso denegado.');
-                            window.location.href = 'login.html';
-                            return;
-                        }
 
                         this.empleadoId = usuario.id;
                         this.empleadoNombre = usuario.nombre;
@@ -824,7 +819,7 @@
                                 return { ...t, propiedad_segura: prop || {} };
                             });
 
-                            this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente');
+                            this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente' || t.estado === 'En Progreso');
                             this.tareasCompletadas = todasLasTareas.filter(t => t.estado === 'Completada').length;
                             this.tareasConNovedad = todasLasTareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').length;
                         }
@@ -842,6 +837,14 @@
                     this.tareaActiva = tarea;
                     this.pestañaActiva = 'checklist';
                     this.nuevoReporte = '';
+
+                    // ✨ Avisamos que el aseo arrancó: así apareces "Ocupado" en el radar del equipo
+                    tarea.estado = 'En Progreso';
+                    fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${tarea.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ estado: 'En Progreso' })
+                    }).catch(e => console.error('No se pudo marcar el aseo como iniciado', e));
 
                     this.resetearChecklist();
                     this.consumosReportados = {};

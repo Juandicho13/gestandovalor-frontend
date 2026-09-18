@@ -99,7 +99,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                     <template x-for="rel in articulosRelacionados" :key="rel.id">
-                        <a :href="`articulo.html?id=${rel.id}`"
+                        <a :href="enlaceArticulo(rel)"
                             class="bg-white rounded-[30px] overflow-hidden shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                             <div class="relative h-56 bg-gray-200 overflow-hidden">
                                 <img :src="rel.foto_url || 'https://via.placeholder.com/800x600?text=Sin+Imagen'"
@@ -515,10 +515,12 @@
                 articulosRelacionados: [],
 
                 async init() {
+                    // Acepta /blog/como-amoblar-un-apartamento y también articulo.html?id=1
                     const urlParams = new URLSearchParams(window.location.search);
-                    const id = urlParams.get('id');
+                    const desdeRuta = decodeURIComponent((window.location.pathname.split('/blog/')[1] || '').replace(/\/$/, ''));
+                    const clave = desdeRuta || urlParams.get('id');
 
-                    if (!id) {
+                    if (!clave) {
                         this.cargando = false;
                         return;
                     }
@@ -527,10 +529,10 @@
 
                     // Si ya leíste este artículo en este navegador, aparece al instante
                     try {
-                        const guardado = JSON.parse(localStorage.getItem(`gv_blog_articulo_${id}`) || 'null');
+                        const guardado = JSON.parse(localStorage.getItem(`gv_blog_articulo_${clave}`) || 'null');
                         if (guardado) {
                             this.articulo = guardado;
-                            document.title = `${guardado.titulo} - GestandoValor Apartasuites`;
+                            this.ponerDatosSEO(guardado);
                             this.cargando = false;
                         }
                     } catch (e) { }
@@ -538,21 +540,21 @@
                     try {
                         // El artículo y la lista corta (sin textos ni fotos pesadas) se piden al mismo tiempo
                         const [resArticulo, resResumen] = await Promise.all([
-                            fetch(`${API}/blog/publico/${id}`),
+                            fetch(`${API}/blog/publico/${encodeURIComponent(clave)}`),
                             fetch(`${API}/blog/resumen`).catch(() => null)
                         ]);
 
                         if (resArticulo.ok) {
                             this.articulo = await resArticulo.json();
-                            document.title = `${this.articulo.titulo} - GestandoValor Apartasuites`;
+                            this.ponerDatosSEO(this.articulo);
                             try {
-                                localStorage.setItem(`gv_blog_articulo_${id}`, JSON.stringify(this.articulo));
+                                localStorage.setItem(`gv_blog_articulo_${clave}`, JSON.stringify(this.articulo));
                             } catch (e) { }
                         }
 
                         if (resResumen && resResumen.ok) {
                             const todos = await resResumen.json();
-                            let filtrados = todos.filter(a => a.id != id && a.estado === 'Publicado');
+                            let filtrados = todos.filter(a => a.id != this.articulo?.id && a.estado === 'Publicado');
                             filtrados = filtrados.sort(() => 0.5 - Math.random());
                             this.articulosRelacionados = filtrados.slice(0, 3);
                         }
@@ -561,6 +563,80 @@
                     } finally {
                         this.cargando = false;
                     }
+                },
+
+                enlaceArticulo(art) {
+                    return art && art.slug ? `/blog/${art.slug}` : `articulo.html?id=${art?.id || ''}`;
+                },
+
+                // ✨ Datos para Google y para cuando compartes el enlace por WhatsApp
+                ponerDatosSEO(articulo) {
+                    if (!articulo) return;
+
+                    const sitio = 'https://gestandovalor.com';
+                    const enlace = articulo.slug ? `${sitio}/blog/${articulo.slug}` : `${sitio}/articulo?id=${articulo.id}`;
+                    const textoPlano = String(articulo.contenido || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                    const resumen = textoPlano.slice(0, 155) || `${articulo.titulo} — Blog de GestandoValor Apartasuites.`;
+
+                    document.title = `${articulo.titulo} | GestandoValor Apartasuites`;
+                    this.ponerEtiqueta('name', 'description', resumen);
+                    this.ponerEnlace('canonical', enlace);
+
+                    this.ponerEtiqueta('property', 'og:type', 'article');
+                    this.ponerEtiqueta('property', 'og:title', articulo.titulo);
+                    this.ponerEtiqueta('property', 'og:description', resumen);
+                    this.ponerEtiqueta('property', 'og:url', enlace);
+                    this.ponerEtiqueta('property', 'og:site_name', 'GestandoValor Apartasuites');
+                    if (articulo.foto_url) this.ponerEtiqueta('property', 'og:image', articulo.foto_url);
+                    this.ponerEtiqueta('name', 'twitter:card', 'summary_large_image');
+
+                    const datos = {
+                        '@context': 'https://schema.org',
+                        '@type': 'BlogPosting',
+                        headline: articulo.titulo,
+                        description: resumen,
+                        image: articulo.foto_url || `${sitio}/GV.png`,
+                        datePublished: articulo.createdAt,
+                        dateModified: articulo.updatedAt || articulo.createdAt,
+                        articleSection: articulo.categoria,
+                        mainEntityOfPage: enlace,
+                        author: { '@type': 'Organization', name: 'GestandoValor Apartasuites' },
+                        publisher: {
+                            '@type': 'Organization',
+                            name: 'GestandoValor Apartasuites',
+                            logo: { '@type': 'ImageObject', url: `${sitio}/GV.png` }
+                        }
+                    };
+
+                    let ficha = document.getElementById('datos-articulo');
+                    if (!ficha) {
+                        ficha = document.createElement('script');
+                        ficha.type = 'application/ld+json';
+                        ficha.id = 'datos-articulo';
+                        document.head.appendChild(ficha);
+                    }
+                    ficha.textContent = JSON.stringify(datos);
+                },
+
+                ponerEtiqueta(tipo, nombre, contenido) {
+                    if (!contenido) return;
+                    let etiqueta = document.head.querySelector(`meta[${tipo}="${nombre}"]`);
+                    if (!etiqueta) {
+                        etiqueta = document.createElement('meta');
+                        etiqueta.setAttribute(tipo, nombre);
+                        document.head.appendChild(etiqueta);
+                    }
+                    etiqueta.setAttribute('content', contenido);
+                },
+
+                ponerEnlace(rel, href) {
+                    let etiqueta = document.head.querySelector(`link[rel="${rel}"]`);
+                    if (!etiqueta) {
+                        etiqueta = document.createElement('link');
+                        etiqueta.setAttribute('rel', rel);
+                        document.head.appendChild(etiqueta);
+                    }
+                    etiqueta.setAttribute('href', href);
                 },
 
                 // FORMATO DE FECHA CORREGIDO ("04 MAR 2026")

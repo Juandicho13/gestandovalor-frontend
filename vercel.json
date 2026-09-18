@@ -1,1 +1,13 @@
-{ "cleanUrls": true }
+{
+    "cleanUrls": true,
+    "rewrites": [
+        {
+            "source": "/blog/:slug",
+            "destination": "/articulo.html"
+        },
+        {
+            "source": "/blog-sitemap.xml",
+            "destination": "https://gestandovalor-backend.onrender.com/blog/sitemap.xml"
+        }
+    ]
+}

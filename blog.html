@@ -120,7 +120,7 @@
                     <article
                         class="bg-white rounded-[30px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col hover:-translate-y-1">
 
-                        <a :href="`articulo.html?id=${art.id}`" class="relative h-60 overflow-hidden block">
+                        <a :href="enlaceArticulo(art)" class="relative h-60 overflow-hidden block">
                             <img :src="art.foto_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'"
                                 :alt="art.titulo"
                                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
@@ -132,12 +132,12 @@
                             <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3 block"
                                 x-text="`${formatearFecha(art.createdAt)} • ${art.tiempo_lectura} min lectura`"></span>
 
-                            <a :href="`articulo.html?id=${art.id}`" class="block mb-4">
+                            <a :href="enlaceArticulo(art)" class="block mb-4">
                                 <h2 class="text-xl font-extrabold text-navy group-hover:text-gold transition-colors leading-snug"
                                     x-text="art.titulo"></h2>
                             </a>
 
-                            <a :href="`articulo.html?id=${art.id}`"
+                            <a :href="enlaceArticulo(art)"
                                 class="mt-auto text-navy font-bold text-sm flex items-center gap-2 hover:text-gold transition-colors w-max">
                                 Leer artículo
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -532,6 +532,11 @@
                 cargando: true,
                 articulos: [],
                 URL_API: 'https://gestandovalor-backend.onrender.com/blog/resumen',
+
+                // ✨ Enlace propio de cada artículo: /blog/como-amoblar-un-apartamento
+                enlaceArticulo(art) {
+                    return art && art.slug ? `/blog/${art.slug}` : `articulo.html?id=${art?.id || ''}`;
+                },
 
                 async init() {
                     // 1. Mostramos al instante lo último que se cargó en este navegador

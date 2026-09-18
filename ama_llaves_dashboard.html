@@ -153,11 +153,18 @@
                 <div class="space-y-8">
 
                     <div>
-                        <div class="flex justify-between items-center mb-6">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
                             <h2 class="text-2xl font-extrabold text-navy">Programar Limpiezas</h2>
-                            <span
-                                class="text-xs font-bold text-warning bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Próximos
-                                Check-outs</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button @click="abrirProgramacion()"
+                                    class="text-xs font-bold text-navy bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors border border-gray-200">
+                                    ⚙️ Programación automática
+                                </button>
+                                <button @click="agendarTodosAutomatico()"
+                                    class="text-xs font-bold text-white bg-navy hover:bg-blue-900 px-4 py-2 rounded-full transition-colors shadow-sm">
+                                    ⚡ Agendar todos
+                                </button>
+                            </div>
                         </div>
 
                         <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
@@ -556,6 +563,65 @@
 
     <div x-show="modalReportes" style="display: none;"
         class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <!-- ✨ PROGRAMACIÓN AUTOMÁTICA: empleado fijo por apartamento -->
+        <div x-show="modalProgramacion" style="display: none;"
+            class="fixed inset-0 z-[120] flex items-center justify-center px-4">
+            <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalProgramacion = false"></div>
+            <div
+                class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-start mb-6 gap-4">
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-navy">Programación automática</h3>
+                        <p class="text-xs text-gray-500 mt-1 font-bold">Elige quién limpia siempre cada apartamento. Los
+                            próximos aseos se asignan solos.</p>
+                    </div>
+                    <button @click="modalProgramacion = false" class="bg-gray-50 p-2 rounded-full shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <p x-show="empleadosAseo.length === 1"
+                    class="bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold rounded-2xl p-3 mb-4">
+                    Solo tienes una persona de aseo, así que queda asignada a todos los apartamentos.
+                </p>
+
+                <p x-show="empleadosAseo.length === 0" class="text-center text-sm text-gray-400 py-6">
+                    Aún no hay personal de aseo registrado.
+                </p>
+
+                <div class="space-y-3" x-show="empleadosAseo.length > 0">
+                    <template x-for="prop in propiedades" :key="prop.id">
+                        <div class="flex items-center gap-3 p-3 border border-gray-100 rounded-2xl bg-gray-50/50">
+                            <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-white border border-gray-200">
+                                <img :src="obtenerFotoApto(prop.id)" class="w-full h-full object-cover">
+                            </div>
+                            <p class="flex-1 min-w-0 text-sm font-bold text-navy truncate"
+                                x-text="prop.titulo || 'Apto sin nombre'"></p>
+                            <select x-model="programacion[prop.id]"
+                                class="bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[180px]">
+                                <option value="">Sin asignar</option>
+                                <template x-for="emp in empleadosAseo" :key="emp.id">
+                                    <option :value="emp.id" x-text="emp.nombre"
+                                        :selected="String(emp.id) === String(programacion[prop.id])"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 mt-6" x-show="empleadosAseo.length > 0">
+                    <button x-show="empleadosAseo.length > 1" @click="asignarTodos(empleadosAseo[0]?.id)"
+                        class="sm:w-auto bg-gray-100 hover:bg-gray-200 text-navy font-bold px-5 py-3 rounded-xl text-sm transition-colors"
+                        x-text="`Asignar todo a ${empleadosAseo[0]?.nombre || ''}`"></button>
+                    <button @click="guardarProgramacion()" :disabled="guardandoProgramacion"
+                        class="flex-1 bg-navy hover:bg-blue-900 text-white font-extrabold py-3 rounded-xl transition-colors disabled:opacity-60"
+                        x-text="guardandoProgramacion ? 'Guardando...' : 'Guardar programación'"></button>
+                </div>
+            </div>
+        </div>
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
         <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
@@ -631,6 +697,9 @@
                 auditoriaChecklist: {},
 
                 modalReportes: false,
+                modalProgramacion: false,
+                programacion: {},
+                guardandoProgramacion: false,
                 novedadConFotos: null,
 
                 // Copia del Checklist de 89 tareas
@@ -781,7 +850,8 @@
 
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
-                        if (!t.estado || String(t.estado).toLowerCase() === 'pendiente') {
+                        const estadoTarea = String(t.estado || 'pendiente').toLowerCase();
+                        if (estadoTarea === 'pendiente' || estadoTarea === 'en progreso') {
                             const id = String(t.propiedad_id);
                             conteoAseosPendientes[id] = (conteoAseosPendientes[id] || 0) + 1;
                         }
@@ -832,7 +902,7 @@
                                 fotoAptoSeguro: this.obtenerFotoApto(res.propiedad_id),
                                 fecha_salida_formato: new Date(res.check_out).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' }),
                                 hora_salida_formato: new Date(res.check_out).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                                empleado_asignado: '',
+                                empleado_asignado: this.empleadoPorDefecto(res.propiedad_id),
                                 urgencia_calculada: autoUrgency
                             });
                         }
@@ -841,7 +911,7 @@
                 },
 
                 get tareasPendientes() {
-                    return this.tareas.filter(t => !t.estado || String(t.estado).toLowerCase() === 'pendiente').map(t => {
+                    return this.tareas.filter(t => ['pendiente', 'en progreso'].includes(String(t.estado || 'pendiente').toLowerCase())).map(t => {
                         const futurasReservas = this.reservas.filter(r => {
                             if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
                             const checkInDate = new Date(r.check_in);
@@ -875,6 +945,83 @@
                             nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
                         }
                     });
+                },
+
+                // ✨ PROGRAMACIÓN AUTOMÁTICA DE ASEOS
+                abrirProgramacion() {
+                    this.programacion = {};
+                    this.propiedades.forEach(p => {
+                        this.programacion[p.id] = p.empleado_aseo_id
+                            || (this.empleadosAseo.length === 1 ? String(this.empleadosAseo[0].id) : '');
+                    });
+                    this.modalProgramacion = true;
+                },
+
+                asignarTodos(empleadoId) {
+                    this.propiedades.forEach(p => { this.programacion[p.id] = String(empleadoId); });
+                },
+
+                async guardarProgramacion() {
+                    this.guardandoProgramacion = true;
+                    try {
+                        for (const prop of this.propiedades) {
+                            const nuevo = this.programacion[prop.id] || null;
+                            if ((prop.empleado_aseo_id || null) === nuevo) continue;
+
+                            const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${prop.id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ empleado_aseo_id: nuevo })
+                            });
+                            if (!res.ok) throw new Error('No se pudo guardar ' + (prop.titulo || ''));
+                            prop.empleado_aseo_id = nuevo;
+                        }
+                        this.modalProgramacion = false;
+                        alert('✅ Programación guardada. Los próximos aseos se asignan solos.');
+                    } catch (e) {
+                        console.error(e);
+                        alert('❌ No se pudo guardar la programación. Intenta de nuevo.');
+                    } finally {
+                        this.guardandoProgramacion = false;
+                    }
+                },
+
+                // Empleado fijo del apartamento; si solo hay uno, ese es el de siempre
+                empleadoPorDefecto(propiedadId) {
+                    const prop = this.propiedades.find(p => String(p.id) === String(propiedadId));
+                    if (prop && prop.empleado_aseo_id) return String(prop.empleado_aseo_id);
+                    if (this.empleadosAseo.length === 1) return String(this.empleadosAseo[0].id);
+                    return '';
+                },
+
+                async agendarTodosAutomatico() {
+                    const pendientes = this.checkoutsSinAsignar.filter(r => this.empleadoPorDefecto(r.propiedad_id));
+                    if (pendientes.length === 0) {
+                        alert('No hay aseos para agendar automáticamente.\n\nAsigna una persona fija a cada apartamento en "Programación automática".');
+                        return;
+                    }
+                    if (!confirm(`¿Agendar ${pendientes.length} aseo(s) con el personal ya asignado?`)) return;
+
+                    this.cargando = true;
+                    try {
+                        for (const reserva of pendientes) {
+                            await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    propiedad_id: String(reserva.propiedad_id),
+                                    empleado_id: this.empleadoPorDefecto(reserva.propiedad_id),
+                                    urgencia: String(reserva.urgencia_calculada)
+                                })
+                            });
+                        }
+                        await this.cargarTareas();
+                    } catch (e) {
+                        console.error(e);
+                        alert('❌ Hubo un error agendando los aseos.');
+                    } finally {
+                        this.cargando = false;
+                    }
                 },
 
                 async asignarAseo(reserva) {
