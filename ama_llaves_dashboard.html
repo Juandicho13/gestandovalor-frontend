@@ -561,21 +561,22 @@
         </div>
     </div>
 
-    <div x-show="modalReportes" style="display: none;"
-        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <!-- ✨ PROGRAMACIÓN AUTOMÁTICA: empleado fijo por apartamento -->
-        <div x-show="modalProgramacion" style="display: none;"
-            class="fixed inset-0 z-[120] flex items-center justify-center px-4">
-            <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalProgramacion = false"></div>
-            <div
-                class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
-                <div class="flex justify-between items-start mb-6 gap-4">
-                    <div>
+    <!-- ✨ PROGRAMACIÓN AUTOMÁTICA: empleado fijo por apartamento -->
+    <div x-show="modalProgramacion" style="display: none;" x-transition.opacity
+        class="fixed inset-0 z-[120] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalProgramacion = false"></div>
+        <div
+            class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 max-h-[90vh] flex flex-col overflow-hidden">
+
+            <div class="p-8 pb-5 border-b border-gray-100 shrink-0">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="min-w-0">
                         <h3 class="text-2xl font-extrabold text-navy">Programación automática</h3>
-                        <p class="text-xs text-gray-500 mt-1 font-bold">Elige quién limpia siempre cada apartamento. Los
-                            próximos aseos se asignan solos.</p>
+                        <p class="text-xs text-gray-500 mt-1 font-bold">Elige quién limpia siempre cada apartamento.
+                            Luego "Agendar todos" reparte los aseos solo.</p>
                     </div>
-                    <button @click="modalProgramacion = false" class="bg-gray-50 p-2 rounded-full shrink-0">
+                    <button @click="modalProgramacion = false"
+                        class="bg-gray-50 hover:bg-gray-100 p-2 rounded-full shrink-0 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12" />
@@ -583,45 +584,104 @@
                     </button>
                 </div>
 
+                <div class="flex items-center gap-3 mt-5" x-show="propiedades.length > 0">
+                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-success rounded-full transition-all duration-500"
+                            :style="`width: ${propiedades.length ? (aptosAsignados / propiedades.length) * 100 : 0}%`">
+                        </div>
+                    </div>
+                    <p class="text-xs font-extrabold text-navy shrink-0">
+                        <span x-text="aptosAsignados"></span> de <span x-text="propiedades.length"></span> con personal
+                        fijo
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-8 py-6">
+
+                <p x-show="empleadosAseo.length === 0" class="text-center text-sm text-gray-400 py-10 font-bold">
+                    Aún no hay personal de aseo registrado.<br>
+                    <span class="font-medium text-xs">Crea usuarios con rol "Personal de Aseo" en el Centro de
+                        Mando.</span>
+                </p>
+
+                <div x-show="empleadosAseo.length > 1" class="mb-5">
+                    <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-2">Asignar todos
+                        los apartamentos a</p>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="emp in empleadosAseo" :key="'todos-' + emp.id">
+                            <button @click="asignarTodos(emp.id)"
+                                class="flex items-center gap-2 bg-gray-50 hover:bg-gold/15 hover:border-gold border border-gray-200 text-navy font-bold px-3 py-2 rounded-full text-xs transition-colors">
+                                <span
+                                    class="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-[10px] font-extrabold shrink-0"
+                                    x-text="emp.nombre ? emp.nombre.substring(0,2).toUpperCase() : '?'"></span>
+                                <span x-text="emp.nombre"></span>
+                            </button>
+                        </template>
+                        <button @click="asignarTodos('')"
+                            class="bg-gray-50 hover:bg-red-50 border border-gray-200 text-gray-500 hover:text-danger font-bold px-3 py-2 rounded-full text-xs transition-colors">
+                            Limpiar todo
+                        </button>
+                    </div>
+                </div>
+
                 <p x-show="empleadosAseo.length === 1"
-                    class="bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold rounded-2xl p-3 mb-4">
+                    class="bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold rounded-2xl p-3 mb-5">
                     Solo tienes una persona de aseo, así que queda asignada a todos los apartamentos.
                 </p>
 
-                <p x-show="empleadosAseo.length === 0" class="text-center text-sm text-gray-400 py-6">
-                    Aún no hay personal de aseo registrado.
-                </p>
-
                 <div class="space-y-3" x-show="empleadosAseo.length > 0">
-                    <template x-for="prop in propiedades" :key="prop.id">
-                        <div class="flex items-center gap-3 p-3 border border-gray-100 rounded-2xl bg-gray-50/50">
-                            <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-white border border-gray-200">
-                                <img :src="obtenerFotoApto(prop.id)" class="w-full h-full object-cover">
+                    <template x-for="prop in propiedades" :key="'prog-' + prop.id">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-2xl transition-colors"
+                            :class="programacion[prop.id] ? 'border-success/30 bg-success/5' : 'border-gray-100 bg-gray-50/50'">
+
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div
+                                    class="w-11 h-11 rounded-xl overflow-hidden shrink-0 bg-white border border-gray-200">
+                                    <img :src="obtenerFotoApto(prop.id)" loading="lazy"
+                                        class="w-full h-full object-cover">
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-bold text-navy truncate"
+                                        x-text="prop.titulo || 'Apto sin nombre'"></p>
+                                    <p class="text-[11px] font-bold truncate"
+                                        :class="programacion[prop.id] ? 'text-success' : 'text-gray-400'"
+                                        x-text="programacion[prop.id] ? '✓ ' + obtenerNombreEmpleado(programacion[prop.id]) : 'Sin personal fijo'">
+                                    </p>
+                                </div>
                             </div>
-                            <p class="flex-1 min-w-0 text-sm font-bold text-navy truncate"
-                                x-text="prop.titulo || 'Apto sin nombre'"></p>
+
                             <select x-model="programacion[prop.id]"
-                                class="bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[180px]">
+                                class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-gold focus:ring-1 focus:ring-gold text-xs text-navy font-bold cursor-pointer w-full sm:w-[190px] shrink-0">
                                 <option value="">Sin asignar</option>
-                                <template x-for="emp in empleadosAseo" :key="emp.id">
-                                    <option :value="emp.id" x-text="emp.nombre"
-                                        :selected="String(emp.id) === String(programacion[prop.id])"></option>
+                                <template x-for="emp in empleadosAseo" :key="'opt-' + prop.id + '-' + emp.id">
+                                    <option :value="String(emp.id)" x-text="emp.nombre"></option>
                                 </template>
                             </select>
                         </div>
                     </template>
-                </div>
 
-                <div class="flex flex-col sm:flex-row gap-3 mt-6" x-show="empleadosAseo.length > 0">
-                    <button x-show="empleadosAseo.length > 1" @click="asignarTodos(empleadosAseo[0]?.id)"
-                        class="sm:w-auto bg-gray-100 hover:bg-gray-200 text-navy font-bold px-5 py-3 rounded-xl text-sm transition-colors"
-                        x-text="`Asignar todo a ${empleadosAseo[0]?.nombre || ''}`"></button>
-                    <button @click="guardarProgramacion()" :disabled="guardandoProgramacion"
-                        class="flex-1 bg-navy hover:bg-blue-900 text-white font-extrabold py-3 rounded-xl transition-colors disabled:opacity-60"
-                        x-text="guardandoProgramacion ? 'Guardando...' : 'Guardar programación'"></button>
+                    <p x-show="propiedades.length === 0" class="text-center text-sm text-gray-400 py-10 font-bold">
+                        No hay apartamentos registrados todavía.
+                    </p>
                 </div>
             </div>
+
+            <div class="p-8 pt-5 border-t border-gray-100 shrink-0 flex flex-col sm:flex-row gap-3"
+                x-show="empleadosAseo.length > 0 && propiedades.length > 0">
+                <button @click="modalProgramacion = false"
+                    class="sm:w-auto bg-gray-100 hover:bg-gray-200 text-navy font-bold px-6 py-3.5 rounded-xl text-sm transition-colors">
+                    Cancelar
+                </button>
+                <button @click="guardarProgramacion()" :disabled="guardandoProgramacion"
+                    class="flex-1 bg-navy hover:bg-blue-900 text-white font-extrabold py-3.5 rounded-xl transition-colors disabled:opacity-60"
+                    x-text="guardandoProgramacion ? 'Guardando...' : 'Guardar programación'"></button>
+            </div>
         </div>
+    </div>
+    <div x-show="modalReportes" style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReportes = false"></div>
         <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
@@ -669,9 +729,7 @@
                 <p x-show="tareasConReporte.length === 0" class="text-center text-sm text-gray-400 py-6">No hay
                     novedades reportadas.</p>
             </div>
-            </template>
         </div>
-    </div>
     </div>
 
     <script>
@@ -948,6 +1006,10 @@
                 },
 
                 // ✨ PROGRAMACIÓN AUTOMÁTICA DE ASEOS
+                get aptosAsignados() {
+                    return this.propiedades.filter(p => this.programacion[p.id]).length;
+                },
+
                 abrirProgramacion() {
                     this.programacion = {};
                     this.propiedades.forEach(p => {
@@ -997,7 +1059,12 @@
                 async agendarTodosAutomatico() {
                     const pendientes = this.checkoutsSinAsignar.filter(r => this.empleadoPorDefecto(r.propiedad_id));
                     if (pendientes.length === 0) {
-                        alert('No hay aseos para agendar automáticamente.\n\nAsigna una persona fija a cada apartamento en "Programación automática".');
+                        // Si todavía nadie tiene personal fijo, abrimos la ventana en vez de solo avisar.
+                        if (this.checkoutsSinAsignar.length > 0) {
+                            this.abrirProgramacion();
+                            return;
+                        }
+                        alert('No hay aseos pendientes por agendar.');
                         return;
                     }
                     if (!confirm(`¿Agendar ${pendientes.length} aseo(s) con el personal ya asignado?`)) return;
