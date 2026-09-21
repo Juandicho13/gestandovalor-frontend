@@ -51,6 +51,11 @@
         <p class="font-bold text-navy animate-pulse">Sincronizando operaciones...</p>
     </div>
 
+    <!-- ⚡ Aviso flotante: no bloquea, se va solo -->
+    <div x-show="aviso" style="display: none;" x-transition
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[130] bg-navy text-white font-bold text-sm px-6 py-4 rounded-2xl shadow-2xl border border-white/10 max-w-[90vw] text-center"
+        x-text="aviso" @click="aviso = ''"></div>
+
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
         <a href="ama_llaves_dashboard.html" class="flex items-center transition-all duration-700 flex-shrink-0">
@@ -756,6 +761,8 @@
 
                 modalReportes: false,
                 modalProgramacion: false,
+                autoAgendando: false,
+                aviso: '',
                 programacion: {},
                 guardandoProgramacion: false,
                 novedadConFotos: null,
@@ -820,6 +827,9 @@
                     ]);
 
                     this.cargando = false;
+
+                    // ⚡ Los aptos con personal fijo se agendan solos: nadie toca "Agendar"
+                    this.autoAgendarPendientes();
                 },
 
                 async fetchFresco(endpoint) {
@@ -1039,7 +1049,8 @@
                             prop.empleado_aseo_id = nuevo;
                         }
                         this.modalProgramacion = false;
-                        alert('✅ Programación guardada. Los próximos aseos se asignan solos.');
+                        this.mostrarAviso('✅ Programación guardada. Agendando los aseos...');
+                        await this.autoAgendarPendientes();
                     } catch (e) {
                         console.error(e);
                         alert('❌ No se pudo guardar la programación. Intenta de nuevo.');
@@ -1054,6 +1065,46 @@
                     if (prop && prop.empleado_aseo_id) return String(prop.empleado_aseo_id);
                     if (this.empleadosAseo.length === 1) return String(this.empleadosAseo[0].id);
                     return '';
+                },
+
+                mostrarAviso(texto) {
+                    this.aviso = texto;
+                    clearTimeout(this._avisoTimer);
+                    this._avisoTimer = setTimeout(() => { this.aviso = ''; }, 6000);
+                },
+
+                // ⚡ Agenda sola los aseos de los aptos que ya tienen personal fijo.
+                // checkoutsSinAsignar ya descarta los que tienen tarea pendiente, asi que no duplica.
+                async autoAgendarPendientes() {
+                    if (this.autoAgendando) return;
+
+                    const pendientes = this.checkoutsSinAsignar.filter(r => this.empleadoPorDefecto(r.propiedad_id));
+                    if (pendientes.length === 0) return;
+
+                    this.autoAgendando = true;
+                    let creados = 0;
+                    try {
+                        for (const reserva of pendientes) {
+                            const res = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    propiedad_id: String(reserva.propiedad_id),
+                                    empleado_id: this.empleadoPorDefecto(reserva.propiedad_id),
+                                    urgencia: String(reserva.urgencia_calculada)
+                                })
+                            });
+                            if (res.ok) creados++;
+                        }
+                        if (creados > 0) {
+                            await this.cargarTareas();
+                            this.mostrarAviso(`⚡ ${creados} aseo${creados > 1 ? 's' : ''} agendado${creados > 1 ? 's' : ''} automáticamente`);
+                        }
+                    } catch (e) {
+                        console.error('Auto-agendar:', e);
+                    } finally {
+                        this.autoAgendando = false;
+                    }
                 },
 
                 async agendarTodosAutomatico() {
