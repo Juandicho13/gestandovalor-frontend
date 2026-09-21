@@ -303,84 +303,128 @@
             </div>
 
             <div x-show="vistaActiva === 'usuarios'" x-transition.opacity style="display: none;">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <h2 class="text-2xl font-extrabold text-navy">Directorio General de Usuarios</h2>
-                    <button @click="abrirModalCrear()"
-                        class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center gap-2 border border-yellow-600 w-full md:w-auto justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                        </svg>
-                        + Nuevo Usuario
-                    </button>
-                </div>
+                <div class="max-w-5xl mx-auto">
 
-                <div class="bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-50 border-b border-gray-100">
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-                                        Nombre</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rol
-                                    </th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-                                        Usuario (Login)</th>
-                                    <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
-                                        Propiedades</th>
-                                    <th
-                                        class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">
-                                        Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                <template x-for="usr in usuarios" :key="usr.id || usr.username">
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="p-5">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                                                    :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
-                                                    x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
-                                                </div>
-                                                <p class="font-bold text-navy" x-text="usr.nombre"></p>
-                                            </div>
-                                        </td>
-                                        <td class="p-5">
-                                            <span
-                                                class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
-                                                :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }"
-                                                x-text="formatearRol(usr.rol)">
-                                            </span>
-                                        </td>
-                                        <td class="p-5">
-                                            <span
-                                                class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200"
-                                                x-text="usr.username"></span>
-                                        </td>
-                                        <td class="p-5">
-                                            <span x-show="usr.rol === 'PROPIETARIO'"
-                                                class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30">
-                                                <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span>
-                                                Asignadas
-                                            </span>
-                                            <span x-show="usr.rol !== 'PROPIETARIO'"
-                                                class="text-xs text-gray-400 font-bold">-</span>
-                                        </td>
-                                        <td class="p-5 text-right">
-                                            <button @click="abrirEdicion(usr)"
-                                                class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
-                                            <button @click="eliminarUsuario(usr.id, usr.nombre)"
-                                                class="text-red-400 hover:text-danger font-bold text-sm transition-colors">Eliminar</button>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <tr x-show="usuarios.length === 0">
-                                    <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay usuarios
-                                        registrados en la base de datos.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
+                        <h2 class="text-2xl font-extrabold text-navy">Directorio General de Usuarios</h2>
+                        <button @click="abrirModalCrear()"
+                            class="bg-gold hover:bg-yellow-500 text-navy px-6 py-3 rounded-full font-extrabold transition-colors shadow-lg text-sm flex items-center justify-center gap-2 border border-yellow-600 w-full md:w-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            Nuevo Usuario
+                        </button>
                     </div>
+
+                    <div class="space-y-4 md:hidden">
+                        <template x-for="usr in usuarios" :key="'movil-' + (usr.id || usr.username)">
+                            <div class="bg-white rounded-[28px] shadow-lg border border-gray-100 p-5">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
+                                        :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
+                                        x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'"></div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-extrabold text-navy truncate" x-text="usr.nombre"></p>
+                                        <p class="text-xs text-gray-400 font-mono truncate" x-text="usr.username"></p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2 mt-4">
+                                    <span
+                                        class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest"
+                                        :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }"
+                                        x-text="formatearRol(usr.rol)"></span>
+                                    <span x-show="usr.rol === 'PROPIETARIO'"
+                                        class="text-[10px] font-extrabold text-navy bg-gold/10 px-3 py-1 rounded-full border border-gold/30 uppercase tracking-widest">
+                                        <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span> Asignadas
+                                    </span>
+                                </div>
+
+                                <div class="flex gap-3 mt-5">
+                                    <button @click="abrirEdicion(usr)"
+                                        class="flex-1 bg-gray-50 hover:bg-gray-100 text-navy font-bold text-sm py-3 rounded-xl transition-colors border border-gray-200">Editar</button>
+                                    <button @click="eliminarUsuario(usr.id, usr.nombre)"
+                                        class="flex-1 bg-red-50 hover:bg-red-100 text-danger font-bold text-sm py-3 rounded-xl transition-colors border border-red-100">Eliminar</button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div x-show="usuarios.length === 0"
+                            class="bg-white rounded-[28px] shadow-lg border border-gray-100 p-8 text-center text-gray-500 font-medium">
+                            No hay usuarios registrados en la base de datos.
+                        </div>
+                    </div>
+
+                    <div
+                        class="hidden md:block bg-white rounded-[30px] shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-100">
+                                        <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                            Nombre</th>
+                                        <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                            Rol</th>
+                                        <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                            Usuario (Login)</th>
+                                        <th class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest">
+                                            Propiedades</th>
+                                        <th
+                                            class="p-5 text-xs font-extrabold text-gray-400 uppercase tracking-widest text-right">
+                                            Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <template x-for="usr in usuarios" :key="usr.id || usr.username">
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="p-5">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
+                                                        :class="{ 'bg-yellow-100 text-yellow-700': usr.rol === 'PROPIETARIO', 'bg-blue-100 text-blue-700': usr.rol === 'ASEO', 'bg-green-100 text-green-700': usr.rol === 'AMA_LLAVES', 'bg-gray-800 text-white': usr.rol === 'ADMIN' || !usr.rol }"
+                                                        x-text="usr.nombre ? usr.nombre.substring(0,2).toUpperCase() : '?'">
+                                                    </div>
+                                                    <p class="font-bold text-navy" x-text="usr.nombre"></p>
+                                                </div>
+                                            </td>
+                                            <td class="p-5">
+                                                <span
+                                                    class="text-[10px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-widest whitespace-nowrap"
+                                                    :class="{ 'bg-yellow-50 text-yellow-700 border-yellow-200': usr.rol === 'PROPIETARIO', 'bg-blue-50 text-blue-600 border-blue-200': usr.rol === 'ASEO', 'bg-green-50 text-success border-green-200': usr.rol === 'AMA_LLAVES', 'bg-gray-100 text-gray-600 border-gray-300': usr.rol === 'ADMIN' || !usr.rol }"
+                                                    x-text="formatearRol(usr.rol)">
+                                                </span>
+                                            </td>
+                                            <td class="p-5">
+                                                <span
+                                                    class="bg-gray-100 text-gray-600 px-3 py-1 rounded font-mono text-xs border border-gray-200"
+                                                    x-text="usr.username"></span>
+                                            </td>
+                                            <td class="p-5">
+                                                <span x-show="usr.rol === 'PROPIETARIO'"
+                                                    class="text-xs font-bold text-navy bg-gold/10 px-2 py-1 rounded border border-gold/30 whitespace-nowrap">
+                                                    <span x-text="usr.propiedades ? usr.propiedades.length : 0"></span>
+                                                    Asignadas
+                                                </span>
+                                                <span x-show="usr.rol !== 'PROPIETARIO'"
+                                                    class="text-xs text-gray-400 font-bold">-</span>
+                                            </td>
+                                            <td class="p-5 text-right whitespace-nowrap">
+                                                <button @click="abrirEdicion(usr)"
+                                                    class="text-gold hover:text-navy font-bold text-sm transition-colors mr-3">Editar</button>
+                                                <button @click="eliminarUsuario(usr.id, usr.nombre)"
+                                                    class="text-red-400 hover:text-danger font-bold text-sm transition-colors">Eliminar</button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr x-show="usuarios.length === 0">
+                                        <td colspan="5" class="p-8 text-center text-gray-500 font-medium">No hay
+                                            usuarios registrados en la base de datos.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

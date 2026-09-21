@@ -196,9 +196,9 @@
 
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div>
 
-                <div class="lg:col-span-2">
+                <div>
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-extrabold text-navy">Logística de Hoy</h2>
                     </div>
@@ -232,43 +232,7 @@
                     </div>
                 </div>
 
-                <div>
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-extrabold text-navy">Estado del Equipo</h2>
-                    </div>
-
-                    <div class="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8">
-                        <div class="space-y-6">
-
-                            <template x-for="(miembro, index) in estadoDelEquipo" :key="miembro.id">
-                                <div class="flex items-start gap-4"
-                                    :class="{'pt-6 border-t border-gray-100': index > 0}">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0"
-                                        :class="miembro.iconBg" x-text="miembro.iniciales"></div>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-navy"
-                                            x-text="miembro.nombre + ' (' + miembro.rolTxt + ')'"></h4>
-                                        <p class="text-xs text-gray-500 mb-1" x-text="miembro.detalle"></p>
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-2 h-2 rounded-full" :class="miembro.dotColor"></span>
-                                            <span class="text-xs font-bold" :class="miembro.statusColor"
-                                                x-text="miembro.estado"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-
-                            <div x-show="estadoDelEquipo.length === 0" class="text-center">
-                                <p class="text-gray-400 font-bold text-sm">No hay personal de Aseo o Ama de Llaves
-                                    registrado.</p>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </div>
     </section>
 
     <div x-show="modalBlog" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center px-4"
@@ -503,41 +467,6 @@
                     return logs;
                 },
 
-                get estadoDelEquipo() {
-                    let equipo = [];
-                    // Filtramos solo a los que limpian o supervisan
-                    const staff = this.usuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
-
-                    staff.forEach(u => {
-                        let estado = 'Disponible';
-                        let statusColor = 'text-success';
-                        let dotColor = 'bg-success';
-                        let detalle = u.rol === 'AMA_LLAVES' ? 'Supervisión' : 'A la espera de rutas';
-                        let iconBg = u.rol === 'AMA_LLAVES' ? 'bg-navy text-white' : 'bg-gold text-navy';
-
-                        if (u.rol === 'ASEO') {
-                            // Revisamos si el empleado tiene tareas pendientes HOY
-                            const tareaActiva = this.tareas.find(t => String(t.empleado_id) === String(u.id) && t.estado === 'Pendiente');
-                            if (tareaActiva) {
-                                estado = 'Limpiando';
-                                statusColor = 'text-blue-500';
-                                dotColor = 'bg-blue-500 animate-pulse';
-                                const prop = this.propiedades.find(p => String(p.id) === String(tareaActiva.propiedad_id));
-                                if (prop) detalle = `Asignado a: ${prop.titulo}`;
-                            }
-                        }
-
-                        equipo.push({
-                            id: u.id,
-                            nombre: u.nombre,
-                            rolTxt: u.rol === 'AMA_LLAVES' ? 'Ama de Llaves' : 'Equipo de Aseo',
-                            iniciales: u.nombre.substring(0, 2).toUpperCase(),
-                            estado, detalle, statusColor, dotColor, iconBg
-                        });
-                    });
-
-                    return equipo;
-                },
 
                 calcularMetricas() {
                     const hoy = new Date();
