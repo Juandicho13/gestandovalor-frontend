@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="Logo.png?v=1">
     <link rel="preconnect" href="https://gestandovalor-backend.onrender.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="gv-auth.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
@@ -38,7 +39,7 @@
         class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-50">
     </div>
     <div
-        class="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gold/10 rounded-full blur-[120px] pointer-events-none">
+        class="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] max-w-full h-[400px] bg-gold/10 rounded-full blur-[120px] pointer-events-none">
     </div>
 
     <main class="relative z-10 flex flex-col items-center px-4 py-10 lg:py-4 min-h-screen lg:justify-center">
@@ -469,7 +470,6 @@
                     else if (this.estado === 'pendiente') texto += `💳 *Pago:* En proceso ⏳\n`;
                     else texto += `💳 *Pago:* No completado ❌\n`;
 
-                    if (this.referencia) texto += `🧾 *Referencia:* ${this.referencia}\n`;
 
                     if (r.nombre || r.telefonoHuesped || r.email) texto += `\n`;
                     if (r.nombre) texto += `🙋 *A nombre de:* ${r.nombre}\n`;
