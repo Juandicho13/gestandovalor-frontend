@@ -263,7 +263,7 @@
                                 <div class="flex items-center gap-2">
                                     <select x-model.number="mesSeleccionado"
                                         @change="irAMes(mesSeleccionado, anioSeleccionado)"
-                                        class="text-xl md:text-2xl font-extrabold text-navy bg-transparent border-b-2 border-gray-200 hover:border-gold focus:border-gold outline-none cursor-pointer pr-1">
+                                        class="text-xl md:text-2xl font-extrabold text-navy bg-transparent border-b-2 border-gray-200 hover:border-gold focus:border-gold outline-none cursor-pointer pr-1 py-2 min-h-[44px]">
                                         <template x-for="(nombre, i) in nombresMeses" :key="i">
                                             <option :value="i" x-text="nombre" :selected="i === mesSeleccionado">
                                             </option>
@@ -271,7 +271,7 @@
                                     </select>
                                     <select x-model.number="anioSeleccionado"
                                         @change="irAMes(mesSeleccionado, anioSeleccionado)"
-                                        class="text-xl md:text-2xl font-extrabold text-navy bg-transparent border-b-2 border-gray-200 hover:border-gold focus:border-gold outline-none cursor-pointer">
+                                        class="text-xl md:text-2xl font-extrabold text-navy bg-transparent border-b-2 border-gray-200 hover:border-gold focus:border-gold outline-none cursor-pointer py-2 min-h-[44px]">
                                         <template x-for="anio in aniosDisponibles" :key="anio">
                                             <option :value="anio" x-text="anio" :selected="anio === anioSeleccionado">
                                             </option>
@@ -451,8 +451,82 @@
                             <h2 class="text-xl font-extrabold text-navy">Reservas de <span
                                     x-text="`${nombresMeses[mesSeleccionado]} ${anioSeleccionado}`"></span></h2>
                         </div>
-                        <div class="overflow-x-auto">
+                        <div class="p-4 space-y-4 md:hidden">
+                            <template x-for="res in reservasDelMes" :key="'movil-' + res.id">
+                                <div class="border border-gray-100 rounded-[24px] p-4 shadow-sm">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-11 h-11 rounded-full text-white flex items-center justify-center font-bold shadow-sm shrink-0"
+                                            :class="obtenerColorCanal(res.canal, 'bg')"
+                                            x-text="obtenerIniciales(res.huesped_nombre)"></div>
+                                        <div class="min-w-0 flex-1">
+                                            <h3 class="text-sm font-extrabold text-navy truncate"
+                                                x-text="res.huesped_nombre"></h3>
+                                            <p class="text-xs text-gray-500"
+                                                x-text="`${res.cantidad_huespedes} Huéspedes`"></p>
+                                        </div>
+                                        <span
+                                            class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold border uppercase tracking-wider shrink-0"
+                                            :class="obtenerColorCanal(res.canal, 'badge')" x-text="res.canal"></span>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 mt-4">
+                                        <div class="flex-1 bg-gray-50 px-3 py-2 rounded-xl text-center">
+                                            <span
+                                                class="block text-[10px] text-gray-500 uppercase font-black tracking-widest">IN</span>
+                                            <span class="block text-xs font-bold text-navy"
+                                                x-text="formatearFechaCorta(res.check_in)"></span>
+                                            <span class="block text-[10px] text-navy font-bold"
+                                                x-text="formatearHora(res.check_in)"></span>
+                                        </div>
+                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                        <div class="flex-1 bg-gray-50 px-3 py-2 rounded-xl text-center">
+                                            <span
+                                                class="block text-[10px] text-gray-500 uppercase font-black tracking-widest">OUT</span>
+                                            <span class="block text-xs font-bold text-navy"
+                                                x-text="formatearFechaCorta(res.check_out)"></span>
+                                            <span class="block text-[10px] text-navy font-bold"
+                                                x-text="formatearHora(res.check_out)"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3"
+                                        x-show="res.huesped_telefono || res.huesped_email">
+                                        <template x-if="res.huesped_telefono">
+                                            <a :href="`https://wa.me/${res.huesped_telefono.length === 10 ? '57' + res.huesped_telefono : res.huesped_telefono}`"
+                                                target="_blank" class="text-xs font-bold text-green-600 py-1.5"
+                                                x-text="`📱 ${res.huesped_telefono}`"></a>
+                                        </template>
+                                        <template x-if="res.huesped_email">
+                                            <a :href="`mailto:${res.huesped_email}`"
+                                                class="text-xs font-bold text-navy truncate max-w-full py-1.5"
+                                                x-text="`✉️ ${res.huesped_email}`"></a>
+                                        </template>
+                                    </div>
+
+                                    <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                                        <p class="flex-1 text-lg font-extrabold text-navy"
+                                            x-text="formatearDinero(res.monto_total)"></p>
+                                        <button @click="editarReserva(res)"
+                                            class="px-4 py-2.5 min-h-[44px] bg-gray-50 border border-gray-200 text-navy rounded-xl text-xs font-bold">Editar</button>
+                                        <button @click="borrarReservaDirecto(res.id)"
+                                            class="px-4 py-2.5 min-h-[44px] bg-red-50 border border-red-100 text-danger rounded-xl text-xs font-bold">Eliminar</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <p x-show="reservasDelMes.length === 0" style="display: none;"
+                                class="p-8 text-center text-gray-500 font-medium">No hay reservas en este mes para esta
+                                propiedad.</p>
+                        </div>
+
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-left border-collapse">
+                                class="text-xl md:text-2xl font-extrabold text-navy bg-transparent border-b-2
+                                border-gray-200 hover:border-gold focus:border-gold outline-none cursor-pointer pr-1">
                                 <thead>
                                     <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-bold">
                                         <th class="p-6 font-medium">Huésped</th>

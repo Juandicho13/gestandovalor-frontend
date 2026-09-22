@@ -154,7 +154,9 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div id="lista-movil" class="p-4 space-y-4 md:hidden"></div>
+
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-bold">
@@ -309,8 +311,10 @@
 
         async function cargarSolicitudes() {
             const tbody = document.getElementById('tabla-cuerpo');
+            const lista = document.getElementById('lista-movil');
             const contador = document.getElementById('contador-solicitudes');
             tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-medium">Cargando base de datos...</td></tr>`;
+            lista.innerHTML = `<p class="p-6 text-center text-gray-400 font-medium">Cargando base de datos...</p>`;
             try {
                 const respuesta = await fetch('https://gestandovalor-backend.onrender.com/prospectos');
                 if (!respuesta.ok) throw new Error('Error al conectar');
@@ -321,10 +325,12 @@
                 solicitudes.sort((a, b) => new Date(b.created_at || b.fechaCreacion) - new Date(a.created_at || a.fechaCreacion));
 
                 tbody.innerHTML = '';
+                lista.innerHTML = '';
                 contador.innerHTML = `Total: <span class="text-gold ml-1">${solicitudes.length}</span>`;
 
                 if (solicitudes.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="6" class="p-16 text-center text-gray-400">Aún no hay solicitudes.</td></tr>`;
+                    lista.innerHTML = `<p class="p-10 text-center text-gray-400">Aún no hay solicitudes.</p>`;
                     return;
                 }
 
@@ -361,10 +367,41 @@
                         </tr>
                     `;
                     tbody.innerHTML += fila;
+
+                    const telefonoLimpio = p.telefono ? p.telefono.replace(/\s+/g, '') : '';
+                    lista.innerHTML += `
+                        <div class="border border-gray-100 rounded-[24px] p-5 shadow-sm">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <h3 class="text-base font-extrabold text-navy truncate">${p.nombre || 'Sin nombre'}</h3>
+                                    <a href="mailto:${p.email}" class="text-xs text-blue-500 break-all">${p.email || 'Sin correo'}</a>
+                                </div>
+                                <div class="shrink-0 text-right">${badgeNuevo}</div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 mt-3">
+                                <span class="px-3 py-1 rounded-lg bg-navy/5 text-navy text-xs font-bold border border-navy/10">${p.ciudadPropiedad || 'Sin ciudad'}</span>
+                                <span class="text-xs text-gray-400 font-medium">${fechaCreacion}</span>
+                            </div>
+
+                            <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 italic mt-3 break-words">${textoMensaje}</div>
+
+                            <div class="flex items-center gap-2 mt-3 text-xs">
+                                <span class="font-extrabold text-navy">${p.fechaReunion || 'Sin agendar'}</span>
+                                <span class="text-gray-500 font-medium">${p.horaReunion || ''}</span>
+                            </div>
+
+                            <div class="flex gap-3 mt-4">
+                                <a href="https://wa.me/57${telefonoLimpio}" target="_blank" class="flex-1 justify-center inline-flex items-center gap-2 bg-green-50 text-success px-4 py-3 min-h-[44px] rounded-xl text-xs font-bold border border-green-200">Contactar</a>
+                                <button onclick="borrarSolicitud('${p.id}')" class="flex-1 justify-center inline-flex items-center gap-2 bg-red-50 text-danger px-4 py-3 min-h-[44px] rounded-xl text-xs font-bold border border-red-200">Eliminar</button>
+                            </div>
+                        </div>
+                    `;
                 });
             } catch (error) {
                 console.error('Error:', error);
                 tbody.innerHTML = `<tr><td colspan="6" class="p-12 text-center text-red-500 font-bold">Error al cargar datos. Verifica la conexión con el servidor.</td></tr>`;
+                lista.innerHTML = `<p class="p-8 text-center text-red-500 font-bold">Error al cargar datos. Verifica la conexión con el servidor.</p>`;
             }
         }
 
