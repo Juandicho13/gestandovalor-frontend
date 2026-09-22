@@ -38,29 +38,42 @@
 
         /* Lo editable se ve dorado desde el principio, no solo al pasar el mouse.
            En celular no hay hover, asi que sin esto no se sabe que se puede tocar. */
-        .editable-field {
-            border: 2px dashed rgba(212, 175, 55, 0.55);
-            transition: all 0.25s ease;
+        .editable-field,
+        [x-model] {
+            box-shadow: inset 0 0 0 1.5px rgba(212, 175, 55, 0.5);
+            background-color: rgba(212, 175, 55, 0.07);
             border-radius: 8px;
-            background: rgba(212, 175, 55, 0.07);
+            transition: box-shadow 0.2s ease, background-color 0.2s ease;
         }
 
-        .editable-field:hover {
-            border-color: #D4AF37;
-            background: #FFF9E6;
+        .editable-field:hover,
+        [x-model]:hover {
+            box-shadow: inset 0 0 0 2px #D4AF37;
+            background-color: #FFF9E6;
         }
 
-        .editable-field:focus {
-            border-color: #0B132B;
-            border-style: solid;
-            background: white;
+        .editable-field:focus,
+        [x-model]:focus {
+            box-shadow: inset 0 0 0 2px #0B132B, 0 0 0 3px rgba(212, 175, 55, 0.25);
+            background-color: #FFFFFF;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
         }
 
-        .editable-field::placeholder {
+        .editable-field::placeholder,
+        [x-model]::placeholder {
             color: #B9A05A;
-            opacity: 0.8;
+            opacity: 0.85;
+        }
+
+        /* El precio va sobre la tarjeta oscura: ahi el dorado no se ve, se marca en blanco */
+        [x-model="propiedad.precio_noche"] {
+            box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.55);
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+
+        [x-model="propiedad.precio_noche"]:hover {
+            box-shadow: inset 0 0 0 2px #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .custom-scrollbar::-webkit-scrollbar {
@@ -932,6 +945,16 @@
                     }
 
                     let zoomLevel = tieneCoordenadasViejas ? 16 : 13;
+
+                    // Si el mapa ya estaba creado, Leaflet lanza "Map container is already
+                    // initialized". Lo desmontamos antes de volver a crearlo.
+                    if (this.mapa) {
+                        try { this.mapa.remove(); } catch (e) { }
+                        this.mapa = null;
+                    }
+                    const contenedorMapa = document.getElementById('mapa-interactivo');
+                    if (contenedorMapa && contenedorMapa._leaflet_id) contenedorMapa._leaflet_id = null;
+
                     this.mapa = L.map('mapa-interactivo').setView([lat, lng], zoomLevel);
 
                     L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
