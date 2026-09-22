@@ -78,11 +78,10 @@
                 Salir
             </button>
         </div>
-
-        <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white border border-gold font-extrabold shadow-lg cursor-pointer"
-                x-text="iniciales"></div>
-        </div>
+        <a href="ama_llaves_dashboard.html" @click="mobileMenuOpen = false"
+            class="text-2xl font-medium text-gray-300 hover:text-gold">Mi Panel</a>
+        <a href="ama_llaves_inventario.html" @click="mobileMenuOpen = false"
+            class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Inventario por Apto</a>
     </nav>
 
     <section class="pt-36 pb-16 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
@@ -331,6 +330,7 @@
     <script>
         function appInventario() {
             return {
+                mobileMenuOpen: false,
                 cargando: true,
                 iniciales: 'AL',
                 propiedades: [],
@@ -350,11 +350,6 @@
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
 
-                        if (usuario.rol !== 'ADMIN' && usuario.rol !== 'AMA_LLAVES') {
-                            alert('⛔ Acceso denegado.');
-                            window.location.href = 'login.html';
-                            return;
-                        }
 
                         this.iniciales = usuario.nombre.substring(0, 2).toUpperCase();
                     } else {

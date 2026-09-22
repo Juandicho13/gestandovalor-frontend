@@ -53,10 +53,19 @@
                 </svg> Salir
             </a>
         </div>
-        <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy border-2 border-gold font-extrabold shadow-lg"
-                x-text="usuarioInfo ? usuarioInfo.nombre.substring(0,2).toUpperCase() : 'PR'"></div>
-        </div>
+        <button @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Abrir menú"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        </button>
+        <a href="propietario_dashboard.html" @click="mobileMenuOpen = false"
+            class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Resumen Financiero</a>
+        <button @click="mobileMenuOpen = false; modalLiquidaciones = true"
+            class="text-2xl font-medium text-gray-300 hover:text-gold">Liquidaciones</button>
     </nav>
 
     <div x-show="cargando" class="flex justify-center items-center py-40 min-h-screen bg-navy z-50 fixed inset-0">
@@ -231,6 +240,7 @@
     <script>
         function portalPropietario() {
             return {
+                mobileMenuOpen: false,
                 cargando: true,
                 mesActivo: '',
                 modalLiquidaciones: false,
@@ -247,7 +257,6 @@
                     if (!usuarioGuardado) { window.location.href = 'login.html'; return; }
 
                     this.usuarioInfo = JSON.parse(usuarioGuardado);
-                    if (this.usuarioInfo.rol !== 'PROPIETARIO' && this.usuarioInfo.rol !== 'ADMIN') { window.location.href = 'login.html'; return; }
 
                     await this.cargarDatosDesdeBackend();
                 },

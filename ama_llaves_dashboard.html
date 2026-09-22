@@ -82,12 +82,35 @@
                 </svg> Salir
             </button>
         </div>
-
-        <div class="flex items-center gap-4 flex-shrink-0">
-            <div class="w-10 h-10 bg-navy rounded-full flex items-center justify-center text-white border border-gold font-extrabold shadow-lg cursor-pointer hover:scale-105 transition-transform"
-                x-text="iniciales">AL</div>
-        </div>
+        <button @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Abrir menú"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-12 h-12 z-[60] focus:outline-none bg-white/5 rounded-full border border-white/10">
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? 'rotate-45 translate-y-[8px]' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300"
+                :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+            <span class="w-6 h-[2px] bg-gold transition-all duration-300 origin-center"
+                :class="mobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : ''"></span>
+        </button>
     </nav>
+
+    <div x-show="mobileMenuOpen" style="display: none;" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-[45] bg-navy/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 md:hidden">
+        <div class="flex flex-col items-center gap-8 w-full mt-10">
+            <a href="ama_llaves_dashboard.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Mi Panel</a>
+            <a href="ama_llaves_inventario.html" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Inventario por Apto</a>
+            <button @click="mobileMenuOpen = false; modalReportes = true"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Historial Novedades</button>
+            <button @click="mobileMenuOpen = false; cerrarSesion()"
+                class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">
+                Salir
+            </button>
+        </div>
+    </div>
 
     <section class="pt-36 pb-12 bg-navy text-white rounded-b-[60px] shadow-sm relative overflow-hidden">
         <div class="absolute inset-0 z-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
@@ -268,7 +291,7 @@
                                                     a:</span>
                                                 <select x-model="tarea.empleado_id"
                                                     @change="cambiarEmpleado(tarea.id, tarea.empleado_id)"
-                                                    class="bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px] shadow-sm">
+                                                    class="bg-white border border-gray-200 rounded-lg px-3 py-2 min-h-[40px] outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px] shadow-sm">
                                                     <template x-for="emp in empleadosAseo" :key="emp.id">
                                                         <option :value="emp.id" x-text="emp.nombre"
                                                             :selected="emp.id == tarea.empleado_id"></option>
@@ -760,6 +783,7 @@
                 auditoriaChecklist: {},
 
                 modalReportes: false,
+                mobileMenuOpen: false,
                 modalProgramacion: false,
                 autoAgendando: false,
                 aviso: '',

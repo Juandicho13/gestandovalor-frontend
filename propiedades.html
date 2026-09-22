@@ -782,7 +782,7 @@
                             <template x-for="comodidad in listaComodidades" :key="comodidad">
                                 <button type="button" @click="toggleComodidad(comodidad)"
                                     class="p-4 border rounded-2xl text-left transition-all duration-200 flex flex-col gap-2"
-                                    :class="form.comodidades.includes(comodidad) ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 hover:border-black'">
+                                    :class="(form.comodidades || []).includes(comodidad) ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 hover:border-black'">
                                     <span class="text-sm font-bold text-gray-800" x-text="comodidad"></span>
                                 </button>
                             </template>
@@ -970,7 +970,7 @@
                     { id: 'camas', label: 'Camas' }, { id: 'banos', label: 'Baños' }
                 ],
                 listaComodidades: ['Wifi Rápido', 'Smart TV', 'Cocina equipada', 'Lavadora / Secadora', 'Parqueadero', 'Aire acondicionado', 'Zona de Trabajo', 'Piscina', 'Jacuzzi'],
-                form: {},
+                form: { comodidades: [], fotos: [] },
 
                 mapaCreacion: null,
                 marcadorCreacion: null,
@@ -982,12 +982,7 @@
                 liquidacionActual: null,
 
                 init() {
-                    const usuario = JSON.parse(localStorage.getItem('gv_usuario_actual') || '{}');
-                    if (usuario.rol !== 'ADMIN') {
-                        alert('⛔ Acceso denegado.');
-                        window.location.href = 'login.html';
-                        return;
-                    }
+
                     this.form = this.getFormVacio();
                     this.cargarPropiedades();
                     this.activarNavbarDinamica();
