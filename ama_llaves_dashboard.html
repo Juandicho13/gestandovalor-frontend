@@ -943,7 +943,7 @@
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
                         const estadoTarea = String(t.estado || 'pendiente').toLowerCase();
-                        if (estadoTarea === 'pendiente' || estadoTarea === 'en progreso') {
+                        if (estadoTarea === 'pendiente' || estadoTarea === 'en progreso' || estadoTarea === 'en pausa') {
                             const id = String(t.propiedad_id);
                             conteoAseosPendientes[id] = (conteoAseosPendientes[id] || 0) + 1;
                         }

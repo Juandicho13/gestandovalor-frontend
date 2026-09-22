@@ -157,6 +157,22 @@
                                                     d="M5 13l4 4L19 7" />
                                             </svg> Disponible
                                         </p>
+                                        <div x-show="miembro.estado === 'En pausa'" style="display: none;">
+                                            <p class="text-sm text-warning font-extrabold mb-2 flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg> <span x-text="`En pausa · ${miembro.ubicacion}`"></span>
+                                            </p>
+                                            <div
+                                                class="flex gap-3 text-[11px] text-gray-500 bg-white px-3 py-1.5 rounded-md border border-gray-100 inline-flex shadow-sm">
+                                                <span><strong class="text-navy">Inició:</strong> <span
+                                                        x-text="miembro.checkIn"></span></span>
+                                            </div>
+                                        </div>
+
                                         <div x-show="miembro.estado === 'Ocupado'">
                                             <p
                                                 class="text-sm text-blue-600 font-extrabold mb-2 flex items-center gap-1">
@@ -174,6 +190,9 @@
                                                 <span><strong class="text-navy">Inició:</strong> <span
                                                         x-text="miembro.checkIn"></span></span>
                                             </div>
+                                            <p x-show="miembro.pausado" style="display: none;"
+                                                class="mt-2 text-[11px] font-bold text-warning"
+                                                x-text="`⏸ Dejó en pausa: ${miembro.pausado}`"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -602,11 +621,16 @@
 
                         const personalOperativo = listaUsuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
                         this.equipoRadar = personalOperativo.map(emp => {
-                            const tareaActual = tareasActivas.find(t => t.empleado_id === emp.id && t.estado === 'En Progreso');
+                            // Un aseo en curso manda sobre uno en pausa: si retomó otro, ese es el que se ve
+                            const enCurso = tareasActivas.find(t => t.empleado_id === emp.id && t.estado === 'En Progreso');
+                            const enPausa = tareasActivas.find(t => t.empleado_id === emp.id && t.estado === 'En Pausa');
+                            const tareaActual = enCurso || enPausa;
                             return {
                                 ...emp,
-                                estado: tareaActual ? 'Ocupado' : 'Disponible',
+                                estado: enCurso ? 'Ocupado' : (enPausa ? 'En pausa' : 'Disponible'),
                                 ubicacion: tareaActual && tareaActual.propiedad ? tareaActual.propiedad.titulo : 'En base',
+                                // Si además dejó otro en pausa mientras trabaja en este, lo mostramos aparte
+                                pausado: (enCurso && enPausa && enPausa.propiedad) ? enPausa.propiedad.titulo : null,
                                 checkIn: tareaActual ? new Date(tareaActual.created_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : null
                             };
                         });

@@ -265,16 +265,16 @@
                 <div class="py-8 border-b border-gray-100">
                     <h2 class="text-2xl font-extrabold text-navy mb-6">¿Qué hay en el alojamiento?</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
-                        <template x-for="comodidad in propiedad.comodidades.slice(0, 6)" :key="comodidad">
+                        <template x-for="comodidad in (propiedad.comodidades || []).slice(0, 6)" :key="comodidad">
                             <div class="flex items-center gap-4 text-gray-700">
                                 <div x-html="obtenerIcono(comodidad)" class="w-6 h-6 text-navy shrink-0"></div>
                                 <span class="font-medium" x-text="comodidad"></span>
                             </div>
                         </template>
                     </div>
-                    <button x-show="propiedad.comodidades.length > 6" @click="openModalServicios = true"
+                    <button x-show="(propiedad.comodidades || []).length > 6" @click="openModalServicios = true"
                         class="mt-8 border border-gray-900 text-gray-900 font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors">
-                        Mostrar las <span x-text="propiedad.comodidades.length"></span> amenidades
+                        Mostrar las <span x-text="(propiedad.comodidades || []).length"></span> amenidades
                     </button>
                 </div>
 
@@ -1507,6 +1507,7 @@
 
                 // ✨ RECORRIDO FOTOGRÁFICO: filas de 1 o 2 fotos con su formato real
                 filasDeFotos(fotos) {
+                    fotos = fotos || [];
                     const filas = [];
                     let i = 0;
                     // Si la categoría tiene cantidad impar, la primera foto va sola
@@ -1535,7 +1536,7 @@
                     const grupos = {};
                     if (!this.propiedad || !this.propiedad.fotos) return [];
 
-                    for (let index = 0; index < this.propiedad.fotos.length; index++) {
+                    for (let index = 0; index < (this.propiedad.fotos || []).length; index++) {
                         let cat = this.propiedad.foto_categorias && this.propiedad.foto_categorias[index] ? this.propiedad.foto_categorias[index] : 'Fotos del alojamiento';
                         if (cat === 'Sin asignar') cat = 'Otras áreas';
 
@@ -1559,7 +1560,7 @@
 
                 necesitaBotonVerMas() {
                     if (!this.propiedad.descripcion) return false;
-                    return this.propiedad.descripcion.length > 250 || this.propiedad.descripcion.includes('\n');
+                    return (this.propiedad.descripcion || '').length > 250 || (this.propiedad.descripcion || '').includes('\n');
                 },
 
                 formatearDescripcionCompleta(desc) {

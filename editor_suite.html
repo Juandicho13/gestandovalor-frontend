@@ -36,11 +36,13 @@
             margin: 0;
         }
 
+        /* Lo editable se ve dorado desde el principio, no solo al pasar el mouse.
+           En celular no hay hover, asi que sin esto no se sabe que se puede tocar. */
         .editable-field {
-            border: 2px dashed transparent;
-            transition: all 0.3s ease;
+            border: 2px dashed rgba(212, 175, 55, 0.55);
+            transition: all 0.25s ease;
             border-radius: 8px;
-            background: transparent;
+            background: rgba(212, 175, 55, 0.07);
         }
 
         .editable-field:hover {
@@ -50,8 +52,15 @@
 
         .editable-field:focus {
             border-color: #0B132B;
+            border-style: solid;
             background: white;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
+        }
+
+        .editable-field::placeholder {
+            color: #B9A05A;
+            opacity: 0.8;
         }
 
         .custom-scrollbar::-webkit-scrollbar {

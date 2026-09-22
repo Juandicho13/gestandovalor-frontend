@@ -1195,6 +1195,31 @@
                     } catch (e) { console.log("Error reportes"); }
                 },
 
+                // ✨ Borrar la publicación completa (faltaba: el botón llamaba a una función inexistente)
+                async eliminarPropiedad() {
+                    if (!this.propiedadActiva) return;
+                    const nombre = this.propiedadActiva.titulo || 'esta propiedad';
+                    if (!confirm(`¿Seguro que quieres eliminar "${nombre}"?\n\nSe borrarán también sus reservas, aseos y liquidaciones. Esto no se puede deshacer.`)) return;
+
+                    this.cargandoAccion = true;
+                    try {
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/propiedades/${this.propiedadActiva.id}`, {
+                            method: 'DELETE'
+                        });
+                        if (!res.ok) throw new Error('El servidor rechazó el borrado');
+
+                        this.propiedades = this.propiedades.filter(p => p.id !== this.propiedadActiva.id);
+                        this.propiedadActiva = null;
+                        this.vista = 'grid';
+                        alert('✅ Propiedad eliminada.');
+                    } catch (e) {
+                        console.error(e);
+                        alert('❌ No se pudo eliminar la propiedad. Intenta de nuevo.');
+                    } finally {
+                        this.cargandoAccion = false;
+                    }
+                },
+
                 toggleComodidad(item) {
                     if (this.form.comodidades.includes(item)) {
                         this.form.comodidades = this.form.comodidades.filter(c => c !== item);

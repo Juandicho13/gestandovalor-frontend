@@ -819,7 +819,7 @@
                                 return { ...t, propiedad_segura: prop || {} };
                             });
 
-                            this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente' || t.estado === 'En Progreso');
+                            this.tareasPendientes = todasLasTareas.filter(t => t.estado === 'Pendiente' || t.estado === 'En Progreso' || t.estado === 'En Pausa');
                             this.tareasCompletadas = todasLasTareas.filter(t => t.estado === 'Completada').length;
                             this.tareasConNovedad = todasLasTareas.filter(t => t.novedad_reportada && t.novedad_reportada.trim() !== '').length;
                         }
@@ -891,6 +891,17 @@
                     clearInterval(this.intervalo);
                     this.horaInicioPausa = new Date();
                     this.guardarProgresoLocal();
+
+                    // Avisamos al servidor para que el radar del equipo lo vea "En Pausa"
+                    if (this.tareaActiva) {
+                        this.tareaActiva.estado = 'En Pausa';
+                        fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ estado: 'En Pausa' })
+                        }).catch(e => console.error('No se pudo marcar la pausa', e));
+                    }
+
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
