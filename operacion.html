@@ -499,13 +499,13 @@
                         </div>
                         <div>
                             <input type="text" x-model="formUsuario.password"
-                                :placeholder="modoEdicion ? 'Cambiar contraseña' : 'Contraseña'"
+                                :placeholder="modoEdicion ? 'Dejar vacío = no cambiar' : 'Contraseña'"
                                 :required="!modoEdicion" minlength="6"
                                 class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
-                            <p class="text-[10px] mt-1 ml-1"
-                                :class="modoEdicion ? 'text-blue-500 font-bold' : 'text-gray-500'">
+                            <p class="text-[10px] mt-1 ml-1 text-gray-500">
                                 <span x-show="!modoEdicion">Mínimo 6 caracteres.</span>
-                                <span x-show="modoEdicion">Contraseña actual visible.</span>
+                                <span x-show="modoEdicion">Déjalo vacío para no cambiarla. Las claves van
+                                    cifradas y nadie puede leerlas.</span>
                             </p>
                         </div>
                     </div>
@@ -688,7 +688,9 @@
                         id: usuario.id,
                         nombre: usuario.nombre,
                         username: usuario.username,
-                        password: usuario.password || '',
+                        // Vacío a propósito: el servidor ya no manda las claves.
+                        // Si se escribe algo aquí se reemplaza; si se deja vacío, no se toca.
+                        password: '',
                         rol: usuario.rol
                     };
 
@@ -712,6 +714,12 @@
 
                     const payload = { ...this.formUsuario };
                     delete payload.id;
+
+                    // Al editar sin escribir clave, no mandamos el campo:
+                    // así el servidor deja la que ya tenía.
+                    if (this.modoEdicion && !(this.formUsuario.password || '').trim()) {
+                        delete payload.password;
+                    }
 
                     if (payload.rol === 'PROPIETARIO') {
                         payload.propiedadesIds = this.propiedadesSeleccionadas;
