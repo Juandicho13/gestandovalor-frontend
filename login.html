@@ -93,6 +93,7 @@
                         class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 pl-2">Usuario de
                         Acceso</label>
                     <input type="text" id="username" name="username" placeholder="Ej: carlos_mendoza"
+                        autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"
                         class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors"
                         required>
                 </div>
@@ -103,8 +104,8 @@
                             class="block text-xs font-bold uppercase tracking-widest text-gray-500">Contraseña</label>
                     </div>
                     <div class="relative">
-                        <input :type="showPass ? 'text' : 'password'" id="password" name="password"
-                            placeholder="••••••••"
+                        <input type="password" :type="showPass ? 'text' : 'password'" id="password" name="password"
+                            placeholder="••••••••" autocomplete="current-password"
                             class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-6 pr-12 text-navy font-medium outline-none focus:border-gold focus:bg-white transition-colors"
                             required>
 
@@ -197,6 +198,17 @@
                     // Guardamos el token de sesión y quién entró.
                     // A partir de aquí toda llamada a la API viaja firmada (ver gv-auth.js).
                     gvGuardarSesion(data.token, usuario);
+
+                    // Le pedimos al navegador que ofrezca guardar la clave.
+                    // Chrome y Android lo soportan; Safari no tiene esta API pero
+                    // igual ofrece guardarla solo, por los atributos autocomplete.
+                    try {
+                        if (window.PasswordCredential && navigator.credentials) {
+                            await navigator.credentials.store(
+                                new PasswordCredential({ id: username, password: password, name: usuario.nombre })
+                            );
+                        }
+                    } catch (e) { /* si el navegador no quiere, seguimos igual */ }
 
                     // Redirige según el Rol
                     switch (usuario.rol) {
