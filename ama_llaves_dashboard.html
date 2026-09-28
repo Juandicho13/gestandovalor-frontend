@@ -856,34 +856,46 @@
                     // ⚡ Los aptos con personal fijo se agendan solos: nadie toca "Agendar"
                     this.autoAgendarPendientes();
                 },
-
+                // ✨ Sin cabeceras extra: la API solo acepta Content-Type y Authorization (CORS).
+                // Con 'Cache-Control' o 'Pragma' el navegador bloqueaba la petición y no llegaban
+                // ni apartamentos, ni empleados, ni reservas. El ?t= y cache: 'no-store' ya evitan datos viejos.
                 async fetchFresco(endpoint) {
                     const url = `https://gestandovalor-backend.onrender.com/${endpoint}?t=${new Date().getTime()}`;
-                    return await fetch(url, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } });
+                    return await fetch(url, { cache: 'no-store' });
                 },
 
                 async cargarPropiedades() {
                     try {
                         const res = await this.fetchFresco('propiedades');
-                        if (res.ok) this.propiedades = await res.json();
-                    } catch (e) { }
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        this.propiedades = await res.json();
+                    } catch (e) {
+                        console.error('No se pudieron cargar los apartamentos:', e);
+                        this.mostrarAviso('⚠️ No se pudieron cargar los apartamentos. Recarga la página.');
+                    }
                 },
 
                 async cargarEmpleados() {
                     try {
                         const res = await this.fetchFresco('usuarios');
-                        if (res.ok) {
-                            const all = await res.json();
-                            this.empleadosAseo = all.filter(u => u.rol === 'ASEO');
-                        }
-                    } catch (e) { }
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        const all = await res.json();
+                        this.empleadosAseo = all.filter(u => u.rol === 'ASEO');
+                    } catch (e) {
+                        console.error('No se pudieron cargar los empleados:', e);
+                        this.mostrarAviso('⚠️ No se pudieron cargar los empleados. Recarga la página.');
+                    }
                 },
 
                 async cargarReservas() {
                     try {
                         const res = await this.fetchFresco('reservas');
-                        if (res.ok) this.reservas = await res.json();
-                    } catch (e) { }
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        this.reservas = await res.json();
+                    } catch (e) {
+                        console.error('No se pudieron cargar las reservas:', e);
+                        this.mostrarAviso('⚠️ No se pudieron cargar las reservas. Recarga la página.');
+                    }
                 },
 
                 async cargarTareas() {
