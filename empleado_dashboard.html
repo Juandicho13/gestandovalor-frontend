@@ -1111,7 +1111,7 @@
                     // Paso B: la foto va directo a Storage (no pasa por el servidor)
                     const subida = await fetch(signedUrl, {
                         method: 'PUT',
-                        headers: { 'Content-Type': foto.blob.type },
+                        headers: { 'Content-Type': foto.blob.type, 'cache-control': 'max-age=31536000' },
                         body: foto.blob
                     });
                     if (!subida.ok) throw new Error('Falló la subida de la foto');

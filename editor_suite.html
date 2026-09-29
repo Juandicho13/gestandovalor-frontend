@@ -1074,7 +1074,7 @@
                     // Paso B: Subimos la foto directo a Supabase
                     const subida = await fetch(signedUrl, {
                         method: 'PUT',
-                        headers: { 'Content-Type': blob.type },
+                        headers: { 'Content-Type': blob.type, 'cache-control': 'max-age=31536000' },
                         body: blob
                     });
 
