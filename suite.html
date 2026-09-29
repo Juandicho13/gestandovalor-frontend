@@ -21,6 +21,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -38,6 +39,20 @@
         }
     </script>
     <style>
+        /* ✨ FIX CALENDARIO DE 2 MESES
+           1) flatpickr marca los huecos del mes anterior y del siguiente con la clase "hidden",
+              pero Tailwind también tiene "hidden" (display: none) y los borraba. Sin esos huecos
+              el día 1 siempre caía en lunes y la última fila quedaba desparramada.
+           2) El padding le quitaba ancho a los días y se cortaba el domingo del segundo mes. */
+        .flatpickr-calendar .flatpickr-day.hidden {
+            display: inline-block !important;
+            visibility: hidden !important;
+        }
+
+        .flatpickr-calendar.multiMonth {
+            box-sizing: content-box !important;
+        }
+
         .flatpickr-calendar {
             border-radius: 24px !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
@@ -223,8 +238,13 @@
 
                 <div class="flex justify-between items-start pb-8 border-b border-gray-100">
                     <div>
+                        <!-- ✨ En "Tu reserva" sale el nombre que se configuró en el editor -->
                         <h2 class="text-2xl font-extrabold text-navy mb-2"
-                            x-text="`${propiedad.tipo_propiedad} entero en ${propiedad.ciudad}`"></h2>
+                            x-text="modoReserva && propiedad.titulo ? propiedad.titulo : `${propiedad.tipo_propiedad} entero en ${propiedad.ciudad}`">
+                        </h2>
+                        <p x-show="modoReserva && propiedad.titulo" style="display: none;"
+                            class="text-gray-500 font-medium mb-1"
+                            x-text="`${propiedad.tipo_propiedad} entero en ${propiedad.ciudad}`"></p>
                         <ol class="flex flex-wrap gap-x-2 text-gray-600 font-medium">
                             <li x-text="`${propiedad.capacidad_huespedes} huéspedes max`"></li><span>·</span>
                             <li

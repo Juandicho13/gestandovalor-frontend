@@ -30,6 +30,20 @@
     </script>
 
     <style>
+        /* ✨ FIX CALENDARIO DE 2 MESES
+           1) flatpickr marca los huecos del mes anterior y del siguiente con la clase "hidden",
+              pero Tailwind también tiene "hidden" (display: none) y los borraba. Sin esos huecos
+              el día 1 siempre caía en lunes y la última fila quedaba desparramada.
+           2) El padding le quitaba ancho a los días y se cortaba el domingo del segundo mes. */
+        .flatpickr-calendar .flatpickr-day.hidden {
+            display: inline-block !important;
+            visibility: hidden !important;
+        }
+
+        .flatpickr-calendar.multiMonth {
+            box-sizing: content-box !important;
+        }
+
         .flatpickr-calendar {
             border-radius: 24px !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;

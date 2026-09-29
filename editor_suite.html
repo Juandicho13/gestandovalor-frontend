@@ -377,10 +377,16 @@
                                 class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-medium">
                         </div>
                     </div>
-                    <div class="mb-6"><label
-                            class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Código
-                            Cerradura</label><input x-model="propiedad.cerradura_codigo" type="text"
-                            class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-mono text-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div><label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Código
+                                Cerradura</label><input x-model="propiedad.cerradura_codigo" type="text"
+                                class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-mono text-lg">
+                        </div>
+                        <div><label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Número
+                                del alojamiento</label><input x-model="propiedad.numero_alojamiento" type="text"
+                                placeholder="Ej: 313"
+                                class="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 outline-none focus:border-gold shadow-sm font-mono text-lg">
+                        </div>
                     </div>
                     <div class="space-y-4 pt-6 border-t border-gold/20">
                         <div><label class="block text-xs font-bold text-airbnb uppercase tracking-wider mb-2">Link de
@@ -650,10 +656,10 @@
                 </div>
             </div>
 
-            <!-- 2. VISTA ORGANIZAR (ARRASTRAR Y SOLTAR) -->
+            <!-- 2. VISTA ORGANIZAR (ARRASTRAR O ESCRIBIR LA POSICIÓN) -->
             <div x-show="vistaModalFotos === 'todas'" class="max-w-6xl mx-auto p-6 md:p-12" style="display: none;">
-                <p class="text-sm text-gray-500 mb-8 font-medium">Haz clic sostenido y arrastra las fotos para cambiar
-                    su orden (La número 1 es la portada).</p>
+                <p class="text-sm text-gray-500 mb-8 font-medium">Arrastra las fotos, o toca el número de una foto y
+                    escribe la posición a la que la quieres mover (la número 1 es la portada).</p>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <template x-for="(fotoUrl, index) in propiedad?.fotos" :key="index">
                         <div draggable="true" @dragstart="draggedIndex = index" @dragover.prevent=""
@@ -663,10 +669,15 @@
 
                             <img :src="fotoUrl" class="w-full h-full object-cover pointer-events-none">
 
-                            <div class="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
-                                <span
-                                    class="bg-white text-navy font-extrabold text-xs w-8 h-8 flex items-center justify-center rounded-full shadow-lg border border-gray-100"
-                                    x-text="index + 1"></span>
+                            <div class="absolute top-3 left-3 flex items-center gap-2 z-20 pointer-events-none">
+                                <!-- ✨ Número editable: en iPhone y iPad no se puede arrastrar, así que se escribe la posición -->
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3"
+                                    enterkeyhint="done" :value="index + 1" :placeholder="index + 1"
+                                    aria-label="Posición de la foto" title="Escribe la nueva posición"
+                                    @pointerdown="$el.closest('[draggable]').draggable = false" @focus="$el.value = ''"
+                                    @click.stop @keydown.enter.prevent="$el.blur()"
+                                    @blur="$el.closest('[draggable]').draggable = true; cambiarPosicionFoto(index, $el)"
+                                    class="pointer-events-auto appearance-none bg-white text-navy font-extrabold text-base w-10 h-10 p-0 text-center rounded-full shadow-lg border border-gray-100 outline-none focus:ring-2 focus:ring-gold placeholder:text-gray-300 cursor-text">
                                 <template x-if="index === 0">
                                     <span
                                         class="bg-white text-navy font-extrabold text-[10px] px-3 py-1.5 flex items-center justify-center rounded-lg shadow-lg uppercase tracking-widest">Portada</span>
@@ -1142,6 +1153,17 @@
                     this.draggedIndex = null;
                 },
 
+                // ✨ Mueve una foto a la posición que se escribe en su número (18 → 1 la vuelve portada)
+                cambiarPosicionFoto(index, input) {
+                    const escrito = parseInt(String(input.value).replace(/\D/g, ''), 10);
+                    input.value = index + 1;
+                    if (!escrito) return; // vacío o 0: la foto se queda donde estaba
+
+                    const total = this.propiedad.fotos.length;
+                    const destino = Math.min(escrito, total) - 1;
+                    this.moverFoto(index, destino);
+                },
+
                 abrirModalFotosInicial() {
                     this.vistaModalFotos = 'inicio';
                     this.modalFotos = true;
@@ -1252,6 +1274,7 @@
                         wifi_red: this.propiedad.wifi_red || '',
                         wifi_pass: this.propiedad.wifi_pass || '',
                         cerradura_codigo: this.propiedad.cerradura_codigo || '',
+                        numero_alojamiento: String(this.propiedad.numero_alojamiento || '').trim(),
                         link_airbnb: this.propiedad.link_airbnb || '',
                         link_booking: this.propiedad.link_booking || '',
 
