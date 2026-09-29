@@ -742,8 +742,9 @@
                         this.iniciales = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : this.empleadoNombre.substring(0, 2).toUpperCase();
 
                         this.resetearChecklist();
-                        await this.cargarPropiedades();
-                        await this.cargarTareasDesdeBD();
+                        // ✨ Apartamentos y aseos se piden al mismo tiempo (antes uno esperaba al otro)
+                        const propiedadesListas = this.cargarPropiedades();
+                        await this.cargarTareasDesdeBD(propiedadesListas);
 
                         // ✨ MAGIA DE AUTOGUARDADO ✨
                         const estadoGuardado = localStorage.getItem('gv_aseo_en_progreso');
@@ -829,11 +830,13 @@
                     } catch (e) { console.error("Error propiedades:", e); }
                 },
 
-                async cargarTareasDesdeBD() {
+                async cargarTareasDesdeBD(esperarPropiedades) {
                     try {
                         const res = await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/empleado/${this.empleadoId}`);
                         if (res.ok) {
                             let todasLasTareas = await res.json();
+                            // Al abrir el panel los apartamentos llegan en paralelo: los esperamos antes de unirlos
+                            if (esperarPropiedades) await esperarPropiedades;
 
                             todasLasTareas = todasLasTareas.map(t => {
                                 const prop = this.propiedades.find(p => String(p.id) === String(t.propiedad_id));

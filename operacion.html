@@ -589,36 +589,31 @@
                 async cargarDatosCompletos() {
                     this.cargando = true;
                     try {
-                        const resUsr = await fetch('https://gestandovalor-backend.onrender.com/usuarios');
-                        let listaUsuarios = [];
-                        if (resUsr.ok) {
-                            listaUsuarios = await resUsr.json();
-                            if (Array.isArray(listaUsuarios)) {
-                                this.usuarios = listaUsuarios.sort((a, b) => (a.rol || '').localeCompare(b.rol || ''));
+                        // ✨ Las tres consultas salen al mismo tiempo (antes cada una esperaba a la anterior)
+                        const pedir = async (ruta) => {
+                            try {
+                                const res = await fetch(`https://gestandovalor-backend.onrender.com/${ruta}`);
+                                if (!res.ok) { console.error(`${ruta}: el servidor respondió`, res.status); return null; }
+                                return await res.json();
+                            } catch (e) {
+                                console.error(`Error cargando ${ruta}:`, e);
+                                return null;
                             }
+                        };
+                        const [dataUsr, dataProp, dataTareas] = await Promise.all([
+                            pedir('usuarios'),
+                            pedir('propiedades/admin'),
+                            pedir('tareas-aseo')
+                        ]);
+
+                        const listaUsuarios = Array.isArray(dataUsr) ? dataUsr : [];
+                        if (Array.isArray(dataUsr)) {
+                            this.usuarios = listaUsuarios.sort((a, b) => (a.rol || '').localeCompare(b.rol || ''));
                         }
 
-                        try {
-                            const resProp = await fetch('https://gestandovalor-backend.onrender.com/propiedades/admin');
-                            if (resProp.ok) {
-                                const dataProp = await resProp.json();
-                                this.propiedadesReales = Array.isArray(dataProp) ? dataProp : [];
-                            } else {
-                                console.error('Propiedades: el servidor respondió', resProp.status);
-                                this.propiedadesReales = [];
-                            }
-                        } catch (e) {
-                            console.error('Error cargando propiedades:', e);
-                            this.propiedadesReales = [];
-                        }
+                        this.propiedadesReales = Array.isArray(dataProp) ? dataProp : [];
 
-                        let tareasActivas = [];
-                        try {
-                            const resTareas = await fetch('https://gestandovalor-backend.onrender.com/tareas-aseo');
-                            if (resTareas.ok) {
-                                tareasActivas = await resTareas.json();
-                            }
-                        } catch (e) { console.log('Aún no hay tareas creadas'); }
+                        const tareasActivas = Array.isArray(dataTareas) ? dataTareas : [];
 
                         const personalOperativo = listaUsuarios.filter(u => u.rol === 'ASEO' || u.rol === 'AMA_LLAVES');
                         this.equipoRadar = personalOperativo.map(emp => {
