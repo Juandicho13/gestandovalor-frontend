@@ -79,18 +79,16 @@
                     Salir
                 </button>
                 <!-- Avatar -->
-                <div
+                <div x-text="iniciales"
                     class="w-8 h-8 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-sm shadow-lg shrink-0">
-                    RI
                 </div>
             </div>
 
             <!-- Lado Derecho: Móvil (Oculto en pantallas grandes) -->
             <div class="flex items-center gap-3 md:hidden">
                 <!-- Avatar -->
-                <div
+                <div x-text="iniciales"
                     class="w-8 h-8 rounded-full bg-gold flex items-center justify-center text-navy font-bold text-sm shadow-lg shrink-0">
-                    RI
                 </div>
 
                 <!-- Botón Hamburguesa / Cerrar -->
@@ -151,7 +149,9 @@
                     <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Hola, <span
                             x-text="empleadoNombre"></span> 👋</h1>
                     <p class="text-gray-400 mt-2">Tienes <strong class="text-white"
-                            x-text="tareasPendientes.length + ' apartamentos'"></strong> asignados en tu ruta de hoy.
+                            x-text="aseosDeHoy + (aseosDeHoy === 1 ? ' aseo' : ' aseos')"></strong> para hoy<span
+                            x-show="aseosProximos > 0"
+                            x-text="' y ' + aseosProximos + (aseosProximos === 1 ? ' programado' : ' programados') + ' para los próximos días'"></span>.
                     </p>
                 </div>
             </div>
@@ -212,76 +212,96 @@
                     <p class="text-gray-500 mt-2">No tienes apartamentos pendientes por limpiar.</p>
                 </div>
 
-                <template x-for="tarea in tareasPendientes" :key="tarea.id">
-                    <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden mb-6"
-                        :class="tareaActiva && tareaActiva.id === tarea.id ? 'ring-4 ring-warning/50' : ''">
+                <!-- ✨ Agenda por días: atrasados, hoy, mañana y los días que siguen -->
+                <template x-for="grupo in gruposAgenda" :key="grupo.clave">
+                    <div class="pt-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-lg font-extrabold"
+                                :class="grupo.clave === 'atrasados' ? 'text-danger' : 'text-navy'"
+                                x-text="grupo.titulo"></h3>
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full"
+                                :class="grupo.clave === 'atrasados' ? 'bg-red-50 text-danger' : 'bg-gray-100 text-gray-500'"
+                                x-text="grupo.tareas.length + (grupo.tareas.length === 1 ? ' aseo' : ' aseos')"></span>
+                        </div>
+                        <template x-for="tarea in grupo.tareas" :key="tarea.id">
+                            <div class="bg-white rounded-[30px] shadow-lg border border-gray-100 overflow-hidden mb-6"
+                                :class="tareaActiva && tareaActiva.id === tarea.id ? 'ring-4 ring-warning/50' : ''">
 
-                        <div class="px-6 py-3 flex items-center justify-between border-b" :class="{
+                                <div class="px-6 py-3 flex items-center justify-between border-b" :class="{
                                 'bg-red-50 border-red-100': tarea.urgencia === 'Urgente',
                                 'bg-yellow-50 border-yellow-100': tarea.urgencia === 'Normal',
                                 'bg-gray-100 border-gray-200': (!tarea.urgencia || tarea.urgencia === 'Flexible')
                              }">
-                            <span class="font-extrabold text-xs uppercase tracking-widest flex items-center gap-2"
-                                :class="{
+                                    <span
+                                        class="font-extrabold text-xs uppercase tracking-widest flex items-center gap-2"
+                                        :class="{
                                     'text-danger': tarea.urgencia === 'Urgente',
                                     'text-warning': tarea.urgencia === 'Normal',
                                     'text-gray-600': (!tarea.urgencia || tarea.urgencia === 'Flexible')
                                   }">
-                                <span
-                                    x-text="tarea.urgencia === 'Urgente' ? '🔥 Urgente' : (tarea.urgencia === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
-                            </span>
-                            <span x-show="tareaActiva && tareaActiva.id === tarea.id"
-                                class="text-[10px] bg-warning text-white px-2 py-1 rounded-md font-bold uppercase tracking-wider animate-pulse">
-                                Limpieza en Pausa
-                            </span>
-                        </div>
-
-                        <div
-                            class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-
-                            <div class="flex items-center gap-5">
-                                <div
-                                    class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
-                                    <img :src="obtenerFotoApto(tarea.propiedad_segura)" alt="Apto"
-                                        class="w-full h-full object-cover">
-                                </div>
-                                <div>
-                                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                                        <h3 class="text-xl font-bold text-navy"
-                                            x-text="tarea.propiedad_segura?.titulo || 'Apartamento sin título'"></h3>
                                         <span
-                                            class="bg-gray-100 text-gray-600 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-200"
-                                            x-text="'🔑 ' + (tarea.propiedad_segura?.cerradura_codigo || 'Consultar admin')"></span>
+                                            x-text="tarea.urgencia === 'Urgente' ? '🔥 Urgente' : (tarea.urgencia === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
+                                    </span>
+                                    <span x-show="tareaActiva && tareaActiva.id === tarea.id"
+                                        class="text-[10px] bg-warning text-white px-2 py-1 rounded-md font-bold uppercase tracking-wider animate-pulse">
+                                        Limpieza en Pausa
+                                    </span>
+                                </div>
+
+                                <div
+                                    class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+
+                                    <div class="flex items-center gap-5">
+                                        <div
+                                            class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
+                                            <img :src="obtenerFotoApto(tarea.propiedad_segura)" alt="Apto"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                                <h3 class="text-xl font-bold text-navy"
+                                                    x-text="tarea.propiedad_segura?.titulo || 'Apartamento sin título'">
+                                                </h3>
+                                                <span
+                                                    class="bg-gray-100 text-gray-600 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-200"
+                                                    x-text="'🔑 ' + (tarea.propiedad_segura?.cerradura_codigo || 'Consultar admin')"></span>
+                                            </div>
+                                            <p class="text-gray-500 text-xs font-medium"
+                                                x-text="tarea.propiedad_segura?.direccion || 'Dirección no especificada'">
+                                            </p>
+                                            <p x-show="tarea.fecha_aseo" class="text-xs font-bold mt-1"
+                                                :class="grupo.clave === 'atrasados' ? 'text-danger' : 'text-gray-600'"
+                                                x-text="textoSalida(tarea, grupo)"></p>
+                                        </div>
                                     </div>
-                                    <p class="text-gray-500 text-xs font-medium"
-                                        x-text="tarea.propiedad_segura?.direccion || 'Dirección no especificada'"></p>
+
+                                    <button
+                                        @click="tareaActiva && tareaActiva.id === tarea.id ? reanudarAseo() : iniciarAseo(tarea)"
+                                        class="w-full md:w-auto font-extrabold py-4 px-8 rounded-xl transition-transform flex justify-center items-center gap-2 flex-shrink-0"
+                                        :class="claseBotonAseo(tarea, grupo)" :disabled="aseoBloqueado(tarea, grupo)">
+
+                                        <svg x-show="tareaActiva && tareaActiva.id === tarea.id"
+                                            class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        </svg>
+                                        <svg x-show="!(tareaActiva && tareaActiva.id === tarea.id)"
+                                            class="w-5 h-5 text-gold" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+
+                                        <span
+                                            x-text="tareaActiva && tareaActiva.id === tarea.id ? 'Reanudar Aseo' : (grupo.iniciable ? 'Iniciar Aseo' : 'Programado')"></span>
+                                    </button>
+
                                 </div>
                             </div>
-
-                            <button
-                                @click="tareaActiva && tareaActiva.id === tarea.id ? reanudarAseo() : iniciarAseo(tarea)"
-                                class="w-full md:w-auto text-white font-extrabold py-4 px-8 rounded-xl shadow-lg transition-transform flex justify-center items-center gap-2 flex-shrink-0"
-                                :class="(tareaActiva && tareaActiva.id !== tarea.id) ? 'bg-gray-300 opacity-50 cursor-not-allowed shadow-none' : (tareaActiva && tareaActiva.id === tarea.id ? 'bg-warning hover:bg-orange-500 active:scale-95' : 'bg-navy hover:bg-blue-900 active:scale-95')"
-                                :disabled="tareaActiva && tareaActiva.id !== tarea.id">
-
-                                <svg x-show="tareaActiva && tareaActiva.id === tarea.id" class="w-5 h-5 text-white"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                </svg>
-                                <svg x-show="!(tareaActiva && tareaActiva.id === tarea.id)" class="w-5 h-5 text-gold"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-
-                                <span
-                                    x-text="tareaActiva && tareaActiva.id === tarea.id ? 'Reanudar Aseo' : 'Iniciar Aseo'"></span>
-                            </button>
-
-                        </div>
+                        </template>
                     </div>
                 </template>
 
@@ -831,6 +851,82 @@
                 obtenerFotoApto(prop) {
                     if (prop && prop.fotos && prop.fotos.length > 0) return prop.fotos[0];
                     return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80';
+                },
+
+                // ✨ AGENDA POR DÍAS
+                // Día 'YYYY-MM-DD' en hora de Colombia, sin importar la zona del celular
+                diaColombia(fecha) {
+                    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(fecha));
+                },
+
+                nombreDia(dia) {
+                    if (dia === this.diaColombia(Date.now())) return 'Hoy';
+                    if (dia === this.diaColombia(Date.now() + 86400000)) return 'Mañana';
+                    const texto = new Date(dia + 'T12:00:00-05:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' });
+                    return texto.charAt(0).toUpperCase() + texto.slice(1);
+                },
+
+                // Atrasados, sin fecha, hoy, mañana y los días que siguen. Dentro de cada día, primero
+                // los urgentes (entra otro huésped ese mismo día) y luego por hora de salida.
+                agruparPorDia(tareas) {
+                    const hoy = this.diaColombia(Date.now());
+                    const peso = (t) => ({ 'Urgente': 0, 'Normal': 1 })[t.urgencia] ?? 2;
+                    const hora = (t) => new Date(t.fecha_aseo || 0).getTime();
+                    const grupos = {};
+                    tareas.forEach(t => {
+                        let clave = 'sin-fecha';
+                        if (t.fecha_aseo) {
+                            const dia = this.diaColombia(t.fecha_aseo);
+                            clave = dia < hoy ? 'atrasados' : dia;
+                        }
+                        (grupos[clave] = grupos[clave] || []).push(t);
+                    });
+                    const rango = (c) => c === 'atrasados' ? 0 : (c === 'sin-fecha' ? 1 : 2);
+                    return Object.keys(grupos)
+                        .sort((a, b) => (rango(a) - rango(b)) || a.localeCompare(b))
+                        .map(clave => ({
+                            clave,
+                            titulo: clave === 'atrasados' ? 'Atrasados' : (clave === 'sin-fecha' ? 'Sin fecha' : this.nombreDia(clave)),
+                            iniciable: clave === 'atrasados' || clave === 'sin-fecha' || clave === hoy,
+                            tareas: grupos[clave].sort((a, b) => clave === 'atrasados'
+                                ? (hora(a) - hora(b)) || (peso(a) - peso(b))
+                                : (peso(a) - peso(b)) || (hora(a) - hora(b)))
+                        }));
+                },
+
+                get gruposAgenda() {
+                    return this.agruparPorDia(this.tareasPendientes);
+                },
+
+                get aseosDeHoy() {
+                    return this.gruposAgenda.filter(g => g.iniciable).reduce((n, g) => n + g.tareas.length, 0);
+                },
+
+                get aseosProximos() {
+                    return this.gruposAgenda.filter(g => !g.iniciable).reduce((n, g) => n + g.tareas.length, 0);
+                },
+
+                // Solo se empiezan los aseos de hoy, atrasados o sin fecha; el que está en curso siempre se puede retomar
+                aseoBloqueado(tarea, grupo) {
+                    if (this.tareaActiva && this.tareaActiva.id === tarea.id) return false;
+                    if (this.tareaActiva) return true;
+                    return !grupo.iniciable;
+                },
+
+                claseBotonAseo(tarea, grupo) {
+                    if (this.tareaActiva && this.tareaActiva.id === tarea.id) return 'text-white shadow-lg bg-warning hover:bg-orange-500 active:scale-95';
+                    if (this.tareaActiva) return 'text-white bg-gray-300 opacity-50 cursor-not-allowed';
+                    if (!grupo.iniciable) return 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed';
+                    return 'text-white shadow-lg bg-navy hover:bg-blue-900 active:scale-95';
+                },
+
+                textoSalida(tarea, grupo) {
+                    if (!tarea.fecha_aseo) return '';
+                    const fecha = new Date(tarea.fecha_aseo);
+                    if (grupo.clave === 'atrasados') {
+                        return 'El huésped salió el ' + fecha.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'America/Bogota' });
+                    }
+                    return 'El huésped sale a las ' + fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Bogota' });
                 },
 
                 iniciarAseo(tarea) {

@@ -260,66 +260,82 @@
                     <div>
                         <h3 class="text-xl font-extrabold text-navy mb-4">Aseos Asignados</h3>
                         <div class="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
-                            <template x-for="tarea in tareasPendientes" :key="tarea.id">
-                                <div
-                                    class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
-                                    <div class="flex items-center gap-4 w-full">
-                                        <div
-                                            class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
-                                            <img :src="tarea.fotoAptoSeguro" alt="Apartamento"
-                                                class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="flex-1">
-                                            <h4 class="text-lg font-extrabold text-navy"
-                                                x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
-                                            </h4>
-
-                                            <p
-                                                class="text-[11px] font-bold text-blue-600 mb-1.5 flex items-center gap-1">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                    </path>
-                                                </svg>
-                                                <span x-text="tarea.proxima_reserva_texto"></span>
-                                            </p>
-
-                                            <div class="flex items-center gap-2">
-                                                <span
-                                                    class="text-gray-500 text-[11px] font-medium uppercase tracking-wider">Asignado
-                                                    a:</span>
-                                                <select x-model="tarea.empleado_id"
-                                                    @change="cambiarEmpleado(tarea.id, tarea.empleado_id)"
-                                                    class="bg-white border border-gray-200 rounded-lg px-3 py-2 min-h-[40px] outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px] shadow-sm">
-                                                    <template x-for="emp in empleadosAseo" :key="emp.id">
-                                                        <option :value="emp.id" x-text="emp.nombre"
-                                                            :selected="emp.id == tarea.empleado_id"></option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
+                            <!-- ✨ Agrupados por día del aseo: atrasados, hoy, mañana y los días que siguen -->
+                            <template x-for="grupo in gruposAseosAsignados" :key="grupo.clave">
+                                <div>
+                                    <div
+                                        class="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                                        <span class="text-xs font-extrabold uppercase tracking-widest"
+                                            :class="grupo.clave === 'atrasados' ? 'text-danger' : 'text-navy'"
+                                            x-text="grupo.titulo"></span>
+                                        <span class="text-[11px] font-bold text-gray-400"
+                                            x-text="grupo.tareas.length + (grupo.tareas.length === 1 ? ' aseo' : ' aseos')"></span>
                                     </div>
+                                    <template x-for="tarea in grupo.tareas" :key="tarea.id">
+                                        <div x-show="tareasPendientes.length === 0" class="p-8 text-center"></div>
+                                        <div
+                                            class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
+                                            <div class="flex items-center gap-4 w-full">
+                                                <div
+                                                    class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 shadow-md border border-gray-200 bg-white">
+                                                    <img :src="tarea.fotoAptoSeguro" alt="Apartamento"
+                                                        class="w-full h-full object-cover">
+                                                </div>
+                                                <div class="flex-1">
+                                                    <h4 class="text-lg font-extrabold text-navy"
+                                                        x-text="(tarea.nombreAptoSeguro !== 'Apto Desconocido' && tarea.nombreAptoSeguro !== 'Sin título' ? tarea.nombreAptoSeguro : 'Apto sin nombre')">
+                                                    </h4>
 
-                                    <div class="flex flex-col items-end gap-2 shrink-0">
-                                        <span
-                                            class="text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shadow-sm"
-                                            :class="{
+                                                    <p
+                                                        class="text-[11px] font-bold text-blue-600 mb-1.5 flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                            </path>
+                                                        </svg>
+                                                        <span x-text="tarea.proxima_reserva_texto"></span>
+                                                    </p>
+
+                                                    <div class="flex items-center gap-2">
+                                                        <span
+                                                            class="text-gray-500 text-[11px] font-medium uppercase tracking-wider">Asignado
+                                                            a:</span>
+                                                        <select x-model="tarea.empleado_id"
+                                                            @change="cambiarEmpleado(tarea.id, tarea.empleado_id)"
+                                                            class="bg-white border border-gray-200 rounded-lg px-3 py-2 min-h-[40px] outline-none focus:border-gold text-xs text-navy font-bold cursor-pointer max-w-[150px] shadow-sm">
+                                                            <template x-for="emp in empleadosAseo" :key="emp.id">
+                                                                <option :value="emp.id" x-text="emp.nombre"
+                                                                    :selected="emp.id == tarea.empleado_id"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-col items-end gap-2 shrink-0">
+                                                <span
+                                                    class="text-[10px] font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider shadow-sm"
+                                                    :class="{
                                                   'bg-red-50 text-danger border border-red-100': tarea.urgencia === 'Urgente',
                                                   'bg-yellow-50 text-warning border border-yellow-100': tarea.urgencia === 'Normal',
                                                   'bg-gray-100 text-gray-500 border border-gray-200': tarea.urgencia === 'Flexible' || (!tarea.urgencia)
                                               }" x-text="tarea.urgencia || 'Flexible'">
-                                        </span>
-                                        <button @click="borrarAseo(tarea.id)" title="Eliminar asignación"
-                                            class="text-gray-300 hover:text-danger transition-colors bg-white hover:bg-red-50 p-1.5 rounded-md border border-transparent hover:border-red-100">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                    </div>
+                                                </span>
+                                                <button @click="borrarAseo(tarea.id)" title="Eliminar asignación"
+                                                    class="text-gray-300 hover:text-danger transition-colors bg-white hover:bg-red-50 p-1.5 rounded-md border border-transparent hover:border-red-100">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
 
@@ -953,8 +969,15 @@
                     const hoy = new Date();
                     hoy.setHours(0, 0, 0, 0);
 
+                    // ✨ Las reservas que ya tienen su aseo (en cualquier estado) no se vuelven a agendar.
+                    // Antes, al terminar un aseo el mismo día de la salida, la reserva aparecía otra vez
+                    // como pendiente y se creaba un aseo repetido.
+                    const reservasConAseo = new Set(this.tareas.filter(t => t.reserva_id).map(t => String(t.reserva_id)));
+
+                    // Aseos viejos (sin reserva ligada): se siguen descontando por apartamento como antes
                     const conteoAseosPendientes = {};
                     this.tareas.forEach(t => {
+                        if (t.reserva_id) return;
                         const estadoTarea = String(t.estado || 'pendiente').toLowerCase();
                         if (estadoTarea === 'pendiente' || estadoTarea === 'en progreso' || estadoTarea === 'en pausa') {
                             const id = String(t.propiedad_id);
@@ -977,6 +1000,8 @@
 
                         if (checkoutsVistos.has(firmaUnica)) continue;
                         checkoutsVistos.add(firmaUnica);
+
+                        if (reservasConAseo.has(String(res.id))) continue;
 
                         if (conteoAseosPendientes[idApto] > 0) {
                             conteoAseosPendientes[idApto]--;
@@ -1013,6 +1038,86 @@
                         }
                     }
                     return reservasAMostrar;
+                },
+
+                get tareasPendientes() {
+                    return this.tareas.filter(t => ['pendiente', 'en progreso', 'en pausa'].includes(String(t.estado || 'pendiente').toLowerCase())).map(t => {
+                        // La próxima llegada se cuenta desde el día del aseo (o desde hoy si no tiene fecha)
+                        const desde = t.fecha_aseo ? new Date(t.fecha_aseo) : new Date();
+                        desde.setHours(0, 0, 0, 0);
+                        const futurasReservas = this.reservas.filter(r => {
+                            if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
+                            if (t.reserva_id && String(r.id) === String(t.reserva_id)) return false;
+                            const checkInDate = new Date(r.check_in);
+                            checkInDate.setHours(0, 0, 0, 0);
+                            return checkInDate >= desde;
+                        });
+                        futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
+                        let textoProximaReserva = 'Sin reservas próximas';
+                        if (futurasReservas.length > 0) {
+                            const nextDate = new Date(futurasReservas[0].check_in);
+                            textoProximaReserva = 'Entra huésped el ' + nextDate.toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
+                        }
+                        let horaSalida = '';
+                        if (t.fecha_aseo) {
+                            const atrasado = this.diaColombia(t.fecha_aseo) < this.diaColombia(Date.now());
+                            horaSalida = atrasado
+                                ? 'Salió el ' + new Date(t.fecha_aseo).toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'America/Bogota' })
+                                : 'Sale ' + new Date(t.fecha_aseo).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Bogota' });
+                        }
+                        return {
+                            ...t,
+                            nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
+                            fotoAptoSeguro: this.obtenerFotoApto(t.propiedad_id),
+                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id),
+                            proxima_reserva_texto: (horaSalida ? horaSalida + ' · ' : '') + textoProximaReserva
+                        }
+                    });
+                },
+
+                // ✨ AGENDA POR DÍAS (igual a la que ve el equipo de aseo)
+                // Día 'YYYY-MM-DD' en hora de Colombia, sin importar la zona del celular
+                diaColombia(fecha) {
+                    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(fecha));
+                },
+
+                nombreDia(dia) {
+                    if (dia === this.diaColombia(Date.now())) return 'Hoy';
+                    if (dia === this.diaColombia(Date.now() + 86400000)) return 'Mañana';
+                    const texto = new Date(dia + 'T12:00:00-05:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' });
+                    return texto.charAt(0).toUpperCase() + texto.slice(1);
+                },
+
+                // Atrasados, sin fecha, hoy, mañana y los días que siguen. Dentro de cada día, primero
+                // los urgentes (entra otro huésped ese mismo día) y luego por hora de salida.
+                agruparPorDia(tareas) {
+                    const hoy = this.diaColombia(Date.now());
+                    const peso = (t) => ({ 'Urgente': 0, 'Normal': 1 })[t.urgencia] ?? 2;
+                    const hora = (t) => new Date(t.fecha_aseo || 0).getTime();
+                    const grupos = {};
+                    tareas.forEach(t => {
+                        let clave = 'sin-fecha';
+                        if (t.fecha_aseo) {
+                            const dia = this.diaColombia(t.fecha_aseo);
+                            clave = dia < hoy ? 'atrasados' : dia;
+                        }
+                        (grupos[clave] = grupos[clave] || []).push(t);
+                    });
+                    const rango = (c) => c === 'atrasados' ? 0 : (c === 'sin-fecha' ? 1 : 2);
+                    return Object.keys(grupos)
+                        .sort((a, b) => (rango(a) - rango(b)) || a.localeCompare(b))
+                        .map(clave => ({
+                            clave,
+                            titulo: clave === 'atrasados' ? 'Atrasados' : (clave === 'sin-fecha' ? 'Sin fecha' : this.nombreDia(clave)),
+                            iniciable: clave === 'atrasados' || clave === 'sin-fecha' || clave === hoy,
+                            tareas: grupos[clave].sort((a, b) => clave === 'atrasados'
+                                ? (hora(a) - hora(b)) || (peso(a) - peso(b))
+                                : (peso(a) - peso(b)) || (hora(a) - hora(b)))
+                        }));
+                },
+
+                get gruposAseosAsignados() {
+                    return this.agruparPorDia(this.tareasPendientes);
                 },
 
                 get tareasPendientes() {
@@ -1128,7 +1233,10 @@
                                 body: JSON.stringify({
                                     propiedad_id: String(reserva.propiedad_id),
                                     empleado_id: this.empleadoPorDefecto(reserva.propiedad_id),
-                                    urgencia: String(reserva.urgencia_calculada)
+                                    urgencia: String(reserva.urgencia_calculada),
+                                    // ✨ El aseo queda el día de la salida y ligado a su reserva
+                                    fecha_aseo: reserva.check_out,
+                                    reserva_id: String(reserva.id)
                                 })
                             });
                             if (res.ok) creados++;
@@ -1166,7 +1274,10 @@
                                 body: JSON.stringify({
                                     propiedad_id: String(reserva.propiedad_id),
                                     empleado_id: this.empleadoPorDefecto(reserva.propiedad_id),
-                                    urgencia: String(reserva.urgencia_calculada)
+                                    urgencia: String(reserva.urgencia_calculada),
+                                    // ✨ El aseo queda el día de la salida y ligado a su reserva
+                                    fecha_aseo: reserva.check_out,
+                                    reserva_id: String(reserva.id)
                                 })
                             });
                         }
@@ -1185,7 +1296,14 @@
                     try {
                         const res = await fetch('https://gestandovalor-backend.onrender.com/reservas/troya/aseos', {
                             method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ propiedad_id: String(reserva.propiedad_id), empleado_id: String(reserva.empleado_asignado), urgencia: String(reserva.urgencia_calculada) })
+                            body: JSON.stringify({
+                                propiedad_id: String(reserva.propiedad_id),
+                                empleado_id: String(reserva.empleado_asignado),
+                                urgencia: String(reserva.urgencia_calculada),
+                                // ✨ El aseo queda el día de la salida y ligado a su reserva
+                                fecha_aseo: reserva.check_out,
+                                reserva_id: String(reserva.id)
+                            })
                         });
                         if (res.ok) await this.cargarTareas();
                         else alert('❌ Hubo un error al guardar.');
