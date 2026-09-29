@@ -272,7 +272,6 @@
                                             x-text="grupo.tareas.length + (grupo.tareas.length === 1 ? ' aseo' : ' aseos')"></span>
                                     </div>
                                     <template x-for="tarea in grupo.tareas" :key="tarea.id">
-                                        <div x-show="tareasPendientes.length === 0" class="p-8 text-center"></div>
                                         <div
                                             class="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
                                             <div class="flex items-center gap-4 w-full">
@@ -1118,32 +1117,6 @@
 
                 get gruposAseosAsignados() {
                     return this.agruparPorDia(this.tareasPendientes);
-                },
-
-                get tareasPendientes() {
-                    return this.tareas.filter(t => ['pendiente', 'en progreso'].includes(String(t.estado || 'pendiente').toLowerCase())).map(t => {
-                        const futurasReservas = this.reservas.filter(r => {
-                            if (String(r.propiedad_id) !== String(t.propiedad_id)) return false;
-                            const checkInDate = new Date(r.check_in);
-                            checkInDate.setHours(0, 0, 0, 0);
-                            const hoy = new Date();
-                            hoy.setHours(0, 0, 0, 0);
-                            return checkInDate >= hoy;
-                        });
-                        futurasReservas.sort((a, b) => new Date(a.check_in) - new Date(b.check_in));
-                        let textoProximaReserva = 'Sin reservas próximas';
-                        if (futurasReservas.length > 0) {
-                            const nextDate = new Date(futurasReservas[0].check_in);
-                            textoProximaReserva = 'Entra huésped el ' + nextDate.toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
-                        }
-                        return {
-                            ...t,
-                            nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
-                            fotoAptoSeguro: this.obtenerFotoApto(t.propiedad_id),
-                            nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id),
-                            proxima_reserva_texto: textoProximaReserva
-                        }
-                    });
                 },
 
                 get tareasCompletadas() {
