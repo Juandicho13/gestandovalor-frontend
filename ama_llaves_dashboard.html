@@ -70,8 +70,10 @@
                 Panel</a>
             <a href="ama_llaves_inventario.html"
                 class="text-sm font-medium hover:text-gold transition-colors">Inventario por Apto</a>
+            <a href="#calendario-aseos" class="text-sm font-medium hover:text-gold transition-colors">Calendario de
+                Aseos</a>
             <button @click="modalReportes = true"
-                class="text-sm font-medium hover:text-gold transition-colors">Historial Novedades</button>
+                class="text-sm font-medium hover:text-gold transition-colors">Historial de Reportes</button>
 
             <div class="h-5 w-px bg-white/20 ml-2"></div>
 
@@ -104,8 +106,10 @@
                 class="text-2xl font-bold text-white border-b-2 border-gold pb-2">Mi Panel</a>
             <a href="ama_llaves_inventario.html" @click="mobileMenuOpen = false"
                 class="text-2xl font-medium text-gray-300 hover:text-gold">Inventario por Apto</a>
+            <a href="#calendario-aseos" @click="mobileMenuOpen = false"
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Calendario de Aseos</a>
             <button @click="mobileMenuOpen = false; modalReportes = true"
-                class="text-2xl font-medium text-gray-300 hover:text-gold">Historial Novedades</button>
+                class="text-2xl font-medium text-gray-300 hover:text-gold">Historial de Reportes</button>
             <button @click="mobileMenuOpen = false; cerrarSesion()"
                 class="mt-8 text-xl font-medium text-red-400 hover:text-red-300 flex items-center gap-2">
                 Salir
@@ -372,6 +376,18 @@
                                             <span
                                                 class="inline-block mt-1 text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200 uppercase tracking-wider"
                                                 x-text="`Limpiado por: ${tarea.nombreEmpleadoSeguro}`"></span>
+                                            <!-- ✨ Qué dejó en sus reportes -->
+                                            <div class="flex flex-wrap gap-1.5 mt-1.5">
+                                                <span x-show="(tarea.fotos_finales || []).length > 0"
+                                                    class="text-[10px] font-extrabold bg-green-50 text-success px-2 py-1 rounded-md border border-green-100"
+                                                    x-text="'📸 ' + (tarea.fotos_finales || []).length + ((tarea.fotos_finales || []).length === 1 ? ' foto final' : ' fotos finales')"></span>
+                                                <span x-show="!(tarea.fotos_finales || []).length"
+                                                    class="text-[10px] font-extrabold bg-gray-50 text-gray-400 px-2 py-1 rounded-md border border-gray-100">Sin
+                                                    fotos finales</span>
+                                                <span x-show="tarea.novedad_reportada"
+                                                    class="text-[10px] font-extrabold bg-red-50 text-danger px-2 py-1 rounded-md border border-red-100">⚠️
+                                                    Reportó daños</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <span
@@ -402,6 +418,140 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- ✨ CALENDARIO DE ASEOS: qué limpió cada persona, por mes y por día -->
+            <div id="calendario-aseos" class="mt-14 scroll-mt-28">
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-navy">Calendario de aseos</h2>
+                        <p class="text-sm text-gray-500 mt-1">Los aseos que terminó cada persona, día por día. Toca un
+                            día para ver el detalle.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select x-model="calEmpleado"
+                            class="bg-white border border-gray-200 rounded-full px-4 py-2.5 outline-none focus:border-gold text-sm text-navy font-bold cursor-pointer shadow-sm">
+                            <option value="">Todo el equipo</option>
+                            <template x-for="emp in empleadosAseo" :key="'cal-' + emp.id">
+                                <option :value="String(emp.id)" x-text="emp.nombre"></option>
+                            </template>
+                        </select>
+                        <div class="flex items-center bg-white border border-gray-200 rounded-full shadow-sm">
+                            <button @click="moverMesCal(-1)" aria-label="Mes anterior"
+                                class="p-2.5 text-navy hover:text-gold transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <span class="px-2 text-sm font-extrabold text-navy min-w-[150px] text-center"
+                                x-text="tituloMesCal"></span>
+                            <button @click="moverMesCal(1)" aria-label="Mes siguiente"
+                                class="p-2.5 text-navy hover:text-gold transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                        <button @click="iniciarCalendario()"
+                            class="text-xs font-bold text-navy bg-gray-100 hover:bg-gray-200 px-4 py-2.5 rounded-full transition-colors border border-gray-200">Hoy</button>
+                    </div>
+                </div>
+
+                <!-- Resumen del mes: cuántos aseos terminó cada persona y cuánto tiempo -->
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <template x-for="r in resumenMesCal" :key="'res-' + r.id">
+                        <button @click="calEmpleado = (calEmpleado === r.id ? '' : r.id)"
+                            class="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm transition-all text-left"
+                            :class="calEmpleado === r.id ? 'border-gold ring-2 ring-gold/30' : 'border-gray-100 hover:border-gray-300'">
+                            <span
+                                class="w-9 h-9 rounded-full text-white font-extrabold text-xs flex items-center justify-center shrink-0"
+                                :style="'background:' + r.color" x-text="r.iniciales"></span>
+                            <span>
+                                <span class="block text-sm font-extrabold text-navy" x-text="r.nombre"></span>
+                                <span class="block text-[11px] font-bold text-gray-500"
+                                    x-text="r.hechos + (r.hechos === 1 ? ' aseo' : ' aseos') + ' · ' + formatearTiempoLargo(r.segundos)"></span>
+                            </span>
+                        </button>
+                    </template>
+                    <p x-show="resumenMesCal.length === 0" class="text-sm text-gray-400 font-bold py-2">Nadie ha
+                        terminado aseos en este mes.</p>
+                </div>
+
+                <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 p-2 sm:p-4 md:p-6">
+                    <div class="grid grid-cols-7 gap-1 md:gap-2 mb-2">
+                        <template x-for="d in ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']" :key="d">
+                            <div class="text-center text-[10px] md:text-xs font-extrabold text-gray-400 uppercase tracking-wider py-1"
+                                x-text="d"></div>
+                        </template>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 md:gap-2">
+                        <template x-for="celda in diasCal" :key="celda.clave">
+                            <button type="button" @click="celda.dia && (calDiaSeleccionado = celda.dia)"
+                                :disabled="!celda.dia" :class="claseCeldaCal(celda)"
+                                class="min-h-[62px] md:min-h-[92px] rounded-xl md:rounded-2xl border p-1 md:p-2 text-left flex flex-col transition-colors min-w-0">
+                                <span class="text-[11px] md:text-sm font-extrabold leading-none"
+                                    :class="celda.esHoy ? 'text-gold' : (celda.hechos || celda.programados ? 'text-navy' : 'text-gray-300')"
+                                    x-text="celda.numero || ''"></span>
+                                <div class="mt-auto flex flex-col md:flex-row md:flex-wrap gap-0.5 md:gap-1 pt-1">
+                                    <template x-for="p in (celda.porPersona || [])" :key="celda.clave + p.id">
+                                        <span
+                                            class="text-[9px] md:text-[10px] font-extrabold text-white rounded-full px-1 md:px-1.5 py-0.5 leading-none text-center truncate"
+                                            :style="'background:' + p.color"
+                                            x-text="p.iniciales + ' ' + p.cantidad"></span>
+                                    </template>
+                                </div>
+                                <span x-show="celda.programados > 0"
+                                    class="text-[9px] md:text-[10px] font-bold text-gray-400 mt-0.5 leading-tight truncate">
+                                    <span class="md:hidden" x-text="'⏳ ' + celda.programados"></span>
+                                    <span class="hidden md:inline" x-text="celda.programados + ' por hacer'"></span>
+                                </span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Detalle del día elegido -->
+                <div x-show="calDiaSeleccionado" style="display: none;"
+                    class="mt-6 bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-extrabold text-navy" x-text="tituloDiaCal"></h3>
+                            <p class="text-[11px] font-bold text-gray-400" x-text="resumenDiaCal"></p>
+                        </div>
+                        <button @click="calDiaSeleccionado = ''" aria-label="Cerrar detalle"
+                            class="text-gray-400 hover:text-navy bg-white p-2 rounded-full border border-gray-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <template x-for="t in aseosDelDiaCal" :key="'dia-' + t.id">
+                        <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200">
+                                <img :src="obtenerFotoApto(t.propiedad_id)" loading="lazy" decoding="async"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-extrabold text-navy text-sm truncate"
+                                    x-text="t.nombreApto + (t.numeroApto ? ' · #' + t.numeroApto : '')"></p>
+                                <p class="text-xs font-bold flex items-center gap-1.5 mt-0.5">
+                                    <span class="w-2 h-2 rounded-full shrink-0" :style="'background:' + t.color"></span>
+                                    <span class="text-navy" x-text="t.nombreEmpleado"></span>
+                                </p>
+                                <p class="text-[11px] text-gray-500 font-medium mt-0.5" x-text="t.detalle"></p>
+                            </div>
+                            <span
+                                class="text-[10px] font-extrabold px-2 py-1 rounded-md border uppercase tracking-wider shrink-0 text-center"
+                                :class="t.claseEtiqueta" x-text="t.etiqueta"></span>
+                        </div>
+                    </template>
+                    <p x-show="aseosDelDiaCal.length === 0" class="p-6 text-center text-sm text-gray-400 font-bold">No
+                        hay aseos este día.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -436,6 +586,54 @@
             </div>
 
             <div class="overflow-y-auto custom-scrollbar bg-gray-50/50 p-6 md:p-8 flex-1 space-y-8">
+
+                <!-- ✨ REPORTES DEL EMPLEADO: fotos del apartamento limpio y daños, cada uno en su lugar -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-green-100">
+                        <h4
+                            class="text-xs font-extrabold text-success uppercase tracking-widest mb-4 flex items-center gap-2">
+                            📸 Fotos finales
+                            <span class="text-gray-400 normal-case tracking-normal font-bold"
+                                x-text="'(' + (tareaAInspeccionar?.fotos_finales || []).length + ')'"></span>
+                        </h4>
+                        <div x-show="(tareaAInspeccionar?.fotos_finales || []).length > 0"
+                            class="grid grid-cols-3 gap-2">
+                            <template x-for="(foto, i) in (tareaAInspeccionar?.fotos_finales || [])" :key="'fin-' + i">
+                                <a :href="foto" target="_blank" rel="noopener"
+                                    class="block aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                    <img :src="foto" loading="lazy" decoding="async"
+                                        class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                                </a>
+                            </template>
+                        </div>
+                        <p x-show="(tareaAInspeccionar?.fotos_finales || []).length === 0"
+                            class="text-xs text-gray-400 font-medium italic">El empleado no subió fotos del apartamento
+                            limpio.</p>
+                    </div>
+
+                    <div class="bg-red-50/40 p-6 rounded-3xl shadow-sm border border-red-100">
+                        <h4
+                            class="text-xs font-extrabold text-danger uppercase tracking-widest mb-4 flex items-center gap-2">
+                            ⚠️ Daños o faltantes
+                        </h4>
+                        <div x-show="tareaAInspeccionar?.novedad_reportada">
+                            <p class="text-sm text-gray-700 bg-white p-3 rounded-xl border border-red-100 whitespace-pre-line"
+                                x-text="tareaAInspeccionar?.novedad_reportada"></p>
+                            <div x-show="(tareaAInspeccionar?.fotos || []).length > 0"
+                                class="grid grid-cols-3 gap-2 mt-3">
+                                <template x-for="(foto, i) in (tareaAInspeccionar?.fotos || [])" :key="'dan-' + i">
+                                    <a :href="foto" target="_blank" rel="noopener"
+                                        class="block aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                        <img :src="foto" loading="lazy" decoding="async"
+                                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                        <p x-show="!tareaAInspeccionar?.novedad_reportada"
+                            class="text-xs text-gray-400 font-medium italic">No reportó daños.</p>
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -730,8 +928,9 @@
         <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-2xl relative z-10 p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-2xl font-extrabold text-navy">Historial de Novedades</h3>
-                    <p class="text-xs text-gray-500 mt-1 font-bold">Daños reportados por el equipo de limpieza.</p>
+                    <h3 class="text-2xl font-extrabold text-navy">Historial de reportes</h3>
+                    <p class="text-xs text-gray-500 mt-1 font-bold">Lo que reportó el equipo de limpieza en cada aseo.
+                    </p>
                 </div>
                 <button @click="modalReportes = false" class="bg-gray-50 p-2 rounded-full"><svg class="w-6 h-6"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -739,7 +938,20 @@
                             d="M6 18L18 6M6 6l12 12" />
                     </svg></button>
             </div>
-            <div class="space-y-4">
+
+            <!-- ✨ Dos categorías: daños y fotos del apartamento limpio -->
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-6 border border-gray-200">
+                <button type="button" @click="tabHistorial = 'danos'"
+                    class="flex-1 py-2.5 text-sm font-extrabold rounded-xl transition-all"
+                    :class="tabHistorial === 'danos' ? 'bg-white text-danger shadow-sm' : 'text-gray-500 hover:text-navy'"
+                    x-text="'⚠️ Daños (' + tareasConReporte.length + ')'"></button>
+                <button type="button" @click="tabHistorial = 'finales'"
+                    class="flex-1 py-2.5 text-sm font-extrabold rounded-xl transition-all"
+                    :class="tabHistorial === 'finales' ? 'bg-white text-success shadow-sm' : 'text-gray-500 hover:text-navy'"
+                    x-text="'📸 Fotos finales (' + tareasConFotosFinales.length + ')'"></button>
+            </div>
+
+            <div class="space-y-4" x-show="tabHistorial === 'danos'">
                 <template x-for="tarea in tareasConReporte" :key="tarea.id">
                     <div class="p-4 border border-red-100 bg-red-50/50 rounded-2xl">
                         <h4 class="text-sm font-bold text-navy"
@@ -754,7 +966,7 @@
                         <button x-show="(tarea.fotos || []).length > 0"
                             @click="novedadConFotos = (novedadConFotos === tarea.id ? null : tarea.id)"
                             class="mt-3 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full transition-colors"
-                            x-text="novedadConFotos === tarea.id ? 'Ocultar fotos' : `📷 Ver ${tarea.fotos.length} foto${tarea.fotos.length > 1 ? 's' : ''}`"></button>
+                            x-text="novedadConFotos === tarea.id ? 'Ocultar fotos' : `📷 Ver ${(tarea.fotos || []).length} foto${(tarea.fotos || []).length > 1 ? 's' : ''}`"></button>
                         <p x-show="(tarea.fotos || []).length === 0" class="mt-2 text-[11px] text-gray-400">Sin fotos
                         </p>
 
@@ -771,7 +983,34 @@
                     </div>
                 </template>
                 <p x-show="tareasConReporte.length === 0" class="text-center text-sm text-gray-400 py-6">No hay
-                    novedades reportadas.</p>
+                    daños reportados.</p>
+            </div>
+
+            <div class="space-y-4" x-show="tabHistorial === 'finales'" style="display: none;">
+                <template x-for="tarea in tareasConFotosFinales" :key="'fin-' + tarea.id">
+                    <div class="p-4 border border-green-100 bg-green-50/40 rounded-2xl">
+                        <h4 class="text-sm font-bold text-navy" x-text="tarea.nombreAptoSeguro"></h4>
+                        <p class="text-xs text-gray-500 mt-1" x-text="tarea.textoFinales"></p>
+
+                        <!-- Las fotos solo se cargan al tocar el botón -->
+                        <button @click="finalesConFotos = (finalesConFotos === tarea.id ? null : tarea.id)"
+                            class="mt-3 text-xs font-bold text-success bg-white hover:bg-green-50 border border-green-100 px-3 py-1.5 rounded-full transition-colors"
+                            x-text="finalesConFotos === tarea.id ? 'Ocultar fotos' : '📸 Ver ' + tarea.fotos_finales.length + (tarea.fotos_finales.length === 1 ? ' foto' : ' fotos')"></button>
+
+                        <template x-if="finalesConFotos === tarea.id">
+                            <div class="grid grid-cols-3 gap-2 mt-3">
+                                <template x-for="(foto, i) in tarea.fotos_finales" :key="i">
+                                    <a :href="foto" target="_blank" rel="noopener"
+                                        class="block aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                                        <img :src="foto" decoding="async" class="w-full h-full object-cover">
+                                    </a>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <p x-show="tareasConFotosFinales.length === 0" class="text-center text-sm text-gray-400 py-6">Todavía
+                    no hay fotos finales.</p>
             </div>
         </div>
     </div>
@@ -806,6 +1045,16 @@
                 programacion: {},
                 guardandoProgramacion: false,
                 novedadConFotos: null,
+
+                // ✨ Historial de reportes: 'danos' o 'finales'
+                tabHistorial: 'danos',
+                finalesConFotos: null,
+
+                // ✨ Calendario de aseos (mes que se ve, persona filtrada y día abierto)
+                calAnio: 2026,
+                calMes: 0,
+                calEmpleado: '',
+                calDiaSeleccionado: '',
 
                 // Copia del Checklist de 89 tareas
                 categoriasChecklist: [
@@ -848,6 +1097,7 @@
                 ],
 
                 async initApp() {
+                    this.iniciarCalendario();
                     const usuarioGuardado = localStorage.getItem('gv_usuario_actual');
                     if (usuarioGuardado) {
                         const usuario = JSON.parse(usuarioGuardado);
@@ -962,6 +1212,195 @@
                         nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id),
                         nombreEmpleadoSeguro: this.obtenerNombreEmpleado(t.empleado_id)
                     }));
+                },
+
+                // ✨ Aseos con fotos del apartamento limpio, el más reciente primero
+                get tareasConFotosFinales() {
+                    const cuando = (t) => new Date(t.completed_at || t.created_at || 0).getTime();
+                    return this.tareas
+                        .filter(t => (t.fotos_finales || []).length > 0)
+                        .sort((a, b) => cuando(b) - cuando(a))
+                        .map(t => {
+                            const numero = this.obtenerNumeroApto(t.propiedad_id);
+                            const fecha = t.completed_at
+                                ? new Date(t.completed_at).toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'America/Bogota' })
+                                : 'Aseo en curso';
+                            return {
+                                ...t,
+                                nombreAptoSeguro: this.obtenerNombreApto(t.propiedad_id) + (numero ? ' · #' + numero : ''),
+                                textoFinales: `${this.obtenerNombreEmpleado(t.empleado_id)} · ${fecha}`
+                            };
+                        });
+                },
+
+                obtenerNumeroApto(id) {
+                    const prop = this.propiedades.find(p => String(p.id) === String(id));
+                    return prop && prop.numero_alojamiento ? String(prop.numero_alojamiento) : '';
+                },
+
+                // ✨ CALENDARIO DE ASEOS: qué terminó cada persona, por día (hora de Colombia)
+                iniciarCalendario() {
+                    const hoy = this.diaColombia(Date.now());
+                    this.calAnio = Number(hoy.slice(0, 4));
+                    this.calMes = Number(hoy.slice(5, 7)) - 1;
+                    this.calDiaSeleccionado = hoy;
+                },
+
+                moverMesCal(delta) {
+                    const d = new Date(this.calAnio, this.calMes + delta, 1);
+                    this.calAnio = d.getFullYear();
+                    this.calMes = d.getMonth();
+                    this.calDiaSeleccionado = '';
+                },
+
+                get tituloMesCal() {
+                    const t = new Date(this.calAnio, this.calMes, 15).toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+                    return t.charAt(0).toUpperCase() + t.slice(1);
+                },
+
+                get prefijoMesCal() {
+                    return `${this.calAnio}-${String(this.calMes + 1).padStart(2, '0')}`;
+                },
+
+                colorEmpleado(id) {
+                    const colores = ['#0B132B', '#D4AF37', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6', '#F59E0B', '#EC4899'];
+                    const i = this.empleadosAseo.findIndex(e => String(e.id) === String(id));
+                    return i === -1 ? '#9CA3AF' : colores[i % colores.length];
+                },
+
+                inicialesDe(nombre) {
+                    const partes = String(nombre || '?').trim().split(/\s+/);
+                    return (partes.length > 1 ? partes[0][0] + partes[1][0] : partes[0].slice(0, 2)).toUpperCase();
+                },
+
+                esAseoHecho(t) {
+                    return ['completada', 'inspeccionada'].includes(String(t.estado || '').toLowerCase()) && !!t.completed_at;
+                },
+
+                esAseoAbierto(t) {
+                    return ['pendiente', 'en progreso', 'en pausa'].includes(String(t.estado || 'pendiente').toLowerCase());
+                },
+
+                // Un aseo hecho cae el día en que se terminó; uno por hacer, el día programado
+                diaDeAseoCal(t) {
+                    if (this.esAseoHecho(t)) return this.diaColombia(t.completed_at);
+                    if (this.esAseoAbierto(t) && t.fecha_aseo) return this.diaColombia(t.fecha_aseo);
+                    return '';
+                },
+
+                get aseosDelMesCal() {
+                    const prefijo = this.prefijoMesCal;
+                    return this.tareas
+                        .map(t => ({ t, dia: this.diaDeAseoCal(t) }))
+                        .filter(x => x.dia && x.dia.startsWith(prefijo));
+                },
+
+                get resumenMesCal() {
+                    const porPersona = {};
+                    this.aseosDelMesCal.filter(x => this.esAseoHecho(x.t)).forEach(({ t }) => {
+                        const id = String(t.empleado_id || '');
+                        const r = porPersona[id] || (porPersona[id] = { id, nombre: this.obtenerNombreEmpleado(t.empleado_id), hechos: 0, segundos: 0 });
+                        r.hechos++;
+                        r.segundos += Number(t.tiempo_segundos) || 0;
+                    });
+                    return Object.values(porPersona)
+                        .map(r => ({ ...r, color: this.colorEmpleado(r.id), iniciales: this.inicialesDe(r.nombre) }))
+                        .sort((a, b) => b.hechos - a.hechos);
+                },
+
+                get diasCal() {
+                    const totalDias = new Date(this.calAnio, this.calMes + 1, 0).getDate();
+                    const vacios = (new Date(this.calAnio, this.calMes, 1).getDay() + 6) % 7; // la semana empieza el lunes
+                    const hoy = this.diaColombia(Date.now());
+                    const delMes = this.aseosDelMesCal.filter(x => !this.calEmpleado || String(x.t.empleado_id) === this.calEmpleado);
+                    const celdas = [];
+                    for (let i = 0; i < vacios; i++) celdas.push({ clave: 'antes-' + i, dia: '' });
+                    for (let n = 1; n <= totalDias; n++) {
+                        const dia = `${this.prefijoMesCal}-${String(n).padStart(2, '0')}`;
+                        const deEseDia = delMes.filter(x => x.dia === dia);
+                        const porPersona = {};
+                        deEseDia.filter(x => this.esAseoHecho(x.t)).forEach(({ t }) => {
+                            const id = String(t.empleado_id || '');
+                            (porPersona[id] = porPersona[id] || { id, cantidad: 0 }).cantidad++;
+                        });
+                        celdas.push({
+                            clave: dia,
+                            dia,
+                            numero: n,
+                            esHoy: dia === hoy,
+                            hechos: deEseDia.filter(x => this.esAseoHecho(x.t)).length,
+                            programados: deEseDia.filter(x => this.esAseoAbierto(x.t)).length,
+                            porPersona: Object.values(porPersona).map(p => ({
+                                ...p,
+                                color: this.colorEmpleado(p.id),
+                                iniciales: this.inicialesDe(this.obtenerNombreEmpleado(p.id))
+                            }))
+                        });
+                    }
+                    while (celdas.length % 7 !== 0) celdas.push({ clave: 'despues-' + celdas.length, dia: '' });
+                    return celdas;
+                },
+
+                claseCeldaCal(celda) {
+                    if (!celda.dia) return 'bg-transparent border-transparent cursor-default';
+                    const elegido = celda.dia === this.calDiaSeleccionado;
+                    let clase = elegido ? 'ring-2 ring-gold border-gold bg-gold/5' : (celda.esHoy ? 'border-gold bg-white' : 'bg-white border-gray-100 hover:border-gray-300');
+                    if (!celda.hechos && !celda.programados && !elegido) clase += ' bg-gray-50/60';
+                    return clase;
+                },
+
+                get tituloDiaCal() {
+                    if (!this.calDiaSeleccionado) return '';
+                    const t = new Date(this.calDiaSeleccionado + 'T12:00:00-05:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' });
+                    return t.charAt(0).toUpperCase() + t.slice(1);
+                },
+
+                get aseosDelDiaCal() {
+                    const dia = this.calDiaSeleccionado;
+                    if (!dia) return [];
+                    const hora = (f) => new Date(f).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Bogota' });
+                    return this.tareas
+                        .filter(t => this.diaDeAseoCal(t) === dia)
+                        .filter(t => !this.calEmpleado || String(t.empleado_id) === this.calEmpleado)
+                        .map(t => {
+                            const estado = String(t.estado || '').toLowerCase();
+                            const hecho = this.esAseoHecho(t);
+                            let detalle;
+                            if (hecho) {
+                                const rango = t.iniciado_at ? `De ${hora(t.iniciado_at)} a ${hora(t.completed_at)}` : `Terminó a las ${hora(t.completed_at)}`;
+                                detalle = `${rango} · ${this.formatearTiempoLargo(t.tiempo_segundos || 0)} de trabajo`;
+                            } else if (estado === 'en progreso') {
+                                detalle = 'Limpiando ahora' + (t.iniciado_at ? ` · empezó a las ${hora(t.iniciado_at)}` : '');
+                            } else if (estado === 'en pausa') {
+                                detalle = 'En pausa' + (t.iniciado_at ? ` · empezó a las ${hora(t.iniciado_at)}` : '');
+                            } else {
+                                detalle = t.fecha_aseo ? `El huésped sale a las ${hora(t.fecha_aseo)}` : 'Sin hora';
+                            }
+                            return {
+                                ...t,
+                                hecho,
+                                nombreApto: this.obtenerNombreApto(t.propiedad_id),
+                                numeroApto: this.obtenerNumeroApto(t.propiedad_id),
+                                nombreEmpleado: this.obtenerNombreEmpleado(t.empleado_id),
+                                color: this.colorEmpleado(t.empleado_id),
+                                detalle,
+                                etiqueta: estado === 'inspeccionada' ? 'Inspeccionado' : (estado === 'completada' ? 'Por inspeccionar' : 'Por hacer'),
+                                claseEtiqueta: estado === 'inspeccionada' ? 'bg-green-50 text-success border-green-100'
+                                    : (estado === 'completada' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-gray-100 text-gray-500 border-gray-200'),
+                                orden: hecho ? new Date(t.completed_at).getTime() : new Date(t.fecha_aseo || 0).getTime()
+                            };
+                        })
+                        .sort((a, b) => (a.hecho === b.hecho ? a.orden - b.orden : (a.hecho ? -1 : 1)));
+                },
+
+                get resumenDiaCal() {
+                    const lista = this.aseosDelDiaCal;
+                    const hechos = lista.filter(t => t.hecho).length;
+                    const porHacer = lista.length - hechos;
+                    const partes = [];
+                    if (hechos) partes.push(hechos + (hechos === 1 ? ' aseo hecho' : ' aseos hechos'));
+                    if (porHacer) partes.push(porHacer + ' por hacer');
+                    return partes.join(' · ') || 'Sin aseos';
                 },
 
                 get checkoutsSinAsignar() {
@@ -1444,7 +1883,9 @@
                             body: JSON.stringify({
                                 estado: 'Pendiente',
                                 reporte_empleado: null,
-                                tiempo_segundos: 0
+                                tiempo_segundos: 0,
+                                // Al repetir el aseo tiene que subir fotos nuevas
+                                fotos_finales: []
                             })
                         });
                         alert('⚠️ Aseo devuelto. El empleado deberá retomar la tarea.');

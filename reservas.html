@@ -85,6 +85,17 @@
         class="hidden bg-airbnb text-airbnb border-airbnb bg-airbnb/10 border-airbnb/20 bg-airbnb/20 bg-booking text-booking border-booking bg-booking/10 border-booking/20 bg-booking/20 bg-directo text-directo border-directo bg-directo/10 border-directo/20 bg-directo/20">
     </div>
 
+    <!-- ✨ Aviso flotante: se va solo (por ejemplo al pasar una reserva a otro apartamento) -->
+    <div x-show="aviso" style="display: none;" x-transition
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[300] bg-navy text-white font-bold text-sm pl-6 pr-3 py-3 rounded-2xl shadow-2xl border border-white/10 max-w-[92vw] flex items-center gap-4">
+        <span x-text="aviso"></span>
+        <button x-show="avisoPropiedadId" @click="verApartamentoDelAviso()"
+            class="shrink-0 bg-gold text-navy font-extrabold text-xs px-4 py-2 rounded-xl hover:bg-yellow-500 transition-colors">Ver
+            calendario</button>
+        <button @click="aviso = ''; avisoPropiedadId = null" aria-label="Cerrar aviso"
+            class="shrink-0 text-white/60 hover:text-white p-1">✕</button>
+    </div>
+
     <div x-show="cargando"
         class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-navy mb-4"></div>
@@ -193,7 +204,7 @@
                         </svg>
                         <input type="text" x-model="busquedaPropiedad" @input="indiceVisible = 0"
                             class="w-full h-full bg-transparent outline-none px-3 text-sm text-navy font-bold placeholder-gray-300"
-                            placeholder="Buscar suite...">
+                            placeholder="Buscar por nombre o número...">
                         <button x-show="busquedaPropiedad !== ''" @click="busquedaPropiedad = ''; indiceVisible = 0"
                             class="text-gray-400 hover:text-navy shrink-0" style="display: none;">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +235,12 @@
                             <div class="min-w-0 flex-1">
                                 <div class="font-extrabold text-navy text-sm leading-tight line-clamp-2"
                                     x-text="prop.titulo || 'Sin título'"></div>
-                                <div class="text-[11px] text-gray-400 truncate mt-0.5" x-text="prop.ciudad || ''"></div>
+                                <div class="text-[11px] text-gray-400 truncate mt-0.5">
+                                    <span x-text="prop.ciudad || ''"></span>
+                                    <!-- ✨ Número del apartamento al lado de la ciudad -->
+                                    <span x-show="prop.numero_alojamiento" class="font-extrabold text-navy"
+                                        x-text="(prop.ciudad ? ' · ' : '') + '#' + prop.numero_alojamiento"></span>
+                                </div>
                             </div>
                         </button>
                     </template>
@@ -841,6 +857,35 @@
                         </div>
                     </div>
 
+                    <!-- ✨ Apartamento: permite pasar la reserva a otro apartamento -->
+                    <div>
+                        <label
+                            class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Apartamento</label>
+                        <div class="relative group">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors pointer-events-none"><svg
+                                    class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg></span>
+                            <select x-model="formReserva.propiedad_id" @change="cambiarApartamentoReserva()"
+                                class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-3 outline-none focus:border-gold focus:bg-white text-navy font-bold cursor-pointer transition-colors shadow-sm appearance-none truncate">
+                                <template x-for="prop in propiedades" :key="'modal-' + prop.id">
+                                    <option :value="prop.id"
+                                        x-text="(prop.titulo || 'Sin título') + (prop.numero_alojamiento ? ' · #' + prop.numero_alojamiento : '')">
+                                    </option>
+                                </template>
+                            </select>
+                        </div>
+                        <p x-show="cargandoDestino" style="display: none;"
+                            class="text-[11px] text-gray-400 font-bold ml-2 mt-1">Revisando las fechas libres de ese
+                            apartamento...</p>
+                        <p x-show="formReserva.id && formReserva.propiedad_id && formReserva.propiedad_id !== propiedadActiva?.id && !cargandoDestino"
+                            style="display: none;" class="text-[11px] text-gold font-bold ml-2 mt-1">La reserva y su
+                            aseo
+                            pasan a este apartamento. El monto no cambia; ajústalo si hace falta.</p>
+                    </div>
+
                     <div>
                         <label
                             class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Fechas
@@ -993,9 +1038,12 @@
 
                 // ✨ FILTRO AUTOMÁTICO DE PROPIEDADES ✨
                 get propiedadesFiltradas() {
-                    if (this.busquedaPropiedad.trim() === '') return this.propiedades;
-                    const termino = this.busquedaPropiedad.toLowerCase();
-                    return this.propiedades.filter(p => (p.titulo || '').toLowerCase().includes(termino));
+                    // ✨ Busca por nombre o por número del apartamento (con o sin #)
+                    const termino = this.busquedaPropiedad.trim().toLowerCase().replace(/^#/, '');
+                    if (termino === '') return this.propiedades;
+                    return this.propiedades.filter(p =>
+                        (p.titulo || '').toLowerCase().includes(termino) ||
+                        String(p.numero_alojamiento || '').toLowerCase().includes(termino));
                 },
 
                 get propiedadesVisibles() {
@@ -1009,6 +1057,23 @@
 
                 reservas: [],
                 tarifasEspeciales: [],
+
+                // ✨ Cuando en la ventana de la reserva se elige OTRO apartamento, aquí quedan
+                // sus reservas y tarifas para revisar fechas libres y calcular el precio
+                reservasDestino: null,
+                tarifasDestino: null,
+                cargandoDestino: false,
+                aviso: '',
+                avisoPropiedadId: null,
+
+                get reservasModal() {
+                    return this.reservasDestino || this.reservas;
+                },
+
+                get propiedadDelModal() {
+                    const id = this.formReserva.propiedad_id;
+                    return this.propiedades.find(p => p.id === id) || this.propiedadActiva;
+                },
 
                 fechaCalendario: new Date(),
                 mesActualTexto: '',
@@ -1174,8 +1239,11 @@
 
                     this.formReserva = {
                         id: null, huesped_nombre: '', check_in: fIn, check_out: fOut,
-                        hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
+                        hora_llegada: '15:00', hora_salida: '11:00', monto_total: '', canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0,
+                        propiedad_id: this.propiedadActiva?.id
                     };
+                    this.reservasDestino = null;
+                    this.tarifasDestino = null;
                     this.cerrarAccionRango();
                     this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out]);
                     this.recalcularTotal();
@@ -1188,13 +1256,13 @@
                     this.generarMesVisual();
                 },
 
-                haySuperposicion(checkInStr, checkOutStr, excludeReservaId = null) {
+                haySuperposicion(checkInStr, checkOutStr, excludeReservaId = null, lista = null) {
                     if (!checkInStr || !checkOutStr) return false;
 
                     const inTime = new Date(checkInStr + "T12:00:00").getTime();
                     const outTime = new Date(checkOutStr + "T12:00:00").getTime();
 
-                    return this.reservas.some(res => {
+                    return (lista || this.reservas).some(res => {
                         if (excludeReservaId && res.id === excludeReservaId) return false;
 
                         const resInTime = new Date(getLocalDateString(res.check_in) + "T12:00:00").getTime();
@@ -1254,15 +1322,15 @@
                     return d1 === d2 ? d1 : `${d1} al ${d2}`;
                 },
 
-                obtenerPrecioPorDia(fechaStr) {
+                obtenerPrecioPorDia(fechaStr, tarifas = null, prop = null) {
                     if (!fechaStr) return 0;
                     const f = new Date(fechaStr + "T12:00:00").getTime();
-                    let tarifaEspecial = this.tarifasEspeciales.find(t => {
+                    let tarifaEspecial = (tarifas || this.tarifasEspeciales).find(t => {
                         const tIn = new Date(t.fecha_inicio).getTime();
                         const tOut = new Date(t.fecha_fin).getTime();
                         return f >= tIn && f <= tOut;
                     });
-                    return tarifaEspecial ? tarifaEspecial.precio : (this.propiedadActiva?.precio_noche || 0);
+                    return tarifaEspecial ? tarifaEspecial.precio : ((prop || this.propiedadActiva)?.precio_noche || 0);
                 },
 
                 // ✨ Resumen del mes seleccionado.
@@ -1370,14 +1438,19 @@
                     this.formReserva = {
                         id: null, huesped_nombre: '', check_in: '', check_out: '',
                         hora_llegada: '15:00', hora_salida: '11:00', monto_total: '',
-                        canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0
+                        canal: 'Directa', cantidad_huespedes: 1, cantidad_mascotas: 0,
+                        propiedad_id: this.propiedadActiva?.id
                     };
+                    this.reservasDestino = null;
+                    this.tarifasDestino = null;
                     this.initFlatpickrReserva();
                     this.modalReserva = true;
                 },
 
                 editarReserva(res) {
-                    this.formReserva = { ...res, cantidad_mascotas: 0 };
+                    this.formReserva = { ...res, cantidad_mascotas: 0, propiedad_id: res.propiedad_id || this.propiedadActiva?.id };
+                    this.reservasDestino = null;
+                    this.tarifasDestino = null;
 
                     const dIn = new Date(res.check_in);
                     const dOut = new Date(res.check_out);
@@ -1395,6 +1468,10 @@
                 recalcularTotal() {
                     if (!this.formReserva.check_in || !this.formReserva.check_out) return;
 
+                    // ✨ Con las tarifas del apartamento elegido en la ventana (puede ser otro)
+                    const prop = this.propiedadDelModal;
+                    const tarifas = this.tarifasDestino || this.tarifasEspeciales;
+
                     let subtotal = 0;
                     let d1 = new Date(this.formReserva.check_in + "T12:00:00");
                     let d2 = new Date(this.formReserva.check_out + "T12:00:00");
@@ -1402,32 +1479,68 @@
                     let diffDays = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
                     if (diffDays < 1) diffDays = 1;
 
-                    let baseGuests = this.propiedadActiva.huespedes_base || 1;
-                    let extraPrice = this.propiedadActiva.precio_huesped_extra || 0;
+                    let baseGuests = prop.huespedes_base || 1;
+                    let extraPrice = prop.precio_huesped_extra || 0;
                     let pax = Number(this.formReserva.cantidad_huespedes) || 1;
                     let extraPaxCount = pax > baseGuests ? pax - baseGuests : 0;
 
                     let numMascotas = Number(this.formReserva.cantidad_mascotas) || 0;
-                    let petPrice = this.propiedadActiva.precio_mascota || 0;
+                    let petPrice = prop.precio_mascota || 0;
 
                     let d = new Date(d1);
                     for (let i = 0; i < diffDays; i++) {
                         let dStr = getLocalDateString(d);
-                        let diaBase = this.obtenerPrecioPorDia(dStr);
+                        let diaBase = this.obtenerPrecioPorDia(dStr, tarifas, prop);
                         subtotal += diaBase + (extraPaxCount * extraPrice) + (numMascotas * petPrice);
                         d.setDate(d.getDate() + 1);
                     }
 
-                    let aseoUnico = this.propiedadActiva.tarifa_aseo || 0;
+                    let aseoUnico = prop.tarifa_aseo || 0;
                     subtotal += aseoUnico;
 
                     this.formReserva.monto_total = subtotal;
                 },
 
+                // ✨ Se eligió otro apartamento en la ventana: traemos sus reservas y tarifas
+                async cambiarApartamentoReserva() {
+                    const destino = this.formReserva.propiedad_id;
+                    if (!destino || destino === this.propiedadActiva?.id) {
+                        this.reservasDestino = null;
+                        this.tarifasDestino = null;
+                    } else {
+                        this.cargandoDestino = true;
+                        try {
+                            const [resReservas, resTarifas] = await Promise.all([
+                                fetch(`https://gestandovalor-backend.onrender.com/reservas/propiedad/${destino}`),
+                                fetch(`https://gestandovalor-backend.onrender.com/tarifas/propiedad/${destino}`)
+                            ]);
+                            this.reservasDestino = resReservas.ok ? await resReservas.json() : [];
+                            this.tarifasDestino = resTarifas.ok ? await resTarifas.json() : [];
+                        } catch (e) {
+                            console.error('No se pudieron traer las reservas de ese apartamento', e);
+                            this.reservasDestino = [];
+                            this.tarifasDestino = [];
+                        } finally {
+                            this.cargandoDestino = false;
+                        }
+                    }
+
+                    // Si en el apartamento elegido esas noches ya están ocupadas, se avisa y se limpian las fechas
+                    if (this.formReserva.check_in && this.formReserva.check_out &&
+                        this.haySuperposicion(this.formReserva.check_in, this.formReserva.check_out, this.formReserva.id, this.reservasModal)) {
+                        alert('⚠️ En ese apartamento esas fechas ya están ocupadas. Elige otras fechas u otro apartamento.');
+                        this.formReserva.check_in = '';
+                        this.formReserva.check_out = '';
+                    }
+                    // Una reserva nueva toma el precio del apartamento elegido; una que se mueve conserva su monto
+                    if (!this.formReserva.id) this.recalcularTotal();
+                    this.initFlatpickrReserva([this.formReserva.check_in, this.formReserva.check_out].filter(Boolean));
+                },
+
                 initFlatpickrReserva(defaultDates = []) {
                     const that = this;
 
-                    const deshabilitadas = this.reservas
+                    const deshabilitadas = this.reservasModal
                         .filter(r => r.id !== this.formReserva.id)
                         .map(r => ({
                             from: getLocalDateString(r.check_in),
@@ -1454,7 +1567,7 @@
                                     let chkIn = instance.formatDate(selectedDates[0], "Y-m-d");
                                     let chkOut = instance.formatDate(selectedDates[1], "Y-m-d");
 
-                                    if (that.haySuperposicion(chkIn, chkOut, that.formReserva.id)) {
+                                    if (that.haySuperposicion(chkIn, chkOut, that.formReserva.id, that.reservasModal)) {
                                         alert("⚠️ Las fechas seleccionadas chocan con una reserva existente. Por favor elige otras fechas.");
                                         instance.clear();
                                         that.formReserva.check_in = '';
@@ -1480,7 +1593,7 @@
                         return;
                     }
 
-                    if (this.haySuperposicion(this.formReserva.check_in, this.formReserva.check_out, this.formReserva.id)) {
+                    if (this.haySuperposicion(this.formReserva.check_in, this.formReserva.check_out, this.formReserva.id, this.reservasModal)) {
                         alert("⚠️ ERROR: Las fechas se cruzan con una reserva que ya está en el calendario.");
                         return;
                     }
@@ -1488,8 +1601,10 @@
                     const dateInString = this.formReserva.check_in + "T" + this.formReserva.hora_llegada + ":00";
                     const dateOutString = this.formReserva.check_out + "T" + this.formReserva.hora_salida + ":00";
 
+                    // ✨ El apartamento elegido en la ventana (puede ser distinto al que se está viendo)
+                    const destinoId = this.formReserva.propiedad_id || this.propiedadActiva.id;
                     const payload = {
-                        propiedad_id: this.propiedadActiva.id,
+                        propiedad_id: destinoId,
                         huesped_nombre: this.formReserva.huesped_nombre,
                         check_in: new Date(dateInString).toISOString(),
                         check_out: new Date(dateOutString).toISOString(),
@@ -1504,6 +1619,35 @@
                     if (this.formReserva.id) {
                         url += `/${this.formReserva.id}`;
                         method = 'PATCH';
+                    }
+
+                    // ✨ Reserva que va para otro apartamento: se guarda primero y luego se quita de este calendario
+                    if (destinoId !== this.propiedadActiva.id) {
+                        const idEditada = this.formReserva.id;
+                        this.cargando = true;
+                        try {
+                            const res = await fetch(url, {
+                                method: method, headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            if (!res.ok) {
+                                let mensaje = 'No se pudo guardar la reserva.';
+                                try { mensaje = (await res.json()).message || mensaje; } catch (e) { }
+                                alert(`⚠️ ${mensaje}`);
+                                return;
+                            }
+                            if (idEditada) this.reservas = this.reservas.filter(r => r.id !== idEditada);
+                            this.generarMesVisual();
+                            this.calcularStats();
+                            this.modalReserva = false;
+                            const destino = this.propiedades.find(p => p.id === destinoId);
+                            this.mostrarAviso(`✅ Reserva ${idEditada ? 'pasada' : 'creada'} en ${destino?.titulo || 'el otro apartamento'}`, destinoId);
+                        } catch (e) {
+                            alert("⚠️ Error de conexión. La reserva no se pudo guardar.");
+                        } finally {
+                            this.cargando = false;
+                        }
+                        return;
                     }
 
                     let tempId = this.formReserva.id ? this.formReserva.id : 'temp_' + Date.now();
@@ -1540,8 +1684,9 @@
                             this.reservas = backupReservas;
                             this.generarMesVisual();
                             this.calcularStats();
-                            const errorData = await res.json();
-                            alert(`⚠️ Error del Servidor:\n${errorData.message || 'Las fechas ya están ocupadas.'}`);
+                            let mensaje = 'Las fechas ya están ocupadas.';
+                            try { mensaje = (await res.json()).message || mensaje; } catch (e) { }
+                            alert(`⚠️ Error del Servidor:\n${mensaje}`);
                         }
                     } catch (e) {
                         this.reservas = backupReservas;
@@ -1549,6 +1694,21 @@
                         this.calcularStats();
                         alert("⚠️ Error de conexión. La reserva no se pudo guardar.");
                     }
+                },
+
+                // ✨ Aviso flotante (se va solo). Si trae un apartamento, deja ir a su calendario
+                mostrarAviso(texto, propiedadId = null) {
+                    this.aviso = texto;
+                    this.avisoPropiedadId = propiedadId;
+                    clearTimeout(this._avisoTimer);
+                    this._avisoTimer = setTimeout(() => { this.aviso = ''; this.avisoPropiedadId = null; }, 8000);
+                },
+
+                verApartamentoDelAviso() {
+                    const prop = this.propiedades.find(p => p.id === this.avisoPropiedadId);
+                    this.aviso = '';
+                    this.avisoPropiedadId = null;
+                    if (prop) this.seleccionarPropiedad(prop);
                 },
 
                 async borrarReservaDirecto(id) {

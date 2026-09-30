@@ -167,7 +167,7 @@
                                                         d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg> <span x-text="`En pausa · ${miembro.ubicacion}`"></span>
                                             </p>
-                                            <div
+                                            <div x-show="miembro.checkIn"
                                                 class="flex gap-3 text-[11px] text-gray-500 bg-white px-3 py-1.5 rounded-md border border-gray-100 inline-flex shadow-sm">
                                                 <span><strong class="text-navy">Inició:</strong> <span
                                                         x-text="miembro.checkIn"></span></span>
@@ -186,7 +186,7 @@
                                                         stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg> <span x-text="`En ${miembro.ubicacion}`"></span>
                                             </p>
-                                            <div
+                                            <div x-show="miembro.checkIn"
                                                 class="flex gap-3 text-[11px] text-gray-500 bg-white px-3 py-1.5 rounded-md border border-gray-100 inline-flex shadow-sm">
                                                 <span><strong class="text-navy">Inició:</strong> <span
                                                         x-text="miembro.checkIn"></span></span>
@@ -498,15 +498,11 @@
                                 class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
                         </div>
                         <div>
+                            <!-- Al editar, si se deja vacía la contraseña no cambia -->
                             <input type="text" x-model="formUsuario.password"
-                                :placeholder="modoEdicion ? 'Dejar vacío = no cambiar' : 'Contraseña'"
-                                :required="!modoEdicion" minlength="6"
+                                :placeholder="modoEdicion ? '' : 'Contraseña (mínimo 6)'" :required="!modoEdicion"
+                                minlength="6"
                                 class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-gold text-sm text-navy font-mono">
-                            <p class="text-[10px] mt-1 ml-1 text-gray-500">
-                                <span x-show="!modoEdicion">Mínimo 6 caracteres.</span>
-                                <span x-show="modoEdicion">Déjalo vacío para no cambiarla. Las claves van
-                                    cifradas y nadie puede leerlas.</span>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -525,28 +521,53 @@
                         Aún no has creado propiedades en el sistema.
                     </p>
 
+                    <!-- ✨ Buscador por nombre o número para encontrar rápido los apartamentos -->
+                    <div x-show="propiedadesReales.length > 0"
+                        class="flex items-center bg-gray-50 rounded-xl border border-gray-200 focus-within:border-gold transition-colors px-3 h-11 mb-3">
+                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" x-model="busquedaAptos" placeholder="Buscar por nombre o número..."
+                            @keydown.enter.prevent
+                            class="w-full h-full bg-transparent outline-none px-2 text-sm text-navy font-bold placeholder-gray-300">
+                        <button type="button" x-show="busquedaAptos" @click="busquedaAptos = ''"
+                            class="text-gray-400 hover:text-navy shrink-0" aria-label="Borrar búsqueda">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
-                        <template x-for="prop in propiedadesReales" :key="prop.id">
+                        <template x-for="prop in propiedadesParaAsignar" :key="prop.id">
                             <label class="relative cursor-pointer group block">
                                 <input type="checkbox" :value="prop.id" x-model="propiedadesSeleccionadas"
                                     class="peer sr-only">
                                 <div
                                     class="rounded-xl overflow-hidden border-4 border-transparent peer-checked:border-gold transition-all relative h-28 shadow-sm group-hover:shadow-md bg-gray-100">
-                                    <img :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''"
-                                        class="w-full h-full object-cover">
+                                    <img x-show="prop.fotos && prop.fotos.length > 0"
+                                        :src="prop.fotos && prop.fotos.length > 0 ? prop.fotos[0] : ''" loading="lazy"
+                                        decoding="async" class="w-full h-full object-cover">
                                     <div
                                         class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/40 to-transparent">
                                     </div>
                                     <div class="absolute bottom-2 left-2 right-2">
                                         <p class="text-white text-xs font-extrabold truncate drop-shadow-md"
                                             x-text="prop.titulo || prop.tipo_propiedad || 'Propiedad'"></p>
-                                        <p class="text-gray-300 text-[10px] uppercase font-bold"
-                                            x-text="prop.ciudad || 'Sin ciudad'"></p>
+                                        <p class="text-gray-300 text-[10px] uppercase font-bold truncate"
+                                            x-text="(prop.ciudad || 'Sin ciudad') + (prop.numero_alojamiento ? ' · #' + prop.numero_alojamiento : '')">
+                                        </p>
                                     </div>
                                 </div>
                             </label>
                         </template>
                     </div>
+                    <p x-show="propiedadesReales.length > 0 && propiedadesParaAsignar.length === 0"
+                        class="text-xs text-gray-400 text-center py-4 font-bold">No hay apartamentos con ese nombre o
+                        número.</p>
                 </div>
 
                 <div class="pt-4 pb-2 sticky bottom-0 bg-white border-t border-gray-100">
@@ -581,6 +602,27 @@
                 modoEdicion: false,
                 formUsuario: { id: '', nombre: '', username: '', password: '', rol: 'PROPIETARIO' },
                 propiedadesSeleccionadas: [],
+                busquedaAptos: '',
+
+                // ✨ Apartamentos para asignar al propietario, filtrados por nombre o número (con o sin #)
+                get propiedadesParaAsignar() {
+                    const termino = this.busquedaAptos.trim().toLowerCase().replace(/^#/, '');
+                    if (!termino) return this.propiedadesReales;
+                    return this.propiedadesReales.filter(p =>
+                        (p.titulo || '').toLowerCase().includes(termino) ||
+                        String(p.numero_alojamiento || '').toLowerCase().includes(termino));
+                },
+
+                // ✨ Hora real en que empezó el aseo (la guarda el servidor al darle "Iniciar").
+                // Si fue otro día, también dice la fecha.
+                horaInicio(tarea) {
+                    if (!tarea || !tarea.iniciado_at) return null;
+                    const inicio = new Date(tarea.iniciado_at);
+                    const hora = inicio.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Bogota' });
+                    const dia = (f) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(f);
+                    if (dia(inicio) === dia(new Date())) return hora;
+                    return inicio.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', timeZone: 'America/Bogota' }) + ', ' + hora;
+                },
 
                 async init() {
                     await this.cargarDatosCompletos();
@@ -627,7 +669,8 @@
                                 ubicacion: tareaActual && tareaActual.propiedad ? tareaActual.propiedad.titulo : 'En base',
                                 // Si además dejó otro en pausa mientras trabaja en este, lo mostramos aparte
                                 pausado: (enCurso && enPausa && enPausa.propiedad) ? enPausa.propiedad.titulo : null,
-                                checkIn: tareaActual ? new Date(tareaActual.created_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : null
+                                // ✨ Hora real en que empezó (antes salía la hora en que se agendó el aseo)
+                                checkIn: this.horaInicio(tareaActual)
                             };
                         });
 
@@ -674,11 +717,13 @@
                     this.modoEdicion = false;
                     this.formUsuario = { id: '', nombre: '', username: '', password: '', rol: 'PROPIETARIO' };
                     this.propiedadesSeleccionadas = [];
+                    this.busquedaAptos = '';
                     this.modalFormulario = true;
                 },
 
                 abrirEdicion(usuario) {
                     this.modoEdicion = true;
+                    this.busquedaAptos = '';
                     this.formUsuario = {
                         id: usuario.id,
                         nombre: usuario.nombre,

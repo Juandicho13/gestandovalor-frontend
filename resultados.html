@@ -78,6 +78,37 @@
             border-color: #D4AF37 !important;
             font-weight: bold;
         }
+
+        /* ✨ FIX SOLO PARA CELULARES (calendario de 1 mes)
+           El padding de 20px le quitaba ancho a los días y la columna del domingo quedaba
+           por fuera: en el celular no se veían ni se podían escoger los domingos.
+           Igual que en alojamientos: cada día ocupa exactamente 1/7 del ancho que queda. */
+        @media (max-width: 768px) {
+            .flatpickr-calendar {
+                max-width: 95vw !important;
+            }
+
+            .flatpickr-innerContainer,
+            .flatpickr-rContainer,
+            .flatpickr-days,
+            .dayContainer {
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .flatpickr-weekdays {
+                width: 100% !important;
+            }
+
+            .flatpickr-day,
+            span.flatpickr-weekday {
+                flex-basis: 14.285% !important;
+                max-width: 14.285% !important;
+                width: 14.285% !important;
+                margin: 0 !important;
+            }
+        }
     </style>
 </head>
 

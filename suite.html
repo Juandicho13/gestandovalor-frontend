@@ -133,6 +133,11 @@
         <p class="font-bold text-navy animate-pulse">Preparando tu experiencia...</p>
     </div>
 
+    <!-- ✨ Aviso de "enlace copiado" -->
+    <div x-show="avisoCompartir" style="display: none;" x-transition.opacity
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[300] bg-navy text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-2xl max-w-[90vw] text-center"
+        x-text="avisoCompartir"></div>
+
     <nav id="navbar"
         class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] backdrop-blur-lg overflow-hidden border-white/10 w-full max-w-full h-24 rounded-none px-6 md:px-10 border-b bg-navy">
 
@@ -219,6 +224,17 @@
                     </div>
                 </template>
             </div>
+
+            <!-- ✨ Compartir: abre el menú del celular (WhatsApp, Instagram, correo...) con el link del alojamiento -->
+            <button @click.stop="compartirAlojamiento()" aria-label="Compartir este alojamiento"
+                class="absolute top-3 right-3 md:top-5 md:right-5 z-10 bg-white/90 backdrop-blur-md border border-gray-200 rounded-full shadow-lg hover:bg-white transition-colors text-navy font-bold text-sm flex items-center gap-2 p-2.5 md:py-2 md:px-4">
+                <svg class="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 15V3m0 0l-4 4m4-4l4 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                </svg>
+                <span class="hidden md:inline">Compartir</span>
+            </button>
 
             <button @click="openModalFotos = true"
                 class="absolute bottom-5 right-5 bg-white/90 backdrop-blur-md border border-gray-200 py-2 px-4 rounded-lg text-navy font-bold items-center gap-2 shadow-lg hover:bg-white transition-colors hidden md:flex text-sm z-10">
@@ -676,11 +692,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
-            <div class="flex gap-4">
-                <button
-                    class="font-bold text-navy underline text-sm hover:text-gold transition-colors">Compartir</button>
-                <button class="font-bold text-navy underline text-sm hover:text-gold transition-colors">Guardar</button>
-            </div>
         </div>
 
         <div class="flex-1 overflow-y-auto px-4 md:px-12 lg:px-24 py-8 custom-scrollbar">
@@ -1320,6 +1331,35 @@
                 mobileMenuOpen: false,
                 openModalFotos: false,
                 openModalServicios: false,
+                avisoCompartir: '',
+
+                // ✨ Compartir como en Airbnb: en el celular abre el menú del sistema con las apps;
+                // en un computador sin ese menú, copia el link y avisa.
+                async compartirAlojamiento() {
+                    const url = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(this.propiedad.id)}`;
+                    const titulo = this.propiedad.titulo || `${this.propiedad.tipo_propiedad || 'Alojamiento'} en ${this.propiedad.ciudad || 'Colombia'}`;
+                    const texto = `${titulo} · ${this.propiedad.ciudad || ''} · GestandoValor`.replace(' ·  · ', ' · ');
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({ title: titulo, text: texto, url });
+                        } catch (e) {
+                            // Si la persona cierra el menú no pasa nada
+                        }
+                        return;
+                    }
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        this.mostrarAvisoCompartir('🔗 Enlace copiado. Pégalo donde quieras compartirlo.');
+                    } catch (e) {
+                        window.prompt('Copia este enlace para compartir el alojamiento:', url);
+                    }
+                },
+
+                mostrarAvisoCompartir(texto) {
+                    this.avisoCompartir = texto;
+                    clearTimeout(this._avisoCompartirTimer);
+                    this._avisoCompartirTimer = setTimeout(() => { this.avisoCompartir = ''; }, 3500);
+                },
 
                 propiedad: { id: '', titulo: '', fotos: [], foto_categorias: [], comodidades: [], precio_noche: 0, descripcion: '', precio_huesped_extra: 0, huespedes_base: 1, tarifa_aseo: 0, precio_mascota: 0, tarifas_especiales: [] },
                 reservasFechas: [],

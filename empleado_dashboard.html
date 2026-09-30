@@ -233,7 +233,7 @@
                                 'bg-gray-100 border-gray-200': (!tarea.urgencia || tarea.urgencia === 'Flexible')
                              }">
                                     <span
-                                        class="font-extrabold text-xs uppercase tracking-widest flex items-center gap-2"
+                                        class="font-extrabold text-xs uppercase tracking-widest flex flex-wrap items-center gap-x-2 gap-y-0.5"
                                         :class="{
                                     'text-danger': tarea.urgencia === 'Urgente',
                                     'text-warning': tarea.urgencia === 'Normal',
@@ -241,6 +241,9 @@
                                   }">
                                         <span
                                             x-text="tarea.urgencia === 'Urgente' ? '🔥 Urgente' : (tarea.urgencia === 'Normal' ? '⚡ Normal' : '☕ Flexible')"></span>
+                                        <!-- ✨ Por qué tiene esa prioridad -->
+                                        <span class="normal-case tracking-normal font-bold text-[11px] opacity-80"
+                                            x-text="tarea.urgencia === 'Urgente' ? 'Entra otro huésped ese mismo día' : (tarea.urgencia === 'Normal' ? 'Hay reserva, pero no llega ese día' : 'Sin reservas próximas')"></span>
                                     </span>
                                     <span x-show="tareaActiva && tareaActiva.id === tarea.id"
                                         class="text-[10px] bg-warning text-white px-2 py-1 rounded-md font-bold uppercase tracking-wider animate-pulse">
@@ -266,8 +269,10 @@
                                                     class="bg-gray-100 text-gray-600 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-200"
                                                     x-text="'🔑 ' + (tarea.propiedad_segura?.cerradura_codigo || 'Consultar admin')"></span>
                                             </div>
-                                            <p class="text-gray-500 text-xs font-medium"
-                                                x-text="tarea.propiedad_segura?.direccion || 'Dirección no especificada'">
+                                            <!-- ✨ Número del apartamento (el que se configura en Propiedades), en vez de la dirección -->
+                                            <p x-show="tarea.propiedad_segura?.numero_alojamiento"
+                                                class="text-navy text-sm font-extrabold"
+                                                x-text="'Apartamento ' + tarea.propiedad_segura?.numero_alojamiento">
                                             </p>
                                             <p x-show="tarea.fecha_aseo" class="text-xs font-bold mt-1"
                                                 :class="grupo.clave === 'atrasados' ? 'text-danger' : 'text-gray-600'"
@@ -322,7 +327,9 @@
                     <span class="text-gold font-bold uppercase tracking-widest text-[10px]">Limpieza en progreso</span>
                     <h2 class="text-3xl font-extrabold text-navy"
                         x-text="tareaActiva?.propiedad_segura?.titulo || 'Apartamento sin título'"></h2>
-                    <p class="text-gray-500 text-sm mt-1" x-text="tareaActiva?.propiedad_segura?.direccion"></p>
+                    <p x-show="tareaActiva?.propiedad_segura?.numero_alojamiento"
+                        class="text-navy text-base font-extrabold mt-1"
+                        x-text="'Apartamento ' + tareaActiva?.propiedad_segura?.numero_alojamiento"></p>
                 </div>
             </div>
 
@@ -405,14 +412,33 @@
                     </div>
                 </div>
 
-                <button @click="modalReporte = true"
-                    class="w-full bg-red-50 text-danger border border-red-200 font-bold py-4 rounded-xl hover:bg-red-100 transition flex justify-center items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    Reportar Daño o Problema
-                </button>
+                <!-- ✨ REPORTES: dos categorías, fotos finales del apartamento limpio y daños -->
+                <h3 class="text-lg font-extrabold text-navy mb-1 border-b-2 border-gold inline-block pb-1">Reportes</h3>
+                <p class="text-xs text-gray-500 mb-4">Antes de finalizar, sube las fotos del apartamento ya limpio. Si
+                    encuentras algo dañado o faltante, repórtalo aparte.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button @click="abrirReporte('finales')"
+                        class="w-full bg-green-50 text-success border border-green-200 font-bold py-4 px-4 rounded-xl hover:bg-green-100 transition flex justify-center items-center gap-2">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Fotos finales</span>
+                        <span x-show="(tareaActiva?.fotos_finales || []).length > 0"
+                            class="text-[11px] bg-success text-white px-2 py-0.5 rounded-full"
+                            x-text="(tareaActiva?.fotos_finales || []).length + ' subida' + ((tareaActiva?.fotos_finales || []).length === 1 ? '' : 's')"></span>
+                    </button>
+                    <button @click="abrirReporte('danos')"
+                        class="w-full bg-red-50 text-danger border border-red-200 font-bold py-4 px-4 rounded-xl hover:bg-red-100 transition flex justify-center items-center gap-2">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <span>Reportar daño o faltante</span>
+                    </button>
+                </div>
             </div>
 
             <div x-show="pestañaActiva === 'consumibles'" x-transition.opacity style="display: none;">
@@ -514,28 +540,55 @@
         class="fixed inset-0 z-[100] flex items-end justify-center sm:items-center px-4 pb-4 sm:pb-0">
         <div class="absolute inset-0 bg-navy/80 backdrop-blur-sm" @click="modalReporte = false"></div>
         <div
-            class="bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl w-full max-w-md relative z-10 overflow-hidden transform transition-all p-6 sm:p-8">
+            class="bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl w-full max-w-md relative z-10 overflow-y-auto max-h-[92vh] transform transition-all p-6 sm:p-8">
             <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 sm:hidden"></div>
-            <h3 class="text-xl font-extrabold text-danger flex items-center gap-2 mb-6">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                Reportar Novedad
-            </h3>
+
+            <!-- ✨ Dos categorías de reporte: fotos del apartamento limpio o daños -->
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-6 border border-gray-200">
+                <button type="button" @click="tipoReporte = 'finales'"
+                    class="flex-1 py-2.5 text-sm font-extrabold rounded-xl transition-all"
+                    :class="tipoReporte === 'finales' ? 'bg-white text-success shadow-sm' : 'text-gray-500 hover:text-navy'">
+                    📸 Fotos finales
+                </button>
+                <button type="button" @click="tipoReporte = 'danos'"
+                    class="flex-1 py-2.5 text-sm font-extrabold rounded-xl transition-all"
+                    :class="tipoReporte === 'danos' ? 'bg-white text-danger shadow-sm' : 'text-gray-500 hover:text-navy'">
+                    ⚠️ Daños
+                </button>
+            </div>
+
+            <h3 class="text-xl font-extrabold mb-1" :class="tipoReporte === 'finales' ? 'text-success' : 'text-danger'"
+                x-text="tipoReporte === 'finales' ? 'Fotos del apartamento limpio' : 'Reportar daño o faltante'"></h3>
+            <p class="text-xs text-gray-500 mb-5"
+                x-text="tipoReporte === 'finales' ? 'Toma una foto de cada espacio ya listo: sala, cocina, baño y alcoba. La ama de llaves las revisa al inspeccionar.' : 'Describe qué está dañado o qué falta y agrega fotos si puedes.'">
+            </p>
 
             <form class="space-y-4" @submit.prevent="enviarReporte()">
-                <div>
+                <div x-show="tipoReporte === 'danos'">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Detalles del Daño
                         o Faltante</label>
                     <textarea x-model="nuevoReporte" placeholder="Ej: Faltan 2 toallas grandes y se rompió una copa..."
-                        rows="3" required
+                        rows="3" :required="tipoReporte === 'danos'"
                         class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-danger text-sm text-navy resize-none"></textarea>
                 </div>
+
+                <!-- Fotos finales que ya se subieron en este aseo -->
+                <div x-show="tipoReporte === 'finales' && (tareaActiva?.fotos_finales || []).length > 0">
+                    <p class="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-2"
+                        x-text="'Ya subiste ' + (tareaActiva?.fotos_finales || []).length + ((tareaActiva?.fotos_finales || []).length === 1 ? ' foto' : ' fotos')">
+                    </p>
+                    <div class="flex gap-2 overflow-x-auto pb-1">
+                        <template x-for="(url, i) in (tareaActiva?.fotos_finales || [])" :key="i">
+                            <img :src="url" loading="lazy" decoding="async"
+                                class="w-14 h-14 rounded-lg object-cover border border-gray-200 shrink-0">
+                        </template>
+                    </div>
+                </div>
+
                 <!-- SECCIÓN DE FOTOS -->
                 <div class="mt-4 mb-4">
-                    <label class="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-2 block">Evidencia
-                        Fotográfica</label>
+                    <label class="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-2 block"
+                        x-text="tipoReporte === 'finales' ? 'Agregar fotos' : 'Evidencia fotográfica'"></label>
 
                     <input type="file" id="inputFotosReporte" accept="image/*" multiple class="hidden"
                         @change="cargarFotosNovedad($event)">
@@ -572,11 +625,13 @@
 
                 <!-- Botones de Acción -->
                 <div class="pt-2 flex gap-3">
-                    <button type="button" @click="modalReporte = false; fotosReporte = []"
+                    <button type="button" @click="cerrarReporte()"
                         class="w-1/3 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
-                    <button type="submit" :disabled="subiendoReporte"
-                        class="w-2/3 bg-danger text-white font-extrabold py-4 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200 disabled:opacity-60"
-                        x-text="subiendoReporte ? (fotosReporte.length ? 'Subiendo fotos...' : 'Enviando...') : 'Enviar Alerta'"></button>
+                    <button type="submit"
+                        :disabled="subiendoReporte || (tipoReporte === 'finales' && fotosReporte.length === 0)"
+                        class="w-2/3 text-white font-extrabold py-4 rounded-xl transition-colors shadow-lg disabled:opacity-60"
+                        :class="tipoReporte === 'finales' ? 'bg-success hover:bg-green-600 shadow-green-200' : 'bg-danger hover:bg-red-600 shadow-red-200'"
+                        x-text="textoBotonReporte"></button>
                 </div>
             </form>
         </div>
@@ -600,6 +655,8 @@
                 pestañaActiva: 'checklist',
 
                 modalReporte: false,
+                // ✨ 'finales' = fotos del apartamento limpio · 'danos' = daño o faltante
+                tipoReporte: 'danos',
                 nuevoReporte: '',
                 fotosReporte: [],
                 subiendoReporte: false,
@@ -1008,6 +1065,17 @@
                 reanudarAseo() {
                     this.aseoActivo = true;
                     this.pausaActiva = false;
+
+                    // ✨ Avisamos que volvió a trabajar: antes el radar lo seguía viendo "En Pausa"
+                    if (this.tareaActiva) {
+                        this.tareaActiva.estado = 'En Progreso';
+                        fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ estado: 'En Progreso' })
+                        }).catch(e => console.error('No se pudo marcar el aseo como reanudado', e));
+                    }
+
                     if (this.horaInicioPausa) {
                         const horaFin = new Date();
                         const duracionSegundos = Math.round((horaFin - this.horaInicioPausa) / 1000);
@@ -1030,12 +1098,33 @@
                     return `${minutos}m ${segundos}s`;
                 },
 
-                // ✨ FOTOS DEL REPORTE DE NOVEDAD
+                // ✨ REPORTES: abre la ventana en la categoría que se tocó
+                abrirReporte(tipo) {
+                    this.tipoReporte = tipo;
+                    this.modalReporte = true;
+                },
+
+                cerrarReporte() {
+                    this.modalReporte = false;
+                    this.fotosReporte.forEach(f => f.url && URL.revokeObjectURL(f.url));
+                    this.fotosReporte = [];
+                },
+
+                get textoBotonReporte() {
+                    if (this.subiendoReporte) return this.fotosReporte.length ? 'Subiendo fotos...' : 'Enviando...';
+                    if (this.tipoReporte === 'finales') {
+                        const n = this.fotosReporte.length;
+                        return n ? `Subir ${n} foto${n === 1 ? '' : 's'}` : 'Elige las fotos';
+                    }
+                    return 'Enviar Alerta';
+                },
+
+                // ✨ FOTOS DEL REPORTE (daños o fotos finales)
                 async cargarFotosNovedad(event) {
                     const archivos = Array.from(event.target.files || []);
                     event.target.value = ''; // permite volver a elegir la misma foto
 
-                    const MAX_FOTOS = 6;
+                    const MAX_FOTOS = this.tipoReporte === 'finales' ? 12 : 6;
                     for (const archivo of archivos) {
                         if (this.fotosReporte.length >= MAX_FOTOS) {
                             alert(`Puedes adjuntar máximo ${MAX_FOTOS} fotos por reporte.`);
@@ -1095,14 +1184,14 @@
                     this.fotosReporte.splice(index, 1);
                 },
 
-                async subirFotoNovedad(foto) {
+                async subirFotoNovedad(foto, carpeta) {
                     // Paso A: permiso temporal del backend para subir directo a Storage
                     const res = await fetch('https://gestandovalor-backend.onrender.com/propiedades/url-subida', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             extension: foto.extension,
-                            propiedadId: `novedades/${this.tareaActiva.propiedad_id}`
+                            propiedadId: carpeta || `novedades/${this.tareaActiva.propiedad_id}`
                         })
                     });
                     if (!res.ok) throw new Error('No se pudo preparar la subida de la foto');
@@ -1120,7 +1209,9 @@
                 },
 
                 async enviarReporte() {
-                    if (!this.nuevoReporte.trim() || !this.tareaActiva) return;
+                    if (!this.tareaActiva) return;
+                    if (this.tipoReporte === 'finales') return this.enviarFotosFinales();
+                    if (!this.nuevoReporte.trim()) return;
                     this.subiendoReporte = true;
                     this.cargando = true;
 
@@ -1163,10 +1254,55 @@
                     }
                 },
 
+                // ✨ Fotos del apartamento ya limpio: se suman a las que ya había en este aseo
+                async enviarFotosFinales() {
+                    if (this.fotosReporte.length === 0) return;
+                    this.subiendoReporte = true;
+                    this.cargando = true;
+
+                    try {
+                        const urlsNuevas = [];
+                        for (const foto of this.fotosReporte) {
+                            urlsNuevas.push(await this.subirFotoNovedad(foto, `aseos/${this.tareaActiva.propiedad_id}`));
+                        }
+                        const fotosFinales = [...(this.tareaActiva.fotos_finales || []), ...urlsNuevas];
+
+                        const res = await fetch(`https://gestandovalor-backend.onrender.com/tareas-aseo/${this.tareaActiva.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ fotos_finales: fotosFinales })
+                        });
+                        if (!res.ok) throw new Error('El servidor no guardó las fotos');
+
+                        this.tareaActiva.fotos_finales = fotosFinales;
+                        this.fotosReporte.forEach(f => f.url && URL.revokeObjectURL(f.url));
+                        this.fotosReporte = [];
+                        this.modalReporte = false;
+                        this.guardarProgresoLocal();
+
+                        alert(`📸 ${urlsNuevas.length === 1 ? 'Foto enviada' : urlsNuevas.length + ' fotos enviadas'} a la Ama de Llaves.`);
+                    } catch (e) {
+                        console.error(e);
+                        alert('No se pudieron subir las fotos. Revisa tu conexión e inténtalo de nuevo.');
+                    } finally {
+                        this.subiendoReporte = false;
+                        this.cargando = false;
+                    }
+                },
+
                 async finalizarAseo() {
                     if (this.tareasCompletadasCheck < this.totalTareas) {
                         const confirmar = confirm(`Faltan tareas por marcar en el Checklist (${this.tareasCompletadasCheck}/${this.totalTareas}).\n\n¿Estás SEGURO que limpiaste todo y quieres finalizar?`);
                         if (!confirmar) return;
+                    }
+
+                    // ✨ Recordatorio de las fotos finales (se puede finalizar igual)
+                    if (!(this.tareaActiva?.fotos_finales || []).length) {
+                        const sinFotos = confirm('Aún no subes las fotos finales del apartamento limpio.\n\nAceptar: finalizar sin fotos\nCancelar: subirlas ahora');
+                        if (!sinFotos) {
+                            this.abrirReporte('finales');
+                            return;
+                        }
                     }
 
                     clearInterval(this.intervalo);

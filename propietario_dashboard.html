@@ -115,11 +115,17 @@
                     <div
                         class="bg-white p-8 rounded-[30px] shadow-lg border border-gray-100 transform transition hover:-translate-y-1 relative overflow-hidden">
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 relative z-10"
-                            x-text="`Tus Ingresos Netos (${mesActivo.split(' ')[0]})`"></p>
+                            x-text="`Ingresos del mes (${mesActivo.split(' ')[0]})`"></p>
                         <h3 class="text-4xl font-black text-navy relative z-10"
-                            x-text="formatearDinero(totalIngresosNetos)"></h3>
-                        <p class="text-xs text-success font-bold mt-2 flex items-center gap-1 relative z-10">
-                            Calculado según reservas reales
+                            x-text="formatearDinero(totalIngresosMes)"></h3>
+                        <!-- ✨ Es el total de las reservas del mes; el valor final sale en la liquidación -->
+                        <p class="text-xs text-gray-500 font-bold mt-2 flex items-center gap-1 relative z-10">
+                            <svg class="w-3.5 h-3.5 text-gold shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Valor estimado del mes, según las reservas registradas
                         </p>
                     </div>
 
@@ -262,7 +268,7 @@
                 usuarioInfo: null,
                 misPropiedades: [],
                 misLiquidaciones: [],
-                totalIngresosNetos: 0,
+                totalIngresosMes: 0,
                 ocupacionPromedio: 0,
                 filtroPropiedadId: null,
 
@@ -295,14 +301,14 @@
                             this.misPropiedades = todasLasPropiedades.filter(p => String(p.propietario_id) === String(this.usuarioInfo.id));
                             const todasLasReservas = await resRes.json();
 
-                            const hoy = new Date();
-                            const mesActual = hoy.getMonth();
-                            const anioActual = hoy.getFullYear();
+                            // ✨ Todo en fechas de Colombia. Si una estadía cruza de mes, cada mes cuenta
+                            // sus noches y la parte proporcional del pago (igual que en el panel de Reservas).
+                            const diaCol = (f) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(f));
+                            const hoyStr = diaCol(Date.now());
+                            const prefijoMes = hoyStr.slice(0, 7); // 'YYYY-MM'
+                            const anioActual = Number(hoyStr.slice(0, 4));
+                            const mesActual = Number(hoyStr.slice(5, 7)) - 1;
                             const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
-
-                            const offsetCol = -5;
-                            const fechaCol = new Date(hoy.getTime() + offsetCol * 3600 * 1000);
-                            const hoyStr = fechaCol.toISOString().split('T')[0];
 
                             let ingresosTotales = 0;
                             let nochesTotalesOcupadas = 0;
@@ -315,37 +321,37 @@
                                 let ocupadoHoy = false;
 
                                 reservasProp.forEach(res => {
-                                    const checkIn = new Date(res.check_in);
-                                    const checkOut = new Date(res.check_out);
-                                    const checkInStr = checkIn.toISOString().split('T')[0];
-                                    const checkOutStr = checkOut.toISOString().split('T')[0];
+                                    const checkInStr = diaCol(res.check_in);
+                                    const checkOutStr = diaCol(res.check_out);
 
                                     if (hoyStr >= checkInStr && hoyStr < checkOutStr) {
                                         ocupadoHoy = true;
                                     }
 
-                                    if ((checkIn.getMonth() === mesActual && checkIn.getFullYear() === anioActual) ||
-                                        (checkOut.getMonth() === mesActual && checkOut.getFullYear() === anioActual)) {
+                                    // Noches de la estadía y cuántas caen en este mes
+                                    const inicio = new Date(checkInStr + 'T12:00:00');
+                                    const totalNoches = Math.max(0, Math.round((new Date(checkOutStr + 'T12:00:00') - inicio) / 86400000));
+                                    let nochesEnMes = 0;
+                                    for (let i = 0; i < totalNoches; i++) {
+                                        const noche = new Date(inicio.getTime() + i * 86400000);
+                                        const nocheStr = `${noche.getFullYear()}-${String(noche.getMonth() + 1).padStart(2, '0')}`;
+                                        if (nocheStr === prefijoMes) nochesEnMes++;
+                                    }
 
-                                        if (checkIn.getMonth() === mesActual) {
-                                            ingresosProp += (Number(res.monto_total || 0) * 0.8);
-                                        }
-
-                                        let fechaInicio = checkIn < new Date(anioActual, mesActual, 1) ? new Date(anioActual, mesActual, 1) : checkIn;
-                                        let fechaFin = checkOut > new Date(anioActual, mesActual + 1, 0) ? new Date(anioActual, mesActual + 1, 0) : checkOut;
-
-                                        let noches = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24));
-                                        if (noches > 0) nochesOcupadasProp += noches;
+                                    if (nochesEnMes > 0) {
+                                        nochesOcupadasProp += nochesEnMes;
+                                        // El valor completo de la reserva, repartido por noches
+                                        ingresosProp += (Number(res.monto_total) || 0) * nochesEnMes / totalNoches;
                                     }
                                 });
 
                                 ingresosTotales += ingresosProp;
                                 nochesTotalesOcupadas += nochesOcupadasProp;
 
-                                return { ...prop, ocupadoHoy, ingresosMes: ingresosProp, nochesOcupadasMes: nochesOcupadasProp };
+                                return { ...prop, ocupadoHoy, ingresosMes: Math.round(ingresosProp), nochesOcupadasMes: nochesOcupadasProp };
                             });
 
-                            this.totalIngresosNetos = ingresosTotales;
+                            this.totalIngresosMes = Math.round(ingresosTotales);
 
                             const totalNochesPosibles = this.misPropiedades.length * diasEnMes;
                             this.ocupacionPromedio = totalNochesPosibles > 0 ? Math.round((nochesTotalesOcupadas / totalNochesPosibles) * 100) : 0;

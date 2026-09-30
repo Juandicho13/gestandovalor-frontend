@@ -148,7 +148,7 @@
                         </svg>
                         <input type="text" x-model="busquedaPropiedad" @input="indiceVisible = 0"
                             class="w-full h-full bg-transparent outline-none px-3 text-sm text-navy font-bold placeholder-gray-300"
-                            placeholder="Buscar suite...">
+                            placeholder="Buscar por nombre o número...">
                         <button x-show="busquedaPropiedad !== ''" @click="busquedaPropiedad = ''; indiceVisible = 0"
                             class="text-gray-400 hover:text-navy shrink-0" style="display: none;">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +178,12 @@
                             <div class="min-w-0 flex-1">
                                 <div class="font-extrabold text-navy text-sm leading-tight line-clamp-2"
                                     x-text="prop.titulo || 'Sin título'"></div>
-                                <div class="text-[11px] text-gray-400 truncate mt-0.5" x-text="prop.ciudad || ''"></div>
+                                <div class="text-[11px] text-gray-400 truncate mt-0.5">
+                                    <span x-text="prop.ciudad || ''"></span>
+                                    <!-- ✨ Número del apartamento al lado de la ciudad -->
+                                    <span x-show="prop.numero_alojamiento" class="font-extrabold text-navy"
+                                        x-text="(prop.ciudad ? ' · ' : '') + '#' + prop.numero_alojamiento"></span>
+                                </div>
                             </div>
                         </button>
                     </template>
@@ -417,9 +422,12 @@
                 porPagina: window.innerWidth < 768 ? 3 : 7,
 
                 get propiedadesFiltradas() {
-                    if (this.busquedaPropiedad.trim() === '') return this.propiedades;
-                    const termino = this.busquedaPropiedad.toLowerCase();
-                    return this.propiedades.filter(p => (p.titulo || '').toLowerCase().includes(termino));
+                    // ✨ Busca por nombre o por número del apartamento (con o sin #)
+                    const termino = this.busquedaPropiedad.trim().toLowerCase().replace(/^#/, '');
+                    if (termino === '') return this.propiedades;
+                    return this.propiedades.filter(p =>
+                        (p.titulo || '').toLowerCase().includes(termino) ||
+                        String(p.numero_alojamiento || '').toLowerCase().includes(termino));
                 },
 
                 get propiedadesVisibles() {

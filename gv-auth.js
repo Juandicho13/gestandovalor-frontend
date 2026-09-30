@@ -1,11 +1,13 @@
 /*
  * GestandoValor · sesión y llamadas protegidas
  * ------------------------------------------------------------------
- * Se carga UNA vez por página, antes que Alpine. Hace cuatro cosas:
+ * Se carga UNA vez por página, antes que Alpine. Hace cinco cosas:
  *   1. Guarda y lee el token de la sesión.
  *   2. Le pone la cabecera Authorization a toda llamada a nuestra API.
  *   3. Si el servidor responde 401, cierra la sesión y manda al login.
  *   4. Hace que cada pestaña recuerde con quién entró.
+ *   5. Deja una hoja de estilos propia de primera en la página (la necesita
+ *      el calendario en iPad y tablets, abajo está explicado por qué).
  *
  * Por qué cabecera y no cookie: el sitio vive en gestandovalor.com y la API
  * en onrender.com. Son dominios distintos, y Safari bloquea las cookies de
@@ -23,6 +25,20 @@
     'use strict';
 
     var API = 'https://gestandovalor-backend.onrender.com';
+
+    // ✨ Calendario en iPad y tablets
+    // Cuando el calendario de 2 meses no cabe ni a la izquierda ni a la derecha del campo
+    // de fechas, flatpickr lo centra escribiendo una regla en la PRIMERA hoja de estilos de
+    // la página. Esa primera hoja era la del CDN de flatpickr, que es de otro dominio, y el
+    // navegador no deja escribir ahí: salía un error y el calendario quedaba medio por fuera
+    // de la pantalla. Con esta hoja vacía de primera, flatpickr escribe aquí y queda centrado.
+    try {
+        if (!document.getElementById('gv-estilos-propios')) {
+            var hoja = document.createElement('style');
+            hoja.id = 'gv-estilos-propios';
+            document.head.insertBefore(hoja, document.head.firstChild);
+        }
+    } catch (e) { }
 
     // Safari en modo privado puede lanzar excepción al tocar el almacenamiento.
     // Todo acceso va envuelto para que la página nunca se caiga por esto.
