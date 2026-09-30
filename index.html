@@ -42,9 +42,18 @@
             <a href="index.html" class="text-sm font-medium text-white border-b-2 border-gold pb-1">Inicio</a>
             <a href="blog.html" class="text-sm font-medium hover:text-gold transition-colors">Blog</a>
             <a href="alojamientos.html" class="text-sm font-medium hover:text-gold transition-colors">Alojamientos</a>
-            <a href="login.html"
-                class="text-sm font-medium hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">Iniciar
-                Sesión</a>
+            <a href="login.html" title="Acceso solo para personal autorizado"
+                class="group flex items-center gap-2 hover:text-gold transition-colors ml-4 border-l border-white/20 pl-6">
+                <svg class="w-4 h-4 text-gold shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path stroke-linecap="round" d="M8 11V7a4 4 0 0 1 8 0v4" />
+                </svg>
+                <span class="flex flex-col leading-tight">
+                    <span class="text-sm font-medium">Iniciar Sesión</span>
+                    <span class="text-[11px] font-semibold text-gold/90">Solo personal autorizado</span>
+                </span>
+            </a>
         </div>
 
         <div class="hidden md:flex items-center gap-4 flex-shrink-0">
@@ -77,7 +86,11 @@
             <a href="alojamientos.html" @click="mobileMenuOpen = false"
                 class="text-2xl font-medium text-gray-300 hover:text-gold">Alojamientos</a>
             <a href="login.html" @click="mobileMenuOpen = false"
-                class="text-2xl font-medium text-gray-300 hover:text-gold">Iniciar Sesión</a>
+                class="flex flex-col items-center text-gray-300 hover:text-gold">
+                <span class="text-2xl font-medium">Iniciar Sesión</span>
+                <span class="text-xs font-semibold uppercase tracking-wider text-gold/90 mt-1">Solo personal
+                    autorizado</span>
+            </a>
 
             <button
                 @click="servicioSeleccionado = 'Información General'; openContact = true; mobileMenuOpen = false; document.getElementById('contacto').scrollIntoView({behavior: 'smooth'})"
@@ -833,6 +846,7 @@
                         <div class="text-5xl font-extrabold text-white group-hover:scale-105 transition-transform">
                             10% <span class="text-3xl text-white/50">-</span> 15%
                         </div>
+                        <p class="text-xs text-gray-400 mt-2">sobre ingresos brutos generados</p>
                     </div>
 
                 </div>
@@ -861,46 +875,85 @@
                 <span class="text-gold font-bold tracking-widest uppercase text-sm">Nuestros Diferenciales</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
                 <div
-                    class="bg-white/5 border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:border-gold/50 hover:bg-white/10 transition-all group h-full">
+                    class="group relative overflow-hidden bg-gradient-to-b from-white/[0.09] to-white/[0.03] border border-gold/25 p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 shadow-lg shadow-black/20 hover:border-gold/70 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(212,175,55,0.55)] transition-all duration-300 h-full">
+                    <span
+                        class="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold/80 to-transparent"></span>
                     <div
-                        class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold group-hover:scale-110 transition-transform">
-                        ✔</div>
+                        class="w-12 h-12 rounded-full bg-gradient-to-br from-[#F3D66B] to-gold text-navy flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)] group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 7h7v7" />
+                        </svg>
+                    </div>
                     <span class="text-white font-bold text-sm leading-tight">Estrategia financiera,<br>no
                         improvisación</span>
                 </div>
 
                 <div
-                    class="bg-white/5 border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:border-gold/50 hover:bg-white/10 transition-all group h-full">
+                    class="group relative overflow-hidden bg-gradient-to-b from-white/[0.09] to-white/[0.03] border border-gold/25 p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 shadow-lg shadow-black/20 hover:border-gold/70 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(212,175,55,0.55)] transition-all duration-300 h-full">
+                    <span
+                        class="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold/80 to-transparent"></span>
                     <div
-                        class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold group-hover:scale-110 transition-transform">
-                        ✔</div>
+                        class="w-12 h-12 rounded-full bg-gradient-to-br from-[#F3D66B] to-gold text-navy flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)] group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <path stroke-linejoin="round"
+                                d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />
+                        </svg>
+                    </div>
                     <span class="text-white font-bold text-sm leading-tight">Estándares<br>hoteleros</span>
                 </div>
 
                 <div
-                    class="bg-white/5 border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:border-gold/50 hover:bg-white/10 transition-all group h-full">
+                    class="group relative overflow-hidden bg-gradient-to-b from-white/[0.09] to-white/[0.03] border border-gold/25 p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 shadow-lg shadow-black/20 hover:border-gold/70 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(212,175,55,0.55)] transition-all duration-300 h-full">
+                    <span
+                        class="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold/80 to-transparent"></span>
                     <div
-                        class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold group-hover:scale-110 transition-transform">
-                        ✔</div>
+                        class="w-12 h-12 rounded-full bg-gradient-to-br from-[#F3D66B] to-gold text-navy flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)] group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5" />
+                            <path stroke-linecap="round" d="M9 17v-3M12 17v-5M15 17v-2" />
+                        </svg>
+                    </div>
                     <span class="text-white font-bold text-sm leading-tight">Reportes claros<br>y transparentes</span>
                 </div>
 
                 <div
-                    class="bg-white/5 border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:border-gold/50 hover:bg-white/10 transition-all group h-full">
+                    class="group relative overflow-hidden bg-gradient-to-b from-white/[0.09] to-white/[0.03] border border-gold/25 p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 shadow-lg shadow-black/20 hover:border-gold/70 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(212,175,55,0.55)] transition-all duration-300 h-full">
+                    <span
+                        class="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold/80 to-transparent"></span>
                     <div
-                        class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold group-hover:scale-110 transition-transform">
-                        ✔</div>
+                        class="w-12 h-12 rounded-full bg-gradient-to-br from-[#F3D66B] to-gold text-navy flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)] group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2" />
+                        </svg>
+                    </div>
                     <span class="text-white font-bold text-sm leading-tight">Atención profesional<br>24/7</span>
                 </div>
 
                 <div
-                    class="bg-white/5 border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:border-gold/50 hover:bg-white/10 transition-all group h-full">
+                    class="group relative overflow-hidden bg-gradient-to-b from-white/[0.09] to-white/[0.03] border border-gold/25 p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 shadow-lg shadow-black/20 hover:border-gold/70 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(212,175,55,0.55)] transition-all duration-300 h-full col-span-2 md:col-span-1">
+                    <span
+                        class="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold/80 to-transparent"></span>
                     <div
-                        class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold group-hover:scale-110 transition-transform">
-                        ✔</div>
+                        class="w-12 h-12 rounded-full bg-gradient-to-br from-[#F3D66B] to-gold text-navy flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)] group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1" />
+                            <circle cx="15" cy="7" r="2" />
+                            <circle cx="9" cy="12" r="2" />
+                            <circle cx="17" cy="17" r="2" />
+                        </svg>
+                    </div>
                     <span class="text-white font-bold text-sm leading-tight">Optimización<br>constante</span>
                 </div>
 
@@ -908,33 +961,142 @@
 
         </div>
     </section>
+    <section class="py-24 bg-navy" x-data="resenasReales()">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-gold font-bold tracking-widest uppercase text-sm mb-4 block">Reseñas reales en
+                    Airbnb</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Lo que dicen nuestros huéspedes</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Opiniones publicadas en Airbnb por huéspedes de los
+                    apartamentos que administramos. Por respeto a su privacidad, no mostramos sus nombres ni sus
+                    fotos.</p>
+            </div>
 
-    <section class="py-24 bg-navy" x-data="{ 
-        comentarios: [
-            { nombre: 'Carlos R.', inicial: 'C', color: 'navy', texto: 'Desde que entregué mi apartasuite a GestandoValor, mis ingresos subieron drásticamente y no tengo que hacer nada.' },
-            { nombre: 'Laura M.', inicial: 'L', color: 'gold', texto: 'Transparencia total. Me encanta que me mantienen al tanto del rendimiento y mi propiedad siempre está impecable.' },
-            { nombre: 'Andrés P.', inicial: 'A', color: 'navy', texto: 'Excelente gestión de precios dinámicos. Mi ocupación no ha bajado del 85%.' },
-            { nombre: 'Mariana G.', inicial: 'M', color: 'gold', texto: 'Me liberaron de todo el estrés operativo. El mantenimiento y limpieza son de primer nivel.' }
-        ]
-    }">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-16">Respaldado por propietarios reales</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                <template x-for="item in comentarios" :key="item.nombre">
+            <template x-for="apto in apartamentos" :key="apto.id">
+                <div
+                    class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start max-w-6xl mx-auto mb-16 last:mb-0">
+
                     <div
-                        class="bg-white p-10 rounded-[40px] shadow-2xl text-left hover:scale-[1.02] transition-transform">
-                        <p class="text-gray-600 italic mb-8 text-lg" x-text="'&quot;' + item.texto + '&quot;'"></p>
-                        <div class="flex items-center gap-4 border-t pt-6">
-                            <div :class="item.color === 'gold' ? 'bg-gold text-navy' : 'bg-navy text-white'"
-                                class="w-12 h-12 rounded-full flex items-center justify-center font-bold"
-                                x-text="item.inicial"></div>
-                            <p class="font-bold text-navy" x-text="item.nombre"></p>
+                        class="lg:col-span-2 bg-white/5 border border-gold/25 rounded-[32px] overflow-hidden shadow-2xl lg:sticky lg:top-28">
+                        <div class="grid grid-cols-2 gap-1">
+                            <img :src="imagen(apto.fotos[0], 1200)" @error="respaldo($event, apto.fotos[0])"
+                                :alt="'Foto del apartamento ' + apto.nombre" loading="lazy" decoding="async"
+                                class="col-span-2 w-full aspect-[4/3] object-cover bg-white/5">
+                            <img :src="imagen(apto.fotos[1], 640)" @error="respaldo($event, apto.fotos[1])"
+                                :alt="'Otra foto del apartamento ' + apto.nombre" loading="lazy" decoding="async"
+                                class="w-full aspect-[4/3] object-cover bg-white/5">
+                            <img :src="imagen(apto.fotos[2], 640)" @error="respaldo($event, apto.fotos[2])"
+                                :alt="'Otra foto del apartamento ' + apto.nombre" loading="lazy" decoding="async"
+                                class="w-full aspect-[4/3] object-cover bg-white/5">
+                        </div>
+                        <div class="p-6 md:p-7 text-left">
+                            <p class="flex flex-wrap items-center gap-x-2 text-sm">
+                                <span class="flex items-center gap-1 text-gold font-extrabold text-base">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path
+                                            d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />
+                                    </svg>
+                                    <span x-text="apto.calificacion"></span>
+                                </span>
+                                <span class="text-gray-400"
+                                    x-text="'· ' + apto.totalResenas + ' reseñas en Airbnb'"></span>
+                            </p>
+                            <h3 class="text-white text-xl md:text-2xl font-extrabold mt-2 leading-snug"
+                                x-text="apto.nombre"></h3>
+                            <p class="text-gray-400 text-sm mt-1" x-text="apto.lugar"></p>
+                            <div class="flex flex-wrap items-center gap-x-5 gap-y-3 mt-6">
+                                <a :href="'suite.html?id=' + apto.id"
+                                    class="inline-flex items-center gap-2 bg-gold hover:bg-yellow-500 text-navy font-bold text-sm py-3 px-5 rounded-full transition-colors">
+                                    Ver este apartamento
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M5 12h14M13 6l6 6-6 6" />
+                                    </svg>
+                                </a>
+                                <a :href="apto.airbnb" target="_blank" rel="noopener"
+                                    class="text-sm text-gray-300 hover:text-gold underline underline-offset-4 transition-colors">Ver
+                                    las reseñas en Airbnb</a>
+                            </div>
                         </div>
                     </div>
-                </template>
-            </div>
+
+                    <div
+                        class="lg:col-span-3 flex sm:grid sm:grid-cols-2 gap-4 sm:gap-5 overflow-x-auto sm:overflow-visible snap-x snap-mandatory scroll-pl-6 sm:scroll-pl-0 -mx-6 px-6 sm:mx-0 sm:px-0 pb-2 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        <template x-for="(resena, indice) in apto.resenas" :key="indice">
+                            <figure
+                                class="shrink-0 w-[85%] sm:w-auto snap-start bg-white rounded-[28px] p-6 shadow-2xl text-left flex flex-col sm:hover:-translate-y-1 transition-transform">
+                                <div class="flex gap-0.5 text-gold" role="img" aria-label="5 de 5 estrellas">
+                                    <template x-for="n in 5" :key="n">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <path
+                                                d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />
+                                        </svg>
+                                    </template>
+                                </div>
+                                <blockquote class="text-gray-700 mt-3 leading-relaxed flex-1"
+                                    x-text="'“' + resena.texto + '”'"></blockquote>
+                                <figcaption class="flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+                                    <img :src="imagen(apto.fotos[1], 640)" @error="respaldo($event, apto.fotos[1])"
+                                        alt="" loading="lazy" decoding="async"
+                                        class="w-11 h-11 rounded-xl object-cover shrink-0 bg-gray-100">
+                                    <div class="min-w-0">
+                                        <p class="text-navy font-bold text-sm leading-snug"
+                                            x-text="'Huésped del ' + apto.corto"></p>
+                                        <p class="text-gray-500 text-xs" x-text="resena.estadia + ' · ' + resena.fecha">
+                                        </p>
+                                    </div>
+                                </figcaption>
+                            </figure>
+                        </template>
+                    </div>
+                    <p class="sm:hidden text-center text-xs text-gray-400 -mt-2">Desliza para ver más reseñas →</p>
+                </div>
+            </template>
         </div>
     </section>
+
+    <script>
+        // Reseñas reales publicadas en Airbnb, con fotos del mismo apartamento.
+        // Sin nombres ni fotos de los huéspedes. Para sumar otro apartamento, copia el bloque
+        // de "apartamentos" y cambia su id, nombre, fotos y reseñas.
+        function resenasReales() {
+            const FOTOS = 'https://ntmoegfmcmzvzzzhjwnd.supabase.co/storage/v1/object/public/fotos-propiedades/';
+            return {
+                apartamentos: [
+                    {
+                        id: '71df6a1a-d8d5-40ef-9ac4-1da9c3addec9',
+                        nombre: 'LOFT moderno | Vista ciudad | atardeceres',
+                        corto: 'LOFT moderno',
+                        lugar: 'Apartaestudio en Chía, Cundinamarca',
+                        calificacion: '4.95',
+                        totalResenas: 38,
+                        airbnb: 'https://www.airbnb.com.co/rooms/1268315321057594320',
+                        fotos: [
+                            FOTOS + '71df6a1a-d8d5-40ef-9ac4-1da9c3addec9/1790615190777-mskjgj.jpg',
+                            FOTOS + '71df6a1a-d8d5-40ef-9ac4-1da9c3addec9/1790615166363-prdxyl.jpg',
+                            FOTOS + '71df6a1a-d8d5-40ef-9ac4-1da9c3addec9/1790615177494-6xbo1f.jpg'
+                        ],
+                        resenas: [
+                            { texto: 'Excelente sitio para quedarse, la zona es muy bonita, muchos sitios para visitar cerca, el edificio es moderno, clima frío delicioso, volveremos sin dudarlo.', estadia: 'Estadía de varias noches', fecha: 'septiembre de 2026' },
+                            { texto: 'Muy buen lugar para estancias cortas, cuenta con comodidades integrales y una gran vista.', estadia: 'Estadía de varias noches', fecha: 'septiembre de 2026' },
+                            { texto: 'Excelente estancia y excelente recepción, siempre contestando y solucionando cosas que necesitamos. Muy amables y atentos.', estadia: 'Viaje con niños', fecha: 'septiembre de 2026' },
+                            { texto: 'El lugar es muy céntrico para casi todo, el lugar es cómodo, acogedor, limpio y tiene una gran vista al ingreso de Chía. Los dueños siempre me respondieron cuando necesité…', estadia: 'Viaje con niños', fecha: 'septiembre de 2026' },
+                            { texto: 'Un lugar muy bonito, agradable, limpio y estratégico.', estadia: 'Estadía de una noche', fecha: 'junio de 2026' },
+                            { texto: 'Limpio, bien mantenido.', estadia: 'Estadía de varias noches', fecha: 'junio de 2026' }
+                        ]
+                    }
+                ],
+                // Las fotos pasan por el optimizador de Vercel (más livianas). Si no responde, se usa la original.
+                imagen(url, ancho) {
+                    return '/_vercel/image?url=' + encodeURIComponent(url) + '&w=' + ancho + '&q=70';
+                },
+                respaldo(evento, url) {
+                    if (evento.target.src !== url) evento.target.src = url;
+                }
+            };
+        }
+    </script>
 
     <section id="contacto" class="pt-32 pb-24 bg-white text-center border-t border-gray-100 rounded-t-[80px]">
         <div class="max-w-4xl mx-auto px-6">
@@ -1320,7 +1482,7 @@
                         <h2 class="text-xl font-bold text-navy">POLÍTICA DE PRIVACIDAD Y TRATAMIENTO DE DATOS PERSONALES
                         </h2>
                         <p class="font-bold text-navy">Gestando Valor – www.gestandovalor.com</p>
-                        <p class="text-sm text-gray-500">Última actualización: 02/03/2026</p>
+                        <p class="text-sm text-gray-500">Última actualización: 30/09/2026</p>
                     </div>
                     <p>En <strong>Gestando Valor</strong> valoramos tu confianza. Por eso protegemos tu información
                         personal y la tratamos de forma responsable, transparente y segura, de acuerdo con la
@@ -1369,7 +1531,7 @@
                     <ul class="list-disc pl-5 space-y-1">
                         <li>Dirección IP</li>
                         <li>Tipo de dispositivo y navegador</li>
-                        <li>Información de navegación y cookies</li>
+                        <li>Datos guardados en tu navegador para que el sitio funcione (ver punto 5)</li>
                     </ul>
 
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">3. ¿Para qué usamos tus datos?</h3>
@@ -1391,10 +1553,22 @@
                     </p>
                     <p>Puedes revocar esta autorización en cualquier momento.</p>
 
-                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">5. Uso de cookies</h3>
-                    <p>Nuestro sitio web utiliza cookies para mejorar la navegación, analizar el uso del sitio y
-                        ofrecerte una mejor experiencia. Puedes aceptar, rechazar o configurar las cookies desde tu
-                        navegador cuando lo desees.</p>
+                    <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">5. Cookies y almacenamiento en el
+                        navegador</h3>
+                    <p>Este sitio web no usa cookies propias ni herramientas de analítica, publicidad o
+                        seguimiento.</p>
+                    <p>Para que el sitio funcione, guardamos en tu navegador solo lo necesario: la sesión (y
+                        algunos borradores de trabajo) de propietarios y personal autorizado cuando inician
+                        sesión, los datos de tu reserva mientras terminas el pago, y una copia de la lista de
+                        destinos y del blog para que las páginas carguen más rápido. Esta información se queda
+                        en tu dispositivo, no se usa para seguirte y puedes borrarla cuando quieras desde la
+                        configuración de tu navegador.</p>
+                    <p>Algunos servicios externos que usa el sitio pueden usar sus propias cookies técnicas o de
+                        seguridad, según sus políticas: por ejemplo, el servicio que aloja las fotos de los
+                        alojamientos, que usa una cookie para protegerse del tráfico automatizado, y la pasarela
+                        de pagos Bold, que interviene cuando pagas en línea.</p>
+                    <p>Si en el futuro agregamos herramientas de analítica o publicidad, actualizaremos esta
+                        política y te pediremos permiso antes de activarlas.</p>
 
                     <h3 class="text-lg font-bold text-navy mt-8 border-b pb-2">6. ¿Compartimos tu información?</h3>
                     <p>Solo compartimos tus datos cuando es necesario para prestar el servicio, por ejemplo con:</p>
