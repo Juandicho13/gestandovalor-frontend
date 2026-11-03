@@ -1694,8 +1694,13 @@
                 },
 
                 calcularNoches(date1, date2) {
-                    const diffTime = Math.abs(date2 - date1);
-                    this.noches = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    // Contamos DIAS DE CALENDARIO, no milisegundos.
+                    // Antes usabamos Math.ceil sobre la resta cruda: bastaba con que una
+                    // de las dos fechas trajera hora (la del reloj al tocar el calendario,
+                    // o un cambio de horario del pais del huesped) para que la fraccion
+                    // subiera a la noche siguiente. Asi 5 noches se cobraban como 6.
+                    const soloDia = (d) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+                    this.noches = Math.max(0, Math.round((soloDia(date2) - soloDia(date1)) / 86400000));
                 },
 
                 iniciarMapa() {
@@ -1866,19 +1871,52 @@
                     };
                 },
 
+                // Las partes del total, para que el mensaje muestre de donde sale cada peso
+                desgloseDelTotal() {
+                    const partes = [];
+                    const subtotal = this.calcularSubtotalNoches();
+                    const promedio = this.noches > 0 ? Math.round(subtotal / this.noches) : 0;
+                    partes.push(`${this.noches} noche${this.noches === 1 ? '' : 's'} x ${this.formatearDinero(promedio)} = ${this.formatearDinero(subtotal)}`);
+
+                    const pagadores = this.adults + this.children;
+                    const base = this.propiedad.huespedes_base || 1;
+                    if (pagadores > base) {
+                        const extras = pagadores - base;
+                        const costo = extras * (this.propiedad.precio_huesped_extra || 0) * this.noches;
+                        if (costo > 0) partes.push(`${extras} huésped(es) extra x ${this.noches} noche(s) = ${this.formatearDinero(costo)}`);
+                    }
+
+                    const mascotas = (this.propiedad.precio_mascota || 0) * this.pets * this.noches;
+                    if (mascotas > 0) partes.push(`Mascota(s) x ${this.noches} noche(s) = ${this.formatearDinero(mascotas)}`);
+
+                    const aseo = this.propiedad.tarifa_aseo || 0;
+                    if (aseo > 0) partes.push(`Tarifa de aseo = ${this.formatearDinero(aseo)}`);
+
+                    return partes;
+                },
+
                 mensajeTransferencia(datos) {
                     const noches = this.noches === 1 ? '1 noche' : `${this.noches} noches`;
-                    let texto = `¡Hola! 👋 Acabo de registrar mi reserva y quiero coordinar mi transferencia:\n\n`;
-                    texto += `🏨 *Alojamiento:* ${this.propiedad.titulo}\n`;
-                    texto += `📅 *Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${noches})\n`;
-                    texto += `👤 *Adultos:* ${datos.adultos}\n`;
-                    if (datos.ninos > 0) texto += `👦 *Niños:* ${datos.ninos}\n`;
-                    if (datos.bebes > 0) texto += `👶 *Bebés:* ${datos.bebes}\n`;
-                    if (datos.mascotas > 0) texto += `🐾 *Mascotas:* ${datos.mascotas}\n`;
-                    texto += `💰 *Total a pagar:* ${datos.totalStr}\n\n`;
-                    texto += `🙋 *A nombre de:* ${datos.nombre}\n`;
-                    texto += `📱 *Celular:* ${datos.telefono}\n`;
-                    texto += `✉️ *Correo:* ${datos.email}`;
+
+                    // Sin emojis a proposito: en el camino hasta WhatsApp se estaban
+                    // rompiendo y llegaban como rombos negros con interrogacion.
+                    let texto = `Hola! Acabo de registrar mi reserva y quiero coordinar mi transferencia:\n\n`;
+                    texto += `*Alojamiento:* ${this.propiedad.titulo}\n`;
+                    texto += `*Fechas:* ${this.checkinLabel} al ${this.checkoutLabel} (${noches})\n`;
+
+                    const quienes = [`${datos.adultos} adulto${datos.adultos === 1 ? '' : 's'}`];
+                    if (datos.ninos > 0) quienes.push(`${datos.ninos} niño${datos.ninos === 1 ? '' : 's'}`);
+                    if (datos.bebes > 0) quienes.push(`${datos.bebes} bebé${datos.bebes === 1 ? '' : 's'}`);
+                    if (datos.mascotas > 0) quienes.push(`${datos.mascotas} mascota${datos.mascotas === 1 ? '' : 's'}`);
+                    texto += `*Huéspedes:* ${quienes.join(', ')}\n\n`;
+
+                    texto += `*Desglose:*\n`;
+                    this.desgloseDelTotal().forEach(p => { texto += `- ${p}\n`; });
+                    texto += `*TOTAL A PAGAR: ${datos.totalStr}*\n\n`;
+
+                    texto += `*A nombre de:* ${datos.nombre}\n`;
+                    texto += `*Celular:* ${datos.telefono}\n`;
+                    texto += `*Correo:* ${datos.email}`;
                     return texto;
                 },
 
