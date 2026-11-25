@@ -1476,7 +1476,9 @@
                     let d1 = new Date(this.formReserva.check_in + "T12:00:00");
                     let d2 = new Date(this.formReserva.check_out + "T12:00:00");
 
-                    let diffDays = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
+                    // Dias de calendario, inmune a la hora y al cambio de horario.
+                    const soloDia = (x) => Date.UTC(x.getFullYear(), x.getMonth(), x.getDate());
+                    let diffDays = Math.round((soloDia(d2) - soloDia(d1)) / 86400000);
                     if (diffDays < 1) diffDays = 1;
 
                     let baseGuests = prop.huespedes_base || 1;

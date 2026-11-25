@@ -422,7 +422,8 @@
 
                         // Si hay Check-In hoy
                         if (checkInStr === hoyStr) {
-                            const noches = Math.ceil((new Date(res.check_out) - new Date(res.check_in)) / (1000 * 60 * 60 * 24));
+                            const soloDia = (d) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+                            const noches = Math.max(0, Math.round((soloDia(new Date(res.check_out)) - soloDia(new Date(res.check_in))) / 86400000));
                             logs.push({
                                 id: 'in_' + res.id,
                                 tipo: 'CHECK-IN',
@@ -485,7 +486,8 @@
                             let fechaInicio = checkIn < new Date(anioActual, mesActual, 1) ? new Date(anioActual, mesActual, 1) : checkIn;
                             let fechaFin = checkOut > new Date(anioActual, mesActual + 1, 0) ? new Date(anioActual, mesActual + 1, 0) : checkOut;
 
-                            let noches = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24));
+                            const soloDiaOcup = (d) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+                            let noches = Math.round((soloDiaOcup(fechaFin) - soloDiaOcup(fechaInicio)) / 86400000);
                             if (noches > 0) nochesOcupadas += noches;
                         }
                     });

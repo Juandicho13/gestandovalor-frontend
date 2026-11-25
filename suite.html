@@ -1330,6 +1330,13 @@
             return `${y}-${m}-${day}`;
         }
 
+        // La fecha 'AAAA-MM-DD' que tiene una reserva EN COLOMBIA, sin importar en que pais
+        // este el huesped. Antes se usaba la fecha del navegador y desde Asia u Oceania las
+        // noches ocupadas salian corridas un dia. Colombia es UTC-5 todo el ano.
+        function fechaColombia(iso) {
+            return new Date(new Date(iso).getTime() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+        }
+
         function suiteApp() {
             return {
                 cargando: true,
@@ -1648,8 +1655,8 @@
 
                     // Las reservas que ya existen, como fechas de texto 'AAAA-MM-DD'
                     const otras = this.reservasFechas.map(r => ({
-                        llegada: getLocalDateString(new Date(r.check_in)),
-                        salida: getLocalDateString(new Date(r.check_out))
+                        llegada: fechaColombia(r.check_in),
+                        salida: fechaColombia(r.check_out)
                     }));
 
                     const aTexto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1783,20 +1790,18 @@
                     const outTime = new Date(checkOutStr + "T12:00:00").getTime();
 
                     return this.reservasFechas.some(res => {
-                        const resInTime = new Date(getLocalDateString(new Date(res.check_in)) + "T12:00:00").getTime();
-                        const resOutTime = new Date(getLocalDateString(new Date(res.check_out)) + "T12:00:00").getTime();
+                        const resInTime = new Date(fechaColombia(res.check_in) + "T12:00:00").getTime();
+                        const resOutTime = new Date(fechaColombia(res.check_out) + "T12:00:00").getTime();
                         return (inTime < resOutTime) && (outTime > resInTime);
                     });
                 },
 
                 obtenerPrecioPorDia(fechaStr) {
                     if (!fechaStr) return this.propiedad.precio_noche;
-                    const f = new Date(fechaStr + "T12:00:00").getTime();
-                    let tarifaEspecial = (this.propiedad.tarifas_especiales || []).find(t => {
-                        const tIn = new Date(t.fecha_inicio).getTime();
-                        const tOut = new Date(t.fecha_fin).getTime();
-                        return f >= tIn && f <= tOut;
-                    });
+                    // Se comparan FECHAS de Colombia, no horas: asi el precio especial aplica
+                    // los mismos dias sin importar desde que pais se mire la pagina.
+                    let tarifaEspecial = (this.propiedad.tarifas_especiales || []).find(t =>
+                        fechaStr >= fechaColombia(t.fecha_inicio) && fechaStr <= fechaColombia(t.fecha_fin));
                     return tarifaEspecial ? tarifaEspecial.precio : (this.propiedad.precio_noche || 0);
                 },
 
@@ -1923,11 +1928,11 @@
                     if (pagadores > base) {
                         const extras = pagadores - base;
                         const costo = extras * (this.propiedad.precio_huesped_extra || 0) * this.noches;
-                        if (costo > 0) partes.push(`${extras} huésped(es) extra x ${this.noches} noche(s) = ${this.formatearDinero(costo)}`);
+                        if (costo > 0) partes.push(`${extras} ${extras === 1 ? 'huésped' : 'huéspedes'} extra x ${this.noches} ${this.noches === 1 ? 'noche' : 'noches'} = ${this.formatearDinero(costo)}`);
                     }
 
                     const mascotas = (this.propiedad.precio_mascota || 0) * this.pets * this.noches;
-                    if (mascotas > 0) partes.push(`Mascota(s) x ${this.noches} noche(s) = ${this.formatearDinero(mascotas)}`);
+                    if (mascotas > 0) partes.push(`${this.pets} ${this.pets === 1 ? 'mascota' : 'mascotas'} x ${this.noches} ${this.noches === 1 ? 'noche' : 'noches'} = ${this.formatearDinero(mascotas)}`);
 
                     const aseo = this.propiedad.tarifa_aseo || 0;
                     if (aseo > 0) partes.push(`Tarifa de aseo = ${this.formatearDinero(aseo)}`);

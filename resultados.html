@@ -623,20 +623,21 @@
 
                 calcularNoches() {
                     if (!this.filtros.in || !this.filtros.out) return 0;
+                    // Dias de calendario. Con Math.ceil bastaba un cambio de horario
+                    // en el pais del huesped para que 5 noches se vieran como 6.
                     const d1 = new Date(this.filtros.in + "T12:00:00");
                     const d2 = new Date(this.filtros.out + "T12:00:00");
-                    const diffTime = Math.abs(d2 - d1);
-                    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const soloDia = (d) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+                    return Math.max(0, Math.round((soloDia(d2) - soloDia(d1)) / 86400000));
                 },
 
                 obtenerPrecioPorDia(prop, fechaStr) {
                     if (!fechaStr) return prop.precio_noche;
-                    const f = new Date(fechaStr + "T12:00:00").getTime();
-                    let tarifaEspecial = (prop.tarifas_especiales || []).find(t => {
-                        const tIn = new Date(t.fecha_inicio).getTime();
-                        const tOut = new Date(t.fecha_fin).getTime();
-                        return f >= tIn && f <= tOut;
-                    });
+                    // Se comparan FECHAS de Colombia, no horas: asi el precio especial aplica
+                    // los mismos dias sin importar desde que pais se mire la pagina.
+                    const enColombia = (iso) => new Date(new Date(iso).getTime() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+                    let tarifaEspecial = (prop.tarifas_especiales || []).find(t =>
+                        fechaStr >= enColombia(t.fecha_inicio) && fechaStr <= enColombia(t.fecha_fin));
                     return tarifaEspecial ? tarifaEspecial.precio : (prop.precio_noche || 0);
                 },
 
