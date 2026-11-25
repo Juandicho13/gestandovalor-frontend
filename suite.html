@@ -1646,27 +1646,67 @@
                 initCalendario(defaultIn, defaultOut) {
                     const that = this;
 
-                    const deshabilitadas = this.reservasFechas.map(r => ({
-                        from: getLocalDateString(new Date(r.check_in)),
-                        to: new Date(new Date(r.check_out).getTime() - 86400000).toISOString().split('T')[0]
+                    // Las reservas que ya existen, como fechas de texto 'AAAA-MM-DD'
+                    const otras = this.reservasFechas.map(r => ({
+                        llegada: getLocalDateString(new Date(r.check_in)),
+                        salida: getLocalDateString(new Date(r.check_out))
                     }));
 
-                    flatpickr("#suite-calendar", {
+                    const aTexto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+                    // Una reserva ocupa NOCHES, no dias. Si alguien llega el 10 y sale el 15,
+                    // ocupa las noches del 10 al 14: el 15 puede llegar otro huesped y el 10
+                    // puede SALIR otro. Antes el calendario apagaba el dia 10 completo y nadie
+                    // podia terminar su estadia ese dia, asi que esas noches se quedaban sin vender.
+                    const nocheOcupada = (dia) => otras.some(r => dia >= r.llegada && dia < r.salida);
+                    const noPuedeSalirEse = (dia) => otras.some(r => dia > r.llegada && dia <= r.salida);
+
+                    let fp = null;
+                    let permitidas = [defaultIn, defaultOut].filter(Boolean); // las fechas que vienen en el enlace
+
+                    const bloqueado = (fecha) => {
+                        const dia = aTexto(fecha);
+                        const elegidas = fp ? fp.selectedDates.map(aTexto) : [];
+
+                        // Ya se eligio la llegada y falta la salida
+                        if (elegidas.length === 1) {
+                            const llegada = elegidas[0];
+                            if (dia === llegada) return false;
+                            if (dia > llegada) return noPuedeSalirEse(dia);
+                            return nocheOcupada(dia);
+                        }
+
+                        // Sin fechas, o con las dos ya elegidas: se esta escogiendo una llegada
+                        if (permitidas.includes(dia)) return false;
+                        return nocheOcupada(dia);
+                    };
+
+                    fp = flatpickr("#suite-calendar", {
                         mode: "range",
                         minDate: "today",
                         dateFormat: "Y-m-d",
                         defaultDate: [defaultIn, defaultOut].filter(Boolean),
-                        disable: deshabilitadas,
+                        disable: [bloqueado],
                         locale: "es",
                         showMonths: window.innerWidth > 768 ? 2 : 1,
                         disableMobile: "true",
                         onChange: function (selectedDates, dateStr, instance) {
+                            // Si tocan como llegada un dia cuya noche ya esta ocupada, se limpia
+                            if (selectedDates.length === 1 && nocheOcupada(aTexto(selectedDates[0]))) {
+                                permitidas = [];
+                                instance.clear();
+                                return;
+                            }
+                            if (selectedDates.length < 2) permitidas = [];
+
                             if (selectedDates.length === 2) {
                                 that.checkinRaw = instance.formatDate(selectedDates[0], "Y-m-d");
-                                pattern = that.checkoutRaw = instance.formatDate(selectedDates[1], "Y-m-d");
+                                that.checkoutRaw = instance.formatDate(selectedDates[1], "Y-m-d");
                                 that.checkinLabel = instance.formatDate(selectedDates[0], "d M");
                                 that.checkoutLabel = instance.formatDate(selectedDates[1], "d M");
                                 that.calcularNoches(selectedDates[0], selectedDates[1]);
+                                permitidas = [that.checkinRaw, that.checkoutRaw];
+                                instance.redraw();
                             } else {
                                 that.checkinRaw = ''; that.checkoutRaw = '';
                                 that.checkinLabel = ''; that.checkoutLabel = '';

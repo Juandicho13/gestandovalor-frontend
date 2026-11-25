@@ -1540,26 +1540,64 @@
                 initFlatpickrReserva(defaultDates = []) {
                     const that = this;
 
-                    const deshabilitadas = this.reservasModal
+                    // Las otras reservas del apartamento, como fechas de texto 'AAAA-MM-DD'
+                    const otras = this.reservasModal
                         .filter(r => r.id !== this.formReserva.id)
-                        .map(r => ({
-                            from: getLocalDateString(r.check_in),
-                            to: new Date(new Date(r.check_out).getTime() - 86400000).toISOString().split('T')[0]
-                        }));
+                        .map(r => ({ llegada: getLocalDateString(r.check_in), salida: getLocalDateString(r.check_out) }));
+
+                    const aTexto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+                    // Una reserva ocupa NOCHES, no dias. Si alguien llega el 10 y sale el 15,
+                    // ocupa las noches del 10 al 14. Por eso:
+                    //  - el dia 15 queda libre para que llegue otro huesped (ya lo estaba)
+                    //  - el dia 10 queda libre para que SALGA otro huesped (esto era lo que fallaba:
+                    //    el calendario apagaba el dia 10 completo y no dejaba terminar ahi una reserva)
+                    const nocheOcupada = (dia) => otras.some(r => dia >= r.llegada && dia < r.salida);
+                    const noPuedeSalirEse = (dia) => otras.some(r => dia > r.llegada && dia <= r.salida);
+
+                    let fp = null;                                   // el calendario, cuando ya exista
+                    let permitidas = (defaultDates || []).filter(Boolean); // fechas que ya vienen elegidas y validadas
+
+                    const bloqueado = (fecha) => {
+                        const dia = aTexto(fecha);
+                        const elegidas = fp ? fp.selectedDates.map(aTexto) : [];
+
+                        // Ya se eligio la llegada y falta la salida
+                        if (elegidas.length === 1) {
+                            const llegada = elegidas[0];
+                            if (dia === llegada) return false;
+                            if (dia > llegada) return noPuedeSalirEse(dia);
+                            return nocheOcupada(dia);
+                        }
+
+                        // Sin fechas, o con las dos ya elegidas: se esta escogiendo una llegada
+                        if (permitidas.includes(dia)) return false;
+                        return nocheOcupada(dia);
+                    };
 
                     setTimeout(() => {
                         if (this.fpModal) this.fpModal.destroy();
-                        this.fpModal = flatpickr("#modal-calendar", {
+                        fp = null;
+                        this.fpModal = fp = flatpickr("#modal-calendar", {
                             mode: "range",
                             dateFormat: "Y-m-d",
                             defaultDate: defaultDates,
                             locale: "es",
-                            disable: deshabilitadas,
+                            disable: [bloqueado],
                             onChange: function (selectedDates, dateStr, instance) {
+                                // Si tocan como llegada un dia cuya noche ya esta ocupada, se limpia
+                                if (selectedDates.length === 1 && nocheOcupada(aTexto(selectedDates[0]))) {
+                                    permitidas = [];
+                                    instance.clear();
+                                    return;
+                                }
+                                if (selectedDates.length < 2) permitidas = [];
+
                                 if (selectedDates.length === 2) {
                                     if (selectedDates[0].getTime() === selectedDates[1].getTime()) {
                                         let nextDay = new Date(selectedDates[0]);
                                         nextDay.setDate(nextDay.getDate() + 1);
+                                        permitidas = [aTexto(selectedDates[0]), aTexto(nextDay)];
                                         instance.setDate([selectedDates[0], nextDay], true);
                                         return;
                                     }
@@ -1569,6 +1607,7 @@
 
                                     if (that.haySuperposicion(chkIn, chkOut, that.formReserva.id, that.reservasModal)) {
                                         alert("⚠️ Las fechas seleccionadas chocan con una reserva existente. Por favor elige otras fechas.");
+                                        permitidas = [];
                                         instance.clear();
                                         that.formReserva.check_in = '';
                                         that.formReserva.check_out = '';
@@ -1576,9 +1615,11 @@
                                         return;
                                     }
 
+                                    permitidas = [chkIn, chkOut];
                                     that.formReserva.check_in = chkIn;
                                     that.formReserva.check_out = chkOut;
                                     that.recalcularTotal();
+                                    instance.redraw();
                                 }
                             }
                         });
